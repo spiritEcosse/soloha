@@ -52,4 +52,10 @@ DB_HOST = ''
 DB_PORT = ''
 DB_ATOMIC_REQUESTS = True
 
+DB_BACKEND_MYSQL = 'django.db.backends.mysql',
+DB_NAME_MYSQL = 'soloha',
+DB_USER_MYSQL = 'soloha',
+DB_PASSWORD_MYSQL = ''
+
+
 MY_SERVER = {'server': '78.24.216.187', 'path': '/home/igor/web/www/cinema/', 'venv': '.env/bin/activate'}

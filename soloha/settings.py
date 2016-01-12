@@ -104,10 +104,10 @@ DATABASES = {
         'ATOMIC_REQUESTS': settings_local.DB_ATOMIC_REQUESTS,
     },
     'mysql': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'ocstore',
-        'USER': 'root',
-        'PASSWORD': '1111'
+        'ENGINE': settings_local.DB_BACKEND_MYSQL,
+        'NAME': settings_local.DB_NAME_MYSQL,
+        'USER': settings_local.DB_USER_MYSQL,
+        'PASSWORD': settings_local.DB_PASSWORD_MYSQL
     }
 }
 
