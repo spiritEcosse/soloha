@@ -4,10 +4,10 @@
 # PYTHONPATH=. DJANGO_SETTINGS_MODULE=cinema.settings tornado_main.py
 
 import os
-from cinema.settings import PROJECT_NAME
+from soloha.settings import PROJECT_NAME
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "%s.settings" % PROJECT_NAME)
-from cinema.settings_local import AUTORELOAD
+from soloha.settings_local import AUTORELOAD
 
 from tornado.options import options, define, parse_command_line
 import django.core.handlers.wsgi
@@ -15,11 +15,12 @@ import tornado.httpserver
 import tornado.ioloop
 import tornado.web
 import tornado.wsgi
+
 if django.VERSION[1] > 5:
     django.setup()
 import logging
 
-define('port', type=int, default=4444)
+define('port', type=int, default=8213)
 
 
 def main():
