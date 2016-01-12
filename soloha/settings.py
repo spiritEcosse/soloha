@@ -107,7 +107,10 @@ DATABASES = {
         'ENGINE': settings_local.DB_BACKEND_MYSQL,
         'NAME': settings_local.DB_NAME_MYSQL,
         'USER': settings_local.DB_USER_MYSQL,
-        'PASSWORD': settings_local.DB_PASSWORD_MYSQL
+        'PASSWORD': settings_local.DB_PASSWORD_MYSQL,
+        'HOST': settings_local.DB_HOST_MYSQL,
+        'POST': settings_local.DB_PORT_MYSQL,
+        'ATOMIC_REQUESTS': settings_local.DB_ATOMIC_REQUESTS_MYSQL,
     }
 }
 
