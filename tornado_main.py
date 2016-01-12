@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 # Run this with
-# PYTHONPATH=. DJANGO_SETTINGS_MODULE=cinema.settings tornado_main.py
+# PYTHONPATH=. DJANGO_SETTINGS_MODULE=soloha.settings tornado_main.py
 
 import os
 from soloha.settings import PROJECT_NAME
