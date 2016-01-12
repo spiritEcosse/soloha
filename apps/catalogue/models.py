@@ -3,6 +3,7 @@ from oscar.apps.catalogue.abstract_models import AbstractProduct, AbstractCatego
 from django.utils.translation import ugettext_lazy as _
 from django.core.cache import cache
 from django.core.urlresolvers import reverse
+from django.utils.translation import pgettext_lazy
 
 
 class CategoryEnable(models.Manager):
@@ -17,6 +18,7 @@ class Category(AbstractCategory):
     meta_description = models.TextField(verbose_name=_('Meta tag: description'), blank=True)
     meta_keywords = models.TextField(verbose_name=_('Meta tag: keywords'), blank=True)
     sort = models.IntegerField(blank=True, null=True)
+    name = models.CharField(_('Name'), max_length=500, db_index=True)
     objects = CategoryEnable()
 
     def get_absolute_url(self):
@@ -39,6 +41,7 @@ class Product(AbstractProduct):
     meta_title = models.CharField(verbose_name=_('Meta tag: title'), blank=True, max_length=255)
     meta_description = models.TextField(verbose_name=_('Meta tag: description'), blank=True)
     meta_keywords = models.TextField(verbose_name=_('Meta tag: keywords'), blank=True)
+    title = models.CharField(pgettext_lazy(u'Product title', u'Title'), max_length=500, blank=True)
 
     def get_absolute_url(self):
         """
