@@ -18,7 +18,6 @@ class Category(AbstractCategory):
     meta_description = models.TextField(verbose_name=_('Meta tag: description'), blank=True)
     meta_keywords = models.TextField(verbose_name=_('Meta tag: keywords'), blank=True)
     sort = models.IntegerField(blank=True, null=True)
-    name = models.CharField(_('Name'), max_length=500, db_index=True)
     objects = CategoryEnable()
 
     def get_absolute_url(self):
@@ -26,7 +25,7 @@ class Category(AbstractCategory):
         url = cache.get(cache_key)
 
         if not url:
-            url = reverse('catalogue:category', kwargs={'category_slug': self.full_slug})
+            url = reverse('category', kwargs={'category_slug': self.full_slug})
             cache.set(cache_key, url)
         return url
 
@@ -41,12 +40,12 @@ class Product(AbstractProduct):
     meta_title = models.CharField(verbose_name=_('Meta tag: title'), blank=True, max_length=255)
     meta_description = models.TextField(verbose_name=_('Meta tag: description'), blank=True)
     meta_keywords = models.TextField(verbose_name=_('Meta tag: keywords'), blank=True)
-    title = models.CharField(pgettext_lazy(u'Product title', u'Title'), max_length=500, blank=True)
 
     def get_absolute_url(self):
         """
         Return a product's absolute url
         """
-        return reverse('catalogue:detail', kwargs={'product_slug': self.slug})
+        category_slug = self.categories.get().full_slug
+        return reverse('detail', kwargs={'slug': self.slug, 'category_slug': category_slug})
 
 from oscar.apps.catalogue.models import *

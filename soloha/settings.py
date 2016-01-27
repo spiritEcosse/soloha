@@ -22,6 +22,9 @@ from oscar import get_core_apps
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_NAME = os.path.basename(BASE_DIR)
 
+location = lambda x: os.path.join(
+    os.path.dirname(os.path.realpath(__file__)), x)
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/
 
@@ -111,7 +114,16 @@ DATABASES = {
         'HOST': settings_local.DB_HOST_MYSQL,
         'POST': settings_local.DB_PORT_MYSQL,
         'ATOMIC_REQUESTS': settings_local.DB_ATOMIC_REQUESTS_MYSQL,
-    }
+    },
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.sqlite3',
+    #     'NAME': location('db.sqlite3'),
+    #     'USER': '',
+    #     'PASSWORD': '',
+    #     'HOST': '',
+    #     'PORT': '',
+    #     'ATOMIC_REQUESTS': True
+    # },
 }
 
 # Internationalization
@@ -180,9 +192,10 @@ AUTHENTICATION_BACKENDS = (
 
 HAYSTACK_CONNECTIONS = {
     'default': {
-        'ENGINE': 'haystack.backends.solr_backend.SolrEngine',
-        'URL': 'http://127.0.0.1:8983/solr',
-        'INCLUDE_SPELLING': True,
+        'ENGINE': 'haystack.backends.simple_backend.SimpleEngine',
+        # 'ENGINE': 'haystack.backends.solr_backend.SolrEngine',
+        # 'URL': 'http://127.0.0.1:8983/solr',
+        # 'INCLUDE_SPELLING': True,
     },
 }
 
