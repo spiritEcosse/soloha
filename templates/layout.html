@@ -1,0 +1,22 @@
+{% extends "promotions/new-homeview.html" %}
+{% load staticfiles %}
+
+{# Local scripts #}
+{% block scripts %}
+    {{ block.super }}
+    <!-- Oscar -->
+    <script src="{% static "oscar/js/oscar/ui.js" %}" type="text/javascript" charset="utf-8"></script>
+
+    <script src="{% static "oscar/js/bootstrap-datetimepicker/bootstrap-datetimepicker.js" %}" type="text/javascript" charset="utf-8"></script>
+    <script src="{% static "oscar/js/bootstrap-datetimepicker/locales/bootstrap-datetimepicker.all.js" %}" type="text/javascript" charset="utf-8"></script>
+{% endblock %}
+
+{% block extrascripts %}
+    {% include "partials/extrascripts.html" %}
+    {{ block.super }}
+{% endblock %}
+
+{% block onbodyload %}
+    {{ block.super }}
+    oscar.init();
+{% endblock %}

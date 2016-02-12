@@ -4,6 +4,9 @@ from django.utils.translation import ugettext_lazy as _
 from django.core.cache import cache
 from django.core.urlresolvers import reverse
 from django.utils.translation import pgettext_lazy
+from django.core.exceptions import ObjectDoesNotExist
+from django.utils.html import strip_entities
+from easy_thumbnails.files import get_thumbnailer
 
 
 class CategoryEnable(models.Manager):
@@ -45,7 +48,25 @@ class Product(AbstractProduct):
         """
         Return a product's absolute url
         """
-        category_slug = self.categories.get().full_slug
-        return reverse('detail', kwargs={'slug': self.slug, 'category_slug': category_slug})
+        kw = {'slug': self.slug}
 
+        try:
+            category_slug = self.categories.get().full_slug
+        except ObjectDoesNotExist:
+            pass
+        else:
+            kw['category_slug'] = category_slug
+
+        return reverse('detail', kwargs=kw)
+
+    def get_values(self):
+        values = dict()
+        values['title'] = strip_entities(self.title)
+        # values['absolute_url'] = self.get_absolute_url()
+        options = {'size': (220, 165), 'crop': True}
+        values['image'] = get_thumbnailer(self.primary_image()).get_thumbnail(options).url
+        return values
+
+
+# class
 from oscar.apps.catalogue.models import *

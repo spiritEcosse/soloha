@@ -5,6 +5,7 @@ import os
 from soloha.settings import BASE_DIR, PROJECT_NAME
 from fabric.state import env
 from soloha.settings_local import MY_SERVER
+
 env.user = 'root'
 env.skip_bad_hosts = True
 env.warn_only = False

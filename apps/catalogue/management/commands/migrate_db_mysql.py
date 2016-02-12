@@ -13,6 +13,7 @@ from oscar.apps.catalogue.categories import create_from_breadcrumbs
 from oscar.core.loading import get_class, get_classes
 from decimal import Decimal
 from django.core.exceptions import MultipleObjectsReturned
+from django.core.exceptions import ObjectDoesNotExist
 
 
 Category = get_model('catalogue', 'category')
@@ -76,9 +77,14 @@ class Command(BaseCommand):
 
                 if res:
                     slug = res[2]
-                    category = Category.objects.get(slug=slug)
-                    product_category = ProductCategory(product=product, category=category)
-                    product_category.save()
+
+                    try:
+                        category = Category.objects.get(slug=slug)
+                    except ObjectDoesNotExist:
+                        pass
+                    else:
+                        product_category = ProductCategory(product=product, category=category)
+                        product_category.save()
 
                 product.images.create(original=row.image)
                 partner_name = row.manufacturer_name
@@ -102,7 +108,6 @@ class Command(BaseCommand):
                 for display_order, image in enumerate(namedtuplefetchall(cursor), start=1):
                     product.images.create(original=image.image, display_order=display_order)
                 product.save()
-                return
 
         def save_category(parent_cat=None, parent_cat_id=0):
             cursor.execute("SELECT * FROM category as cat NATURAL JOIN category_description Inner JOIN url_alias "

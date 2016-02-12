@@ -1,0 +1,66 @@
+from django.test import TestCase
+from django.test import Client
+from django.core.urlresolvers import reverse
+from oscar.test import factories
+from oscar.apps.order.models import Line
+from django.core import serializers
+from apps.catalogue.models import Product
+from soloha.settings import MAX_COUNT_PRODUCT
+from apps.catalogue.models import ProductRecommendation
+from apps.promotions.views import RecommendView
+from django.utils.html import strip_entities
+import json
+from sorl.thumbnail import get_thumbnail
+
+
+class TestHomePage(TestCase):
+    def setUp(self):
+        self.client = Client()
+
+    def test_hits_product(self):
+        factories.create_order()
+        response = self.client.post(reverse('promotions:hits'), HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEqual(200, response.status_code)
+        # products = [line.product.get_value() for line in Line.objects.order_by('-product__date_created')[:MAX_COUNT_PRODUCT]]
+        # products = serializers.serialize("json", products)
+        # self.assertJSONEqual(response.content, products)
+
+    def test_new_product(self):
+        factories.create_product(title='Product 1')
+        factories.create_product(title='Product 2')
+        response = self.client.post(reverse('promotions:new'), HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEqual(200, response.status_code)
+        # products = Product.objects.order_by('-date_created')[:MAX_COUNT_PRODUCT]
+        # products = [product.get_values() for product in products]
+        # products = serializers.serialize("json", products)
+        # self.assertJSONEqual(response.content, products)
+
+    # def test_special_product(self):
+    #     factories.create_product()
+    #     response = self.client.post(reverse('promotions:special'), HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+    #     self.assertEqual(200, response.status_code)
+    #     # products = Product.objects.all()[:10]
+    #     # products = serializers.serialize("json", products)
+    #     # self.assertJSONEqual(response.content, products)
+
+    def test_recommend_product(self):
+        product_1 = factories.create_product(title='Product 1')
+        product_2 = factories.create_product(title='Product 2')
+        product_3 = factories.create_product(title='Product 3')
+        product_4 = factories.create_product(title='Product 4')
+        product_5 = factories.create_product(title='Product 5')
+
+        ProductRecommendation.objects.create(primary=product_1, recommendation=product_2)
+        ProductRecommendation.objects.create(primary=product_1, recommendation=product_3)
+        ProductRecommendation.objects.create(primary=product_2, recommendation=product_3)
+        ProductRecommendation.objects.create(primary=product_2, recommendation=product_4)
+        ProductRecommendation.objects.create(primary=product_3, recommendation=product_5)
+
+        # with self.assertNumQueries(6):
+        response = self.client.post(reverse('promotions:recommend'), HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEqual(200, response.status_code)
+
+    def test_product_values(self):
+        product = factories.create_product()
+        keys = ['image', 'title', 'absolute_url']
+        self.assertItemsEqual(keys, product.get_values().keys())

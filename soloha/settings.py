@@ -57,7 +57,8 @@ INSTALLED_APPS = [
     'django.contrib.flatpages',
     'compressor',
     'widget_tweaks',
-] + get_core_apps(['apps.catalogue'])
+    'djangular',
+] + get_core_apps(['apps.catalogue', 'apps.promotions'])
 
 SITE_ID = 1
 
@@ -106,15 +107,15 @@ DATABASES = {
         'POST': settings_local.DB_PORT,
         'ATOMIC_REQUESTS': settings_local.DB_ATOMIC_REQUESTS,
     },
-    'mysql': {
-        'ENGINE': settings_local.DB_BACKEND_MYSQL,
-        'NAME': settings_local.DB_NAME_MYSQL,
-        'USER': settings_local.DB_USER_MYSQL,
-        'PASSWORD': settings_local.DB_PASSWORD_MYSQL,
-        'HOST': settings_local.DB_HOST_MYSQL,
-        'POST': settings_local.DB_PORT_MYSQL,
-        'ATOMIC_REQUESTS': settings_local.DB_ATOMIC_REQUESTS_MYSQL,
-    },
+    # 'mysql': {
+    #     'ENGINE': settings_local.DB_BACKEND_MYSQL,
+    #     'NAME': settings_local.DB_NAME_MYSQL,
+    #     'USER': settings_local.DB_USER_MYSQL,
+    #     'PASSWORD': settings_local.DB_PASSWORD_MYSQL,
+    #     'HOST': settings_local.DB_HOST_MYSQL,
+    #     'POST': settings_local.DB_PORT_MYSQL,
+    #     'ATOMIC_REQUESTS': settings_local.DB_ATOMIC_REQUESTS_MYSQL,
+    # },
     # 'default': {
     #     'ENGINE': 'django.db.backends.sqlite3',
     #     'NAME': location('db.sqlite3'),
@@ -146,6 +147,19 @@ LANGUAGES = (
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
+
+TEMPLATE_LOADERS = (
+    'django.template.loaders.filesystem.Loader',
+    'django.template.loaders.app_directories.Loader',
+)
+
+import os
+location = lambda x: os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', x)
+from oscar import OSCAR_MAIN_TEMPLATE_DIR
+TEMPLATE_DIRS = (
+    location('templates'),
+    OSCAR_MAIN_TEMPLATE_DIR,
+)
 
 STATIC_URL = '/static_root/'
 STATIC_ROOT = os.path.join(BASE_DIR,  'static_root')
@@ -208,3 +222,18 @@ OSCAR_ORDER_STATUS_PIPELINE = {
 }
 
 OSCAR_DEFAULT_CURRENCY = 'UAH'
+#
+# USE_LESS = True
+#
+# COMPRESS_PRECOMPILERS = (
+#     ('text/less', 'lessc {infile} {outfile}'),
+# )
+#
+# COMPRESS_OFFLINE_CONTEXT = {
+#     # this is the only default value from compressor itself
+#     'STATIC_URL': STATIC_URL,
+#     'use_less': USE_LESS,
+# }
+
+
+MAX_COUNT_PRODUCT = 10

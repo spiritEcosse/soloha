@@ -7,5 +7,11 @@
       <schema-pattern>ocstore.*</schema-pattern>
       <default-schemas>ocstore.*</default-schemas>
     </data-source>
+    <data-source name="PostgreSQL - soloha_shop@localhost" uuid="f151fe8b-c8b9-488b-b77f-d6fa2201fd33">
+      <secret-storage>master_key</secret-storage>
+      <user-name>soloha</user-name>
+      <schema-pattern>soloha_shop.pg_catalog soloha_shop.public</schema-pattern>
+      <default-schemas>soloha_shop.public</default-schemas>
+    </data-source>
   </component>
 </project>

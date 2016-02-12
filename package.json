@@ -1,0 +1,21 @@
+{
+  "name": "soloha",
+  "version": "1.0.0",
+  "description": "Project soloha",
+  "main": "index.js",
+  "dependencies": {},
+  "devDependencies": {
+    "grunt": "^0.4.5",
+    "grunt-contrib-coffee": "^0.13.0",
+    "grunt-contrib-less": "^1.2.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "ssh://root@78.24.216.187/home/igor/web/www/soloha/.git"
+  },
+  "author": "Igor",
+  "license": "ISC"
+}

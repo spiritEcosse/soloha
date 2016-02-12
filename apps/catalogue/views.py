@@ -1,11 +1,5 @@
-from oscar.apps.catalogue.views import ProductDetailView as CoreProductDetailView
+from oscar.apps.catalogue.views import ProductCategoryView as CoreProductCategoryView
 
 
-class ProductDetailView(CoreProductDetailView):
-    def get_object(self, queryset=None):
-        # Check if self.object is already set to prevent unnecessary DB calls
-        if hasattr(self, 'object'):
-            return self.object
-        else:
-
-            return super(ProductDetailView, self).get_object(queryset)
+class ProductCategoryView(CoreProductCategoryView):
+    template_name = 'catalogue/soloha_category.html'
