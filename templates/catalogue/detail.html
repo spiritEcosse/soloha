@@ -1,0 +1,410 @@
+{% extends "layout.html" %}
+
+{% load history_tags %}
+{% load currency_filters %}
+{% load reviews_tags %}
+{% load staticfiles %}
+{% load product_tags %}
+{% load display_tags %}
+{% load i18n %}
+{% load purchase_info_tags %}
+{% load thumbnail %}
+
+{% block title %}
+    {{ product.title }} | {{ block.super }}
+{% endblock %}
+
+{% block description %}
+    {{ product.meta_description|default:""|striptags }}
+{% endblock %}
+
+{% block keywords %}
+    {{ product.meta_keywords|default:""|striptags }}
+{% endblock %}
+
+{% block extrascripts %}
+    <script src="{% static 'bower_components/lightslider/dist/js/lightslider.min.js' %}"></script>
+    <script src="{% static 'src/js/product.js' %}"></script>
+{% endblock extrascripts %}
+
+{% block main %}
+    <div class="col-xs-24 content product" id="info">
+        {% block breadcrumbs %}
+            <ul class="breadcrumb">
+                <li>
+                    <a href="{{ homepage_url }}">{% trans "Home" %}</a>
+                </li>
+                {% with category=product.categories.all.0 %}
+                    {% for c in category.get_ancestors_and_self %}
+                        <li>
+                            <a href="{{ c.get_absolute_url }}">{{ c.name }}</a>
+                        </li>
+                    {% endfor %}
+                    <li class="active">{{ product.title }}</li>
+
+                    {% get_back_button as backbutton %}
+                    {% if backbutton %}
+                        <li class="pull-right">
+                            <a href="{{ backbutton.url }}">
+                                <i class="icon-arrow-left"></i> {{ backbutton.title }}
+                            </a>
+                        </li>
+                    {% endif %}
+                {% endwith %}
+            </ul>
+        {% endblock breadcrumbs %}
+        <h1 class="line-bottom row">{{ product.get_title }}</h1>
+
+        {% if user.is_authenticated and user.is_staff %}
+            <a class="pull-right hidden-xs" href="{% url 'dashboard:catalogue-product' pk=product.id %}">
+                <small><i class="icon-edit"></i> {% trans "Edit this product" %}</small>
+            </a>
+        {% endif %}
+
+        <div class="row">
+            <div class="col-xs-17 col-sm-8 col-md-9 scrollspy">
+                {% block product_gallery %}
+                    {% include "catalogue/partials/gallery.html" %}
+                {% endblock %}
+
+                <div class="wrapper">
+                    <div class="reviews pull-left">
+                        <a href="#" class="pull-left">
+                            {% iffeature "reviews" %}
+                                {{ product.num_approved_reviews }}
+                                {% trans "reviews" %}
+                            {% endiffeature %}
+                        </a>
+                        {% iffeature "reviews" %}
+                            <p class="star-rating Four pull-left">
+                                {% include "catalogue/reviews/partials/review_stars.html" %}
+                            </p>
+                        {% endiffeature %}
+                        <div class="social">Поделиться:</div>
+                    </div>
+                    <div class="defer pull-right">
+                        <a class="love" href="#">
+                            Отложить
+                        </a>
+                        {#                        {% iffeature "wishlists" %}#}
+                        {#                            {% include "catalogue/partials/add_to_wishlist.html" %}#}
+                        {#                        {% endiffeature %}#}
+                        <a class="compare" href="#">Сравнить</a>
+                    </div>
+                </div>
+                <div class="row liner" id="nav-fix">
+                    <div class="col-xs-22">
+                        <ul class="nav nav-tabs nav-stacked">
+                            <li class="active"><a data-toggle="tab" href="#info">Общая информация</a></li>
+                            <li><a data-toggle="tab" href="#options">Выбрать дополнительные опции</a></li>
+                            <li><a data-toggle="tab" href="#characteristics">Характеристики</a></li>
+                            <li><a data-toggle="tab" href="#description">Описание</a></li>
+                            <li><a data-toggle="tab" href="#reviews">Отзывы</a></li>
+                            <li><a data-toggle="tab" href="#delivery">Доставка и оплата</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div id="section3" class="col-xs-24 col-sm-11 col-md-15" >
+                <div class="row common" >
+                    <div class="col-xs-24 col-sm-24 col-md-10 price">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                Артикул: {{ product.id }}
+                                <div class="pull-right">Под заказ</div>
+                            </div>
+                            <div class="panel-body">
+                                <div class="text-center wrapper-number">
+                                    {% if price %}
+                                        цена:
+                                        <span class="number">
+                                            {{ price }} {{ currency }}
+    {#                                    {% block product_stock_record %}#}
+    {#                                        {% include "catalogue/partials/stock_record.html" with verbose=1 %}#}
+    {#                                    {% endblock %}#}
+                                        </span>
+                                    {% else %}
+                                        {{ product_not_availability }}
+                                    {% endif %}
+                                </div>
+                                <div class="row">
+                                    <div class="wrapper-btn-primary col-xs-12">
+                                        <button class="btn btn-block btn-primary">
+                                            Купить
+                                            {#                                            {% block product_basket_form %}#}
+                                            {#                                                {% include "catalogue/partials/add_to_basket_form.html" %}#}
+                                            {#                                            {% endblock %}#}
+                                        </button>
+                                    </div>
+                                    <div class="wrapper-btn-faster col-xs-12">
+                                        <button class="btn btn-block btn-faster btn-primary">Купить в 1 клик</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="panel-footer">
+                                <div class="row text-center">
+                                    <div class="col-xs-8">
+                                        <div class="icon icon-car">
+                                            <span class="glyphicon glyphicon-info-sign btn-xs"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-8">
+                                        <div class="icon icon-pay">
+                                            <span class="glyphicon glyphicon-info-sign btn-xs"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-8">
+                                        <div class="icon icon-manager">
+                                            <span class="glyphicon glyphicon-info-sign btn-xs"></span>
+                                        </div>
+                                    </div>
+                                    <div class="clearfix"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {#                    <div class="col-xs-24 col-sm-24 col-md-14 options">#}
+                    {#                        <span class="relation">*Цена зависит от выбранных параметров:</span>#}
+                    {#                        {% for attribute in attributes %}#}
+                    {#                            <div class="panel panel-default">#}
+                    {#                                <div class="panel-heading">#}
+                    {#                                    <div class="row option">#}
+                    {#                                        <div class="col-xs-15 name">#}
+                    {#                                            {{ attribute.name }}#}
+                    {#                                        </div>#}
+                    {#                                        <div class="col-xs-11 pull-right values">#}
+                    {#                                            <select class="form-control input-md">#}
+                    {#                                                {% for value in attribute.productattributevalue_set.all %}#}
+                    {#                                                    <option>{{ value.value_option.option }}</option>#}
+                    {#                                                {% endfor %}#}
+                    {#                                            </select>#}
+                    {#                                        </div>#}
+                    {#                                    </div>#}
+                    {#                                </div>#}
+                    {#                            </div>#}
+                    {#                        {% endfor %}#}
+                    {#                    </div>#}
+                    <div class="col-xs-24 tab-content-info">
+                        <div class="panel panel-default info" id="options">
+                            <div class="panel-heading text-center">
+                                Выбрать дополнительные опции:
+                            </div>
+                            <div class="panel-body">
+                                <div class="row option">
+                                    <div class="col-xs-12 name">
+                                        Дополнительные опции:
+                                    </div>
+                                    <div class="col-xs-12 values pull-right">
+                                        <div class="checkbox">
+                                            <label>
+                                                <input type="checkbox" value="">
+                                                Нестандартный размер (+ 20%)
+                                            </label>
+                                        </div>
+                                        <div class="checkbox">
+                                            <label>
+                                                <input type="checkbox" value="">
+                                                Патинирование<span class="glyphicon glyphicon-info-sign btn-xs"></span>
+                                                <span class="add_to_price">(+ 4%)</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row option">
+                                    <div class="col-xs-12 name">
+                                        Комплектация:
+                                    </div>
+                                    <div class="col-xs-12 values pull-right">
+                                        <div class="checkbox">
+                                            <label class="block">
+                                                <input type="checkbox" value="">
+                                                <select class="form-control">
+                                                    <option>Большие ящики (2 шт) ясень (+ 2225 грн)</option>
+                                                    <option>2</option>
+                                                    <option>3</option>
+                                                    <option>4</option>
+                                                    <option>5</option>
+                                                </select>
+                                            </label>
+                                        </div>
+                                        <div class="checkbox">
+                                            <label>
+                                                <input type="checkbox" value="">
+                                                <select class="form-control">
+                                                    <option>Маленькие ящики (4 шт) ясень (+ 3000 грн)</option>
+                                                    <option>2</option>
+                                                    <option>3</option>
+                                                    <option>4</option>
+                                                    <option>5</option>
+                                                </select>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel panel-default characteristics" id="characteristics">
+                            <div class="panel-heading text-center">
+                                Характеристики:
+                            </div>
+                            <div class="panel-body">
+                                <div class="row option">
+                                    <div class="col-xs-12">
+                                        Артикул:
+                                    </div>
+                                    <div class="col-xs-12 values">
+                                        {{ product.id }}
+                                    </div>
+                                </div>
+                                {% for av in product.attribute_values.all %}
+                                    <div class="row option">
+                                        <div class="col-xs-12">
+                                            {{ av.attribute.name }}
+                                        </div>
+                                        <div class="col-xs-12 values">
+                                            {{ av.value_as_html }}
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                                {% iffeature "reviews" %}
+                                    <div class="row option">
+                                        <div class="col-xs-12">
+                                            {% trans "Number of reviews" %}
+                                        </div>
+                                        <div class="col-xs-12 values">
+                                            {{ product.num_approved_reviews }}
+                                        </div>
+                                    </div>
+                                {% endiffeature %}
+                            </div>
+                        </div>
+                        {% block product_description %}
+                            {% if product.description %}
+                                <div class="panel panel-default" id="description">
+                                    <div class="panel-heading text-center">{% trans "Product Description" %}</div>
+                                    <div class="panel-body">
+                                        <p>{{ product.description|safe }}</p>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        {% endblock %}
+
+                        <div class="panel panel-default reviews" id="reviews">
+                            <div class="panel-heading text-center">Отзывы:</div>
+                            <div class="panel-body">
+                                <div class="write">
+                                    <span class="glyphicon glyphicon-pencil"></span>
+                                    Написать отзыв о товаре
+                                </div>
+                                <div class="row list">
+                                    {% iffeature "reviews" %}
+                                        {% block product_review %}
+                                            <section>
+                                                <div id="reviews" class="sub-header">
+                                                    {% if product.num_approved_reviews > 3 %}
+                                                        <a href="{% url 'catalogue:reviews-list' product_slug=product.slug product_pk=product.id %}" class="btn pull-right">{% trans "See all reviews" %}</a>
+                                                    {% endif %}
+                                                    <h2>{% trans "Customer Reviews" %}</h2>
+                                                </div>
+
+                                                {% if product.num_approved_reviews == 0 %}
+                                                    <p>
+                                                        {% if product|is_review_permitted:user %}
+                                                            {% url 'catalogue:reviews-add' product_slug=product.slug product_pk=product.id as add_review_url %}
+                                                            {% blocktrans %}This product does not have any reviews yet -
+                                                                <a href="{{ add_review_url }}#addreview">be the first to write one</a>.
+                                                            {% endblocktrans %}
+                                                        {% else %}
+                                                            {% trans "This product does not have any reviews yet" %}.
+                                                        {% endif %}
+                                                    </p>
+                                                {% else %}
+                                                    <ol class="list-unstyled review-list">
+                                                        {% for review in reviews|slice:":3" %}
+                                                            <li>
+                                                                {% include 'catalogue/partials/review.html' %}
+                                                            </li>
+                                                        {% endfor %}
+                                                    </ol>
+                                                {% endif %}
+                                            </section>
+                                        {% endblock product_review %}
+                                    {% endiffeature %}
+
+                                    <div class="col-xs-24 head">
+                                        <div class="name pull-left">Валерий</div>
+                                        <p class="star-rating Four pull-left">
+                                            <span class="glyphicon glyphicon-star"></span>
+                                            <span class="glyphicon glyphicon-star"></span>
+                                            <span class="glyphicon glyphicon-star"></span>
+                                            <span class="glyphicon glyphicon-star"></span>
+                                        </p>
+                                        <div class="date pull-left">
+                                            <time>04.01.2016</time>
+                                        </div>
+                                        <div class="clearfix"></div>
+                                        <div class="full-text">
+                                            <span class="text">Комментарий:</span>
+                                            <p>
+                                                Очень довольны покупкой и работой компании. В ходе приёма заявки уделили
+                                                должное внимание все рассказали, показали. Сроки по изготовлению выдерживают.
+                                            </p>
+                                            <a href="#" class="answer pull-right">Ответить</a>
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-24 head">
+                                        <div class="name pull-left">Валерий</div>
+                                        <p class="star-rating Four pull-left">
+                                            <span class="glyphicon glyphicon-star"></span>
+                                            <span class="glyphicon glyphicon-star"></span>
+                                            <span class="glyphicon glyphicon-star"></span>
+                                            <span class="glyphicon glyphicon-star"></span>
+                                        </p>
+                                        <div class="date pull-left">
+                                            <time>04.01.2016</time>
+                                        </div>
+                                        <div class="clearfix"></div>
+                                        <div class="full-text">
+                                            <span class="text">Комментарий:</span>
+                                            <p>
+                                                Очень довольны покупкой и работой компании. В ходе приёма заявки уделили
+                                                должное внимание все рассказали, показали. Сроки по изготовлению выдерживают.
+                                            </p>
+                                            <a href="#" class="answer pull-right">Ответить</a>
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-24">
+                                        <a class="pull-right more" href="#">Посмотреть все отзывы >> </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel panel-default reviews" id="delivery">
+                            <div class="panel-heading text-center">Доставка и оплата:</div>
+                            <div class="panel-body">
+                                Часть информации и ссылка на страницу с полной информацией
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row" >
+            <div class="col-xs-24">
+                {% with recommended_products=product.recommended_products.all|slice:":6" %}
+                    {% if recommended_products %}
+                        <h2>{% trans "Recommended items" %}</h2>
+                        <ul class="row">
+                            {% for product in recommended_products %}
+                                <li class="col-xs-6 col-sm-4 col-md-3 col-lg-3">
+                                    {% render_product product %}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                {% endwith %}
+            </div>
+            {% recently_viewed_products %}
+        </div>
+    </div>
+{% endblock main %}

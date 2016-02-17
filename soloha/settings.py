@@ -18,6 +18,7 @@ from oscar import OSCAR_MAIN_TEMPLATE_DIR
 from soloha import settings_local
 from django.utils.translation import ugettext_lazy as _
 from oscar import get_core_apps
+import sys
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_NAME = os.path.basename(BASE_DIR)
@@ -39,26 +40,27 @@ ALLOWED_HOSTS = settings_local.ALLOWED_HOSTS
 # Application definition
 
 INSTALLED_APPS = [
-    'suit',
-    'django.contrib.admin',
-    'django.contrib.sitemaps',
-    'debug_toolbar',
-    # 'django_select2',
-    # 'bootstrap_pagination',
-    # 'djangular',
-    # 'ckeditor',
+                     'suit',
+                     'django.contrib.admin',
+                     'django.contrib.sitemaps',
+                     'debug_toolbar',
+                     # 'django_select2',
+                     # 'bootstrap_pagination',
+                     # 'djangular',
+                     # 'ckeditor',
 
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.sites',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'django.contrib.flatpages',
-    'compressor',
-    'widget_tweaks',
-    'djangular',
-] + get_core_apps(['apps.catalogue', 'apps.promotions'])
+                     'django.contrib.auth',
+                     'django.contrib.contenttypes',
+                     'django.contrib.sessions',
+                     'django.contrib.sites',
+                     'django.contrib.messages',
+                     'django.contrib.staticfiles',
+                     'django.contrib.flatpages',
+                     'compressor',
+                     'widget_tweaks',
+                     'djangular',
+                     'easy_thumbnails',
+                 ] + get_core_apps(['apps.catalogue', 'apps.promotions'])
 
 SITE_ID = 1
 
@@ -97,35 +99,48 @@ WSGI_APPLICATION = 'soloha.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.8/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': settings_local.DB_BACKEND,
-        'NAME': settings_local.DB_NAME,
-        'USER': settings_local.DB_USER,
-        'PASSWORD': settings_local.DB_PASSWORD,
-        'HOST': settings_local.DB_HOST,
-        'POST': settings_local.DB_PORT,
-        'ATOMIC_REQUESTS': settings_local.DB_ATOMIC_REQUESTS,
-    },
-    # 'mysql': {
-    #     'ENGINE': settings_local.DB_BACKEND_MYSQL,
-    #     'NAME': settings_local.DB_NAME_MYSQL,
-    #     'USER': settings_local.DB_USER_MYSQL,
-    #     'PASSWORD': settings_local.DB_PASSWORD_MYSQL,
-    #     'HOST': settings_local.DB_HOST_MYSQL,
-    #     'POST': settings_local.DB_PORT_MYSQL,
-    #     'ATOMIC_REQUESTS': settings_local.DB_ATOMIC_REQUESTS_MYSQL,
-    # },
-    # 'default': {
-    #     'ENGINE': 'django.db.backends.sqlite3',
-    #     'NAME': location('db.sqlite3'),
-    #     'USER': '',
-    #     'PASSWORD': '',
-    #     'HOST': '',
-    #     'PORT': '',
-    #     'ATOMIC_REQUESTS': True
-    # },
-}
+if 'test' in sys.argv:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': location('db.sqlite3'),
+            'USER': '',
+            'PASSWORD': '',
+            'HOST': '',
+            'PORT': '',
+            'ATOMIC_REQUESTS': True
+        },
+    }
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': settings_local.DB_BACKEND,
+            'NAME': settings_local.DB_NAME,
+            'USER': settings_local.DB_USER,
+            'PASSWORD': settings_local.DB_PASSWORD,
+            'HOST': settings_local.DB_HOST,
+            'POST': settings_local.DB_PORT,
+            'ATOMIC_REQUESTS': settings_local.DB_ATOMIC_REQUESTS,
+        },
+        # 'mysql': {
+        #     'ENGINE': settings_local.DB_BACKEND_MYSQL,
+        #     'NAME': settings_local.DB_NAME_MYSQL,
+        #     'USER': settings_local.DB_USER_MYSQL,
+        #     'PASSWORD': settings_local.DB_PASSWORD_MYSQL,
+        #     'HOST': settings_local.DB_HOST_MYSQL,
+        #     'POST': settings_local.DB_PORT_MYSQL,
+        #     'ATOMIC_REQUESTS': settings_local.DB_ATOMIC_REQUESTS_MYSQL,
+        # },
+        # 'default': {
+        #     'ENGINE': 'django.db.backends.sqlite3',
+        #     'NAME': location('db.sqlite3'),
+        #     'USER': '',
+        #     'PASSWORD': '',
+        #     'HOST': '',
+        #     'PORT': '',
+        #     'ATOMIC_REQUESTS': True
+        # },
+    }
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/
@@ -182,14 +197,14 @@ CKEDITOR_CONFIGS = {
         'toolbar': 'full',
         'height': 300,
         'width': 650,
-        },
-    }
+    },
+}
 
 CACHES = settings_local.CACHES
 CACHE_MIDDLEWARE_SECONDS = settings_local.CACHE_MIDDLEWARE_SECONDS
 CACHE_MIDDLEWARE_KEY_PREFIX = settings_local.CACHE_MIDDLEWARE_KEY_PREFIX
 
-IMAGE_NOT_FOUND = 'images/image_not_found.jpg'
+IMAGE_NOT_FOUND = 'image_not_found.jpg'
 ADMINS = (('igor', 'shevchenkcoigor@gmail.com'),)
 DEFAULT_FROM_EMAIL = settings_local.DEFAULT_FROM_EMAIL
 EMAIL_COMPANY = settings_local.EMAIL_COMPANY
@@ -212,6 +227,8 @@ HAYSTACK_CONNECTIONS = {
         # 'INCLUDE_SPELLING': True,
     },
 }
+
+OSCAR_MISSING_IMAGE_URL = 'image_not_found.jpg'
 
 OSCAR_INITIAL_ORDER_STATUS = 'Pending'
 OSCAR_INITIAL_LINE_STATUS = 'Pending'
@@ -236,4 +253,4 @@ OSCAR_DEFAULT_CURRENCY = 'UAH'
 # }
 
 
-MAX_COUNT_PRODUCT = 10
+MAX_COUNT_PRODUCT = 20

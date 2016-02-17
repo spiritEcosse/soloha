@@ -1,0 +1,32 @@
+{
+  "name": "static",
+  "authors": [
+    "Igor <shevchenkcoigor@gmail.com>"
+  ],
+  "description": "'Project soloha'",
+  "main": "bower.json",
+  "moduleType": [],
+  "license": "MIT",
+  "homepage": "",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular-scroll": "~1.0.0",
+    "angular-bootstrap": "~1.1.2",
+    "Yamm3": "yamm3#~1.1.0",
+    "angular": "~1.4.9",
+    "bootstrap": "~3.3.6",
+    "bxslider-4": "https://github.com/stevenwanderski/bxslider-4.git#~4.2.5",
+    "angular-animate": "~1.4.9",
+    "slick-carousel": "~1.5.9",
+    "yamm": "https://github.com/geedmo/yamm.git",
+    "lightslider": "~1.1.5",
+    "seiyria-bootstrap-slider": "~6.0.6"
+  }
+}

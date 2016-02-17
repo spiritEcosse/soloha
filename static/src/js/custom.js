@@ -8,6 +8,10 @@ $(document).ready(function() {
         loop:true
     });
 
+    setTimeout(function(){
+        slider.refresh();
+    }, 1000);
+
     $('#link_news').click(function(){
         slider.refresh();
     });
@@ -31,9 +35,4 @@ $(document).ready(function() {
     $('.dropdown-menu').click(function(event){
         event.stopPropagation();
     });
-});
-
-$('#home_tabs a').click(function (e) {
-    e.preventDefault()
-    $(this).tab('show')
 });

@@ -11,8 +11,8 @@ app.controller 'Home', ['$http', '$scope', '$window', '$document', '$log', 'djan
   news = djangoUrl.reverse('promotions:new')
 
   $http.post(news).success (products) ->
+    $scope.products = products
     $scope.news = products
-    $scope.products = $scope.news
 #    slider.refresh()
   .error ->
     console.error('An error occurred during submission')

@@ -35,8 +35,8 @@
       recommends = djangoUrl.reverse('promotions:recommend');
       news = djangoUrl.reverse('promotions:new');
       $http.post(news).success(function(products) {
-        $scope.news = products;
-        return $scope.products = $scope.news;
+        $scope.products = products;
+        return $scope.news = products;
       }).error(function() {
         return console.error('An error occurred during submission');
       });

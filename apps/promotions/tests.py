@@ -3,14 +3,12 @@ from django.test import Client
 from django.core.urlresolvers import reverse
 from oscar.test import factories
 from oscar.apps.order.models import Line
-from django.core import serializers
 from apps.catalogue.models import Product
 from soloha.settings import MAX_COUNT_PRODUCT
 from apps.catalogue.models import ProductRecommendation
 from apps.promotions.views import RecommendView
-from django.utils.html import strip_entities
 import json
-from sorl.thumbnail import get_thumbnail
+from django.db.models.query import Prefetch
 
 
 class TestHomePage(TestCase):
@@ -21,19 +19,17 @@ class TestHomePage(TestCase):
         factories.create_order()
         response = self.client.post(reverse('promotions:hits'), HTTP_X_REQUESTED_WITH='XMLHttpRequest')
         self.assertEqual(200, response.status_code)
-        # products = [line.product.get_value() for line in Line.objects.order_by('-product__date_created')[:MAX_COUNT_PRODUCT]]
-        # products = serializers.serialize("json", products)
-        # self.assertJSONEqual(response.content, products)
+        products = [line.product.get_values() for line in Line.objects.order_by('-product__date_created')[:MAX_COUNT_PRODUCT]]
+        self.assertJSONEqual(response.content, json.dumps(products))
 
     def test_new_product(self):
         factories.create_product(title='Product 1')
         factories.create_product(title='Product 2')
         response = self.client.post(reverse('promotions:new'), HTTP_X_REQUESTED_WITH='XMLHttpRequest')
         self.assertEqual(200, response.status_code)
-        # products = Product.objects.order_by('-date_created')[:MAX_COUNT_PRODUCT]
-        # products = [product.get_values() for product in products]
-        # products = serializers.serialize("json", products)
-        # self.assertJSONEqual(response.content, products)
+        products = Product.objects.order_by('-date_created')[:MAX_COUNT_PRODUCT]
+        products = [product.get_values() for product in products]
+        self.assertJSONEqual(response.content, json.dumps(products))
 
     # def test_special_product(self):
     #     factories.create_product()
@@ -56,11 +52,15 @@ class TestHomePage(TestCase):
         ProductRecommendation.objects.create(primary=product_2, recommendation=product_4)
         ProductRecommendation.objects.create(primary=product_3, recommendation=product_5)
 
+        queryset_product = Product.objects.only('title')
+
         # with self.assertNumQueries(6):
         response = self.client.post(reverse('promotions:recommend'), HTTP_X_REQUESTED_WITH='XMLHttpRequest')
         self.assertEqual(200, response.status_code)
-
-    def test_product_values(self):
-        product = factories.create_product()
-        keys = ['image', 'title', 'absolute_url']
-        self.assertItemsEqual(keys, product.get_values().keys())
+        object_list = ProductRecommendation.objects.prefetch_related(
+            Prefetch('recommendation', queryset=queryset_product),
+            Prefetch('recommendation__images'),
+            Prefetch('recommendation__categories')
+        ).order_by('-recommendation__date_created')[:MAX_COUNT_PRODUCT]
+        products = [recommend.recommendation.get_values() for recommend in object_list]
+        self.assertJSONEqual(response.content, json.dumps(products))

@@ -18,7 +18,7 @@ class HomeView(CoreHomeView):
 queryset_product = Product.objects.only('title')
 
 
-class HitsView(views.JSONResponseMixin, views.AjaxResponseMixin, MultipleObjectMixin, View):
+class HitsView(views.JSONResponseMixin, views.AjaxResponseMixin, ListView):
     model = Line
 
     def get_queryset(self):
@@ -27,7 +27,7 @@ class HitsView(views.JSONResponseMixin, views.AjaxResponseMixin, MultipleObjectM
             Prefetch('product', queryset=queryset_product),
             Prefetch('product__images'),
             Prefetch('product__categories'),
-        ).order_by('?')[:MAX_COUNT_PRODUCT]
+        ).order_by('-product__date_created')[:MAX_COUNT_PRODUCT]
 
     def post(self, request, *args, **kwargs):
         self.object_list = self.get_queryset()
@@ -38,12 +38,12 @@ class HitsView(views.JSONResponseMixin, views.AjaxResponseMixin, MultipleObjectM
         return self.render_json_response(products)
 
 
-class SpecialView(views.JSONResponseMixin, views.AjaxResponseMixin, MultipleObjectMixin, View):
+class SpecialView(views.JSONResponseMixin, views.AjaxResponseMixin, ListView):
     def post_ajax(self, request, *args, **kwargs):
         super(SpecialView, self).post_ajax(request, *args, **kwargs)
 
 
-class RecommendView(views.JSONResponseMixin, views.AjaxResponseMixin, MultipleObjectMixin, View):
+class RecommendView(views.JSONResponseMixin, views.AjaxResponseMixin, ListView):
     model = ProductRecommendation
 
     def get_queryset(self):
@@ -52,7 +52,7 @@ class RecommendView(views.JSONResponseMixin, views.AjaxResponseMixin, MultipleOb
             Prefetch('recommendation', queryset=queryset_product),
             Prefetch('recommendation__images'),
             Prefetch('recommendation__categories')
-        ).order_by('?')[:MAX_COUNT_PRODUCT]
+        ).order_by('-recommendation__date_created')[:MAX_COUNT_PRODUCT]
 
     def post(self, request, *args, **kwargs):
         self.object_list = self.get_queryset()
@@ -63,7 +63,7 @@ class RecommendView(views.JSONResponseMixin, views.AjaxResponseMixin, MultipleOb
         return self.render_json_response(products)
 
 
-class NewView(views.JSONResponseMixin, views.AjaxResponseMixin, MultipleObjectMixin, View):
+class NewView(views.JSONResponseMixin, views.AjaxResponseMixin, ListView):
     model = Product
 
     def get_queryset(self):
@@ -71,7 +71,7 @@ class NewView(views.JSONResponseMixin, views.AjaxResponseMixin, MultipleObjectMi
         return queryset.prefetch_related(
             Prefetch('images'),
             Prefetch('categories'),
-        ).order_by('?').only('title')[:MAX_COUNT_PRODUCT]
+        ).order_by('-date_created').only('title')[:MAX_COUNT_PRODUCT]
 
     def post(self, request, *args, **kwargs):
         self.object_list = self.get_queryset()
