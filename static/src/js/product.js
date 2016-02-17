@@ -3,11 +3,6 @@
  */
 
 $(document).ready(function() {
-    $('.lightSlider').lightSlider({
-        item:4,
-        loop:true
-    });
-
     $('#lightSlider_product').lightSlider({
         gallery:true,
         item:1,
@@ -18,9 +13,5 @@ $(document).ready(function() {
         thumbMargin:4,
         slideMargin:0,
         loop:true
-    });
-
-    $('.dropdown-menu').click(function(event){
-        event.stopPropagation();
     });
 });

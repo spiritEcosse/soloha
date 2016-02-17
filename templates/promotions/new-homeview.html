@@ -67,55 +67,57 @@
                     <div class="price"><strong>Цена:</strong>{{ product.price }}</div>
                     <p>
                     <a href="#" class="btn btn-primary" role="button">
-                {% endverbatim products %}{% trans "Купить" %}{% verbatim products %}
-                </a>
-                </p>
-                </div>
-                <div class="mask">
-                    <div class="title">
-                        <a href="{{ product.absolute_url }}">{{ product.title }}</a>
+                {% endverbatim products %}
+                {% trans "Купить" %}
+                {% verbatim products %}
+                    </a>
+                    </p>
                     </div>
-                    <div class="filters">
-                        <div class="rows">
-                            <div class="option_name">
-                                <span>По типу:</span>
-                            </div>
+                    <div class="mask">
+                        <div class="title">
+                            <a href="{{ product.absolute_url }}">{{ product.title }}</a>
+                        </div>
+                        <div class="filters">
+                            <div class="rows">
+                                <div class="option_name">
+                                    <span>По типу:</span>
+                                </div>
 
-                            <div class="option_value"><span>Кровати с мягким изголовьем</span></div>
-                        </div>
-                        <div class="rows">
-                            <div class="option_name">
-                                <span>По размеру:</span>
+                                <div class="option_value"><span>Кровати с мягким изголовьем</span></div>
                             </div>
-                            <div class="option_value"><span>Полуторные,Двухспальные</span></div>
-                        </div>
-                        <div class="rows">
-                            <div class="option_name">
-                                <span>Каркас:</span>
+                            <div class="rows">
+                                <div class="option_name">
+                                    <span>По размеру:</span>
+                                </div>
+                                <div class="option_value"><span>Полуторные,Двухспальные</span></div>
                             </div>
+                            <div class="rows">
+                                <div class="option_name">
+                                    <span>Каркас:</span>
+                                </div>
 
-                            <div class="option_value"><span>Металлический</span></div>
-                        </div>
-                        <div class="rows">
-                            <div class="option_name">
-                                <span>Подъёмный механизм:</span>
+                                <div class="option_value"><span>Металлический</span></div>
                             </div>
+                            <div class="rows">
+                                <div class="option_name">
+                                    <span>Подъёмный механизм:</span>
+                                </div>
 
-                            <div class="option_value"><span>нет</span></div>
+                                <div class="option_value"><span>нет</span></div>
+                            </div>
+                            <div class="rows">
+                                <div class="option_name"><span>Ящики:</span></div>
+                                <div class="option_value"><span>нет</span></div>
+                            </div>
                         </div>
-                        <div class="rows">
-                            <div class="option_name"><span>Ящики:</span></div>
-                            <div class="option_value"><span>нет</span></div>
+                        <a href="#">Смотреть все характеристики</a>
+                        <div class="btn-block">
+                            <a href="#" class="btn btn-primary" role="button">Купить</a>
                         </div>
                     </div>
-                    <a href="#">Смотреть все характеристики</a>
-                    <div class="btn-block">
-                        <a href="#" class="btn btn-primary" role="button">Купить</a>
                     </div>
-                </div>
-                </div>
-                </div>
-            {% endverbatim products %}
+                    </div>
+                {% endverbatim products %}
             </div>
         </div>
     </div>
