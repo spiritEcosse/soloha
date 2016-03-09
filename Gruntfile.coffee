@@ -4,9 +4,15 @@ module.exports = (grunt) ->
     coffee:
       files:
         src: [
-          'apps/**/*.coffee',
+          'apps/catalogue/**/*.coffee',
         ],
-        dest: 'static/build/js/script.js'
+        dest: 'static/build/js/catalogue/script.js'
+    common_coffee:
+      files:
+        src: [
+          'soloha/**/*.coffee',
+        ],
+        dest: 'static/build/js/common/script.js'
     less:
       development:
         options:
@@ -29,8 +35,9 @@ module.exports = (grunt) ->
         dest: ''
   )
 
+
   grunt.loadNpmTasks('grunt-contrib-coffee')
   grunt.loadNpmTasks('grunt-contrib-less')
   #  grunt.loadNpmTasks('grunt-yui-compressor')
   #  grunt.loadNpmTasks('grunt-contrib-imagemin')
-  grunt.registerTask('default', ['coffee:files', 'less'])
+  grunt.registerTask('default', ['coffee:files', 'common_coffee:files', 'less'])

@@ -4,6 +4,11 @@
 {% load promotion_tags %}
 {% load thumbnail %}
 
+{% block extrascripts %}
+    <script src="{% static 'build/js/common/app.js' %}"></script>
+    <script src="{% static 'build/js/common/controllers.js' %}"></script>
+{% endblock extrascripts %}
+
 {% block layout %}
     {# Top-horizontal bar with account, notifictions, dashboard links #}
     {% if user.is_authenticated and user.is_staff %}
@@ -13,7 +18,7 @@
     <div class="container page" {% block ngApp %}{% endblock ngApp %}>
         {# Site logo/title, mini-basket, browse dropdown and searchbox #}
         {% block header %}
-            <header>
+            <header ng-controller="Header">
                 <div class="row top">
                     <div class="col-xs-4"></div>
                     <div class="col-xs-14 col-sm-12 col-md-14 phones">
@@ -218,617 +223,65 @@
                             </div>
                             <div id="navbar_menu" class="collapse navbar-collapse">
                                 <ul class="nav navbar-nav">
-                                    <li class="dropdown">
-                                        <a role="button" class="dropdown-toggle" data-toggle="dropdown">
-                                            <img src="{% static "image/icon_krovat.png" %}" class="img-responsive icon"/>
-                                        </a>
-                                        <a href="category.html">
-                                            Кровати
-                                        </a>
-                                        <div class="arrow"></div>
-                                        <div class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu">
-                                            <div class="yamm-content">
-                                                <div class="col-xs-6">
-                                                    <ul class="list-group">
-                                                        <li class="list-group-item">
-                                                            <a tabindex="-1" href="#">Деревянные кровати
-                                                                <span class="glyphicon glyphicon-menu-right pull-right"></span>
-                                                            </a>
-                                                        </li>
-                                                        <li class="list-group-item">
-                                                            <a tabindex="-1" href="#">
-                                                                Металлические кровати
-                                                                <span class="glyphicon glyphicon-menu-right pull-right"></span>
-                                                            </a>
-                                                        </li>
-                                                        <li class="list-group-item">
-                                                            <a tabindex="-1" href="#">Кровати с мягким изголовьем
-                                                                <span class="glyphicon glyphicon-menu-right pull-right"></span>
-                                                            </a>
-                                                        </li>
-                                                        <li class="list-group-item">
-                                                            <a tabindex="-1" href="#">Двухъярусные кровати
-                                                                <span class="glyphicon glyphicon-menu-right pull-right"></span>
-                                                            </a>
-                                                        </li>
-                                                        <li class="list-group-item active">
-                                                            <a tabindex="-1" href="#">Детские кровати
-                                                                <span class="glyphicon glyphicon-menu-right pull-right"></span>
-                                                            </a>
-                                                        </li>
-                                                        <li class="list-group-item">
-                                                            <a tabindex="-1" href="#">Каркасы для матрасов
-                                                                <span class="glyphicon glyphicon-menu-right pull-right"></span>
-                                                            </a></li>
-                                                        <li class="list-group-item text-center">
-                                                            <a tabindex="-1" href="#">
-                                                                Все кровати
-                                                                <span class="glyphicon glyphicon-menu-right"></span>
-                                                            </a>
-                                                        </li>
-                                                    </ul>
-                                                </div>
-                                                <div class="col-xs-6">
-                                                    <div class="panel panel-default">
-                                                        <div class="panel-heading">
-                                                            <a href="category.html">Детские кровати</a>
-                                                        </div>
-                                                        <div class="panel-body">
-                                                            <ul class="list-group">
-                                                                <li class="list-group-item">
-                                                                    <a href="#">Кровати для детей и подростков</a>
-                                                                </li>
-                                                                <li class="list-group-item">
-                                                                    <a href="#">Кроватки для новорожденных</a>
-                                                                </li>
-                                                            </ul>
+                                    {% verbatim categories %}
+                                        <li class="dropdown" ng-cloak ng-show="categories.length" ng-repeat="category in categories">
+                                            <a role="button" class="dropdown-toggle" data-toggle="dropdown">
+                                                <img src="{{ category.icon }}" class="img-responsive icon"/>
+                                                {{ category.name }}
+                                            </a>
+                                            <div class="dropdown-menu" ng-if="category.info.has_children" role="menu" aria-labelledby="dropdownMenu">
+                                                <div class="arrow"></div>
+                                                <div class="yamm-content">
+                                                    <div class="col-xs-6">
+                                                        <ul class="list-group nav nav-pills nav-stacked">
+                                                            <li class="list-group-item active">
+                                                                <a tabindex="-1" href="{{ category.absolute_url }}">{{ category.name }}
+                                                                    <span class="glyphicon glyphicon-menu-right pull-right"></span>
+                                                                </a>
+                                                            </li>
+                                                            <li class="list-group-item text-center">
+                                                                <a tabindex="-1" href="#">
+                                                                    Все кровати
+                                                                    <span class="glyphicon glyphicon-menu-right"></span>
+                                                                </a>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                    <div class="col-xs-6">
+                                                        <div class="tab-content">
+                                                            <div class="tab-pane active" id="tab1">
+                                                                <div class="panel panel-default">
+                                                                    <div class="panel-heading">
+                                                                        <a href="category.html">Детские кровати</a>
+                                                                    </div>
+                                                                    <div class="panel-body">
+                                                                        <ul class="list-group">
+                                                                            <li class="list-group-item">
+                                                                                <a href="#">Кровати для детей и подростков</a>
+                                                                            </li>
+                                                                            <li class="list-group-item">
+                                                                                <a href="#">Кроватки для новорожденных</a>
+                                                                            </li>
+                                                                        </ul>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                </div>
-                                                <div class="col-xs-12 text-right image">
-                                                    <img src="/media/images/make_up/menu_image.png" class="img-responsive pull-right" title="" alt=""/>
-                                                    <a class="btn btn-default btn-menu btn-xs" href="category.html">Хочу</a>
+                                                    <div class="col-xs-12 text-right image">
+                                                        <img src="/media/images/make_up/menu_image.png" class="img-responsive pull-right" title="" alt=""/>
+                                                        <a class="btn btn-default btn-menu btn-xs" href="category.html">Хочу</a>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    </li>
-                                    <li class="dropdown">
-                                        <a role="button" class="dropdown-toggle" data-toggle="dropdown">
-                                            <img src="{% static "image/icon_tkany.png" %} " class="img-responsive icon"/>
-                                        </a>
-                                        <a href="category.html">
-                                            Мебельные ткани и кожа
-                                        </a>
-                                        <div class="arrow"></div>
-                                        <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu">
-                                            <li>
-                                                <div class="yamm-content">
-                                                    <div class="col-xs-6">
-                                                        <ul class="list-group">
-                                                            <li class="list-group-item">
-                                                                <a tabindex="-1" href="#">Деревянные кровати
-                                                                    <span class="glyphicon glyphicon-menu-right pull-right"></span>
-                                                                </a>
-                                                            </li>
-                                                            <li class="list-group-item">
-                                                                <a tabindex="-1" href="#">
-                                                                    Металлические кровати
-                                                                    <span class="glyphicon glyphicon-menu-right pull-right"></span>
-                                                                </a>
-                                                            </li>
-                                                            <li class="list-group-item">
-                                                                <a tabindex="-1" href="#">Кровати с мягким изголовьем
-                                                                    <span class="glyphicon glyphicon-menu-right pull-right"></span>
-                                                                </a>
-                                                            </li>
-                                                            <li class="list-group-item">
-                                                                <a tabindex="-1" href="#">Двухъярусные кровати
-                                                                    <span class="glyphicon glyphicon-menu-right pull-right"></span>
-                                                                </a>
-                                                            </li>
-                                                            <li class="list-group-item active">
-                                                                <a tabindex="-1" href="#">Детские кровати
-                                                                    <span class="glyphicon glyphicon-menu-right pull-right"></span>
-                                                                </a>
-                                                            </li>
-                                                            <li class="list-group-item">
-                                                                <a tabindex="-1" href="#">Каркасы для матрасов
-                                                                    <span class="glyphicon glyphicon-menu-right pull-right"></span>
-                                                                </a></li>
-                                                            <li class="list-group-item text-center">
-                                                                <a tabindex="-1" href="#">
-                                                                    Все кровати
-                                                                    <span class="glyphicon glyphicon-menu-right"></span>
-                                                                </a>
-                                                            </li>
-                                                        </ul>
-                                                    </div>
-                                                    <div class="col-xs-6">
-                                                        <div class="panel panel-default">
-                                                            <div class="panel-heading">
-                                                                <a href="category.html">Детские кровати</a>
-                                                            </div>
-                                                            <div class="panel-body">
-                                                                <ul class="list-group">
-                                                                    <li class="list-group-item">
-                                                                        <a href="#">Кровати для детей и подростков</a>
-                                                                    </li>
-                                                                    <li class="list-group-item">
-                                                                        <a href="#">Кроватки для новорожденных</a>
-                                                                    </li>
-                                                                </ul>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-xs-12 text-right image">
-                                                        <img src="/media/images/make_up/menu_image.png" class="img-responsive pull-right" title="" alt=""/>
-                                                        <a class="btn btn-default btn-menu btn-xs" href="category.html">Хочу</a>
-                                                    </div>
-                                                </div>
-                                            </li>
-                                        </ul>
-                                    </li>
-                                    <li class="dropdown">
-                                        <a role="button" class="dropdown-toggle" data-toggle="dropdown">
-                                            <img src="{% static "image/icon_divan.png" %}" class="img-responsive icon"/>
-                                        </a>
-                                        <a href="category.html">
-                                            Диваны
-                                        </a>
-                                        <div class="arrow"></div>
-                                        <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu">
-                                            <li>
-                                                <div class="yamm-content">
-                                                    <div class="col-xs-6">
-                                                        <ul class="list-group">
-                                                            <li class="list-group-item">
-                                                                <a tabindex="-1" href="#">Деревянные кровати
-                                                                    <span class="glyphicon glyphicon-menu-right pull-right"></span>
-                                                                </a>
-                                                            </li>
-                                                            <li class="list-group-item">
-                                                                <a tabindex="-1" href="#">
-                                                                    Металлические кровати
-                                                                    <span class="glyphicon glyphicon-menu-right pull-right"></span>
-                                                                </a>
-                                                            </li>
-                                                            <li class="list-group-item">
-                                                                <a tabindex="-1" href="#">Кровати с мягким изголовьем
-                                                                    <span class="glyphicon glyphicon-menu-right pull-right"></span>
-                                                                </a>
-                                                            </li>
-                                                            <li class="list-group-item">
-                                                                <a tabindex="-1" href="#">Двухъярусные кровати
-                                                                    <span class="glyphicon glyphicon-menu-right pull-right"></span>
-                                                                </a>
-                                                            </li>
-                                                            <li class="list-group-item active">
-                                                                <a tabindex="-1" href="#">Детские кровати
-                                                                    <span class="glyphicon glyphicon-menu-right pull-right"></span>
-                                                                </a>
-                                                            </li>
-                                                            <li class="list-group-item">
-                                                                <a tabindex="-1" href="#">Каркасы для матрасов
-                                                                    <span class="glyphicon glyphicon-menu-right pull-right"></span>
-                                                                </a></li>
-                                                            <li class="list-group-item text-center">
-                                                                <a tabindex="-1" href="#">
-                                                                    Все кровати
-                                                                    <span class="glyphicon glyphicon-menu-right"></span>
-                                                                </a>
-                                                            </li>
-                                                        </ul>
-                                                    </div>
-                                                    <div class="col-xs-6">
-                                                        <div class="panel panel-default">
-                                                            <div class="panel-heading">
-                                                                <a href="category.html">Детские кровати</a>
-                                                            </div>
-                                                            <div class="panel-body">
-                                                                <ul class="list-group">
-                                                                    <li class="list-group-item">
-                                                                        <a href="#">Кровати для детей и подростков</a>
-                                                                    </li>
-                                                                    <li class="list-group-item">
-                                                                        <a href="#">Кроватки для новорожденных</a>
-                                                                    </li>
-                                                                </ul>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-xs-12 text-right image">
-                                                        <img src="/media/images/make_up/menu_image.png" class="img-responsive pull-right" title="" alt=""/>
-                                                        <a class="btn btn-default btn-menu btn-xs" href="category.html">Хочу</a>
-                                                    </div>
-                                                </div>
-                                            </li>
-                                        </ul>
-                                    </li>
-                                    <li class="dropdown">
-                                        <a role="button" class="dropdown-toggle" data-toggle="dropdown">
-                                            <img src="{% static "image/icon_matras.png" %} " class="img-responsive icon"/>
-                                        </a>
-                                        <a href="category.html">
-                                            Матрасы
-                                        </a>
-                                        <div class="arrow"></div>
-                                        <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu">
-                                            <li>
-                                                <div class="yamm-content">
-                                                    <div class="col-xs-6">
-                                                        <ul class="list-group">
-                                                            <li class="list-group-item">
-                                                                <a tabindex="-1" href="#">Деревянные кровати
-                                                                    <span class="glyphicon glyphicon-menu-right pull-right"></span>
-                                                                </a>
-                                                            </li>
-                                                            <li class="list-group-item">
-                                                                <a tabindex="-1" href="#">
-                                                                    Металлические кровати
-                                                                    <span class="glyphicon glyphicon-menu-right pull-right"></span>
-                                                                </a>
-                                                            </li>
-                                                            <li class="list-group-item">
-                                                                <a tabindex="-1" href="#">Кровати с мягким изголовьем
-                                                                    <span class="glyphicon glyphicon-menu-right pull-right"></span>
-                                                                </a>
-                                                            </li>
-                                                            <li class="list-group-item">
-                                                                <a tabindex="-1" href="#">Двухъярусные кровати
-                                                                    <span class="glyphicon glyphicon-menu-right pull-right"></span>
-                                                                </a>
-                                                            </li>
-                                                            <li class="list-group-item active">
-                                                                <a tabindex="-1" href="#">Детские кровати
-                                                                    <span class="glyphicon glyphicon-menu-right pull-right"></span>
-                                                                </a>
-                                                            </li>
-                                                            <li class="list-group-item">
-                                                                <a tabindex="-1" href="#">Каркасы для матрасов
-                                                                    <span class="glyphicon glyphicon-menu-right pull-right"></span>
-                                                                </a></li>
-                                                            <li class="list-group-item text-center">
-                                                                <a tabindex="-1" href="#">
-                                                                    Все кровати
-                                                                    <span class="glyphicon glyphicon-menu-right"></span>
-                                                                </a>
-                                                            </li>
-                                                        </ul>
-                                                    </div>
-                                                    <div class="col-xs-6">
-                                                        <div class="panel panel-default">
-                                                            <div class="panel-heading">
-                                                                <a href="category.html">Детские кровати</a>
-                                                            </div>
-                                                            <div class="panel-body">
-                                                                <ul class="list-group">
-                                                                    <li class="list-group-item">
-                                                                        <a href="#">Кровати для детей и подростков</a>
-                                                                    </li>
-                                                                    <li class="list-group-item">
-                                                                        <a href="#">Кроватки для новорожденных</a>
-                                                                    </li>
-                                                                </ul>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-xs-12 text-right image">
-                                                        <img src="/media/images/make_up/menu_image.png" class="img-responsive pull-right" title="" alt=""/>
-                                                        <a class="btn btn-default btn-menu btn-xs" href="category.html">Хочу</a>
-                                                    </div>
-                                                </div>
-                                            </li>
-                                        </ul>
-                                    </li>
-                                    <li class="dropdown">
-                                        <a role="button" class="dropdown-toggle" data-toggle="dropdown">
-                                            <img src="{% static "image/icon_korpusnaya.png" %}" class="img-responsive icon"/>
-                                        </a>
-                                        <a href="category.html">
-                                            Корпусная мебель
-                                        </a>
-                                        <div class="arrow"></div>
-                                        <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu">
-                                            <li>
-                                                <div class="yamm-content">
-                                                    <div class="col-xs-6">
-                                                        <ul class="list-group">
-                                                            <li class="list-group-item">
-                                                                <a tabindex="-1" href="#">Деревянные кровати
-                                                                    <span class="glyphicon glyphicon-menu-right pull-right"></span>
-                                                                </a>
-                                                            </li>
-                                                            <li class="list-group-item">
-                                                                <a tabindex="-1" href="#">
-                                                                    Металлические кровати
-                                                                    <span class="glyphicon glyphicon-menu-right pull-right"></span>
-                                                                </a>
-                                                            </li>
-                                                            <li class="list-group-item">
-                                                                <a tabindex="-1" href="#">Кровати с мягким изголовьем
-                                                                    <span class="glyphicon glyphicon-menu-right pull-right"></span>
-                                                                </a>
-                                                            </li>
-                                                            <li class="list-group-item">
-                                                                <a tabindex="-1" href="#">Двухъярусные кровати
-                                                                    <span class="glyphicon glyphicon-menu-right pull-right"></span>
-                                                                </a>
-                                                            </li>
-                                                            <li class="list-group-item active">
-                                                                <a tabindex="-1" href="#">Детские кровати
-                                                                    <span class="glyphicon glyphicon-menu-right pull-right"></span>
-                                                                </a>
-                                                            </li>
-                                                            <li class="list-group-item">
-                                                                <a tabindex="-1" href="#">Каркасы для матрасов
-                                                                    <span class="glyphicon glyphicon-menu-right pull-right"></span>
-                                                                </a></li>
-                                                            <li class="list-group-item text-center">
-                                                                <a tabindex="-1" href="#">
-                                                                    Все кровати
-                                                                    <span class="glyphicon glyphicon-menu-right"></span>
-                                                                </a>
-                                                            </li>
-                                                        </ul>
-                                                    </div>
-                                                    <div class="col-xs-6">
-                                                        <div class="panel panel-default">
-                                                            <div class="panel-heading">
-                                                                <a href="category.html">Детские кровати</a>
-                                                            </div>
-                                                            <div class="panel-body">
-                                                                <ul class="list-group">
-                                                                    <li class="list-group-item">
-                                                                        <a href="#">Кровати для детей и подростков</a>
-                                                                    </li>
-                                                                    <li class="list-group-item">
-                                                                        <a href="#">Кроватки для новорожденных</a>
-                                                                    </li>
-                                                                </ul>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-xs-12 text-right image">
-                                                        <img src="/media/images/make_up/menu_image.png" class="img-responsive pull-right" title="" alt=""/>
-                                                        <a class="btn btn-default btn-menu btn-xs" href="category.html">Хочу</a>
-                                                    </div>
-                                                </div>
-                                            </li>
-                                        </ul>
-                                    </li>
-                                    <li class="dropdown">
-                                        <a role="button" class="dropdown-toggle" data-toggle="dropdown">
-                                            <img src="{% static "image/icon_kiddy.png" %}" class="img-responsive icon"/>
-                                        </a>
-                                        <a href="category.html">
-                                            Детская мебель
-                                        </a>
-                                        <div class="arrow"></div>
-                                        <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu">
-                                            <li>
-                                                <div class="yamm-content">
-                                                    <div class="col-xs-6">
-                                                        <ul class="list-group">
-                                                            <li class="list-group-item">
-                                                                <a tabindex="-1" href="#">Деревянные кровати
-                                                                    <span class="glyphicon glyphicon-menu-right pull-right"></span>
-                                                                </a>
-                                                            </li>
-                                                            <li class="list-group-item">
-                                                                <a tabindex="-1" href="#">
-                                                                    Металлические кровати
-                                                                    <span class="glyphicon glyphicon-menu-right pull-right"></span>
-                                                                </a>
-                                                            </li>
-                                                            <li class="list-group-item">
-                                                                <a tabindex="-1" href="#">Кровати с мягким изголовьем
-                                                                    <span class="glyphicon glyphicon-menu-right pull-right"></span>
-                                                                </a>
-                                                            </li>
-                                                            <li class="list-group-item">
-                                                                <a tabindex="-1" href="#">Двухъярусные кровати
-                                                                    <span class="glyphicon glyphicon-menu-right pull-right"></span>
-                                                                </a>
-                                                            </li>
-                                                            <li class="list-group-item active">
-                                                                <a tabindex="-1" href="#">Детские кровати
-                                                                    <span class="glyphicon glyphicon-menu-right pull-right"></span>
-                                                                </a>
-                                                            </li>
-                                                            <li class="list-group-item">
-                                                                <a tabindex="-1" href="#">Каркасы для матрасов
-                                                                    <span class="glyphicon glyphicon-menu-right pull-right"></span>
-                                                                </a></li>
-                                                            <li class="list-group-item text-center">
-                                                                <a tabindex="-1" href="#">
-                                                                    Все кровати
-                                                                    <span class="glyphicon glyphicon-menu-right"></span>
-                                                                </a>
-                                                            </li>
-                                                        </ul>
-                                                    </div>
-                                                    <div class="col-xs-6">
-                                                        <div class="panel panel-default">
-                                                            <div class="panel-heading">
-                                                                <a href="category.html">Детские кровати</a>
-                                                            </div>
-                                                            <div class="panel-body">
-                                                                <ul class="list-group">
-                                                                    <li class="list-group-item">
-                                                                        <a href="#">Кровати для детей и подростков</a>
-                                                                    </li>
-                                                                    <li class="list-group-item">
-                                                                        <a href="#">Кроватки для новорожденных</a>
-                                                                    </li>
-                                                                </ul>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-xs-12 text-right image">
-                                                        <img src="/media/images/make_up/menu_image.png" class="img-responsive pull-right" title="" alt=""/>
-                                                        <a class="btn btn-default btn-menu btn-xs" href="category.html">Хочу</a>
-                                                    </div>
-                                                </div>
-                                            </li>
-                                        </ul>
-                                    </li>
-                                    <li class="dropdown">
-                                        <a role="button" class="dropdown-toggle" data-toggle="dropdown">
-                                            <img src="{% static "image/icon_korpusnaya.png" %}" class="img-responsive icon"/>
-                                        </a>
-                                        <a href="category.html">
-                                            Мебель для кухни
-                                        </a>
-                                        <div class="arrow"></div>
-                                        <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu">
-                                            <li>
-                                                <div class="yamm-content">
-                                                    <div class="col-xs-6">
-                                                        <ul class="list-group">
-                                                            <li class="list-group-item">
-                                                                <a tabindex="-1" href="#">Деревянные кровати
-                                                                    <span class="glyphicon glyphicon-menu-right pull-right"></span>
-                                                                </a>
-                                                            </li>
-                                                            <li class="list-group-item">
-                                                                <a tabindex="-1" href="#">
-                                                                    Металлические кровати
-                                                                    <span class="glyphicon glyphicon-menu-right pull-right"></span>
-                                                                </a>
-                                                            </li>
-                                                            <li class="list-group-item">
-                                                                <a tabindex="-1" href="#">Кровати с мягким изголовьем
-                                                                    <span class="glyphicon glyphicon-menu-right pull-right"></span>
-                                                                </a>
-                                                            </li>
-                                                            <li class="list-group-item">
-                                                                <a tabindex="-1" href="#">Двухъярусные кровати
-                                                                    <span class="glyphicon glyphicon-menu-right pull-right"></span>
-                                                                </a>
-                                                            </li>
-                                                            <li class="list-group-item active">
-                                                                <a tabindex="-1" href="#">Детские кровати
-                                                                    <span class="glyphicon glyphicon-menu-right pull-right"></span>
-                                                                </a>
-                                                            </li>
-                                                            <li class="list-group-item">
-                                                                <a tabindex="-1" href="#">Каркасы для матрасов
-                                                                    <span class="glyphicon glyphicon-menu-right pull-right"></span>
-                                                                </a></li>
-                                                            <li class="list-group-item text-center">
-                                                                <a tabindex="-1" href="#">
-                                                                    Все кровати
-                                                                    <span class="glyphicon glyphicon-menu-right"></span>
-                                                                </a>
-                                                            </li>
-                                                        </ul>
-                                                    </div>
-                                                    <div class="col-xs-6">
-                                                        <div class="panel panel-default">
-                                                            <div class="panel-heading">
-                                                                <a href="category.html">Детские кровати</a>
-                                                            </div>
-                                                            <div class="panel-body">
-                                                                <ul class="list-group">
-                                                                    <li class="list-group-item">
-                                                                        <a href="#">Кровати для детей и подростков</a>
-                                                                    </li>
-                                                                    <li class="list-group-item">
-                                                                        <a href="#">Кроватки для новорожденных</a>
-                                                                    </li>
-                                                                </ul>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-xs-12 text-right image">
-                                                        <img src="/media/images/make_up/menu_image.png" class="img-responsive pull-right" title="" alt=""/>
-                                                        <a class="btn btn-default btn-menu btn-xs" href="category.html">Хочу</a>
-                                                    </div>
-                                                </div>
-                                            </li>
-                                        </ul>
-                                    </li>
-                                    <li class="dropdown">
-                                        <a role="button" class="dropdown-toggle" data-toggle="dropdown">
-                                            <img src="{% static "image/icon_sales.png" %} " class="img-responsive icon text-center"/>
-                                        </a>
-                                        <a href="category.html">
-                                            Акции
-                                        </a>
-                                        <div class="arrow"></div>
-                                        <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu">
-                                            <li>
-                                                <div class="yamm-content">
-                                                    <div class="col-xs-6">
-                                                        <ul class="list-group">
-                                                            <li class="list-group-item">
-                                                                <a tabindex="-1" href="#">Деревянные кровати
-                                                                    <span class="glyphicon glyphicon-menu-right pull-right"></span>
-                                                                </a>
-                                                            </li>
-                                                            <li class="list-group-item">
-                                                                <a tabindex="-1" href="#">
-                                                                    Металлические кровати
-                                                                    <span class="glyphicon glyphicon-menu-right pull-right"></span>
-                                                                </a>
-                                                            </li>
-                                                            <li class="list-group-item">
-                                                                <a tabindex="-1" href="#">Кровати с мягким изголовьем
-                                                                    <span class="glyphicon glyphicon-menu-right pull-right"></span>
-                                                                </a>
-                                                            </li>
-                                                            <li class="list-group-item">
-                                                                <a tabindex="-1" href="#">Двухъярусные кровати
-                                                                    <span class="glyphicon glyphicon-menu-right pull-right"></span>
-                                                                </a>
-                                                            </li>
-                                                            <li class="list-group-item active">
-                                                                <a tabindex="-1" href="#">Детские кровати
-                                                                    <span class="glyphicon glyphicon-menu-right pull-right"></span>
-                                                                </a>
-                                                            </li>
-                                                            <li class="list-group-item">
-                                                                <a tabindex="-1" href="#">Каркасы для матрасов
-                                                                    <span class="glyphicon glyphicon-menu-right pull-right"></span>
-                                                                </a></li>
-                                                            <li class="list-group-item text-center">
-                                                                <a tabindex="-1" href="#">
-                                                                    Все кровати
-                                                                    <span class="glyphicon glyphicon-menu-right"></span>
-                                                                </a>
-                                                            </li>
-                                                        </ul>
-                                                    </div>
-                                                    <div class="col-xs-6">
-                                                        <div class="panel panel-default">
-                                                            <div class="panel-heading">
-                                                                <a href="category.html">Детские кровати</a>
-                                                            </div>
-                                                            <div class="panel-body">
-                                                                <ul class="list-group">
-                                                                    <li class="list-group-item">
-                                                                        <a href="#">Кровати для детей и подростков</a>
-                                                                    </li>
-                                                                    <li class="list-group-item">
-                                                                        <a href="#">Кроватки для новорожденных</a>
-                                                                    </li>
-                                                                </ul>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-xs-12 text-right image">
-                                                        <img src="/media/images/make_up/menu_image.png" class="img-responsive pull-right" title="" alt=""/>
-                                                        <a class="btn btn-default btn-menu btn-xs" href="category.html">Хочу</a>
-                                                    </div>
-                                                </div>
-                                            </li>
-                                        </ul>
-                                    </li>
+                                        </li>
+                                    {% endverbatim categories %}
                                 </ul>
                             </div>
                         </div>
                     </nav>
                 </div>
+                {%csrf_token %}
             </header>
         {% endblock header %}
 

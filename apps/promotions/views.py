@@ -10,6 +10,12 @@ from sorl.thumbnail import get_thumbnail
 from django.db.models.query import Prefetch
 from django.views.generic.list import MultipleObjectMixin
 from django.views.generic import View
+from oscar.core.loading import get_model
+from django.views.generic.detail import BaseDetailView
+from soloha.settings import IMAGE_NOT_FOUND
+from easy_thumbnails.files import get_thumbnailer
+
+Category = get_model('catalogue', 'category')
 
 
 class HomeView(CoreHomeView):
@@ -20,6 +26,7 @@ queryset_product = Product.objects.only('title')
 
 class HitsView(views.JSONResponseMixin, views.AjaxResponseMixin, ListView):
     model = Line
+    template_name = ''
 
     def get_queryset(self):
         queryset = super(HitsView, self).get_queryset()
@@ -39,12 +46,15 @@ class HitsView(views.JSONResponseMixin, views.AjaxResponseMixin, ListView):
 
 
 class SpecialView(views.JSONResponseMixin, views.AjaxResponseMixin, ListView):
+    template_name = ''
+
     def post_ajax(self, request, *args, **kwargs):
         super(SpecialView, self).post_ajax(request, *args, **kwargs)
 
 
 class RecommendView(views.JSONResponseMixin, views.AjaxResponseMixin, ListView):
     model = ProductRecommendation
+    template_name = ''
 
     def get_queryset(self):
         queryset = super(RecommendView, self).get_queryset()
@@ -65,6 +75,7 @@ class RecommendView(views.JSONResponseMixin, views.AjaxResponseMixin, ListView):
 
 class NewView(views.JSONResponseMixin, views.AjaxResponseMixin, ListView):
     model = Product
+    template_name = ''
 
     def get_queryset(self):
         queryset = super(NewView, self).get_queryset()
@@ -80,3 +91,28 @@ class NewView(views.JSONResponseMixin, views.AjaxResponseMixin, ListView):
         super(NewView, self).post_ajax(request, *args, **kwargs)
         products = [product.get_values() for product in self.object_list]
         return self.render_json_response(products)
+
+
+class CategoriesView(views.JSONResponseMixin, views.AjaxResponseMixin, ListView):
+    model = Category
+    template_name = ''
+
+    def get_queryset(self):
+        return Category.dump_obj()
+
+    def post(self, request, *args, **kwargs):
+        self.object_list = self.get_queryset()
+
+    def post_ajax(self, request, *args, **kwargs):
+        super(CategoriesView, self).post_ajax(request, *args, **kwargs)
+        options = {'size': (50, 31), 'crop': True}
+        categories = []
+
+        for category in self.object_list:
+            icon = category.get_icon()
+            categories.append({
+                'name': category.name,
+                'icon': get_thumbnailer(icon).get_thumbnail(options).url,
+                'absolute_url': category.get_absolute_url()
+            })
+        return self.render_json_response(categories)

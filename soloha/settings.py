@@ -59,7 +59,8 @@ INSTALLED_APPS = [
                      'compressor',
                      'widget_tweaks',
                      'djangular',
-                     'easy_thumbnails',
+                     # 'easy_thumbnails',
+                     # 'smart_load_tag',
                  ] + get_core_apps(['apps.catalogue', 'apps.promotions'])
 
 SITE_ID = 1
@@ -238,6 +239,8 @@ OSCAR_ORDER_STATUS_PIPELINE = {
     'Cancelled': (),
 }
 
+THUMBNAIL_DUMMY = True
+THUMBNAIL_FORCE_OVERWRITE = True
 OSCAR_DEFAULT_CURRENCY = 'UAH'
 #
 # USE_LESS = True

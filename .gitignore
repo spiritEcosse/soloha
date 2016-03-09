@@ -13,7 +13,7 @@ media/
 !/media/image_not_found.jpg
 # Vagrant
 .vagrant
-
+npm-debug.log
 # Temporary/OS files
 *.swp
 *.swo

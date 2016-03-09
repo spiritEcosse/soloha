@@ -12,6 +12,7 @@ import logging
 from soloha.settings import IMAGE_NOT_FOUND
 from oscar.apps.partner.strategy import Selector
 from django.contrib.postgres.fields import ArrayField
+from django.core import serializers
 
 logger = logging.getLogger(__name__)
 
@@ -29,6 +30,7 @@ class Category(AbstractCategory):
     meta_keywords = models.TextField(verbose_name=_('Meta tag: keywords'), blank=True)
     sort = models.IntegerField(blank=True, null=True)
     objects = CategoryEnable()
+    icon = models.ImageField(_('Icon'), upload_to='categories', blank=True, null=True, max_length=255)
 
     def get_absolute_url(self):
         cache_key = 'CATEGORY_URL_%s' % self.pk
@@ -38,6 +40,82 @@ class Category(AbstractCategory):
             url = reverse('category', kwargs={'category_slug': self.full_slug})
             cache.set(cache_key, url)
         return url
+
+    @classmethod
+    def dump_bulk_depth(cls, parent=None, keep_ids=True):
+        """Dumps a tree branch to a python data structure."""
+
+        # Because of fix_tree, this method assumes that the depth
+        # and numchild properties in the nodes can be incorrect,
+        # so no helper methods are used
+        qset = cls._get_serializable_model().get_annotated_list(max_depth=2)
+        if parent:
+            qset = qset.filter(path__startswith=parent.path)
+        ret, lnk = [], {}
+        for pyobj in serializers.serialize('python', qset):
+            # django's serializer stores the attributes in 'fields'
+            fields = pyobj['fields']
+            path = fields['path']
+            depth = int(len(path) / cls.steplen)
+            # this will be useless in load_bulk
+            del fields['depth']
+            del fields['path']
+            del fields['numchild']
+            if 'id' in fields:
+                # this happens immediately after a load_bulk
+                del fields['id']
+
+            newobj = {'data': fields}
+            if keep_ids:
+                newobj['id'] = pyobj['pk']
+
+            if (not parent and depth == 1) or\
+               (parent and len(path) == len(parent.path)):
+                ret.append(newobj)
+            else:
+                parentpath = cls._get_basepath(path, depth - 1)
+                parentobj = lnk[parentpath]
+                if 'children' not in parentobj:
+                    parentobj['children'] = []
+                parentobj['children'].append(newobj)
+            lnk[path] = newobj
+        return ret
+
+    @classmethod
+    def dump_obj(cls):
+        """Recursively obtaining categories."""
+        res_categories = []
+        categories = Category.get_root_nodes().filter(enable=True).order_by('sort')
+        options = {'size': (50, 31), 'crop': True}
+
+        for obj in categories:
+            if obj.has_children():
+                setattr(obj, 'children', obj.get_rec_cat())
+
+            icon = obj.get_icon()
+            res_categories.append({
+                'name': obj.name,
+                'icon': get_thumbnailer(icon).get_thumbnail(options).url,
+                'children': obj.children
+            })
+
+    def get_rec_cat(self):
+        children = []
+
+        for category in self.get_children():
+            if category.has_children():
+                setattr(category, 'children', category.get_rec_cat())
+
+            children.append({
+                'name': category.name,
+                'absolute_url': category.get_absolute_url(),
+                'children': category.children
+            })
+
+        return children
+
+    def get_icon(self):
+        return self.icon or IMAGE_NOT_FOUND
 
     def parent(self):
         return self.get_parent()
@@ -78,29 +156,6 @@ class Product(AbstractProduct):
         values['image'] = get_thumbnailer(getattr(self.primary_image(), 'original', IMAGE_NOT_FOUND)).get_thumbnail(options).url
         return values
 
-    def primary_image(self):
-        """
-        Returns the primary image for a product. Usually used when one can
-        only display one product image, e.g. in a list of products.
-        """
-        images = self.images.all()
-        ordering = self.images.model.Meta.ordering
-        if not ordering or ordering[0] != 'display_order':
-            # Only apply order_by() if a custom model doesn't use default
-            # ordering. Applying order_by() busts the prefetch cache of
-            # the ProductManager
-            images = images.order_by('display_order')
-        try:
-            return images[0]
-        except IndexError:
-            # We return a dict with fields that mirror the key properties of
-            # the ProductImage class so this missing image can be used
-            # interchangeably in templates.  Strategy pattern ftw!
-            return {
-                'original': IMAGE_NOT_FOUND,
-                'caption': '',
-                'is_missing': True
-            }
 
 
 # class MissingProductImage(CoreMissingProductImage):

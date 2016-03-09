@@ -9,6 +9,10 @@ from apps.catalogue.models import ProductRecommendation
 from apps.promotions.views import RecommendView
 import json
 from django.db.models.query import Prefetch
+from oscar.core.loading import get_model
+from oscar.apps.catalogue.categories import create_from_breadcrumbs
+from apps.catalogue.tests import get_annotated_list
+Category = get_model('catalogue', 'category')
 
 
 class TestHomePage(TestCase):
@@ -64,3 +68,18 @@ class TestHomePage(TestCase):
         ).order_by('-recommendation__date_created')[:MAX_COUNT_PRODUCT]
         products = [recommend.recommendation.get_values() for recommend in object_list]
         self.assertJSONEqual(response.content, json.dumps(products))
+
+    def get_categories(self):
+        categories = (
+            'Food > Cheese',
+            'Food > Meat',
+            'Clothes > Man > Jackets',
+            'Clothes > Woman > Skirts',
+        )
+        for breadcrumbs in categories:
+            create_from_breadcrumbs(breadcrumbs)
+
+        response = self.client.post(reverse('promotions:categories'), HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        # categories = Category.get_root_nodes().filter(enable=True).order_by('name').only('name')
+        categories = get_annotated_list()
+        self.assertJSONEqual(response.content, json.dumps(categories))

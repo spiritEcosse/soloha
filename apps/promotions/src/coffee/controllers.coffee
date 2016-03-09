@@ -2,7 +2,7 @@
 
 ### Controllers ###
 
-app_name = "promotions"
+app_name = "soloha"
 app = angular.module "#{app_name}.controllers", []
 
 app.controller 'Home', ['$http', '$scope', '$window', '$document', '$log', 'djangoUrl', ($http, $scope, $window, $document, $log, djangoUrl) ->
@@ -13,7 +13,6 @@ app.controller 'Home', ['$http', '$scope', '$window', '$document', '$log', 'djan
   $http.post(news).success (products) ->
     $scope.products = products
     $scope.news = products
-#    slider.refresh()
   .error ->
     console.error('An error occurred during submission')
 

@@ -17,9 +17,10 @@
                     <div class="image_container">
                         {% with image=product.primary_image %}
                             {% thumbnail image.original "220x165" crop="center" as thumb %}
-                            <a class="image" href="{{ product.get_absolute_url }}">
-                                <img src="{{ thumb.url }}" alt="{{ product.get_title }}" title="{{ product.get_title }}">
-                            </a>
+                                <a class="image" href="{{ product.get_absolute_url }}">
+                                    <img src="{{ thumb.url }}" alt="{{ product.get_title }}" title="{{ product.get_title }}">
+                                </a>
+                            {% endthumbnail %}
                         {% endwith %}
                     </div>
                 {% endblock %}
@@ -33,9 +34,9 @@
                             {% endif %}
                         </div>
                     {% endblock %}
-{#                    <strong>Цена:</strong>5555#}
+                    {#                    <strong>Цена:</strong>5555#}
                 </div>
-{#                <p><a href="#" class="btn btn-primary" role="button">Купить</a></p>#}
+                {#                <p><a href="#" class="btn btn-primary" role="button">Купить</a></p>#}
             </div>
             <div class="mask">
                 <div class="title">
