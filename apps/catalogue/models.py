@@ -42,32 +42,60 @@ class Category(AbstractCategory):
         return url
 
     @classmethod
-    def dump_bulk_depth(cls, parent=None, keep_ids=True):
+    def get_annotated_list_qs_depth(cls, parent=None, max_depth=None):
+        """
+        Gets an annotated list from a tree branch, change queryset
+
+        :param parent:
+
+            The node whose descendants will be annotated. The node itself
+            will be included in the list. If not given, the entire tree
+            will be annotated.
+
+        :param max_depth:
+
+            Optionally limit to specified depth
+
+        :sort_order
+
+            Sort order queryset.
+
+        """
+
+        result, info = [], {}
+        start_depth, prev_depth = (None, None)
+        qs = cls.objects.all()
+        if max_depth:
+            qs = qs.filter(depth__lte=max_depth)
+        return cls.get_annotated_list_qs(qs)
+
+    @classmethod
+    def dump_bulk_depth(cls, parent=None, keep_ids=True, max_depth=3):
         """Dumps a tree branch to a python data structure."""
 
         # Because of fix_tree, this method assumes that the depth
         # and numchild properties in the nodes can be incorrect,
         # so no helper methods are used
-        qset = cls._get_serializable_model().get_annotated_list(max_depth=2)
-        if parent:
-            qset = qset.filter(path__startswith=parent.path)
+        data = cls._get_serializable_model().get_annotated_list_qs_depth(max_depth=max_depth)
         ret, lnk = [], {}
-        for pyobj in serializers.serialize('python', qset):
+        options = {'size': (50, 31), 'crop': True}
+
+        for pyobj, info in data:
             # django's serializer stores the attributes in 'fields'
-            fields = pyobj['fields']
-            path = fields['path']
+            path = pyobj.path
             depth = int(len(path) / cls.steplen)
             # this will be useless in load_bulk
-            del fields['depth']
-            del fields['path']
-            del fields['numchild']
-            if 'id' in fields:
-                # this happens immediately after a load_bulk
-                del fields['id']
+            icon = pyobj.get_icon()
 
-            newobj = {'data': fields}
+            newobj = {'data': {
+                'name': pyobj.name,
+                'icon': get_thumbnailer(icon).get_thumbnail(options).url,
+                'absolute_url': pyobj.get_absolute_url(),
+                'slug': pyobj.slug
+            }}
+
             if keep_ids:
-                newobj['id'] = pyobj['pk']
+                newobj['id'] = pyobj.pk
 
             if (not parent and depth == 1) or\
                (parent and len(path) == len(parent.path)):
@@ -80,39 +108,6 @@ class Category(AbstractCategory):
                 parentobj['children'].append(newobj)
             lnk[path] = newobj
         return ret
-
-    @classmethod
-    def dump_obj(cls):
-        """Recursively obtaining categories."""
-        res_categories = []
-        categories = Category.get_root_nodes().filter(enable=True).order_by('sort')
-        options = {'size': (50, 31), 'crop': True}
-
-        for obj in categories:
-            if obj.has_children():
-                setattr(obj, 'children', obj.get_rec_cat())
-
-            icon = obj.get_icon()
-            res_categories.append({
-                'name': obj.name,
-                'icon': get_thumbnailer(icon).get_thumbnail(options).url,
-                'children': obj.children
-            })
-
-    def get_rec_cat(self):
-        children = []
-
-        for category in self.get_children():
-            if category.has_children():
-                setattr(category, 'children', category.get_rec_cat())
-
-            children.append({
-                'name': category.name,
-                'absolute_url': category.get_absolute_url(),
-                'children': category.children
-            })
-
-        return children
 
     def get_icon(self):
         return self.icon or IMAGE_NOT_FOUND

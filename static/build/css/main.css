@@ -7765,6 +7765,12 @@ header .bottom .navbar .nav > li .yamm-content .dropdown-menu > li > a:hover,
 header .bottom .navbar .nav > li .yamm-content .dropdown-menu > li > a:focus {
   background-color: transparent;
 }
+header .bottom .navbar .nav > li .yamm-content .list-group .list-group-item {
+  clear: both;
+  width: 100%;
+  display: block;
+  height: auto;
+}
 header .bottom .navbar .nav > li .yamm-content .panel-default > .panel-heading {
   color: #f08825;
   padding: 5px 10px;
@@ -7810,24 +7816,41 @@ header .bottom .navbar .nav > li .yamm-content .panel-default .panel-body .list-
   color: #6f6f6f;
 }
 header .bottom .navbar .nav > li .yamm-content ul.list-group {
-  margin: 0px;
-  padding: 0px;
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+header .bottom .navbar .nav > li .yamm-content ul.list-group .list-group-item.active,
+header .bottom .navbar .nav > li .yamm-content ul.list-group .list-group-item.active:hover,
+header .bottom .navbar .nav > li .yamm-content ul.list-group .list-group-item.active:focus {
+  background: linear-gradient(to top, #ffae42 0%, #f08825 44%, #ffae42 100%);
 }
 header .bottom .navbar .nav > li .yamm-content ul.list-group .list-group-item.active a,
 header .bottom .navbar .nav > li .yamm-content ul.list-group .list-group-item.active:hover a,
 header .bottom .navbar .nav > li .yamm-content ul.list-group .list-group-item.active:focus a {
   color: #ffffff;
+  background: transparent;
+  border: none;
 }
 header .bottom .navbar .nav > li .yamm-content ul.list-group li.list-group-item {
   padding: 8px;
+  text-align: left;
+  background: none;
 }
 header .bottom .navbar .nav > li .yamm-content ul.list-group li.list-group-item:hover,
 header .bottom .navbar .nav > li .yamm-content ul.list-group li.list-group-item:focus {
-  background-image: linear-gradient(to top, #ffae42 0%, #f08825 44%, #ffae42 100%);
+  background: linear-gradient(to top, #ffae42 0%, #f08825 44%, #ffae42 100%);
 }
 header .bottom .navbar .nav > li .yamm-content ul.list-group li.list-group-item:hover a,
 header .bottom .navbar .nav > li .yamm-content ul.list-group li.list-group-item:focus a {
   color: #ffffff;
+  border: none;
+}
+header .bottom .navbar .nav > li .yamm-content ul.list-group li.list-group-item:hover a:hover,
+header .bottom .navbar .nav > li .yamm-content ul.list-group li.list-group-item:focus a:hover,
+header .bottom .navbar .nav > li .yamm-content ul.list-group li.list-group-item:hover a:focus,
+header .bottom .navbar .nav > li .yamm-content ul.list-group li.list-group-item:focus a:focus {
+  border: none;
 }
 header .bottom .navbar .nav > li .yamm-content ul.list-group li.list-group-item a {
   color: #6f6f6f;

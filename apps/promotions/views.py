@@ -98,21 +98,12 @@ class CategoriesView(views.JSONResponseMixin, views.AjaxResponseMixin, ListView)
     template_name = ''
 
     def get_queryset(self):
-        return Category.dump_obj()
+        return Category.dump_bulk_depth()
 
     def post(self, request, *args, **kwargs):
         self.object_list = self.get_queryset()
 
     def post_ajax(self, request, *args, **kwargs):
         super(CategoriesView, self).post_ajax(request, *args, **kwargs)
-        options = {'size': (50, 31), 'crop': True}
-        categories = []
-
-        for category in self.object_list:
-            icon = category.get_icon()
-            categories.append({
-                'name': category.name,
-                'icon': get_thumbnailer(icon).get_thumbnail(options).url,
-                'absolute_url': category.get_absolute_url()
-            })
+        categories = self.object_list
         return self.render_json_response(categories)

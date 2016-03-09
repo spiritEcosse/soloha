@@ -3,6 +3,7 @@
 {% load compress %}
 {% load promotion_tags %}
 {% load thumbnail %}
+{% load i18n %}
 
 {% block extrascripts %}
     <script src="{% static 'build/js/common/app.js' %}"></script>
@@ -225,22 +226,22 @@
                                 <ul class="nav navbar-nav">
                                     {% verbatim categories %}
                                         <li class="dropdown" ng-cloak ng-show="categories.length" ng-repeat="category in categories">
-                                            <a role="button" class="dropdown-toggle" data-toggle="dropdown">
-                                                <img src="{{ category.icon }}" class="img-responsive icon"/>
-                                                {{ category.name }}
+                                            <a role="button" class="dropdown-toggle" data-toggle="dropdown" ng-cloak>
+                                                <img src="{{ category.data.icon }}" class="img-responsive icon"/>
+                                                {{ category.data.name }}
                                             </a>
-                                            <div class="dropdown-menu" ng-if="category.info.has_children" role="menu" aria-labelledby="dropdownMenu">
-                                                <div class="arrow"></div>
+                                            <div class="arrow"></div>
+                                            <div class="dropdown-menu" ng-if="category.children.length" role="menu" >
                                                 <div class="yamm-content">
                                                     <div class="col-xs-6">
-                                                        <ul class="list-group nav nav-pills nav-stacked">
-                                                            <li class="list-group-item active">
-                                                                <a tabindex="-1" href="{{ category.absolute_url }}">{{ category.name }}
+                                                        <ul class="list-group nav nav-tabs tabs-left">
+                                                            <li class="list-group-item" ng-repeat="sub_categories in category.children">
+                                                                <a data-toggle="tab" href="#{{ sub_categories.data.slug }}">{{ sub_categories.data.name }}
                                                                     <span class="glyphicon glyphicon-menu-right pull-right"></span>
                                                                 </a>
                                                             </li>
-                                                            <li class="list-group-item text-center">
-                                                                <a tabindex="-1" href="#">
+                                                            <li class="text-center list-group-item">
+                                                                <a tabindex="-1" href="#" class="text-center">
                                                                     Все кровати
                                                                     <span class="glyphicon glyphicon-menu-right"></span>
                                                                 </a>
@@ -249,18 +250,15 @@
                                                     </div>
                                                     <div class="col-xs-6">
                                                         <div class="tab-content">
-                                                            <div class="tab-pane active" id="tab1">
+                                                            <div class="tab-pane" ng-if="sub_categories.children.length" id="{{ sub_categories.data.slug }}" ng-repeat="sub_categories in category.children">
                                                                 <div class="panel panel-default">
                                                                     <div class="panel-heading">
-                                                                        <a href="category.html">Детские кровати</a>
+                                                                        <a href="{{ sub_categories.data.absolute_url }}">{{ sub_categories.data.name }}</a>
                                                                     </div>
                                                                     <div class="panel-body">
                                                                         <ul class="list-group">
-                                                                            <li class="list-group-item">
-                                                                                <a href="#">Кровати для детей и подростков</a>
-                                                                            </li>
-                                                                            <li class="list-group-item">
-                                                                                <a href="#">Кроватки для новорожденных</a>
+                                                                            <li class="list-group-item" ng-repeat="sub_sub_categories in sub_categories.children">
+                                                                                <a href="{{ sub_sub_categories.data.absolute_url }}">{{ sub_sub_categories.data.name }}</a>
                                                                             </li>
                                                                         </ul>
                                                                     </div>

@@ -473,6 +473,15 @@ header {
               background-color: transparent;
             }
 
+            .list-group {
+              .list-group-item {
+                clear: both;
+                width: 100%;
+                display: block;
+                height: auto;
+              }
+            }
+
             .panel-default > .panel-heading {
               color: #f08825;
               padding: 5px 10px;
@@ -527,23 +536,35 @@ header {
             }
 
             ul.list-group {
-              margin: 0px;
-              padding: 0px;
+              margin: 0;
+              padding: 0;
+              border:none;
 
               .list-group-item.active, .list-group-item.active:hover, .list-group-item.active:focus {
+                background: linear-gradient(to top, #ffae42 0%, #f08825 44%, #ffae42 100%);
+
                 a {
                   color: #ffffff;
+                  background: transparent;
+                  border:none;
                 }
               }
 
               li.list-group-item {
                 padding: 8px;
+                text-align: left;
+                background: none;
 
                 &:hover, &:focus {
-                  background-image: linear-gradient(to top, #ffae42 0%, #f08825 44%, #ffae42 100%);
+                  background: linear-gradient(to top, #ffae42 0%, #f08825 44%, #ffae42 100%);
 
                   a {
                     color: #ffffff;
+                    border:none;
+
+                    &:hover, &:focus {
+                      border: none;
+                    }
                   }
                 }
 
