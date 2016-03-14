@@ -233,28 +233,25 @@
                                             <div class="dropdown-menu" ng-if="category.children.length" role="menu" >
                                                 <div class="yamm-content">
                                                     <div class="col-xs-6">
+                                                        <div class="heading">
+                                                            <a ng-href="{{ category.data.absolute_url }}">{{ category.data.name }}</a>
+                                                        </div>
                                                         <ul class="list-group nav nav-tabs tabs-left">
                                                             <li class="list-group-item" ng-repeat="sub_categories in category.children">
-                                                                <a data-toggle="tab" href="#{{ sub_categories.data.slug }}">{{ sub_categories.data.name }}
+                                                                <a data-toggle="tab" ng-href="#{{ sub_categories.data.slug }}">{{ sub_categories.data.name }}
                                                                     <span class="glyphicon glyphicon-menu-right pull-right"></span>
-                                                                </a>
-                                                            </li>
-                                                            <li class="text-center list-group-item">
-                                                                <a tabindex="-1" href="#" class="text-center">
-                                                                    Все кровати
-                                                                    <span class="glyphicon glyphicon-menu-right"></span>
                                                                 </a>
                                                             </li>
                                                         </ul>
                                                     </div>
                                                     <div class="col-xs-6">
                                                         <div class="tab-content">
-                                                            <div class="tab-pane" ng-if="sub_categories.children.length" id="{{ sub_categories.data.slug }}" ng-repeat="sub_categories in category.children">
+                                                            <div class="tab-pane" id="{{ sub_categories.data.slug }}" ng-repeat="sub_categories in category.children">
                                                                 <div class="panel panel-default">
                                                                     <div class="panel-heading">
                                                                         <a href="{{ sub_categories.data.absolute_url }}">{{ sub_categories.data.name }}</a>
                                                                     </div>
-                                                                    <div class="panel-body">
+                                                                    <div class="panel-body" ng-if="sub_categories.children.length">
                                                                         <ul class="list-group">
                                                                             <li class="list-group-item" ng-repeat="sub_sub_categories in sub_categories.children">
                                                                                 <a href="{{ sub_sub_categories.data.absolute_url }}">{{ sub_sub_categories.data.name }}</a>
@@ -266,8 +263,8 @@
                                                         </div>
                                                     </div>
                                                     <div class="col-xs-12 text-right image">
-                                                        <img src="/media/images/make_up/menu_image.png" class="img-responsive pull-right" title="" alt=""/>
-                                                        <a class="btn btn-default btn-menu btn-xs" href="category.html">Хочу</a>
+                                                        <img ng-src="{{ category.data.image_banner }}" class="img-responsive pull-right" title="{{ category.data.name }}" alt="{{ category.data.name }}"/>
+                                                        <a class="btn btn-default btn-menu btn-xs" href="{{ category.data.link_banner }}">Хочу</a>
                                                     </div>
                                                 </div>
                                             </div>

@@ -29,10 +29,12 @@ class Category(AbstractCategory):
     meta_description = models.TextField(verbose_name=_('Meta tag: description'), blank=True)
     meta_keywords = models.TextField(verbose_name=_('Meta tag: keywords'), blank=True)
     sort = models.IntegerField(blank=True, null=True)
-    objects = CategoryEnable()
+    node_order_by = ['sort']
     icon = models.ImageField(_('Icon'), upload_to='categories', blank=True, null=True, max_length=255)
     created = models.DateTimeField(auto_now_add=True)
-    node_order_by = ['sort']
+    image_banner = models.ImageField(_('Image banner'), upload_to='categories', blank=True, null=True, max_length=255)
+    link_banner = models.URLField(_('Link banner'), blank=True, null=True, max_length=255)
+    objects = CategoryEnable()
 
     def get_values(self):
         return {
@@ -40,7 +42,14 @@ class Category(AbstractCategory):
             'icon': self.get_icon(),
             'absolute_url': self.get_absolute_url(),
             'slug': self.slug,
+            'image_banner': self.get_image_banner(),
+            'link_banner': self.link_banner,
         }
+
+    def get_image_banner(self):
+        image_banner = self.image_banner or IMAGE_NOT_FOUND
+        options = {'size': (544, 212), 'crop': True}
+        return get_thumbnailer(image_banner).get_thumbnail(options).url
 
     def get_absolute_url(self):
         cache_key = 'CATEGORY_URL_%s' % self.pk

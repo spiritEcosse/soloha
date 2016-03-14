@@ -174,6 +174,8 @@ class TestCatalog(TestCase):
             'icon': category.get_icon(),
             'absolute_url': category.get_absolute_url(),
             'slug': category.slug,
+            'image_banner': category.get_image_banner(),
+            'link_banner': category.link_banner,
         }
         really = category.get_values()
         self.assertDictEqual(must, really)
