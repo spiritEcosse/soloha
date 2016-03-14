@@ -22,59 +22,19 @@ ProductCategory = get_model('catalogue', 'ProductCategory')
 STATUS_CODE_200 = 200
 
 
-def get_annotated_list(depth=None, parent=None):
-    """
-    Gets an annotated list from a tree branch.
-
-    Borrows heavily from treebeard's get_annotated_list
-    """
-    # 'depth' is the backwards-compatible name for the template tag,
-    # 'max_depth' is the better variable name.
-    max_depth = depth
-
-    annotated_categories = []
-
-    start_depth, prev_depth = (None, None)
-    if parent:
-        categories = parent.get_descendants()
-        if max_depth is not None:
-            max_depth += parent.get_depth()
-    else:
-        categories = Category.get_tree()
-
-    info = {}
-    for node in categories:
-        node_depth = node.get_depth()
-        if start_depth is None:
-            start_depth = node_depth
-        if max_depth is not None and node_depth > max_depth:
-            continue
-
-        # Update previous node's info
-        info['has_children'] = prev_depth is None or node_depth > prev_depth
-        if prev_depth is not None and node_depth < prev_depth:
-            info['num_to_close'] = list(range(0, prev_depth - node_depth))
-
-        info = {'num_to_close': [],
-                'level': node_depth - start_depth}
-        annotated_categories.append((node, info,))
-        prev_depth = node_depth
-
-    if prev_depth is not None:
-        # close last leaf
-        info['num_to_close'] = list(range(0, prev_depth - start_depth))
-        info['has_children'] = prev_depth > prev_depth
-
-    return annotated_categories
-
-
 class TestCatalog(TestCase):
     def setUp(self):
         self.client = Client()
 
     def create_category(self):
         categories = (
-            'Clothes > Woman > Skirts',
+            '1',
+            '2 > 21',
+            '2 > 22',
+            '2 > 23 > 231',
+            '2 > 24',
+            '3',
+            '4 > 41',
         )
         for breadcrumbs in categories:
             create_from_breadcrumbs(breadcrumbs)
@@ -86,7 +46,7 @@ class TestCatalog(TestCase):
         self.assertEqual(response.request['PATH_INFO'], product.get_absolute_url())
 
         self.create_category()
-        category = Category.objects.get(name='Skirts')
+        category = Category.objects.get(name='21')
         product_category = ProductCategory(product=product, category=category)
         product_category.save()
         response = self.client.get(product.get_absolute_url())
@@ -95,7 +55,7 @@ class TestCatalog(TestCase):
 
     def test_url_category(self):
         self.create_category()
-        category = Category.objects.get(name='Skirts')
+        category = Category.objects.get(name='213')
         response = self.client.get(category.get_absolute_url())
         self.assertEqual(response.status_code, STATUS_CODE_200)
         self.assertEqual(response.request['PATH_INFO'], category.get_absolute_url())
@@ -200,3 +160,132 @@ class TestCatalog(TestCase):
         #     product, expected_product_attr_value = self._create_product_attribute()
         #     received_product_attr_value = ProductAttributeValue.objects.filter(product=product, pos_characteristic=self.needle)
         #     self.assertListEqual(expected_product_attr_value, list(received_product_attr_value))
+
+    def test_category_get_values(self):
+        """
+
+        Returns:
+
+        """
+        self.create_category()
+        category = Category.objects.get(name='1')
+        must = {
+            'name': category.name,
+            'icon': category.get_icon(),
+            'absolute_url': category.get_absolute_url(),
+            'slug': category.slug,
+        }
+        really = category.get_values()
+        self.assertDictEqual(must, really)
+
+    def get_load_data(self):
+        """
+        get data for model category
+        Returns:
+        Examples
+        in key data store fields model category
+        in key children store list children model category
+        [
+            {'data': {'name': '1', 'sort': 1}},
+            {'data': {'name': '2', 'sort': 2}, 'children': [
+                {'data': {'name': '21', 'sort': 1}},
+                {'data': {'name': '22', 'sort': 2}},
+                {'data': {'name': '23', 'sort': 3}, 'children': [
+                    {'data': {'name': '231', 'sort': 1}},
+                ]},
+                {'data': {'name': '24', 'sort': 3}},
+            ]},
+            {'data': {'name': '3', 'sort': 4}},
+            {'data': {'name': '4', 'sort': 5}, 'children': [
+                {'data': {'name': '41', 'sort': 1}},
+            ]},
+        ]
+        """
+        return [
+            {'data': {'name': '4', 'sort': -5}, 'children': [
+                {'data': {'name': '41', 'sort': 1}},
+            ]},
+            {'data': {'name': '2', 'sort': 0}, 'children': [
+                {'data': {'name': '24', 'sort': 0}},
+                {'data': {'name': '21', 'sort': 1}},
+                {'data': {'name': '22', 'sort': 2}},
+                {'data': {'name': '23', 'sort': 3}, 'children': [
+                    {'data': {'name': '231', 'sort': 1}},
+                ]},
+            ]},
+            {'data': {'name': '1', 'sort': 1}},
+            {'data': {'name': '3', 'sort': 2}},
+        ]
+
+    def test_dump_bulk_depth(self):
+        Category.load_bulk(self.get_load_data())
+        load_data = list()
+        load_data.append({'data': Category.objects.get(name='4').get_values()})
+        load_data.append({'data': Category.objects.get(name='2').get_values()})
+        load_data.append({'data': Category.objects.get(name='1').get_values()})
+        load_data.append({'data': Category.objects.get(name='3').get_values()})
+        dump_bulk_depth_data = Category.dump_bulk_depth(max_depth=1, keep_ids=False)
+        self.assertListEqual(load_data, dump_bulk_depth_data)
+
+        load_data = list()
+        load_data.append({
+            'data': Category.objects.get(name='4').get_values(),
+            'children': [{'data': Category.objects.get(name='41').get_values()}]
+        })
+        load_data.append({
+            'data': Category.objects.get(name='2').get_values(),
+            'children': [
+                {'data': Category.objects.get(name='24').get_values()},
+                {'data': Category.objects.get(name='21').get_values()},
+                {'data': Category.objects.get(name='22').get_values()},
+                {'data': Category.objects.get(name='23').get_values()},
+            ]
+        })
+        load_data.append({'data': Category.objects.get(name='1').get_values()})
+        load_data.append({'data': Category.objects.get(name='3').get_values()})
+        dump_bulk_depth_data = Category.dump_bulk_depth(max_depth=2, keep_ids=False)
+        self.assertListEqual(load_data, dump_bulk_depth_data)
+
+        load_data = list()
+        load_data.append({
+            'data': Category.objects.get(name='4').get_values(),
+            'children': [{'data': Category.objects.get(name='41').get_values()}]
+        })
+        load_data.append({
+            'data': Category.objects.get(name='2').get_values(),
+            'children': [
+                {'data': Category.objects.get(name='24').get_values()},
+                {'data': Category.objects.get(name='21').get_values()},
+                {'data': Category.objects.get(name='22').get_values()},
+                {
+                    'data': Category.objects.get(name='23').get_values(),
+                    'children': [{'data': Category.objects.get(name='231').get_values()}]
+                },
+            ]
+        })
+        load_data.append({'data': Category.objects.get(name='1').get_values()})
+        load_data.append({'data': Category.objects.get(name='3').get_values()})
+        dump_bulk_depth_data = Category.dump_bulk_depth(max_depth=3, keep_ids=False)
+        self.assertListEqual(load_data, dump_bulk_depth_data)
+
+        load_data = list()
+        load_data.append({
+            'data': Category.objects.get(name='4').get_values(),
+            'children': [{'data': Category.objects.get(name='41').get_values()}]
+        })
+        load_data.append({
+            'data': Category.objects.get(name='2').get_values(),
+            'children': [
+                {'data': Category.objects.get(name='24').get_values()},
+                {'data': Category.objects.get(name='21').get_values()},
+                {'data': Category.objects.get(name='22').get_values()},
+                {
+                    'data': Category.objects.get(name='23').get_values(),
+                    'children': [{'data': Category.objects.get(name='231').get_values()}]
+                },
+            ]
+        })
+        load_data.append({'data': Category.objects.get(name='1').get_values()})
+        load_data.append({'data': Category.objects.get(name='3').get_values()})
+        dump_bulk_depth_data = Category.dump_bulk_depth(max_depth=0, keep_ids=False)
+        self.assertListEqual(load_data, dump_bulk_depth_data)

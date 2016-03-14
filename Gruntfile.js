@@ -4,10 +4,16 @@
   module.exports = function(grunt) {
     grunt.initConfig({
       pkg: grunt.file.readJSON('package.json'),
-      coffee: {
+      catalogue_coffee: {
         files: {
-          src: ['apps/**/*.coffee'],
-          dest: 'static/build/js/script.js'
+          src: ['apps/catalogue/**/*.coffee'],
+          dest: 'static/build/js/catalogue/script.js'
+        }
+      },
+      promotions_coffee: {
+        files: {
+          src: ['apps/promotions/**/*.coffee'],
+          dest: 'static/build/js/promotions/script.js'
         }
       },
       common_coffee: {
@@ -50,8 +56,7 @@
     });
     grunt.loadNpmTasks('grunt-contrib-coffee');
     grunt.loadNpmTasks('grunt-contrib-less');
-    grunt.registerTask('default', ['coffee:files', 'less']);
-    return grunt.registerTask('compile', ['common_coffee']);
+    return grunt.registerTask('default', ['common_coffee:files', 'promotions_coffee:files', 'catalogue_coffee:files', 'less']);
   };
 
 }).call(this);

@@ -4,6 +4,7 @@
 {% load promotion_tags %}
 {% load category_tags %}
 {% load product_tags %}
+{% load staticfiles %}
 {% load i18n %}
 
 {% block title %}
@@ -17,6 +18,12 @@
 {% block keywords %}
     {{ category.meta_keywords|default:""|striptags }}
 {% endblock %}
+
+{% block ngController %}ng-controller="Catalogue" ng-cloak{% endblock ngController %}
+
+{% block extrascripts %}
+    {{ block.super }}
+{% endblock extrascripts %}
 
 {% block left-bar %}
     <div class="heading">Подбор по параметрам</div>

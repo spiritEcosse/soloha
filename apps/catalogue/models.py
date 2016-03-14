@@ -31,6 +31,16 @@ class Category(AbstractCategory):
     sort = models.IntegerField(blank=True, null=True)
     objects = CategoryEnable()
     icon = models.ImageField(_('Icon'), upload_to='categories', blank=True, null=True, max_length=255)
+    created = models.DateTimeField(auto_now_add=True)
+    node_order_by = ['sort']
+
+    def get_values(self):
+        return {
+            'name': self.name,
+            'icon': self.get_icon(),
+            'absolute_url': self.get_absolute_url(),
+            'slug': self.slug,
+        }
 
     def get_absolute_url(self):
         cache_key = 'CATEGORY_URL_%s' % self.pk
@@ -64,41 +74,56 @@ class Category(AbstractCategory):
 
         result, info = [], {}
         start_depth, prev_depth = (None, None)
-        qs = cls.objects.all()
+        qs = cls.get_tree(parent)
         if max_depth:
             qs = qs.filter(depth__lte=max_depth)
         return cls.get_annotated_list_qs(qs)
 
     @classmethod
     def dump_bulk_depth(cls, parent=None, keep_ids=True, max_depth=3):
-        """Dumps a tree branch to a python data structure."""
+        """
+        Dumps a tree branch to a python type structure.
 
+        Args:
+            parent: by default None (if you set the Parent to the object category then we obtain a tree search)
+            keep_ids: by default True (if True add id category in data)
+            max_depth: by default 3 (max depth in category tree) (if max_depth = 0 return all tree)
+
+        Returns:
+        [{'data': category.get_values()},
+            {'data': category.get_values(), 'children':[
+                {'data': category.get_values()},
+                {'data': category.get_values()},
+                {'data': category.get_values(), 'children':[
+                    {'data': category.get_values()},
+                ]},
+                {'data': category.get_values()},
+            ]},
+            {'data': category.get_values()},
+            {'data': category.get_values(), 'children':[
+                {'data': category.get_values()},
+            ]},
+        ]
+        """
         # Because of fix_tree, this method assumes that the depth
         # and numchild properties in the nodes can be incorrect,
         # so no helper methods are used
-        data = cls._get_serializable_model().get_annotated_list_qs_depth(max_depth=max_depth)
+        data = cls.get_annotated_list_qs_depth(max_depth=max_depth)
         ret, lnk = [], {}
-        options = {'size': (50, 31), 'crop': True}
 
         for pyobj, info in data:
             # django's serializer stores the attributes in 'fields'
             path = pyobj.path
             depth = int(len(path) / cls.steplen)
             # this will be useless in load_bulk
-            icon = pyobj.get_icon()
 
-            newobj = {'data': {
-                'name': pyobj.name,
-                'icon': get_thumbnailer(icon).get_thumbnail(options).url,
-                'absolute_url': pyobj.get_absolute_url(),
-                'slug': pyobj.slug
-            }}
+            newobj = {'data': pyobj.get_values()}
 
             if keep_ids:
                 newobj['id'] = pyobj.pk
 
-            if (not parent and depth == 1) or\
-               (parent and len(path) == len(parent.path)):
+            if (not parent and depth == 1) or \
+                    (parent and len(path) == len(parent.path)):
                 ret.append(newobj)
             else:
                 parentpath = cls._get_basepath(path, depth - 1)
@@ -110,7 +135,9 @@ class Category(AbstractCategory):
         return ret
 
     def get_icon(self):
-        return self.icon or IMAGE_NOT_FOUND
+        icon = self.icon or IMAGE_NOT_FOUND
+        options = {'size': (50, 31), 'crop': True}
+        return get_thumbnailer(icon).get_thumbnail(options).url
 
     def parent(self):
         return self.get_parent()
@@ -178,8 +205,8 @@ class ProductAttributeValue(AbstractProductAttributeValue):
 # class ProductAttribute(AbstractProductAttribute):
 #     pos_option = models.BooleanField(verbose_name=_('This is option'), default=False, db_index=True)
 #     pos_attribute = models.BooleanField(verbose_name=_('This is attribute'), default=False, db_index=True)
-    # pos_filter = models.BooleanField(verbose_name=_('This is filter'), default=False, db_index=True)
-    # pos_characteristic = models.BooleanField(verbose_name=_('This is characteristic'), default=False, db_index=True)
+# pos_filter = models.BooleanField(verbose_name=_('This is filter'), default=False, db_index=True)
+# pos_characteristic = models.BooleanField(verbose_name=_('This is characteristic'), default=False, db_index=True)
 
 
 from oscar.apps.catalogue.models import *

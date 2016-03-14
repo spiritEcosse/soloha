@@ -3,7 +3,7 @@
 ### Controllers ###
 
 app_name = "soloha"
-app = angular.module "#{app_name}.controllers", []
+app = angular.module "#{app_name}.controllers"
 
 app.controller 'Home', ['$http', '$scope', '$window', '$document', '$log', 'djangoUrl', ($http, $scope, $window, $document, $log, djangoUrl) ->
   hits = djangoUrl.reverse('promotions:hits')

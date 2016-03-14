@@ -6,6 +6,7 @@
   "dependencies": {},
   "devDependencies": {
     "grunt": "^0.4.5",
+    "grunt-coffee-build": "^1.4.12",
     "grunt-contrib": "^0.11.0",
     "grunt-contrib-coffee": "^0.13.0",
     "grunt-contrib-less": "^1.2.0"

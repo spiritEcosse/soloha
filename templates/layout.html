@@ -7,7 +7,6 @@
 
 {% block extrascripts %}
     <script src="{% static 'build/js/common/app.js' %}"></script>
-    <script src="{% static 'build/js/common/controllers.js' %}"></script>
 {% endblock extrascripts %}
 
 {% block layout %}
@@ -16,7 +15,7 @@
         {% include "partials/nav_accounts.html" %}
     {% endif %}
 
-    <div class="container page" {% block ngApp %}{% endblock ngApp %}>
+    <div class="container page" {% block ngApp %}ng-app="soloha"{% endblock ngApp %}>
         {# Site logo/title, mini-basket, browse dropdown and searchbox #}
         {% block header %}
             <header ng-controller="Header">

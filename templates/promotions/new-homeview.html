@@ -2,14 +2,12 @@
 {% load staticfiles %}
 {% load i18n %}
 
-{% block ngApp %}ng-app="soloha"{% endblock %}
 {% block ngController %}ng-controller="Home" ng-cloak{% endblock ngController %}
 
 {% block extrascripts %}
     {{ block.super }}
     <script src="{% static 'bower_components/lightslider/dist/js/lightslider.min.js' %}"></script>
     <script src="{% static 'src/js/custom.js' %}"></script>
-    <script src="{% static 'build/js/script.js' %}"></script>
 {% endblock extrascripts %}
 
 {% block main %}
