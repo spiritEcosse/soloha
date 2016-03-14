@@ -3,7 +3,7 @@
 ### Declare app level module which depends on filters, and services ###
 
 app_name = 'soloha'
-app = angular.module app_name, ["#{app_name}.controllers", 'ng.django.urls']
+app = angular.module app_name, ["#{app_name}.controllers", 'ng.django.urls', 'ui.bootstrap']
 
 app.config ['$httpProvider', ($httpProvider) ->
   $httpProvider.defaults.xsrfCookieName = 'csrftoken'

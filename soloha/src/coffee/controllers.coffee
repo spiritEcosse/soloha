@@ -13,3 +13,4 @@ app.controller 'Header', ['$http', '$scope', '$window', '$document', '$log', 'dj
   .error ->
     console.log('An error occurred during submission')
 ]
+

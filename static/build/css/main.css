@@ -7681,6 +7681,10 @@ header .bottom .yamm .dropdown-menu {
   left: 0;
   margin: 0;
 }
+header .bottom .yamm .dropdown-menu .tabs-left .nav-tabs,
+header .bottom .yamm .dropdown-menu .tab-content {
+  float: left;
+}
 header .bottom .navbar {
   margin-bottom: 0;
   background-image: linear-gradient(to top, #ffae42 0%, #f08825 48%, #ffae42 100%);
@@ -7765,7 +7769,19 @@ header .bottom .navbar .nav > li .yamm-content .dropdown-menu > li > a:hover,
 header .bottom .navbar .nav > li .yamm-content .dropdown-menu > li > a:focus {
   background-color: transparent;
 }
-header .bottom .navbar .nav > li .yamm-content .list-group .list-group-item {
+header .bottom .navbar .nav > li .yamm-content .list-group {
+  margin-bottom: 0;
+}
+header .bottom .navbar .nav > li .yamm-content .tab-content {
+  width: 45%;
+  margin-left: 5%;
+}
+header .bottom .navbar .nav > li .yamm-content .nav-tabs,
+header .bottom .navbar .nav > li .yamm-content .tabs-left {
+  border: none;
+}
+header .bottom .navbar .nav > li .yamm-content .list-group .list-group-item,
+header .bottom .navbar .nav > li .yamm-content .nav-stacked .list-group-item {
   clear: both;
   width: 100%;
   display: block;
@@ -7815,47 +7831,149 @@ header .bottom .navbar .nav > li .yamm-content .panel-default .panel-body .list-
   text-decoration: none;
   color: #6f6f6f;
 }
-header .bottom .navbar .nav > li .yamm-content ul.list-group {
+header .bottom .navbar .nav > li .yamm-content .ng-isolate-scope .nav-tabs {
+  width: 50%;
+}
+header .bottom .navbar .nav > li .yamm-content ul.nav-stacked {
   margin: 0;
   padding: 0;
   border: none;
 }
-header .bottom .navbar .nav > li .yamm-content ul.list-group .list-group-item.active,
-header .bottom .navbar .nav > li .yamm-content ul.list-group .list-group-item.active:hover,
-header .bottom .navbar .nav > li .yamm-content ul.list-group .list-group-item.active:focus {
-  background: linear-gradient(to top, #ffae42 0%, #f08825 44%, #ffae42 100%);
+header .bottom .navbar .nav > li .yamm-content ul.nav-stacked li.ng-isolate-scope {
+  position: relative;
+  display: block;
+  padding: 10px 15px;
+  margin-bottom: -1px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  margin-top: 0;
+  border-top: 0;
+  padding: 8px;
+  text-align: left;
+  background: none;
+  width: auto;
+  height: auto;
 }
-header .bottom .navbar .nav > li .yamm-content ul.list-group .list-group-item.active a,
-header .bottom .navbar .nav > li .yamm-content ul.list-group .list-group-item.active:hover a,
-header .bottom .navbar .nav > li .yamm-content ul.list-group .list-group-item.active:focus a {
+header .bottom .navbar .nav > li .yamm-content ul.nav-stacked li.ng-isolate-scope:first-child {
+  border-top-right-radius: 4px;
+  border-top-left-radius: 4px;
+}
+header .bottom .navbar .nav > li .yamm-content ul.nav-stacked li.ng-isolate-scope:last-child {
+  margin-bottom: 0;
+  border-bottom-right-radius: 4px;
+  border-bottom-left-radius: 4px;
+}
+header .bottom .navbar .nav > li .yamm-content ul.nav-stacked li.ng-isolate-scope.disabled,
+header .bottom .navbar .nav > li .yamm-content ul.nav-stacked li.ng-isolate-scope.disabled:hover,
+header .bottom .navbar .nav > li .yamm-content ul.nav-stacked li.ng-isolate-scope.disabled:focus {
+  background-color: #eeeeee;
+  color: #777777;
+  cursor: not-allowed;
+}
+header .bottom .navbar .nav > li .yamm-content ul.nav-stacked li.ng-isolate-scope.disabled .list-group-item-heading,
+header .bottom .navbar .nav > li .yamm-content ul.nav-stacked li.ng-isolate-scope.disabled:hover .list-group-item-heading,
+header .bottom .navbar .nav > li .yamm-content ul.nav-stacked li.ng-isolate-scope.disabled:focus .list-group-item-heading {
+  color: inherit;
+}
+header .bottom .navbar .nav > li .yamm-content ul.nav-stacked li.ng-isolate-scope.disabled .list-group-item-text,
+header .bottom .navbar .nav > li .yamm-content ul.nav-stacked li.ng-isolate-scope.disabled:hover .list-group-item-text,
+header .bottom .navbar .nav > li .yamm-content ul.nav-stacked li.ng-isolate-scope.disabled:focus .list-group-item-text {
+  color: #777777;
+}
+header .bottom .navbar .nav > li .yamm-content ul.nav-stacked li.ng-isolate-scope.active,
+header .bottom .navbar .nav > li .yamm-content ul.nav-stacked li.ng-isolate-scope.active:hover,
+header .bottom .navbar .nav > li .yamm-content ul.nav-stacked li.ng-isolate-scope.active:focus {
+  z-index: 2;
+  color: #fff;
+  background-color: #337ab7;
+  border-color: #337ab7;
+}
+header .bottom .navbar .nav > li .yamm-content ul.nav-stacked li.ng-isolate-scope.active .list-group-item-heading,
+header .bottom .navbar .nav > li .yamm-content ul.nav-stacked li.ng-isolate-scope.active:hover .list-group-item-heading,
+header .bottom .navbar .nav > li .yamm-content ul.nav-stacked li.ng-isolate-scope.active:focus .list-group-item-heading,
+header .bottom .navbar .nav > li .yamm-content ul.nav-stacked li.ng-isolate-scope.active .list-group-item-heading > small,
+header .bottom .navbar .nav > li .yamm-content ul.nav-stacked li.ng-isolate-scope.active:hover .list-group-item-heading > small,
+header .bottom .navbar .nav > li .yamm-content ul.nav-stacked li.ng-isolate-scope.active:focus .list-group-item-heading > small,
+header .bottom .navbar .nav > li .yamm-content ul.nav-stacked li.ng-isolate-scope.active .list-group-item-heading > .small,
+header .bottom .navbar .nav > li .yamm-content ul.nav-stacked li.ng-isolate-scope.active:hover .list-group-item-heading > .small,
+header .bottom .navbar .nav > li .yamm-content ul.nav-stacked li.ng-isolate-scope.active:focus .list-group-item-heading > .small {
+  color: inherit;
+}
+header .bottom .navbar .nav > li .yamm-content ul.nav-stacked li.ng-isolate-scope.active .list-group-item-text,
+header .bottom .navbar .nav > li .yamm-content ul.nav-stacked li.ng-isolate-scope.active:hover .list-group-item-text,
+header .bottom .navbar .nav > li .yamm-content ul.nav-stacked li.ng-isolate-scope.active:focus .list-group-item-text {
+  color: #c7ddef;
+}
+header .bottom .navbar .nav > li .yamm-content ul.nav-stacked li.ng-isolate-scope:first-child {
+  border-top: 1px solid #ddd;
+}
+header .bottom .navbar .nav > li .yamm-content ul.nav-stacked li.ng-isolate-scope:first-child:hover,
+header .bottom .navbar .nav > li .yamm-content ul.nav-stacked li.ng-isolate-scope:first-child:focus {
+  border-top: 1px solid #ddd;
+}
+header .bottom .navbar .nav > li .yamm-content ul.nav-stacked li.ng-isolate-scope:first-child a {
+  border: none;
+}
+header .bottom .navbar .nav > li .yamm-content ul.nav-stacked li.ng-isolate-scope:hover,
+header .bottom .navbar .nav > li .yamm-content ul.nav-stacked li.ng-isolate-scope:focus {
+  background: linear-gradient(to top, #ffae42 0%, #f08825 44%, #ffae42 100%);
+  border-top: 0;
+  margin-top: 0;
+  border-bottom: 1px solid #ddd;
+  border-right: 1px solid #ddd;
+  border-left: 1px solid #ddd;
+}
+header .bottom .navbar .nav > li .yamm-content ul.nav-stacked li.ng-isolate-scope:hover a,
+header .bottom .navbar .nav > li .yamm-content ul.nav-stacked li.ng-isolate-scope:focus a {
   color: #ffffff;
   background: transparent;
   border: none;
 }
-header .bottom .navbar .nav > li .yamm-content ul.list-group li.list-group-item {
-  padding: 8px;
-  text-align: left;
-  background: none;
-}
-header .bottom .navbar .nav > li .yamm-content ul.list-group li.list-group-item:hover,
-header .bottom .navbar .nav > li .yamm-content ul.list-group li.list-group-item:focus {
-  background: linear-gradient(to top, #ffae42 0%, #f08825 44%, #ffae42 100%);
-}
-header .bottom .navbar .nav > li .yamm-content ul.list-group li.list-group-item:hover a,
-header .bottom .navbar .nav > li .yamm-content ul.list-group li.list-group-item:focus a {
-  color: #ffffff;
+header .bottom .navbar .nav > li .yamm-content ul.nav-stacked li.ng-isolate-scope:hover a:hover,
+header .bottom .navbar .nav > li .yamm-content ul.nav-stacked li.ng-isolate-scope:focus a:hover,
+header .bottom .navbar .nav > li .yamm-content ul.nav-stacked li.ng-isolate-scope:hover a:focus,
+header .bottom .navbar .nav > li .yamm-content ul.nav-stacked li.ng-isolate-scope:focus a:focus {
   border: none;
 }
-header .bottom .navbar .nav > li .yamm-content ul.list-group li.list-group-item:hover a:hover,
-header .bottom .navbar .nav > li .yamm-content ul.list-group li.list-group-item:focus a:hover,
-header .bottom .navbar .nav > li .yamm-content ul.list-group li.list-group-item:hover a:focus,
-header .bottom .navbar .nav > li .yamm-content ul.list-group li.list-group-item:focus a:focus {
+header .bottom .navbar .nav > li .yamm-content ul.nav-stacked li.ng-isolate-scope a {
   border: none;
-}
-header .bottom .navbar .nav > li .yamm-content ul.list-group li.list-group-item a {
   color: #6f6f6f;
   font-size: 14px;
   font-weight: 400;
+}
+header .bottom .navbar .nav > li .yamm-content ul.nav-stacked li.ng-isolate-scope.active,
+header .bottom .navbar .nav > li .yamm-content ul.nav-stacked .ng-isolate-scope.active:hover,
+header .bottom .navbar .nav > li .yamm-content ul.nav-stacked .ng-isolate-scope.active:focus {
+  background: linear-gradient(to top, #ffae42 0%, #f08825 44%, #ffae42 100%);
+  border: none;
+  border-top: 1px solid #ddd;
+}
+header .bottom .navbar .nav > li .yamm-content ul.nav-stacked li.ng-isolate-scope.active a,
+header .bottom .navbar .nav > li .yamm-content ul.nav-stacked .ng-isolate-scope.active:hover a,
+header .bottom .navbar .nav > li .yamm-content ul.nav-stacked .ng-isolate-scope.active:focus a {
+  color: #ffffff;
+  border: none;
+  background: transparent;
+}
+header .bottom .navbar .nav > li .yamm-content ul.nav-stacked li.ng-isolate-scope.active:hover,
+header .bottom .navbar .nav > li .yamm-content ul.nav-stacked .ng-isolate-scope.active:hover:hover,
+header .bottom .navbar .nav > li .yamm-content ul.nav-stacked .ng-isolate-scope.active:focus:hover,
+header .bottom .navbar .nav > li .yamm-content ul.nav-stacked li.ng-isolate-scope.active:focus,
+header .bottom .navbar .nav > li .yamm-content ul.nav-stacked .ng-isolate-scope.active:hover:focus,
+header .bottom .navbar .nav > li .yamm-content ul.nav-stacked .ng-isolate-scope.active:focus:focus {
+  background: linear-gradient(to top, #ffae42 0%, #f08825 44%, #ffae42 100%);
+  border: none;
+  border-top: 1px solid #ddd;
+}
+header .bottom .navbar .nav > li .yamm-content ul.nav-stacked li.ng-isolate-scope.active:hover a,
+header .bottom .navbar .nav > li .yamm-content ul.nav-stacked .ng-isolate-scope.active:hover:hover a,
+header .bottom .navbar .nav > li .yamm-content ul.nav-stacked .ng-isolate-scope.active:focus:hover a,
+header .bottom .navbar .nav > li .yamm-content ul.nav-stacked li.ng-isolate-scope.active:focus a,
+header .bottom .navbar .nav > li .yamm-content ul.nav-stacked .ng-isolate-scope.active:hover:focus a,
+header .bottom .navbar .nav > li .yamm-content ul.nav-stacked .ng-isolate-scope.active:focus:focus a {
+  color: #ffffff;
+  border: none;
+  background: transparent;
 }
 header .bottom .navbar .nav > li .yamm-content .image {
   position: relative;

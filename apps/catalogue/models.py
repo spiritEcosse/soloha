@@ -13,7 +13,8 @@ from soloha.settings import IMAGE_NOT_FOUND
 from oscar.apps.partner.strategy import Selector
 from django.contrib.postgres.fields import ArrayField
 from django.core import serializers
-
+from easy_thumbnails.exceptions import (
+    InvalidImageFormatError, EasyThumbnailsError)
 logger = logging.getLogger(__name__)
 
 
@@ -47,9 +48,12 @@ class Category(AbstractCategory):
         }
 
     def get_image_banner(self):
-        image_banner = self.image_banner or IMAGE_NOT_FOUND
-        options = {'size': (544, 212), 'crop': True}
-        return get_thumbnailer(image_banner).get_thumbnail(options).url
+        image_banner = ''
+
+        if self.image_banner:
+            options = {'size': (544, 212), 'crop': True}
+            image_banner = get_thumbnailer(self.image_banner).get_thumbnail(options).url
+        return image_banner
 
     def get_absolute_url(self):
         cache_key = 'CATEGORY_URL_%s' % self.pk
@@ -144,9 +148,12 @@ class Category(AbstractCategory):
         return ret
 
     def get_icon(self):
-        icon = self.icon or IMAGE_NOT_FOUND
-        options = {'size': (50, 31), 'crop': True}
-        return get_thumbnailer(icon).get_thumbnail(options).url
+        icon = ''
+
+        if self.icon:
+            options = {'size': (50, 31), 'crop': True}
+            icon = get_thumbnailer(self.icon).get_thumbnail(options).url
+        return icon
 
     def parent(self):
         return self.get_parent()
@@ -184,7 +191,13 @@ class Product(AbstractProduct):
         info = strategy.fetch_for_product(self)
         values['price'] = str(info.price.incl_tax)
         options = {'size': (220, 165), 'crop': True}
-        values['image'] = get_thumbnailer(getattr(self.primary_image(), 'original', IMAGE_NOT_FOUND)).get_thumbnail(options).url
+
+        image = getattr(self.primary_image(), 'original', IMAGE_NOT_FOUND)
+
+        try:
+            values['image'] = get_thumbnailer(image).get_thumbnail(options).url
+        except InvalidImageFormatError:
+            values['image'] = get_thumbnailer(IMAGE_NOT_FOUND).get_thumbnail(options).url
         return values
 
 

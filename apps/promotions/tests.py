@@ -81,5 +81,5 @@ class TestHomePage(TestCase):
 
         response = self.client.post(reverse('promotions:categories'), HTTP_X_REQUESTED_WITH='XMLHttpRequest')
         # categories = Category.get_root_nodes().filter(enable=True).order_by('name').only('name')
-        categories = get_annotated_list()
+        categories = Category.get_annotated_list()
         self.assertJSONEqual(response.content, json.dumps(categories))

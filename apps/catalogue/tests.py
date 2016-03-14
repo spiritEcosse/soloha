@@ -204,9 +204,7 @@ class TestCatalog(TestCase):
         ]
         """
         return [
-            {'data': {'name': '4', 'sort': -5}, 'children': [
-                {'data': {'name': '41', 'sort': 1}},
-            ]},
+            {'data': {'name': '1', 'sort': 1}},
             {'data': {'name': '2', 'sort': 0}, 'children': [
                 {'data': {'name': '24', 'sort': 0}},
                 {'data': {'name': '21', 'sort': 1}},
@@ -215,8 +213,10 @@ class TestCatalog(TestCase):
                     {'data': {'name': '231', 'sort': 1}},
                 ]},
             ]},
-            {'data': {'name': '1', 'sort': 1}},
             {'data': {'name': '3', 'sort': 2}},
+            {'data': {'name': '4', 'sort': -5}, 'children': [
+                {'data': {'name': '41', 'sort': 1}},
+            ]},
         ]
 
     def test_dump_bulk_depth(self):

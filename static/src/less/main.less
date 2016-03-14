@@ -375,6 +375,10 @@ header {
         width: 100%;
         left:0;
         margin: 0;
+
+        .tabs-left .nav-tabs, .tab-content {
+          float:left;
+        }
       }
     }
 
@@ -418,7 +422,7 @@ header {
       }
 
       .nav {
-        .open  {
+        .open {
           .arrow {
             bottom: 0;
 
@@ -474,6 +478,19 @@ header {
             }
 
             .list-group {
+              margin-bottom: 0;
+            }
+
+            .tab-content {
+              width: 45%;
+              margin-left: 5%;
+            }
+
+            .nav-tabs, .tabs-left {
+              border: none;
+            }
+
+            .list-group, .nav-stacked {
               .list-group-item {
                 clear: both;
                 width: 100%;
@@ -535,31 +552,50 @@ header {
               }
             }
 
-            ul.list-group {
+            .ng-isolate-scope {
+              .nav-tabs {
+                width: 50%;
+              }
+            }
+
+            ul.nav-stacked {
               margin: 0;
               padding: 0;
               border:none;
 
-              .list-group-item.active, .list-group-item.active:hover, .list-group-item.active:focus {
-                background: linear-gradient(to top, #ffae42 0%, #f08825 44%, #ffae42 100%);
-
-                a {
-                  color: #ffffff;
-                  background: transparent;
-                  border:none;
-                }
-              }
-
-              li.list-group-item {
+              li.ng-isolate-scope {
+                .list-group-item();
+                margin-top: 0;
+                border-top: 0;
                 padding: 8px;
                 text-align: left;
                 background: none;
+                width: auto;
+                height: auto;
+
+                &:first-child {
+                  border-top: 1px solid @border-header;
+
+                  &:hover, &:focus {
+                    border-top: 1px solid @border-header;
+                  }
+
+                  a {
+                    border: none;
+                  }
+                }
 
                 &:hover, &:focus {
                   background: linear-gradient(to top, #ffae42 0%, #f08825 44%, #ffae42 100%);
+                  border-top:0;
+                  margin-top: 0;
+                  border-bottom: 1px solid @border-header;
+                  border-right: 1px solid @border-header;
+                  border-left: 1px solid @border-header;
 
                   a {
                     color: #ffffff;
+                    background: transparent;
                     border:none;
 
                     &:hover, &:focus {
@@ -569,9 +605,34 @@ header {
                 }
 
                 a {
+                  border: none;
                   color: #6f6f6f;
                   font-size: 14px;
                   font-weight: 400;
+                }
+              }
+
+              li.ng-isolate-scope.active, .ng-isolate-scope.active:hover, .ng-isolate-scope.active:focus {
+                background: linear-gradient(to top, #ffae42 0%, #f08825 44%, #ffae42 100%);
+                border:none;
+                border-top: 1px solid @border-header;
+
+                a {
+                  color: #ffffff;
+                  border: none;
+                  background: transparent;
+                }
+
+                &:hover, &:focus {
+                  background: linear-gradient(to top, #ffae42 0%, #f08825 44%, #ffae42 100%);
+                  border:none;
+                  border-top: 1px solid @border-header;
+
+                  a {
+                    color: #ffffff;
+                    border: none;
+                    background: transparent;
+                  }
                 }
               }
             }
