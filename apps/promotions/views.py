@@ -1,19 +1,13 @@
 from oscar.apps.promotions.views import HomeView as CoreHomeView
 from braces import views
-from django.views.generic import DetailView, ListView
 from oscar.apps.order.models import Line
 from apps.catalogue.models import Product
 from soloha.settings import MAX_COUNT_PRODUCT
 from apps.catalogue.models import ProductRecommendation
-from django.utils.html import strip_entities
-from sorl.thumbnail import get_thumbnail
 from django.db.models.query import Prefetch
 from django.views.generic.list import MultipleObjectMixin
 from django.views.generic import View
 from oscar.core.loading import get_model
-from django.views.generic.detail import BaseDetailView
-from soloha.settings import IMAGE_NOT_FOUND
-from easy_thumbnails.files import get_thumbnailer
 
 Category = get_model('catalogue', 'category')
 

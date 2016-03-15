@@ -1,0 +1,65 @@
+{% load i18n %}
+
+{% verbatim products %}
+    <div class="col-sm-6 col-md-6" ng-cloak ng-show="products.length" ng-repeat="product in products" >
+        <div class="thumbnail text-center">
+            <div class="caption">
+                <div class="title">
+                    <a ng-href="{{ product.absolute_url }}">{{ product.title }}</a>
+                </div>
+                <a href="#" class="image"><img ng-src="{{ product.image }}" class="img-responsive" alt="{{ product.title }}" title="{{ product.title }}"/></a>
+                <div class="model"></div>
+                <div class="price"><strong>Цена:</strong>{{ product.price }}</div>
+                <p>
+                    <a href="#" class="btn btn-primary" role="button">
+                        {% endverbatim products %}
+                            {% trans "Купить" %}
+                        {% verbatim products %}
+                    </a>
+                </p>
+            </div>
+            <div class="mask">
+                <div class="title">
+                    <a href="{{ product.absolute_url }}">{{ product.title }}</a>
+                </div>
+                <div class="filters">
+                    <div class="rows">
+                        <div class="option_name">
+                            <span>По типу:</span>
+                        </div>
+
+                        <div class="option_value"><span>Кровати с мягким изголовьем</span></div>
+                    </div>
+                    <div class="rows">
+                        <div class="option_name">
+                            <span>По размеру:</span>
+                        </div>
+                        <div class="option_value"><span>Полуторные,Двухспальные</span></div>
+                    </div>
+                    <div class="rows">
+                        <div class="option_name">
+                            <span>Каркас:</span>
+                        </div>
+
+                        <div class="option_value"><span>Металлический</span></div>
+                    </div>
+                    <div class="rows">
+                        <div class="option_name">
+                            <span>Подъёмный механизм:</span>
+                        </div>
+
+                        <div class="option_value"><span>нет</span></div>
+                    </div>
+                    <div class="rows">
+                        <div class="option_name"><span>Ящики:</span></div>
+                        <div class="option_value"><span>нет</span></div>
+                    </div>
+                </div>
+                <a href="#">Смотреть все характеристики</a>
+                <div class="btn-block">
+                    <a href="#" class="btn btn-primary" role="button">Купить</a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endverbatim products %}

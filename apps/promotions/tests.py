@@ -6,12 +6,10 @@ from oscar.apps.order.models import Line
 from apps.catalogue.models import Product
 from soloha.settings import MAX_COUNT_PRODUCT
 from apps.catalogue.models import ProductRecommendation
-from apps.promotions.views import RecommendView
 import json
 from django.db.models.query import Prefetch
 from oscar.core.loading import get_model
 from oscar.apps.catalogue.categories import create_from_breadcrumbs
-from apps.catalogue.tests import get_annotated_list
 Category = get_model('catalogue', 'category')
 
 

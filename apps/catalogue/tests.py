@@ -7,11 +7,12 @@ from oscar.test.factories import create_product
 from oscar.apps.catalogue.categories import create_from_breadcrumbs
 from easy_thumbnails.files import get_thumbnailer
 from soloha.settings import IMAGE_NOT_FOUND
-from apps.catalogue.models import ProductImage
 from oscar.apps.partner.strategy import Selector
 from oscar.test import factories
 from django.utils.html import strip_entities
-from apps.catalogue.models import ProductAttribute, AttributeOptionGroup, AttributeOption, ProductAttributeValue
+from django.core.urlresolvers import reverse
+import json
+from django.db.models.query import Prefetch
 
 
 Product = get_model('catalogue', 'product')
@@ -55,15 +56,16 @@ class TestCatalog(TestCase):
 
     def test_url_category(self):
         self.create_category()
-        category = Category.objects.get(name='213')
+        category = Category.objects.get(name='231')
         response = self.client.get(category.get_absolute_url())
-        self.assertEqual(response.status_code, STATUS_CODE_200)
         self.assertEqual(response.request['PATH_INFO'], category.get_absolute_url())
+        self.assertEqual(response.status_code, STATUS_CODE_200)
 
     def test_url_catalogue(self):
         catalogue = '/catalogue/'
         response = self.client.get(catalogue)
         self.assertEqual(response.request['PATH_INFO'], catalogue)
+        self.assertEqual(response.status_code, STATUS_CODE_200)
 
     def test_product_values(self):
         product = factories.create_product()
@@ -291,3 +293,22 @@ class TestCatalog(TestCase):
         load_data.append({'data': Category.objects.get(name='3').get_values()})
         dump_bulk_depth_data = Category.dump_bulk_depth(max_depth=0, keep_ids=False)
         self.assertListEqual(load_data, dump_bulk_depth_data)
+
+    def test_get_list_product(self):
+        """
+        get list product by current category
+        Returns:
+        None
+        """
+        self.create_category()
+        category = Category.objects.get(name='231')
+        product = create_product()
+        product_category = ProductCategory(product=product, category=category)
+        product_category.save()
+        response = self.client.post(reverse('catalogue:products'), {'category_pk': category.pk}, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        products_queryset = Product.objects.filter(categories=category.pk).prefetch_related(
+            Prefetch('images'),
+            Prefetch('categories'),
+        ).order_by('-date_created')
+        products = [product.get_values() for product in products_queryset]
+        self.assertJSONEqual(response.content, json.dumps(products))

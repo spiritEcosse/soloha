@@ -7476,6 +7476,14 @@ div {
   padding-left: 30px;
   line-height: 18px;
 }
+[ng\:cloak],
+[ng-cloak],
+[data-ng-cloak],
+[x-ng-cloak],
+.ng-cloak,
+.x-ng-cloak {
+  display: none !important;
+}
 header .top {
   height: 40px;
   background-color: #f08825;
@@ -7853,6 +7861,7 @@ header .bottom .navbar .nav > li .yamm-content ul.nav-stacked li.ng-isolate-scop
   background: none;
   width: auto;
   height: auto;
+  overflow: hidden;
 }
 header .bottom .navbar .nav > li .yamm-content ul.nav-stacked li.ng-isolate-scope:first-child {
   border-top-right-radius: 4px;
@@ -7914,6 +7923,9 @@ header .bottom .navbar .nav > li .yamm-content ul.nav-stacked li.ng-isolate-scop
 header .bottom .navbar .nav > li .yamm-content ul.nav-stacked li.ng-isolate-scope:first-child a {
   border: none;
 }
+header .bottom .navbar .nav > li .yamm-content ul.nav-stacked li.ng-isolate-scope:last-child {
+  text-align: center;
+}
 header .bottom .navbar .nav > li .yamm-content ul.nav-stacked li.ng-isolate-scope:hover,
 header .bottom .navbar .nav > li .yamm-content ul.nav-stacked li.ng-isolate-scope:focus {
   background: linear-gradient(to top, #ffae42 0%, #f08825 44%, #ffae42 100%);
@@ -7934,6 +7946,13 @@ header .bottom .navbar .nav > li .yamm-content ul.nav-stacked li.ng-isolate-scop
 header .bottom .navbar .nav > li .yamm-content ul.nav-stacked li.ng-isolate-scope:hover a:focus,
 header .bottom .navbar .nav > li .yamm-content ul.nav-stacked li.ng-isolate-scope:focus a:focus {
   border: none;
+}
+header .bottom .navbar .nav > li .yamm-content ul.nav-stacked li.ng-isolate-scope .wrap-head {
+  width: 90%;
+  cursor: pointer;
+}
+header .bottom .navbar .nav > li .yamm-content ul.nav-stacked li.ng-isolate-scope .wrap-head:hover {
+  text-decoration: underline;
 }
 header .bottom .navbar .nav > li .yamm-content ul.nav-stacked li.ng-isolate-scope a {
   border: none;

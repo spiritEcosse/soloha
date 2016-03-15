@@ -226,7 +226,7 @@
                                     {% verbatim categories %}
                                         <li class="dropdown" ng-cloak ng-show="categories.length" ng-repeat="category in categories">
                                             <a role="button" class="dropdown-toggle" data-toggle="dropdown" ng-cloak>
-                                                <img src="{{ category.data.icon }}" class="img-responsive icon"/>
+                                                <img ng-cloak src="{{ category.data.icon }}" class="img-responsive icon"/>
                                                 {{ category.data.name }}
                                             </a>
                                             <div class="arrow"></div>
@@ -237,10 +237,8 @@
                                                             <uib-tabset active="active" vertical="true">
                                                                 <uib-tab index="$index" ng-repeat="sub_categories in category.children" active="tab.active" disable="tab.disabled">
                                                                     <uib-tab-heading heading="{{ sub_categories.data.name }}">
-                                                                        <a data-toggle="tab" ng-href="#">
-                                                                            {{ sub_categories.data.name }}
-                                                                            <span class="glyphicon glyphicon-menu-right pull-right"></span>
-                                                                        </a>
+                                                                        <div class="pull-left wrap-head">{{ sub_categories.data.name }}</div>
+                                                                        <div class="pull-right"><span class="glyphicon glyphicon-menu-right pull-right"></span></div>
                                                                     </uib-tab-heading>
                                                                     <div class="tab-pane">
                                                                         <div class="panel panel-default">
@@ -257,6 +255,12 @@
                                                                         </div>
                                                                     </div>
                                                                 </uib-tab>
+                                                                <li class="text-center uib-tab nav-item ng-isolate-scope">
+                                                                    <a ng-href="{{ category.data.absolute_url }}">
+                                                                        {{ category.data.name }}
+                                                                        <span class="glyphicon glyphicon-menu-right"></span>
+                                                                    </a>
+                                                                </li>
                                                             </uib-tabset>
                                                         </ul>
                                                     </div>

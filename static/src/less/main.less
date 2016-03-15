@@ -133,6 +133,10 @@ a, span, div {
   }
 }
 
+[ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
+  display: none !important;
+}
+
 header {
   .top {
     height: @header_top;
@@ -572,6 +576,7 @@ header {
                 background: none;
                 width: auto;
                 height: auto;
+                overflow: hidden;
 
                 &:first-child {
                   border-top: 1px solid @border-header;
@@ -583,6 +588,9 @@ header {
                   a {
                     border: none;
                   }
+                }
+                &:last-child {
+                  text-align: center;
                 }
 
                 &:hover, &:focus {
@@ -601,6 +609,15 @@ header {
                     &:hover, &:focus {
                       border: none;
                     }
+                  }
+                }
+
+                .wrap-head {
+                  width: 90%;
+                  cursor: pointer;
+
+                  &:hover {
+                    text-decoration: underline;
                   }
                 }
 

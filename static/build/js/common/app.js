@@ -52,7 +52,22 @@
 
   app = angular.module(app_name + ".controllers");
 
-  app.controller('Catalogue', ['$http', '$scope', '$window', '$document', '$log', 'djangoUrl', function($http, $scope, $window, $document, $log, djangoUrl) {}]);
+  app.controller('Catalogue', [
+    '$http', '$scope', '$window', '$document', '$log', 'djangoUrl', function($http, $scope, $window, $document, $log, djangoUrl) {
+      var products_url;
+      products_url = djangoUrl.reverse('catalogue:products');
+      $scope.products_template = 'templates/catalogue/partials/product_json.html';
+      return $scope.$watch("category", function() {
+        return $http.post(products_url, {
+          category_pk: $scope.category.pk
+        }).success(function(products) {
+          return $scope.products = products;
+        }).error(function() {
+          return console.error('An error occurred during submission');
+        });
+      });
+    }
+  ]);
 
 }).call(this);
 

@@ -29,7 +29,7 @@ class Category(AbstractCategory):
     h1 = models.CharField(verbose_name=_('h1'), blank=True, max_length=255)
     meta_description = models.TextField(verbose_name=_('Meta tag: description'), blank=True)
     meta_keywords = models.TextField(verbose_name=_('Meta tag: keywords'), blank=True)
-    sort = models.IntegerField(blank=True, null=True)
+    sort = models.IntegerField(blank=True, null=True, default=0)
     node_order_by = ['sort']
     icon = models.ImageField(_('Icon'), upload_to='categories', blank=True, null=True, max_length=255)
     created = models.DateTimeField(auto_now_add=True)
