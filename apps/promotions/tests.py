@@ -10,7 +10,9 @@ import json
 from django.db.models.query import Prefetch
 from oscar.core.loading import get_model
 from oscar.apps.catalogue.categories import create_from_breadcrumbs
+from django import db
 Category = get_model('catalogue', 'category')
+ProductCategory = get_model('catalogue', 'productcategory')
 
 
 class TestHomePage(TestCase):
@@ -24,12 +26,38 @@ class TestHomePage(TestCase):
         products = [line.product.get_values() for line in Line.objects.order_by('-product__date_created')[:MAX_COUNT_PRODUCT]]
         self.assertJSONEqual(response.content, json.dumps(products))
 
+    def create_category(self):
+        categories = (
+            '1',
+            '2 > 21',
+            '2 > 22',
+            '2 > 23 > 231',
+            '2 > 24',
+            '3',
+            '4 > 41',
+        )
+        for breadcrumbs in categories:
+            create_from_breadcrumbs(breadcrumbs)
+
+    def create_product_bulk(self):
+        self.create_category()
+
+        for num in xrange(1, 100):
+            product = factories.create_product(title='Product {}'.format(num))
+            factories.create_product_image(product=product)
+            category = Category.objects.get(name='231')
+            product_category = ProductCategory(product=product, category=category)
+            product_category.save()
+
     def test_new_product(self):
-        factories.create_product(title='Product 1')
-        factories.create_product(title='Product 2')
-        response = self.client.post(reverse('promotions:new'), HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.create_product_bulk()
+        with self.assertNumQueries(5):
+            response = self.client.post(reverse('promotions:new'), HTTP_X_REQUESTED_WITH='XMLHttpRequest')
         self.assertEqual(200, response.status_code)
-        products = Product.objects.order_by('-date_created')[:MAX_COUNT_PRODUCT]
+        products = Product.objects.prefetch_related(
+            Prefetch('images'),
+            Prefetch('categories', queryset=ProductCategory.objects.select_related('category', 'product'))
+        ).order_by('-date_created')[:MAX_COUNT_PRODUCT]
         products = [product.get_values() for product in products]
         self.assertJSONEqual(response.content, json.dumps(products))
 
@@ -41,28 +69,22 @@ class TestHomePage(TestCase):
     #     # products = serializers.serialize("json", products)
     #     # self.assertJSONEqual(response.content, products)
 
+    def create_product_bulk_recommend(self):
+        self.create_product_bulk()
+        product_desc = Product.objects.all().order_by('-date_created')
+        product_asc = Product.objects.all().order_by('date_created')
+
+        for num in xrange(0, len(product_desc)):
+            ProductRecommendation.objects.create(primary=product_desc[num], recommendation=product_asc[num])
+
     def test_recommend_product(self):
-        product_1 = factories.create_product(title='Product 1')
-        product_2 = factories.create_product(title='Product 2')
-        product_3 = factories.create_product(title='Product 3')
-        product_4 = factories.create_product(title='Product 4')
-        product_5 = factories.create_product(title='Product 5')
-
-        ProductRecommendation.objects.create(primary=product_1, recommendation=product_2)
-        ProductRecommendation.objects.create(primary=product_1, recommendation=product_3)
-        ProductRecommendation.objects.create(primary=product_2, recommendation=product_3)
-        ProductRecommendation.objects.create(primary=product_2, recommendation=product_4)
-        ProductRecommendation.objects.create(primary=product_3, recommendation=product_5)
-
-        queryset_product = Product.objects.only('title')
-
-        # with self.assertNumQueries(6):
-        response = self.client.post(reverse('promotions:recommend'), HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.create_product_bulk_recommend()
+        with self.assertNumQueries(5):
+            response = self.client.post(reverse('promotions:recommend'), HTTP_X_REQUESTED_WITH='XMLHttpRequest')
         self.assertEqual(200, response.status_code)
         object_list = ProductRecommendation.objects.prefetch_related(
-            Prefetch('recommendation', queryset=queryset_product),
             Prefetch('recommendation__images'),
-            Prefetch('recommendation__categories')
+            Prefetch('recommendation__categories', queryset=ProductCategory.objects.select_related('category', 'product'))
         ).order_by('-recommendation__date_created')[:MAX_COUNT_PRODUCT]
         products = [recommend.recommendation.get_values() for recommend in object_list]
         self.assertJSONEqual(response.content, json.dumps(products))

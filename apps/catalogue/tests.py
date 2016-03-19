@@ -41,13 +41,22 @@ class TestCatalog(TestCase):
             create_from_breadcrumbs(breadcrumbs)
 
     def test_url_product(self):
+        Category.load_bulk(self.get_load_data())
         product = create_product()
         response = self.client.get(product.get_absolute_url())
         self.assertEqual(response.status_code, STATUS_CODE_200)
         self.assertEqual(response.request['PATH_INFO'], product.get_absolute_url())
 
-        self.create_category()
+        # with value for param slug
         category = Category.objects.get(name='21')
+        product_category = ProductCategory(product=product, category=category)
+        product_category.save()
+        response = self.client.get(product.get_absolute_url())
+        self.assertEqual(response.status_code, STATUS_CODE_200)
+        self.assertEqual(response.request['PATH_INFO'], product.get_absolute_url())
+
+        # without value for param slug
+        category = Category.objects.get(name='231')
         product_category = ProductCategory(product=product, category=category)
         product_category.save()
         response = self.client.get(product.get_absolute_url())
@@ -190,10 +199,10 @@ class TestCatalog(TestCase):
         in key data store fields model category
         in key children store list children model category
         [
-            {'data': {'name': '1', 'sort': 1}},
+            {'data': {'name': '1', 'sort': 1, 'slug': '1'}},
             {'data': {'name': '2', 'sort': 2}, 'children': [
-                {'data': {'name': '21', 'sort': 1}},
-                {'data': {'name': '22', 'sort': 2}},
+                {'data': {'name': '21', 'sort': 1, 'slug': '21'}},
+                {'data': {'name': '22', 'sort': 2, 'slug': '22'}},
                 {'data': {'name': '23', 'sort': 3}, 'children': [
                     {'data': {'name': '231', 'sort': 1}},
                 ]},
@@ -305,7 +314,9 @@ class TestCatalog(TestCase):
         product = create_product()
         product_category = ProductCategory(product=product, category=category)
         product_category.save()
-        response = self.client.post(reverse('catalogue:products'), {'category_pk': category.pk}, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        category_json = json.dumps({'category_pk': category.pk})
+        response = self.client.post(reverse('catalogue:products'), category_json,
+                                    content_type='application/json', HTTP_X_REQUESTED_WITH='XMLHttpRequest')
         products_queryset = Product.objects.filter(categories=category.pk).prefetch_related(
             Prefetch('images'),
             Prefetch('categories'),

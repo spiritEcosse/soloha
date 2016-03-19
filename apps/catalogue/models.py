@@ -5,7 +5,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.core.cache import cache
 from django.core.urlresolvers import reverse
 from django.utils.translation import pgettext_lazy
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.utils.html import strip_entities
 from easy_thumbnails.files import get_thumbnailer
 import logging
@@ -15,6 +15,7 @@ from django.contrib.postgres.fields import ArrayField
 from django.core import serializers
 from easy_thumbnails.exceptions import (
     InvalidImageFormatError, EasyThumbnailsError)
+from django.utils.text import slugify
 logger = logging.getLogger(__name__)
 
 
@@ -36,6 +37,36 @@ class Category(AbstractCategory):
     image_banner = models.ImageField(_('Image banner'), upload_to='categories', blank=True, null=True, max_length=255)
     link_banner = models.URLField(_('Link banner'), blank=True, null=True, max_length=255)
     objects = CategoryEnable()
+    url = models.URLField(_('Full slug'), max_length=1000, editable=False)
+
+    def __str__(self):
+        return self.name
+
+    def save(self, *args, **kwargs):
+        """
+        Create a url from the url of the parent of the current slug
+        Args:
+            *args:
+            **kwargs:
+
+        Returns:
+
+        """
+        if not self.slug:
+            self.slug = slugify(self.name)
+
+        try:
+            Category.objects.get(slug=self.slug)
+        except ObjectDoesNotExist:
+            self.slug = self.slug
+        else:
+            raise ValueError('This slug "{}" the exists already. (Name "{}")'.format(self.slug, self.name))
+
+        self.url = self.slug
+
+        if self.parent():
+            self.url = '{}/{}'.format(self.parent().url, self.url)
+        super(AbstractCategory, self).save(*args, **kwargs)
 
     def get_values(self):
         return {
@@ -60,7 +91,7 @@ class Category(AbstractCategory):
         url = cache.get(cache_key)
 
         if not url:
-            url = reverse('category', kwargs={'category_slug': self.full_slug})
+            url = reverse('category', kwargs={'category_slug': self.url})
             cache.set(cache_key, url)
         return url
 
@@ -174,9 +205,11 @@ class Product(AbstractProduct):
         kw = {'slug': self.slug}
 
         try:
-            category_slug = self.categories.get().full_slug
+            category_slug = self.categories.get().category.url
+        except MultipleObjectsReturned:
+            kw['category_slug'] = self.categories.first().category.url
         except ObjectDoesNotExist:
-            pass
+            logger.error('Product object "{}" does not have categories'.format(self))
         else:
             kw['category_slug'] = category_slug
 
@@ -185,11 +218,16 @@ class Product(AbstractProduct):
     def get_values(self):
         values = dict()
         values['title'] = strip_entities(self.title)
-        values['absolute_url'] = self.get_absolute_url()
-        selector = Selector()
-        strategy = selector.strategy()
-        info = strategy.fetch_for_product(self)
-        values['price'] = str(info.price.incl_tax)
+
+        if self.categories.first():
+            values['absolute_url'] = self.categories.first().category.url
+        else:
+            values['absolute_url'] = self.slug
+
+        # selector = Selector()
+        # strategy = selector.strategy()
+        # info = strategy.fetch_for_product(self)
+        # values['price'] = str(info.price.incl_tax)
         options = {'size': (220, 165), 'crop': True}
 
         image = getattr(self.primary_image(), 'original', IMAGE_NOT_FOUND)

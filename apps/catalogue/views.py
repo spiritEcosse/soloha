@@ -18,17 +18,15 @@ class ProductCategoryView(CoreProductCategoryView):
 
 class CategoryProducts(views.JSONResponseMixin, views.AjaxResponseMixin, MultipleObjectMixin, View):
     model = Product
-    paginate_by = 24
 
     def get_queryset(self, **kwargs):
         queryset = super(CategoryProducts, self).get_queryset().filter(categories=kwargs['category_pk'])
         return queryset.prefetch_related(
             Prefetch('images'),
-            Prefetch('categories'),
         ).order_by('-date_created')
 
     def post(self, request, *args, **kwargs):
-        data = json.load(self.request.body)
+        data = json.loads(self.request.body)
         self.object_list = self.get_queryset(category_pk=data['category_pk'])
 
     def post_ajax(self, request, *args, **kwargs):

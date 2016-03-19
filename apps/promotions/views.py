@@ -10,6 +10,7 @@ from django.views.generic import View
 from oscar.core.loading import get_model
 
 Category = get_model('catalogue', 'category')
+ProductCategory = get_model('catalogue', 'productcategory')
 
 
 class HomeView(CoreHomeView):
@@ -52,10 +53,9 @@ class RecommendView(views.JSONResponseMixin, views.AjaxResponseMixin, MultipleOb
 
     def get_queryset(self):
         queryset = super(RecommendView, self).get_queryset()
-        return queryset.prefetch_related(
-            Prefetch('recommendation', queryset=queryset_product),
+        return queryset.select_related('recommendation').prefetch_related(
             Prefetch('recommendation__images'),
-            Prefetch('recommendation__categories')
+            Prefetch('recommendation__categories', queryset=ProductCategory.objects.select_related('category', 'product'))
         ).order_by('-recommendation__date_created')[:MAX_COUNT_PRODUCT]
 
     def post(self, request, *args, **kwargs):
@@ -74,8 +74,8 @@ class NewView(views.JSONResponseMixin, views.AjaxResponseMixin, MultipleObjectMi
         queryset = super(NewView, self).get_queryset()
         return queryset.prefetch_related(
             Prefetch('images'),
-            Prefetch('categories'),
-        ).order_by('-date_created').only('title')[:MAX_COUNT_PRODUCT]
+            Prefetch('categories', queryset=ProductCategory.objects.select_related('category', 'product'))
+        ).order_by('-date_created')[:MAX_COUNT_PRODUCT]
 
     def post(self, request, *args, **kwargs):
         self.object_list = self.get_queryset()

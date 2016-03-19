@@ -56,7 +56,6 @@
     '$http', '$scope', '$window', '$document', '$log', 'djangoUrl', function($http, $scope, $window, $document, $log, djangoUrl) {
       var products_url;
       products_url = djangoUrl.reverse('catalogue:products');
-      $scope.products_template = 'templates/catalogue/partials/product_json.html';
       return $scope.$watch("category", function() {
         return $http.post(products_url, {
           category_pk: $scope.category.pk

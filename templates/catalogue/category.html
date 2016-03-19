@@ -351,42 +351,39 @@
         </div>
     </div>
 
-    {% if products %}
-        <div class="row items">
-            <div ng-include src="'{{ products_template }}'"></div>
+    <div class="row items" ng-if="products.length">
+        {% include "catalogue/partials/product_json.html" %}
 
-            <div class="clearfix"></div>
-            <div class="col-xs-6 col-xs-offset-8 wrapper">
-                <a href="#" class="more_products">
-                    ПОКАЗАТЬ ЕЩЕ
-                </a>
-            </div>
-            <div class="col-xs-10 text-right">
-                <nav>
-                    <ul class="pagination">
-                        <li>
-                            <a href="#" aria-label="Previous">
-                                <span aria-hidden="true">&laquo;</span>
-                            </a>
-                        </li>
-                        <li><a href="#">1</a></li>
-                        <li><a href="#">2</a></li>
-                        <li><a href="#">3</a></li>
-                        <li><a href="#">4</a></li>
-                        <li><a href="#">5</a></li>
-                        <li>
-                            <a href="#" aria-label="Next">
-                                <span aria-hidden="true">&raquo;</span>
-                            </a>
-                        </li>
-                    </ul>
-                </nav>
-            </div>
-            {% include "partials/pagination.html" %}
+        <div class="clearfix"></div>
+        <div class="col-xs-6 col-xs-offset-8 wrapper">
+            <a href="#" class="more_products">
+                ПОКАЗАТЬ ЕЩЕ
+            </a>
         </div>
-    {% else %}
-        <p class="nonefound">{% trans "No products found." %}</p>
-    {% endif %}
+        <div class="col-xs-10 text-right">
+            <nav>
+                <ul class="pagination">
+                    <li>
+                        <a href="#" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    <li><a href="#">1</a></li>
+                    <li><a href="#">2</a></li>
+                    <li><a href="#">3</a></li>
+                    <li><a href="#">4</a></li>
+                    <li><a href="#">5</a></li>
+                    <li>
+                        <a href="#" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+        {% include "partials/pagination.html" %}
+    </div>
+    <p class="nonefound" ng-if="!products.length">{% trans "No products found." %}</p>
 {% endblock %}
 
 {% block post_content %}
