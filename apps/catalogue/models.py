@@ -204,25 +204,15 @@ class Product(AbstractProduct):
         """
         kw = {'slug': self.slug}
 
-        try:
-            category_slug = self.categories.get().category.url
-        except MultipleObjectsReturned:
-            kw['category_slug'] = self.categories.first().category.url
-        except ObjectDoesNotExist:
-            logger.error('Product object "{}" does not have categories'.format(self))
-        else:
-            kw['category_slug'] = category_slug
+        if self.categories.exists():
+            kw['category_slug'] = self.categories.first().url
 
         return reverse('detail', kwargs=kw)
 
     def get_values(self):
         values = dict()
         values['title'] = strip_entities(self.title)
-
-        if self.categories.first():
-            values['absolute_url'] = self.categories.first().category.url
-        else:
-            values['absolute_url'] = self.slug
+        values['absolute_url'] = self.get_absolute_url()
 
         # selector = Selector()
         # strategy = selector.strategy()

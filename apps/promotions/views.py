@@ -55,7 +55,7 @@ class RecommendView(views.JSONResponseMixin, views.AjaxResponseMixin, MultipleOb
         queryset = super(RecommendView, self).get_queryset()
         return queryset.select_related('recommendation').prefetch_related(
             Prefetch('recommendation__images'),
-            Prefetch('recommendation__categories', queryset=ProductCategory.objects.select_related('category', 'product'))
+            Prefetch('recommendation__categories')
         ).order_by('-recommendation__date_created')[:MAX_COUNT_PRODUCT]
 
     def post(self, request, *args, **kwargs):
@@ -74,7 +74,7 @@ class NewView(views.JSONResponseMixin, views.AjaxResponseMixin, MultipleObjectMi
         queryset = super(NewView, self).get_queryset()
         return queryset.prefetch_related(
             Prefetch('images'),
-            Prefetch('categories', queryset=ProductCategory.objects.select_related('category', 'product'))
+            Prefetch('categories')
         ).order_by('-date_created')[:MAX_COUNT_PRODUCT]
 
     def post(self, request, *args, **kwargs):

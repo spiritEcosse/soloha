@@ -56,7 +56,7 @@ class TestHomePage(TestCase):
         self.assertEqual(200, response.status_code)
         products = Product.objects.prefetch_related(
             Prefetch('images'),
-            Prefetch('categories', queryset=ProductCategory.objects.select_related('category', 'product'))
+            Prefetch('categories')
         ).order_by('-date_created')[:MAX_COUNT_PRODUCT]
         products = [product.get_values() for product in products]
         self.assertJSONEqual(response.content, json.dumps(products))
@@ -82,9 +82,9 @@ class TestHomePage(TestCase):
         with self.assertNumQueries(5):
             response = self.client.post(reverse('promotions:recommend'), HTTP_X_REQUESTED_WITH='XMLHttpRequest')
         self.assertEqual(200, response.status_code)
-        object_list = ProductRecommendation.objects.prefetch_related(
+        object_list = ProductRecommendation.objects.select_related('recommendation').prefetch_related(
             Prefetch('recommendation__images'),
-            Prefetch('recommendation__categories', queryset=ProductCategory.objects.select_related('category', 'product'))
+            Prefetch('recommendation__categories')
         ).order_by('-recommendation__date_created')[:MAX_COUNT_PRODUCT]
         products = [recommend.recommendation.get_values() for recommend in object_list]
         self.assertJSONEqual(response.content, json.dumps(products))
