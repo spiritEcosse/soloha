@@ -55,17 +55,17 @@ class Category(AbstractCategory):
         if not self.slug:
             self.slug = slugify(self.name)
 
-        try:
-            Category.objects.get(slug=self.slug)
-        except ObjectDoesNotExist:
-            self.slug = self.slug
-        else:
-            raise ValueError('This slug "{}" the exists already. (Name "{}")'.format(self.slug, self.name))
+            try:
+                Category.objects.get(slug=self.slug)
+            except ObjectDoesNotExist:
+                self.slug = self.slug
+            else:
+                raise ValueError('This slug "{}" the exists already. (Name "{}")'.format(self.slug, self))
 
-        self.url = self.slug
+            self.url = self.slug
 
-        if self.parent():
-            self.url = '{}/{}'.format(self.parent().url, self.url)
+            if self.parent():
+                self.url = '{}/{}'.format(self.parent().url, self.url)
         super(AbstractCategory, self).save(*args, **kwargs)
 
     def get_values(self):
@@ -87,13 +87,7 @@ class Category(AbstractCategory):
         return image_banner
 
     def get_absolute_url(self):
-        cache_key = 'CATEGORY_URL_%s' % self.pk
-        url = cache.get(cache_key)
-
-        if not url:
-            url = reverse('category', kwargs={'category_slug': self.url})
-            cache.set(cache_key, url)
-        return url
+        return reverse('category', kwargs={'category_slug': self.url})
 
     @classmethod
     def get_annotated_list_qs_depth(cls, parent=None, max_depth=None):

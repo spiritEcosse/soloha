@@ -1,0 +1,21 @@
+{% verbatim paginator %}
+    <div class="col-xs-10 text-right" ng-show="paginator.is_paginated">
+        <nav>
+            <ul class="pagination">
+                <li ng-show="paginator.previous_page_number">
+                    <a href="?page={{ paginator.previous_page_number }}" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+                <li ng-repeat="page in paginator.page_range" ng-class="{active: page == paginator.number}">
+                    <a href="?page={{ page }}">{{ page }}</a>
+                </li>
+                <li ng-show="paginator.next_page_number">
+                    <a href="?page={{ paginator.next_page_number }}" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+{% endverbatim paginator %}

@@ -7,18 +7,20 @@ from oscar.test.factories import create_product
 from oscar.apps.catalogue.categories import create_from_breadcrumbs
 from easy_thumbnails.files import get_thumbnailer
 from soloha.settings import IMAGE_NOT_FOUND
-from oscar.apps.partner.strategy import Selector
 from oscar.test import factories
 from django.utils.html import strip_entities
 from django.core.urlresolvers import reverse
 import json
 from django.db.models.query import Prefetch
-
+from apps.catalogue.views import ProductCategoryView, CategoryProducts
+from django.core.paginator import Paginator
+from test.factories import catalogue
 
 Product = get_model('catalogue', 'product')
 ProductClass = get_model('catalogue', 'ProductClass')
 Category = get_model('catalogue', 'category')
 ProductCategory = get_model('catalogue', 'ProductCategory')
+test_catalogue = catalogue.Test()
 
 STATUS_CODE_200 = 200
 
@@ -28,6 +30,11 @@ class TestCatalog(TestCase):
         self.client = Client()
 
     def create_category(self):
+        """
+        bulk create categories
+        Returns:
+
+        """
         categories = (
             '1',
             '2 > 21',
@@ -41,6 +48,11 @@ class TestCatalog(TestCase):
             create_from_breadcrumbs(breadcrumbs)
 
     def test_url_product(self):
+        """
+        accessibility page product
+        Returns:
+            None
+        """
         Category.load_bulk(self.get_load_data())
         product = create_product()
         response = self.client.get(product.get_absolute_url())
@@ -64,29 +76,53 @@ class TestCatalog(TestCase):
         self.assertEqual(response.request['PATH_INFO'], product.get_absolute_url())
 
     def test_url_category(self):
+        """
+        accessibility page category
+        Returns:
+            None
+        """
         self.create_category()
+        category = Category.objects.get(name='1')
+        response = self.client.get(category.get_absolute_url())
+        self.assertEqual(category, response.context['category'])
+        self.assertEqual(response.resolver_match.func.__name__, ProductCategoryView.as_view().__name__)
+        self.assertEqual(response.request['PATH_INFO'], category.get_absolute_url())
+        self.assertEqual(response.status_code, STATUS_CODE_200)
+
         category = Category.objects.get(name='231')
         response = self.client.get(category.get_absolute_url())
+        self.assertEqual(category, response.context['category'])
+        self.assertEqual(response.resolver_match.func.__name__, ProductCategoryView.as_view().__name__)
         self.assertEqual(response.request['PATH_INFO'], category.get_absolute_url())
         self.assertEqual(response.status_code, STATUS_CODE_200)
 
     def test_url_catalogue(self):
+        """
+        accessibility page catalogue
+        Returns:
+            None
+        """
         catalogue = '/catalogue/'
         response = self.client.get(catalogue)
         self.assertEqual(response.request['PATH_INFO'], catalogue)
         self.assertEqual(response.status_code, STATUS_CODE_200)
 
     def test_product_values(self):
+        """
+        test list fields model Product
+        Returns:
+            None
+        """
         product = factories.create_product()
         factories.create_product_image(product, original=IMAGE_NOT_FOUND)
 
         values = dict()
         values['title'] = strip_entities(product.title)
         values['absolute_url'] = product.get_absolute_url()
-        selector = Selector()
-        strategy = selector.strategy()
-        info = strategy.fetch_for_product(product)
-        values['price'] = str(info.price.incl_tax)
+        # selector = Selector()
+        # strategy = selector.strategy()
+        # info = strategy.fetch_for_product(product)
+        # values['price'] = str(info.price.incl_tax)
         options = {'size': (220, 165), 'crop': True}
         values['image'] = get_thumbnailer(getattr(product.primary_image(), 'original', IMAGE_NOT_FOUND)).get_thumbnail(options).url
         self.assertDictEqual(values, product.get_values())
@@ -174,12 +210,13 @@ class TestCatalog(TestCase):
 
     def test_category_get_values(self):
         """
-
+        test list fields model Category
         Returns:
-
+            None
         """
         self.create_category()
-        category = Category.objects.get(name='1')
+        with self.assertNumQueries(1):
+            category = Category.objects.get(name='1')
         must = {
             'name': category.name,
             'icon': category.get_icon(),
@@ -231,6 +268,11 @@ class TestCatalog(TestCase):
         ]
 
     def test_dump_bulk_depth(self):
+        """
+        test tree categories by depth
+        Returns:
+            None
+        """
         Category.load_bulk(self.get_load_data())
         load_data = list()
         load_data.append({'data': Category.objects.get(name='4').get_values()})
@@ -303,23 +345,44 @@ class TestCatalog(TestCase):
         dump_bulk_depth_data = Category.dump_bulk_depth(max_depth=0, keep_ids=False)
         self.assertListEqual(load_data, dump_bulk_depth_data)
 
+    def test_attribute_class_view(self):
+        self.assertEqual(CategoryProducts.paginate_by, 24)
+        self.assertEqual(CategoryProducts.model, Product)
+
     def test_get_list_product(self):
         """
         get list product by current category
         Returns:
-        None
+            None
         """
-        self.create_category()
+        context = {}
+        test_catalogue.create_product_bulk()
         category = Category.objects.get(name='231')
-        product = create_product()
-        product_category = ProductCategory(product=product, category=category)
-        product_category.save()
-        category_json = json.dumps({'category_pk': category.pk})
-        response = self.client.post(reverse('catalogue:products'), category_json,
-                                    content_type='application/json', HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        category_dict = {'category_pk': category.pk}
         products_queryset = Product.objects.filter(categories=category.pk).prefetch_related(
             Prefetch('images'),
             Prefetch('categories'),
         ).order_by('-date_created')
-        products = [product.get_values() for product in products_queryset]
-        self.assertJSONEqual(response.content, json.dumps(products))
+        context['products'] = [product.get_values() for product in products_queryset]
+
+        for num in xrange(1, 2):
+            category_dict.update({'page': num})
+            with self.assertNumQueries(5):
+                response = self.client.post(reverse('catalogue:products'),
+                                            json.dumps(category_dict),
+                                            content_type='application/json', HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+            context = self.get_paginator(context=context, all_pages=CategoryProducts.paginate_by, per_page=num)
+            self.assertEqual(response.resolver_match.func.__name__, CategoryProducts.as_view().__name__)
+            self.assertJSONEqual(response.content, json.dumps(context))
+
+    def get_paginator(self, context, all_pages, per_page):
+        paginator = Paginator(context['products'], all_pages)
+        page = paginator.page(per_page)
+        context['paginator'] = {
+            'page_range': paginator.page_range,
+            'is_paginated': page.has_other_pages(),
+            'previous_page_number': page.previous_page_number() if page.has_previous() else None,
+            'next_page_number': page.next_page_number() if page.has_next() else None,
+            'page_number': page.number,
+        }
+        return context

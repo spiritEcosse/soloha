@@ -351,7 +351,7 @@
         </div>
     </div>
 
-    <div class="row items" ng-if="products.length">
+    <div class="row items" ng-if="products.length > 0">
         {% include "catalogue/partials/product_json.html" %}
 
         <div class="clearfix"></div>
@@ -360,30 +360,10 @@
                 ПОКАЗАТЬ ЕЩЕ
             </a>
         </div>
-        <div class="col-xs-10 text-right">
-            <nav>
-                <ul class="pagination">
-                    <li>
-                        <a href="#" aria-label="Previous">
-                            <span aria-hidden="true">&laquo;</span>
-                        </a>
-                    </li>
-                    <li><a href="#">1</a></li>
-                    <li><a href="#">2</a></li>
-                    <li><a href="#">3</a></li>
-                    <li><a href="#">4</a></li>
-                    <li><a href="#">5</a></li>
-                    <li>
-                        <a href="#" aria-label="Next">
-                            <span aria-hidden="true">&raquo;</span>
-                        </a>
-                    </li>
-                </ul>
-            </nav>
-        </div>
-        {% include "partials/pagination.html" %}
+
+        {% include "catalogue/partials/pagination.html" %}
     </div>
-    <p class="nonefound" ng-if="!products.length">{% trans "No products found." %}</p>
+    <p class="nonefound" ng-if="products.length == 0">{% trans "No products found." %}</p>
 {% endblock %}
 
 {% block post_content %}

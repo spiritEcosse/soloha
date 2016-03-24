@@ -14,7 +14,25 @@ ProductCategory = get_model('catalogue', 'productcategory')
 
 
 class HomeView(CoreHomeView):
-    template_name = 'promotions/new-homeview.html'
+    def get_context_data(self, **kwargs):
+        context = super(HomeView, self).get_context_data(**kwargs)
+
+        context['products_new'] = Product.objects.only('title', 'slug').prefetch_related(
+            Prefetch('images'),
+            Prefetch('categories')
+        ).order_by('-date_created')[:MAX_COUNT_PRODUCT]
+
+        context['products_recommend'] = ProductRecommendation.objects.select_related('recommendation').prefetch_related(
+            Prefetch('recommendation__images'),
+            Prefetch('recommendation__categories')
+        ).order_by('-recommendation__date_created')[:MAX_COUNT_PRODUCT]
+
+        context['products_order'] = Line.objects.select_related('product').prefetch_related(
+            Prefetch('product__images'),
+            Prefetch('product__categories'),
+        ).order_by('-product__date_created')[:MAX_COUNT_PRODUCT]
+
+        return context
 
 queryset_product = Product.objects.only('title')
 
