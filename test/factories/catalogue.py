@@ -59,3 +59,7 @@ class Test(object):
         for num in xrange(0, len(product_desc)):
             ProductRecommendation.objects.create(primary=product_desc[num], recommendation=product_asc[num])
 
+    @classmethod
+    def create_order(cls):
+        for num in xrange(1, 20):
+            factories.create_order()

@@ -24,12 +24,8 @@ $(document).ready(function() {
         slider.refresh();
     });
 
-    $('#link_recommends').click(function(){
+    $('#recommended-tab').click(function(){
         slider.refresh();
-    });
-
-    $('#recommended_href').click(function() {
-        $('#recommended').focus();
     });
 
     $('.dropdown-menu').click(function(event){

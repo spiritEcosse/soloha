@@ -352,7 +352,11 @@
     </div>
 
     <div class="row items" ng-if="products.length > 0">
-        {% include "catalogue/partials/product_json.html" %}
+        <div class="col-sm-6 col-md-6">
+            {% for prod in prod %}
+                {% include "catalogue/partials/product.html" %}
+            {% endfor %}
+        </div>
 
         <div class="clearfix"></div>
         <div class="col-xs-6 col-xs-offset-8 wrapper">
