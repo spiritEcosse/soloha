@@ -17,21 +17,6 @@ from oscar.core.loading import get_model
 ORMCategory = get_model('catalogue', 'Category')
 
 
-def remove_ancestor_slugs(apps, schema_editor):
-    MigrationCategory = apps.get_model('catalogue', 'Category')
-    for category in MigrationCategory.objects.all():
-        category.slug = category.slug.split(ORMCategory._slug_separator)[-1]
-        category.save()
-
-
-def add_ancestor_slugs(apps, schema_editor):
-    MigrationCategory = apps.get_model('catalogue', 'Category')
-    for category in MigrationCategory.objects.all():
-        orm_category = ORMCategory.objects.get(pk=category.pk)
-        category.slug = orm_category.full_slug
-        category.save()
-
-
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -39,5 +24,4 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(remove_ancestor_slugs, add_ancestor_slugs),
     ]
