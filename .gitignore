@@ -9,7 +9,7 @@
 fabfile.py
 db.sqlite3
 soloha_shop
-media/
+/media/*
 !/media/image_not_found.jpg
 # Vagrant
 .vagrant

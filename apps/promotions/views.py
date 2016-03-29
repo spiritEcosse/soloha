@@ -9,7 +9,6 @@ from django.views.generic import View
 from oscar.core.loading import get_model
 
 Category = get_model('catalogue', 'category')
-ProductCategory = get_model('catalogue', 'ProductCategory')
 ProductRecommendation = get_model('catalogue', 'ProductRecommendation')
 
 

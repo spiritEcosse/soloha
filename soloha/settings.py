@@ -61,7 +61,8 @@ INSTALLED_APPS = \
         'widget_tweaks',
         'djangular',
         'mptt',
-        # 'easy_thumbnails',
+        'feincms',
+        'easy_thumbnails',
         # 'smart_load_tag',
     ] + get_core_apps(['apps.catalogue', 'apps.promotions'])
 

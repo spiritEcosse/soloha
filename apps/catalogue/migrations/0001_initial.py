@@ -142,21 +142,6 @@ class Migration(migrations.Migration):
             bases=(models.Model,),
         ),
         migrations.CreateModel(
-            name='ProductCategory',
-            fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('category', models.ForeignKey(verbose_name='Category', to='catalogue.Category')),
-                ('product', models.ForeignKey(verbose_name='Product', to='catalogue.Product')),
-            ],
-            options={
-                'ordering': ['product', 'category'],
-                'verbose_name_plural': 'Product categories',
-                'verbose_name': 'Product category',
-                'abstract': False,
-            },
-            bases=(models.Model,),
-        ),
-        migrations.CreateModel(
             name='ProductClass',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
@@ -215,10 +200,6 @@ class Migration(migrations.Migration):
         migrations.AlterUniqueTogether(
             name='productimage',
             unique_together=set([('product', 'display_order')]),
-        ),
-        migrations.AlterUniqueTogether(
-            name='productcategory',
-            unique_together=set([('product', 'category')]),
         ),
         migrations.AlterUniqueTogether(
             name='productattributevalue',

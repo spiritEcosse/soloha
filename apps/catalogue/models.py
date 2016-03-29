@@ -20,13 +20,6 @@ if not is_model_registered('catalogue', 'Category'):
     __all__.append('Category')
 
 
-if not is_model_registered('catalogue', 'ProductCategory'):
-    class ProductCategory(AbstractProductCategory):
-        pass
-
-    __all__.append('ProductCategory')
-
-
 if not is_model_registered('catalogue', 'Filter'):
     class Filter(AbstractFilter):
         pass
@@ -88,6 +81,9 @@ if not is_model_registered('catalogue', 'ProductImage'):
         pass
 
     __all__.append('ProductImage')
+
+
+from oscar.apps.catalogue.models import *  # noqa
 
 
 

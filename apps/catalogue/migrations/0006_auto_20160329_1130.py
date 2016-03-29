@@ -2,10 +2,9 @@
 from __future__ import unicode_literals
 
 from django.db import migrations, models
-import oscar.models.fields.autoslugfield
 import mptt.fields
-import oscar.core.validators
 import django.core.validators
+import oscar.core.validators
 
 
 class Migration(migrations.Migration):
@@ -20,7 +19,10 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('title', models.CharField(max_length=255)),
-                ('slug', oscar.models.fields.autoslugfield.AutoSlugField(populate_from=b'title', editable=False, max_length=200, blank=True, unique=True, verbose_name='Slug')),
+                ('slug', models.SlugField(unique=True, max_length=255, verbose_name='Slug')),
+                ('sort', models.IntegerField(default=0, null=True, blank=True)),
+                ('enable', models.BooleanField(default=True, verbose_name='Enable')),
+                ('created', models.DateTimeField(auto_now_add=True)),
                 ('lft', models.PositiveIntegerField(editable=False, db_index=True)),
                 ('rght', models.PositiveIntegerField(editable=False, db_index=True)),
                 ('tree_id', models.PositiveIntegerField(editable=False, db_index=True)),
@@ -28,15 +30,31 @@ class Migration(migrations.Migration):
                 ('parent', mptt.fields.TreeForeignKey(related_name='children', verbose_name='Parent', blank=True, to='catalogue.Filter', null=True)),
             ],
             options={
-                'ordering': ('title',),
+                'ordering': ('sort', 'title', 'id'),
                 'abstract': False,
                 'verbose_name': 'Filter',
                 'verbose_name_plural': 'Filters',
             },
         ),
+        migrations.CreateModel(
+            name='ProductCategory',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+            ],
+            options={
+                'ordering': ['product', 'category'],
+                'abstract': False,
+                'verbose_name': 'Product category',
+                'verbose_name_plural': 'Product categories',
+            },
+        ),
         migrations.AlterModelOptions(
             name='category',
-            options={'ordering': ('sort', 'name', 'pk'), 'verbose_name': 'Category', 'verbose_name_plural': 'Categories'},
+            options={'ordering': ('sort', 'name', 'id'), 'verbose_name': 'Category', 'verbose_name_plural': 'Categories'},
+        ),
+        migrations.RemoveField(
+            model_name='category',
+            name='url',
         ),
         migrations.AddField(
             model_name='category',
@@ -116,7 +134,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='category',
             name='slug',
-            field=oscar.models.fields.autoslugfield.AutoSlugField(populate_from=b'title', editable=False, max_length=200, blank=True, unique=True, verbose_name='Slug'),
+            field=models.SlugField(unique=True, max_length=200, verbose_name='Slug'),
         ),
         migrations.AlterField(
             model_name='productattribute',
@@ -124,9 +142,23 @@ class Migration(migrations.Migration):
             field=models.SlugField(max_length=128, verbose_name='Code', validators=[django.core.validators.RegexValidator(regex=b'^[a-zA-Z_][0-9a-zA-Z_]*$', message="Code can only contain the letters a-z, A-Z, digits, and underscores, and can't start with a digit"), oscar.core.validators.non_python_keyword]),
         ),
         migrations.AddField(
+            model_name='productcategory',
+            name='category',
+            field=models.ForeignKey(verbose_name='Category', to='catalogue.Category'),
+        ),
+        migrations.AddField(
+            model_name='productcategory',
+            name='product',
+            field=models.ForeignKey(verbose_name='Product', to='catalogue.Product'),
+        ),
+        migrations.AddField(
             model_name='product',
             name='filters',
             field=models.ManyToManyField(to='catalogue.Filter', verbose_name='Filters of product'),
+        ),
+        migrations.AlterUniqueTogether(
+            name='productcategory',
+            unique_together=set([('product', 'category')]),
         ),
         migrations.AlterUniqueTogether(
             name='filter',

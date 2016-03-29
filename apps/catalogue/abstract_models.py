@@ -44,8 +44,7 @@ class CustomAbstractProduct(models.Model):
                     " this product)."))
 
     # Title is mandatory for canonical products but optional for child products
-    title = models.CharField(pgettext_lazy(u'Product title', u'Title'),
-                             max_length=255, blank=True)
+    title = models.CharField(pgettext_lazy(u'Product title', u'Title'), max_length=255, blank=True)
     slug = models.SlugField(_('Slug'), max_length=255, unique=False)
     description = models.TextField(_('Description'), blank=True)
 
@@ -200,7 +199,7 @@ class CustomAbstractProduct(models.Model):
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(self.get_title())
-        super(AbstractProduct, self).save(*args, **kwargs)
+        super(CustomAbstractProduct, self).save(*args, **kwargs)
         self.attr.save()
 
     # Properties
@@ -463,16 +462,16 @@ class CustomAbstractProduct(models.Model):
 @python_2_unicode_compatible
 class AbstractFilter(MPTTModel):
     title = models.CharField(max_length=255)
-    slug = AutoSlugField(verbose_name=_('Slug'), max_length=200, unique=True, populate_from='title')
+    slug = models.SlugField(verbose_name=_('Slug'), max_length=255, unique=True)
     parent = TreeForeignKey('self', verbose_name=_('Parent'), related_name='children', blank=True, null=True, db_index=True)
-
-    class MPTTMeta:
-        ordering = ['tree_id', 'lft']
+    sort = models.IntegerField(blank=True, null=True, default=0)
+    enable = models.BooleanField(verbose_name=_('Enable'), default=True)
+    created = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         abstract = True
-        unique_together = ('slug', 'parent')
-        ordering = ('title', )
+        unique_together = ('slug', 'parent', )
+        ordering = ('sort', 'title', 'id', )
         verbose_name = _('Filter')
         verbose_name_plural = _('Filters')
 
@@ -480,44 +479,31 @@ class AbstractFilter(MPTTModel):
         return self.title
 
 
-class CategoryEnable(models.Manager):
-    def get_queryset(self):
-        return super(CategoryEnable, self).get_queryset().filter(enable=True)
-
-
 @python_2_unicode_compatible
 class CustomAbstractCategory(MPTTModel):
+    name = models.CharField(_('Name'), max_length=255, db_index=True)
+    slug = models.SlugField(verbose_name=_('Slug'), max_length=200, unique=True)
     enable = models.BooleanField(verbose_name=_('Enable'), default=True)
+    parent = TreeForeignKey('self', verbose_name=_('Parent'), related_name='children', blank=True, null=True, db_index=True)
     meta_title = models.CharField(verbose_name=_('Meta tag: title'), blank=True, max_length=255)
     h1 = models.CharField(verbose_name=_('h1'), blank=True, max_length=255)
     meta_description = models.TextField(verbose_name=_('Meta tag: description'), blank=True)
     meta_keywords = models.TextField(verbose_name=_('Meta tag: keywords'), blank=True)
     sort = models.IntegerField(blank=True, null=True, default=0)
-    node_order_by = ['sort']
     icon = models.ImageField(_('Icon'), upload_to='categories', blank=True, null=True, max_length=255)
     created = models.DateTimeField(auto_now_add=True)
     image_banner = models.ImageField(_('Image banner'), upload_to='categories', blank=True, null=True, max_length=255)
     link_banner = models.URLField(_('Link banner'), blank=True, null=True, max_length=255)
-    url = models.URLField(_('Full slug'), max_length=1000, editable=False)
-
-    name = models.CharField(_('Name'), max_length=255, db_index=True)
     description = models.TextField(_('Description'), blank=True)
     image = models.ImageField(_('Image'), upload_to='categories', blank=True, null=True, max_length=255)
-    slug = AutoSlugField(verbose_name=_('Slug'), max_length=200, unique=True, populate_from='title')
-    parent = TreeForeignKey('self', verbose_name=_('Parent'), related_name='children', blank=True, null=True, db_index=True)
-
-    objects = CategoryEnable()
 
     _slug_separator = '/'
     _full_name_separator = ' > '
 
-    class MPTTMeta:
-        order_insertion_by = ('sort', 'name', 'pk', )
-
     class Meta:
         abstract = True
         app_label = 'catalogue'
-        ordering = ('sort', 'name', 'pk', )
+        ordering = ('sort', 'name', 'id', )
         verbose_name = _('Category')
         verbose_name_plural = _('Categories')
 
@@ -537,7 +523,6 @@ class CustomAbstractCategory(MPTTModel):
         names = [category.name for category in self.get_ancestors_and_self()]
         return self._full_name_separator.join(names)
 
-    @property
     def full_slug(self):
         """
         Returns a string of this category's slug concatenated with the slugs
@@ -583,10 +568,10 @@ class CustomAbstractCategory(MPTTModel):
         """
         if self.slug:
             # Slug was supplied. Hands off!
-            super(AbstractCategory, self).save(*args, **kwargs)
+            super(CustomAbstractCategory, self).save(*args, **kwargs)
         else:
             self.slug = self.generate_slug()
-            super(AbstractCategory, self).save(*args, **kwargs)
+            super(CustomAbstractCategory, self).save(*args, **kwargs)
             # We auto-generated a slug, so we need to make sure that it's
             # unique. As we need to be able to inspect the category's siblings
             # for that, we need to wait until the instance is saved. We
@@ -633,8 +618,11 @@ class CustomAbstractCategory(MPTTModel):
             image_banner = get_thumbnailer(self.image_banner).get_thumbnail(options).url
         return image_banner
 
+    # def get_absolute_url(self):
+    #     return reverse('catalog:category', kwargs={'slug': self.full_slug()})
+
     def get_absolute_url(self):
-        return reverse('category', kwargs={'category_slug': self.url})
+        return reverse('category', kwargs={'category_slug': self.full_slug()})
 
     @classmethod
     def get_annotated_list_qs_depth(cls, parent=None, max_depth=None):
