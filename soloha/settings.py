@@ -39,29 +39,32 @@ ALLOWED_HOSTS = settings_local.ALLOWED_HOSTS
 
 # Application definition
 
-INSTALLED_APPS = [
-                     'suit',
-                     'django.contrib.admin',
-                     'django.contrib.sitemaps',
-                     'debug_toolbar',
-                     # 'django_select2',
-                     # 'bootstrap_pagination',
-                     # 'djangular',
-                     # 'ckeditor',
+INSTALLED_APPS = \
+    [
+        'suit',
+        'django.contrib.admin',
+        'django.contrib.sitemaps',
+        'debug_toolbar',
+         # 'django_select2',
+         # 'bootstrap_pagination',
+         # 'djangular',
+         # 'ckeditor',
 
-                     'django.contrib.auth',
-                     'django.contrib.contenttypes',
-                     'django.contrib.sessions',
-                     'django.contrib.sites',
-                     'django.contrib.messages',
-                     'django.contrib.staticfiles',
-                     'django.contrib.flatpages',
-                     'compressor',
-                     'widget_tweaks',
-                     'djangular',
-                     # 'easy_thumbnails',
-                     # 'smart_load_tag',
-                 ] + get_core_apps(['apps.catalogue', 'apps.promotions'])
+        'django.contrib.auth',
+        'django.contrib.contenttypes',
+        'django.contrib.sessions',
+        'django.contrib.sites',
+        'django.contrib.messages',
+        'django.contrib.staticfiles',
+        'django.contrib.flatpages',
+        'compressor',
+        'widget_tweaks',
+        'djangular',
+        'mptt',
+        'feincms',
+        'easy_thumbnails',
+        # 'smart_load_tag',
+    ] + get_core_apps(['apps.catalogue', 'apps.promotions'])
 
 SITE_ID = 1
 

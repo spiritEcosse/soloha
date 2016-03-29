@@ -1,272 +1,90 @@
-from django.db import models
-from oscar.apps.catalogue.abstract_models import AbstractProduct, AbstractCategory, AbstractProductAttributeValue, \
-    AbstractProductAttribute, MissingProductImage as CoreMissingProductImage
-from django.utils.translation import ugettext_lazy as _
-from django.core.cache import cache
-from django.core.urlresolvers import reverse
-from django.utils.translation import pgettext_lazy
-from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
-from django.utils.html import strip_entities
-from easy_thumbnails.files import get_thumbnailer
-import logging
-from soloha.settings import IMAGE_NOT_FOUND
-from oscar.apps.partner.strategy import Selector
-from django.contrib.postgres.fields import ArrayField
-from django.core import serializers
-from easy_thumbnails.exceptions import (
-    InvalidImageFormatError, EasyThumbnailsError)
-from django.utils.text import slugify
+from oscar.core.loading import is_model_registered
+from oscar.apps.catalogue.abstract_models import *  # noqa
+from apps.catalogue.abstract_models import CustomAbstractProduct, AbstractFilter, CustomAbstractCategory
+
+__all__ = ['ProductAttributesContainer']
+
 logger = logging.getLogger(__name__)
 
+if not is_model_registered('catalogue', 'ProductClass'):
+    class ProductClass(AbstractProductClass):
+        pass
 
-class CategoryEnable(models.Manager):
-    def get_queryset(self):
-        return super(CategoryEnable, self).get_queryset().filter(enable=1)
-
-
-class Category(AbstractCategory):
-    enable = models.BooleanField(verbose_name=_('Enable'), default=True)
-    meta_title = models.CharField(verbose_name=_('Meta tag: title'), blank=True, max_length=255)
-    h1 = models.CharField(verbose_name=_('h1'), blank=True, max_length=255)
-    meta_description = models.TextField(verbose_name=_('Meta tag: description'), blank=True)
-    meta_keywords = models.TextField(verbose_name=_('Meta tag: keywords'), blank=True)
-    sort = models.IntegerField(blank=True, null=True, default=0)
-    node_order_by = ['sort']
-    icon = models.ImageField(_('Icon'), upload_to='categories', blank=True, null=True, max_length=255)
-    created = models.DateTimeField(auto_now_add=True)
-    image_banner = models.ImageField(_('Image banner'), upload_to='categories', blank=True, null=True, max_length=255)
-    link_banner = models.URLField(_('Link banner'), blank=True, null=True, max_length=255)
-    objects = CategoryEnable()
-    url = models.URLField(_('Full slug'), max_length=1000, editable=False)
-
-    def __str__(self):
-        return self.name
-
-    def save(self, *args, **kwargs):
-        """
-        Create a url from the url of the parent of the current slug
-        Args:
-            *args:
-            **kwargs:
-
-        Returns:
-
-        """
-        if not self.slug:
-            self.slug = slugify(self.name)
-
-            try:
-                Category.objects.get(slug=self.slug)
-            except ObjectDoesNotExist:
-                self.slug = self.slug
-            else:
-                raise ValueError('This slug "{}" the exists already. (Name "{}")'.format(self.slug, self))
-
-            self.url = self.slug
-
-            if self.parent():
-                self.url = '{}/{}'.format(self.parent().url, self.url)
-        super(AbstractCategory, self).save(*args, **kwargs)
-
-    def get_values(self):
-        return {
-            'name': self.name,
-            'icon': self.get_icon(),
-            'absolute_url': self.get_absolute_url(),
-            'slug': self.slug,
-            'image_banner': self.get_image_banner(),
-            'link_banner': self.link_banner,
-        }
-
-    def get_image_banner(self):
-        image_banner = ''
-
-        if self.image_banner:
-            options = {'size': (544, 212), 'crop': True}
-            image_banner = get_thumbnailer(self.image_banner).get_thumbnail(options).url
-        return image_banner
-
-    def get_absolute_url(self):
-        return reverse('category', kwargs={'category_slug': self.url})
-
-    @classmethod
-    def get_annotated_list_qs_depth(cls, parent=None, max_depth=None):
-        """
-        Gets an annotated list from a tree branch, change queryset
-
-        :param parent:
-
-            The node whose descendants will be annotated. The node itself
-            will be included in the list. If not given, the entire tree
-            will be annotated.
-
-        :param max_depth:
-
-            Optionally limit to specified depth
-
-        :sort_order
-
-            Sort order queryset.
-
-        """
-
-        result, info = [], {}
-        start_depth, prev_depth = (None, None)
-        qs = cls.get_tree(parent)
-        if max_depth:
-            qs = qs.filter(depth__lte=max_depth)
-        return cls.get_annotated_list_qs(qs)
-
-    @classmethod
-    def dump_bulk_depth(cls, parent=None, keep_ids=True, max_depth=3):
-        """
-        Dumps a tree branch to a python type structure.
-
-        Args:
-            parent: by default None (if you set the Parent to the object category then we obtain a tree search)
-            keep_ids: by default True (if True add id category in data)
-            max_depth: by default 3 (max depth in category tree) (if max_depth = 0 return all tree)
-
-        Returns:
-        [{'data': category.get_values()},
-            {'data': category.get_values(), 'children':[
-                {'data': category.get_values()},
-                {'data': category.get_values()},
-                {'data': category.get_values(), 'children':[
-                    {'data': category.get_values()},
-                ]},
-                {'data': category.get_values()},
-            ]},
-            {'data': category.get_values()},
-            {'data': category.get_values(), 'children':[
-                {'data': category.get_values()},
-            ]},
-        ]
-        """
-        # Because of fix_tree, this method assumes that the depth
-        # and numchild properties in the nodes can be incorrect,
-        # so no helper methods are used
-        data = cls.get_annotated_list_qs_depth(max_depth=max_depth)
-        ret, lnk = [], {}
-
-        for pyobj, info in data:
-            # django's serializer stores the attributes in 'fields'
-            path = pyobj.path
-            depth = int(len(path) / cls.steplen)
-            # this will be useless in load_bulk
-
-            newobj = {'data': pyobj.get_values()}
-
-            if keep_ids:
-                newobj['id'] = pyobj.pk
-
-            if (not parent and depth == 1) or \
-                    (parent and len(path) == len(parent.path)):
-                ret.append(newobj)
-            else:
-                parentpath = cls._get_basepath(path, depth - 1)
-                parentobj = lnk[parentpath]
-                if 'children' not in parentobj:
-                    parentobj['children'] = []
-                parentobj['children'].append(newobj)
-            lnk[path] = newobj
-        return ret
-
-    def get_icon(self):
-        icon = ''
-
-        if self.icon:
-            options = {'size': (50, 31), 'crop': True}
-            icon = get_thumbnailer(self.icon).get_thumbnail(options).url
-        return icon
-
-    def parent(self):
-        return self.get_parent()
-    parent.short_description = _('Get parent')
+    __all__.append('ProductClass')
 
 
-class Product(AbstractProduct):
-    enable = models.BooleanField(verbose_name=_('Enable'), default=True)
-    h1 = models.CharField(verbose_name=_('h1'), blank=True, max_length=255)
-    meta_title = models.CharField(verbose_name=_('Meta tag: title'), blank=True, max_length=255)
-    meta_description = models.TextField(verbose_name=_('Meta tag: description'), blank=True)
-    meta_keywords = models.TextField(verbose_name=_('Meta tag: keywords'), blank=True)
-    # product_filter = models.ManyToManyField('catalogue.ProductFilter') # , through='ProductFilterRelationship')
+if not is_model_registered('catalogue', 'Category'):
+    class Category(CustomAbstractCategory):
+        pass
+
+    __all__.append('Category')
 
 
-    def get_absolute_url(self):
-        """
-        Return a product's absolute url
-        """
-        kw = {'slug': self.slug}
+if not is_model_registered('catalogue', 'Filter'):
+    class Filter(AbstractFilter):
+        pass
 
-        if self.categories.exists():
-            kw['category_slug'] = self.categories.first().url
+    __all__.append('Filter')
 
-        return reverse('detail', kwargs=kw)
 
-    def get_values(self):
-        values = dict()
-        values['title'] = strip_entities(self.title)
-        values['absolute_url'] = self.get_absolute_url()
+if not is_model_registered('catalogue', 'Product'):
+    class Product(CustomAbstractProduct):
+        pass
 
-        # selector = Selector()
-        # strategy = selector.strategy()
-        # info = strategy.fetch_for_product(self)
-        # values['price'] = str(info.price.incl_tax)
-        options = {'size': (220, 165), 'crop': True}
+    __all__.append('Product')
 
-        image = getattr(self.primary_image(), 'original', IMAGE_NOT_FOUND)
 
-        try:
-            values['image'] = get_thumbnailer(image).get_thumbnail(options).url
-        except InvalidImageFormatError:
-            values['image'] = get_thumbnailer(IMAGE_NOT_FOUND).get_thumbnail(options).url
-        return values
+if not is_model_registered('catalogue', 'ProductRecommendation'):
+    class ProductRecommendation(AbstractProductRecommendation):
+        pass
+
+    __all__.append('ProductRecommendation')
+
+
+if not is_model_registered('catalogue', 'ProductAttribute'):
+    class ProductAttribute(AbstractProductAttribute):
+        pass
+
+    __all__.append('ProductAttribute')
+
+
+if not is_model_registered('catalogue', 'ProductAttributeValue'):
+    class ProductAttributeValue(AbstractProductAttributeValue):
+        pass
+
+    __all__.append('ProductAttributeValue')
+
+
+if not is_model_registered('catalogue', 'AttributeOptionGroup'):
+    class AttributeOptionGroup(AbstractAttributeOptionGroup):
+        pass
+
+    __all__.append('AttributeOptionGroup')
+
+
+if not is_model_registered('catalogue', 'AttributeOption'):
+    class AttributeOption(AbstractAttributeOption):
+        pass
+
+    __all__.append('AttributeOption')
+
+
+if not is_model_registered('catalogue', 'Option'):
+    class Option(AbstractOption):
+        pass
+
+    __all__.append('Option')
+
+
+if not is_model_registered('catalogue', 'ProductImage'):
+    class ProductImage(AbstractProductImage):
+        pass
+
+    __all__.append('ProductImage')
+
+
+from oscar.apps.catalogue.models import *  # noqa
 
 
 
-# class MissingProductImage(CoreMissingProductImage):
-#     def __init__(self, name=None):
-#         super(MissingProductImage, self).__init__()
-#         print self.name
 
-# class ProductFilter(models.Model):
-#     name = models.CharField(verbose_name=('Filter name'), null=True, max_length=255)
-#     # product = models.ManyToManyField(Product)
-#     parent = models.ManyToManyField('self', null=True, blank=True)
-
-# class ProductFilterRelationship(models.Model):
-#     product = models.ForeignKey(Product)
-#     product_filter = models.ForeignKey(ProductFilter)
-#     filter_value = models.ForeignKey(FilterValue)
-
-# class FilterValue(models.Model):
-#     name = models.CharField(verbose_name=('Filter'))
-
-
-
-class ProductAttributeValue(AbstractProductAttributeValue):
-    pass
-
-# class GroupFilter(models.Model):
-#     name = models.CharField(_('Name filter'), max_length=128)
-#
-#     def __str__(self):
-#         return self.name
-#
-#     class Meta:a
-#         abstract = True
-#         app_label = 'catalogue'
-#         verbose_name = _('Filter group')
-#         verbose_name_plural = _('Filter groups')
-#
-
-# class ProductAttribute(AbstractProductAttribute):
-#     pos_option = models.BooleanField(verbose_name=_('This is option'), default=False, db_index=True)
-#     pos_attribute = models.BooleanField(verbose_name=_('This is attribute'), default=False, db_index=True)
-# pos_filter = models.BooleanField(verbose_name=_('This is filter'), default=False, db_index=True)
-# pos_characteristic = models.BooleanField(verbose_name=_('This is characteristic'), default=False, db_index=True)
-
-
-from oscar.apps.catalogue.models import *

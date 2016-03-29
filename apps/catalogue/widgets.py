@@ -18,19 +18,19 @@ class MPTTModelMultipleChoiceField(forms.ModelMultipleChoiceField):
     def label_from_instance(self, obj):
         level = getattr(obj, getattr(self.queryset.model._meta, 'level_attr', 'level'), 0)
         return u'%s %s' % ('-'*level, smart_unicode(obj))
-    
+
     def _get_choices(self):
         if hasattr(self, '_choices'):
             return self._choices
         return MPTTModelChoiceIterator(self)
-    
+
     choices = property(_get_choices, forms.ChoiceField._set_choices)
 
 
 class MPTTFilteredSelectMultiple(widgets.FilteredSelectMultiple):
     def __init__(self, verbose_name, is_stacked, attrs=None, choices=()):
         super(MPTTFilteredSelectMultiple, self).__init__(verbose_name, is_stacked, attrs, choices)
-    
+
     def render_options(self, choices, selected_choices):
         """
         this is copy'n'pasted from django.forms.widgets Select(Widget)
@@ -59,8 +59,16 @@ class MPTTFilteredSelectMultiple(widgets.FilteredSelectMultiple):
             else:
                 output.append(render_option(option_value, option_label, sort_fields))
         return u'\n'.join(output)
-    
+
     class Media:
         extend = False
         js = (settings.STATIC_ROOT + "js/mptt_m2m_selectbox.js",
               )
+
+    class Media:
+        extend = False
+        js = (
+            settings.STATIC_URL + "admin/js/core.js",
+            settings.STATIC_URL + "admin/js/mptt_m2m_selectbox.js",
+            settings.STATIC_URL + "admin/js/SelectFilter2.js",
+        )
