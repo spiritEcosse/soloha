@@ -7,6 +7,8 @@ from oscar.core.loading import get_model
 from braces import views
 from django.views.generic.list import MultipleObjectMixin
 from django.db.models.query import Prefetch
+
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 import json
 
 Product = get_model('catalogue', 'product')

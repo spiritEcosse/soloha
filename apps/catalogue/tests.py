@@ -386,3 +386,4 @@ class TestCatalog(TestCase):
     #         'page_number': page.number,
     #     }
     #     return context
+

@@ -191,7 +191,7 @@ class Product(AbstractProduct):
     meta_title = models.CharField(verbose_name=_('Meta tag: title'), blank=True, max_length=255)
     meta_description = models.TextField(verbose_name=_('Meta tag: description'), blank=True)
     meta_keywords = models.TextField(verbose_name=_('Meta tag: keywords'), blank=True)
-    product_filter = models.ManyToManyField('catalogue.ProductFilter') # , through='ProductFilterRelationship')
+    # product_filter = models.ManyToManyField('catalogue.ProductFilter') # , through='ProductFilterRelationship')
 
 
     def get_absolute_url(self):
@@ -231,10 +231,10 @@ class Product(AbstractProduct):
 #         super(MissingProductImage, self).__init__()
 #         print self.name
 
-class ProductFilter(models.Model):
-    name = models.CharField(verbose_name=('Filter name'), null=True, max_length=255)
-    # product = models.ManyToManyField(Product)
-    parent = models.ManyToManyField('self', null=True, blank=True)
+# class ProductFilter(models.Model):
+#     name = models.CharField(verbose_name=('Filter name'), null=True, max_length=255)
+#     # product = models.ManyToManyField(Product)
+#     parent = models.ManyToManyField('self', null=True, blank=True)
 
 # class ProductFilterRelationship(models.Model):
 #     product = models.ForeignKey(Product)
