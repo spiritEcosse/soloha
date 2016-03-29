@@ -5,8 +5,7 @@
 {% load staticfiles %}
 
 {% block product %}
-    <div class="items">
-        <div class="thumbnail text-center">
+    <div class="thumbnail text-center">
             <div class="caption">
                 <div class="title">
                     {% block product_title %}
@@ -28,13 +27,14 @@
                 <div class="price">
                     {% block product_price %}
                         <div class="product_price">
-                            {% include "catalogue/partials/stock_record.html" %}
+{#                            {% include "catalogue/partials/stock_record.html" %}#}
+
                             {% if not product.is_parent %}
                                 {% include "catalogue/partials/add_to_basket_form_compact.html" %}
                             {% endif %}
                         </div>
                     {% endblock %}
-                    {#                    <strong>Цена:</strong>5555#}
+                                        <strong>Цена:</strong>5555
                 </div>
                 {#                <p><a href="#" class="btn btn-primary" role="button">Купить</a></p>#}
             </div>
@@ -81,5 +81,4 @@
                 </div>
             </div>
         </div>
-    </div>
 {% endblock %}

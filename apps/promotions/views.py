@@ -3,35 +3,50 @@ from braces import views
 from oscar.apps.order.models import Line
 from apps.catalogue.models import Product
 from soloha.settings import MAX_COUNT_PRODUCT
-from apps.catalogue.models import ProductRecommendation
 from django.db.models.query import Prefetch
 from django.views.generic.list import MultipleObjectMixin
 from django.views.generic import View
 from oscar.core.loading import get_model
 
 Category = get_model('catalogue', 'category')
-ProductCategory = get_model('catalogue', 'productcategory')
+ProductCategory = get_model('catalogue', 'ProductCategory')
+ProductRecommendation = get_model('catalogue', 'ProductRecommendation')
 
 
 class HomeView(CoreHomeView):
     def get_context_data(self, **kwargs):
         context = super(HomeView, self).get_context_data(**kwargs)
+        only = ['title', 'slug', 'structure', 'product_class', 'product_options__name', 'product_options__code', 'product_options__type']
 
-        context['products_new'] = Product.objects.only('title', 'slug').prefetch_related(
+        context['products_new'] = Product.objects.only(*only).select_related('product_class').prefetch_related(
             Prefetch('images'),
+            Prefetch('product_options'),
+            Prefetch('product_class__options'),
+            Prefetch('stockrecords'),
             Prefetch('categories')
         ).order_by('-date_created')[:MAX_COUNT_PRODUCT]
 
-        context['products_recommend'] = ProductRecommendation.objects.select_related('recommendation').prefetch_related(
-            Prefetch('recommendation__images'),
-            Prefetch('recommendation__categories')
-        ).order_by('-recommendation__date_created')[:MAX_COUNT_PRODUCT]
+        context['products_recommend'] = Product.objects.filter(
+            productrecommendation__isnull=False
+        ).only(*only).select_related('product_class').prefetch_related(
+            Prefetch('images'),
+            Prefetch('product_options'),
+            Prefetch('product_class__options'),
+            Prefetch('stockrecords'),
+            Prefetch('categories')
+        ).order_by('-date_created')[:MAX_COUNT_PRODUCT]
 
-        context['products_order'] = Line.objects.select_related('product').prefetch_related(
-            Prefetch('product__images'),
-            Prefetch('product__categories'),
-        ).order_by('-product__date_created')[:MAX_COUNT_PRODUCT]
+        context['products_order'] = Product.objects.filter(
+            line__isnull=False
+        ).only(*only).select_related('product_class').prefetch_related(
+            Prefetch('images'),
+            Prefetch('product_options'),
+            Prefetch('stockrecords'),
+            Prefetch('product_class__options'),
+            Prefetch('categories'),
+        ).order_by('-date_created')[:MAX_COUNT_PRODUCT]
 
+        context['products_special'] = []
         return context
 
 queryset_product = Product.objects.only('title')

@@ -1,21 +1,41 @@
+{#{% verbatim paginator %}#}
+{#    <div class="col-xs-10 text-right">#}
+{#        <nav>#}
+{#            <ul class="pagination">#}
+{#                <li>#}
+{#                    <a href="?page={{ paginator.previous_page_number }}" aria-label="Previous">#}
+{#                        <span aria-hidden="true">&laquo;</span>#}
+{#                    </a>#}
+{#                </li>#}
+{#                <li>#}
+{#                    <a href="?page={{ page }}">{{ page }}</a>#}
+{#                </li>#}
+{#                <li>#}
+{#                    <a href="?page={{ paginator.next_page_number }}" aria-label="Next">#}
+{#                        <span aria-hidden="true">&raquo;</span>#}
+{#                    </a>#}
+{#                </li>#}
+{#            </ul>#}
+{#        </nav>#}
+{#    </div>#}
+{#{% endverbatim paginator %}#}
+
 {% verbatim paginator %}
-    <div class="col-xs-10 text-right" ng-show="paginator.is_paginated">
-        <nav>
-            <ul class="pagination">
-                <li ng-show="paginator.previous_page_number">
-                    <a href="?page={{ paginator.previous_page_number }}" aria-label="Previous">
-                        <span aria-hidden="true">&laquo;</span>
-                    </a>
-                </li>
-                <li ng-repeat="page in paginator.page_range" ng-class="{active: page == paginator.number}">
-                    <a href="?page={{ page }}">{{ page }}</a>
-                </li>
-                <li ng-show="paginator.next_page_number">
-                    <a href="?page={{ paginator.next_page_number }}" aria-label="Next">
-                        <span aria-hidden="true">&raquo;</span>
-                    </a>
-                </li>
-            </ul>
-        </nav>
+{% if paginator.num_pages > 1 %}
+    <div>
+        <ul class="pagination">
+            {% if page_obj.has_previous %}
+                <li class="previous"><a href="?{% get_parameters page %}page={{ page_obj.previous_page_number }}">{% trans "previous" %}</a></li>
+            {% endif %}
+            <li class="current">
+            {% blocktrans with page_num=page_obj.number total_pages=paginator.num_pages %}
+                Page {{ page_num }} of {{ total_pages }}
+            {% endblocktrans %}
+            </li>
+            {% if page_obj.has_next %}
+                <li class="next"><a href="?{% get_parameters page %}page={{ page_obj.next_page_number }}">{% trans "next" %}</a></li>
+            {% endif %}
+        </ul>
     </div>
+{% endif %}
 {% endverbatim paginator %}

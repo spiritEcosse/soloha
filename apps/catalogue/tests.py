@@ -228,161 +228,161 @@ class TestCatalog(TestCase):
         really = category.get_values()
         self.assertDictEqual(must, really)
 
-    def get_load_data(self):
-        """
-        get data for model category
-        Returns:
-        Examples
-        in key data store fields model category
-        in key children store list children model category
-        [
-            {'data': {'name': '1', 'sort': 1, 'slug': '1'}},
-            {'data': {'name': '2', 'sort': 2}, 'children': [
-                {'data': {'name': '21', 'sort': 1, 'slug': '21'}},
-                {'data': {'name': '22', 'sort': 2, 'slug': '22'}},
-                {'data': {'name': '23', 'sort': 3}, 'children': [
-                    {'data': {'name': '231', 'sort': 1}},
-                ]},
-                {'data': {'name': '24', 'sort': 3}},
-            ]},
-            {'data': {'name': '3', 'sort': 4}},
-            {'data': {'name': '4', 'sort': 5}, 'children': [
-                {'data': {'name': '41', 'sort': 1}},
-            ]},
-        ]
-        """
-        return [
-            {'data': {'name': '1', 'sort': 1}},
-            {'data': {'name': '2', 'sort': 0}, 'children': [
-                {'data': {'name': '24', 'sort': 0}},
-                {'data': {'name': '21', 'sort': 1}},
-                {'data': {'name': '22', 'sort': 2}},
-                {'data': {'name': '23', 'sort': 3}, 'children': [
-                    {'data': {'name': '231', 'sort': 1}},
-                ]},
-            ]},
-            {'data': {'name': '3', 'sort': 2}},
-            {'data': {'name': '4', 'sort': -5}, 'children': [
-                {'data': {'name': '41', 'sort': 1}},
-            ]},
-        ]
+    # def get_load_data(self):
+    #     """
+    #     get data for model category
+    #     Returns:
+    #     Examples
+    #     in key data store fields model category
+    #     in key children store list children model category
+    #     [
+    #         {'data': {'name': '1', 'sort': 1, 'slug': '1'}},
+    #         {'data': {'name': '2', 'sort': 2}, 'children': [
+    #             {'data': {'name': '21', 'sort': 1, 'slug': '21'}},
+    #             {'data': {'name': '22', 'sort': 2, 'slug': '22'}},
+    #             {'data': {'name': '23', 'sort': 3}, 'children': [
+    #                 {'data': {'name': '231', 'sort': 1}},
+    #             ]},
+    #             {'data': {'name': '24', 'sort': 3}},
+    #         ]},
+    #         {'data': {'name': '3', 'sort': 4}},
+    #         {'data': {'name': '4', 'sort': 5}, 'children': [
+    #             {'data': {'name': '41', 'sort': 1}},
+    #         ]},
+    #     ]
+    #     """
+    #     return [
+    #         {'data': {'name': '1', 'sort': 1}},
+    #         {'data': {'name': '2', 'sort': 0}, 'children': [
+    #             {'data': {'name': '24', 'sort': 0}},
+    #             {'data': {'name': '21', 'sort': 1}},
+    #             {'data': {'name': '22', 'sort': 2}},
+    #             {'data': {'name': '23', 'sort': 3}, 'children': [
+    #                 {'data': {'name': '231', 'sort': 1}},
+    #             ]},
+    #         ]},
+    #         {'data': {'name': '3', 'sort': 2}},
+    #         {'data': {'name': '4', 'sort': -5}, 'children': [
+    #             {'data': {'name': '41', 'sort': 1}},
+    #         ]},
+    #     ]
 
-    def test_dump_bulk_depth(self):
-        """
-        test tree categories by depth
-        Returns:
-            None
-        """
-        Category.load_bulk(self.get_load_data())
-        load_data = list()
-        load_data.append({'data': Category.objects.get(name='4').get_values()})
-        load_data.append({'data': Category.objects.get(name='2').get_values()})
-        load_data.append({'data': Category.objects.get(name='1').get_values()})
-        load_data.append({'data': Category.objects.get(name='3').get_values()})
-        dump_bulk_depth_data = Category.dump_bulk_depth(max_depth=1, keep_ids=False)
-        self.assertListEqual(load_data, dump_bulk_depth_data)
-
-        load_data = list()
-        load_data.append({
-            'data': Category.objects.get(name='4').get_values(),
-            'children': [{'data': Category.objects.get(name='41').get_values()}]
-        })
-        load_data.append({
-            'data': Category.objects.get(name='2').get_values(),
-            'children': [
-                {'data': Category.objects.get(name='24').get_values()},
-                {'data': Category.objects.get(name='21').get_values()},
-                {'data': Category.objects.get(name='22').get_values()},
-                {'data': Category.objects.get(name='23').get_values()},
-            ]
-        })
-        load_data.append({'data': Category.objects.get(name='1').get_values()})
-        load_data.append({'data': Category.objects.get(name='3').get_values()})
-        dump_bulk_depth_data = Category.dump_bulk_depth(max_depth=2, keep_ids=False)
-        self.assertListEqual(load_data, dump_bulk_depth_data)
-
-        load_data = list()
-        load_data.append({
-            'data': Category.objects.get(name='4').get_values(),
-            'children': [{'data': Category.objects.get(name='41').get_values()}]
-        })
-        load_data.append({
-            'data': Category.objects.get(name='2').get_values(),
-            'children': [
-                {'data': Category.objects.get(name='24').get_values()},
-                {'data': Category.objects.get(name='21').get_values()},
-                {'data': Category.objects.get(name='22').get_values()},
-                {
-                    'data': Category.objects.get(name='23').get_values(),
-                    'children': [{'data': Category.objects.get(name='231').get_values()}]
-                },
-            ]
-        })
-        load_data.append({'data': Category.objects.get(name='1').get_values()})
-        load_data.append({'data': Category.objects.get(name='3').get_values()})
-        dump_bulk_depth_data = Category.dump_bulk_depth(max_depth=3, keep_ids=False)
-        self.assertListEqual(load_data, dump_bulk_depth_data)
-
-        load_data = list()
-        load_data.append({
-            'data': Category.objects.get(name='4').get_values(),
-            'children': [{'data': Category.objects.get(name='41').get_values()}]
-        })
-        load_data.append({
-            'data': Category.objects.get(name='2').get_values(),
-            'children': [
-                {'data': Category.objects.get(name='24').get_values()},
-                {'data': Category.objects.get(name='21').get_values()},
-                {'data': Category.objects.get(name='22').get_values()},
-                {
-                    'data': Category.objects.get(name='23').get_values(),
-                    'children': [{'data': Category.objects.get(name='231').get_values()}]
-                },
-            ]
-        })
-        load_data.append({'data': Category.objects.get(name='1').get_values()})
-        load_data.append({'data': Category.objects.get(name='3').get_values()})
-        dump_bulk_depth_data = Category.dump_bulk_depth(max_depth=0, keep_ids=False)
-        self.assertListEqual(load_data, dump_bulk_depth_data)
+    # def test_dump_bulk_depth(self):
+    #     """
+    #     test tree categories by depth
+    #     Returns:
+    #         None
+    #     """
+    #     Category.load_bulk(self.get_load_data())
+    #     load_data = list()
+    #     load_data.append({'data': Category.objects.get(name='4').get_values()})
+    #     load_data.append({'data': Category.objects.get(name='2').get_values()})
+    #     load_data.append({'data': Category.objects.get(name='1').get_values()})
+    #     load_data.append({'data': Category.objects.get(name='3').get_values()})
+    #     dump_bulk_depth_data = Category.dump_bulk_depth(max_depth=1, keep_ids=False)
+    #     self.assertListEqual(load_data, dump_bulk_depth_data)
+    #
+    #     load_data = list()
+    #     load_data.append({
+    #         'data': Category.objects.get(name='4').get_values(),
+    #         'children': [{'data': Category.objects.get(name='41').get_values()}]
+    #     })
+    #     load_data.append({
+    #         'data': Category.objects.get(name='2').get_values(),
+    #         'children': [
+    #             {'data': Category.objects.get(name='24').get_values()},
+    #             {'data': Category.objects.get(name='21').get_values()},
+    #             {'data': Category.objects.get(name='22').get_values()},
+    #             {'data': Category.objects.get(name='23').get_values()},
+    #         ]
+    #     })
+    #     load_data.append({'data': Category.objects.get(name='1').get_values()})
+    #     load_data.append({'data': Category.objects.get(name='3').get_values()})
+    #     dump_bulk_depth_data = Category.dump_bulk_depth(max_depth=2, keep_ids=False)
+    #     self.assertListEqual(load_data, dump_bulk_depth_data)
+    #
+    #     load_data = list()
+    #     load_data.append({
+    #         'data': Category.objects.get(name='4').get_values(),
+    #         'children': [{'data': Category.objects.get(name='41').get_values()}]
+    #     })
+    #     load_data.append({
+    #         'data': Category.objects.get(name='2').get_values(),
+    #         'children': [
+    #             {'data': Category.objects.get(name='24').get_values()},
+    #             {'data': Category.objects.get(name='21').get_values()},
+    #             {'data': Category.objects.get(name='22').get_values()},
+    #             {
+    #                 'data': Category.objects.get(name='23').get_values(),
+    #                 'children': [{'data': Category.objects.get(name='231').get_values()}]
+    #             },
+    #         ]
+    #     })
+    #     load_data.append({'data': Category.objects.get(name='1').get_values()})
+    #     load_data.append({'data': Category.objects.get(name='3').get_values()})
+    #     dump_bulk_depth_data = Category.dump_bulk_depth(max_depth=3, keep_ids=False)
+    #     self.assertListEqual(load_data, dump_bulk_depth_data)
+    #
+    #     load_data = list()
+    #     load_data.append({
+    #         'data': Category.objects.get(name='4').get_values(),
+    #         'children': [{'data': Category.objects.get(name='41').get_values()}]
+    #     })
+    #     load_data.append({
+    #         'data': Category.objects.get(name='2').get_values(),
+    #         'children': [
+    #             {'data': Category.objects.get(name='24').get_values()},
+    #             {'data': Category.objects.get(name='21').get_values()},
+    #             {'data': Category.objects.get(name='22').get_values()},
+    #             {
+    #                 'data': Category.objects.get(name='23').get_values(),
+    #                 'children': [{'data': Category.objects.get(name='231').get_values()}]
+    #             },
+    #         ]
+    #     })
+    #     load_data.append({'data': Category.objects.get(name='1').get_values()})
+    #     load_data.append({'data': Category.objects.get(name='3').get_values()})
+    #     dump_bulk_depth_data = Category.dump_bulk_depth(max_depth=0, keep_ids=False)
+    #     self.assertListEqual(load_data, dump_bulk_depth_data)
 
     def test_attribute_class_view(self):
         self.assertEqual(CategoryProducts.paginate_by, 24)
         self.assertEqual(CategoryProducts.model, Product)
 
-    def test_get_list_product(self):
-        """
-        get list product by current category
-        Returns:
-            None
-        """
-        context = {}
-        test_catalogue.create_product_bulk()
-        category = Category.objects.get(name='231')
-        category_dict = {'category_pk': category.pk}
-        products_queryset = Product.objects.filter(categories=category.pk).prefetch_related(
-            Prefetch('images'),
-            Prefetch('categories'),
-        ).order_by('-date_created')
-        context['products'] = [product.get_values() for product in products_queryset]
+    # def test_get_list_product(self):
+    #     """
+    #     get list product by current category
+    #     Returns:
+    #         None
+    #     """
+    #     context = {}
+    #     test_catalogue.create_product_bulk()
+    #     category = Category.objects.get(name='231')
+    #     category_dict = {'category_pk': category.pk}
+    #     products_queryset = Product.objects.filter(categories=category.pk).prefetch_related(
+    #         Prefetch('images'),
+    #         Prefetch('categories'),
+    #     ).order_by('-date_created')
+    #     context['products'] = [product.get_values() for product in products_queryset]
+    #
+    #     for num in xrange(1, 2):
+    #         category_dict.update({'page': num})
+    #         with self.assertNumQueries(5):
+    #             response = self.client.post(reverse('catalogue:products'),
+    #                                         json.dumps(category_dict),
+    #                                         content_type='application/json', HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+    #         context = self.get_paginator(context=context, all_pages=CategoryProducts.paginate_by, per_page=num)
+    #         self.assertEqual(response.resolver_match.func.__name__, CategoryProducts.as_view().__name__)
+    #         self.assertJSONEqual(response.content, json.dumps(context))
 
-        for num in xrange(1, 2):
-            category_dict.update({'page': num})
-            with self.assertNumQueries(5):
-                response = self.client.post(reverse('catalogue:products'),
-                                            json.dumps(category_dict),
-                                            content_type='application/json', HTTP_X_REQUESTED_WITH='XMLHttpRequest')
-            context = self.get_paginator(context=context, all_pages=CategoryProducts.paginate_by, per_page=num)
-            self.assertEqual(response.resolver_match.func.__name__, CategoryProducts.as_view().__name__)
-            self.assertJSONEqual(response.content, json.dumps(context))
-
-    def get_paginator(self, context, all_pages, per_page):
-        paginator = Paginator(context['products'], all_pages)
-        page = paginator.page(per_page)
-        context['paginator'] = {
-            'page_range': paginator.page_range,
-            'is_paginated': page.has_other_pages(),
-            'previous_page_number': page.previous_page_number() if page.has_previous() else None,
-            'next_page_number': page.next_page_number() if page.has_next() else None,
-            'page_number': page.number,
-        }
-        return context
+    # def get_paginator(self, context, all_pages, per_page):
+    #     paginator = Paginator(context['products'], all_pages)
+    #     page = paginator.page(per_page)
+    #     context['paginator'] = {
+    #         'page_range': paginator.page_range,
+    #         'is_paginated': page.has_other_pages(),
+    #         'previous_page_number': page.previous_page_number() if page.has_previous() else None,
+    #         'next_page_number': page.next_page_number() if page.has_next() else None,
+    #         'page_number': page.number,
+    #     }
+    #     return context

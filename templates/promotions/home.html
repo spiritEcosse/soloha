@@ -51,78 +51,49 @@
     </div>
 
     <div class="col-xs-24 items">
-        <ul class="nav  nav-tabs nav-justified" id="home_tabs">
-            <li class="active"><a data-toggle="tab" role="tab" href="#sectionNews" ng-click="get_news()" id="link_news">Новинки</a></li>
-            <li><a data-toggle="tab" role="tab" href="#hits" id="link_hits" ng-click="get_hits()">Хиты продаж</a></li>
-            <li><a data-toggle="tab" role="tab" href="#special" id="link_special" ng-click="get_special()">Акции</a></li>
-            <li><a data-toggle="tab" role="tab" href="#recommended" id="link_recommends" ng-click="get_recommends()">Рекомендуем</a></li>
+        <ul class="nav nav-tabs nav-justified" id="home_tabs" role="tablist">
+            <li role="presentation" class="active"><a data-toggle="tab" role="tab" href="#news" id="news-tab">{% trans "Новинки" %}</a></li>
+            <li role="presentation"><a data-toggle="tab" role="tab" href="#hits" id="hits-tab">{% trans "Хиты продаж" %}</a></li>
+            <li role="presentation"><a data-toggle="tab" role="tab" href="#special" id="special-tab">{% trans "Акции" %}</a></li>
+            <li role="presentation"><a data-toggle="tab" role="tab" href="#recommended" id="recommended-tab">{% trans "Рекомендуем" %}</a></li>
         </ul>
 
-        <div class="tab-content" >
-            <div class="lightSlider">
-                {% verbatim products %}
-                    <div class="col-sm-6 col-md-6" ng-cloak ng-show="products.length" ng-repeat="product in products" >
-                    <div class="thumbnail text-center">
-                    <div class="caption">
-                    <div class="title">
-                        <a href="{{ product.absolute_url }}">{{ product.title }}</a>
-                    </div>
-                    <a href="#" class="image"><img ng-src="{{ product.image }}" class="img-responsive" alt="{{ product.title }}" title="{{ product.title }}"/></a>
-                    <div class="model"></div>
-                    <div class="price"><strong>Цена:</strong>{{ product.price }}</div>
-                    <p>
-                    <a href="#" class="btn btn-primary" role="button">
-                {% endverbatim products %}
-                {% trans "Купить" %}
-                {% verbatim products %}
-                    </a>
-                    </p>
-                    </div>
-                    <div class="mask">
-                        <div class="title">
-                            <a href="{{ product.absolute_url }}">{{ product.title }}</a>
+        <div class="tab-content">
+            <div role="tabpanel" id="news" class="tab-pane fade in active" aria-labelledby="news-tab">
+                <div class="lightSlider">
+                    {% for product in products_new %}
+                        <div class="col-sm-6 col-md-6">
+                            {% include "catalogue/partials/product.html" %}
                         </div>
-                        <div class="filters">
-                            <div class="rows">
-                                <div class="option_name">
-                                    <span>По типу:</span>
-                                </div>
-
-                                <div class="option_value"><span>Кровати с мягким изголовьем</span></div>
-                            </div>
-                            <div class="rows">
-                                <div class="option_name">
-                                    <span>По размеру:</span>
-                                </div>
-                                <div class="option_value"><span>Полуторные,Двухспальные</span></div>
-                            </div>
-                            <div class="rows">
-                                <div class="option_name">
-                                    <span>Каркас:</span>
-                                </div>
-
-                                <div class="option_value"><span>Металлический</span></div>
-                            </div>
-                            <div class="rows">
-                                <div class="option_name">
-                                    <span>Подъёмный механизм:</span>
-                                </div>
-
-                                <div class="option_value"><span>нет</span></div>
-                            </div>
-                            <div class="rows">
-                                <div class="option_name"><span>Ящики:</span></div>
-                                <div class="option_value"><span>нет</span></div>
-                            </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div role="tabpanel" id="hits" class="tab-pane fade in" aria-labelledby="hits-tab">
+                <div class="lightSlider">
+                    {% for product in products_order %}
+                        <div class="col-sm-6 col-md-6">
+                            {% include 'catalogue/partials/product.html' %}
                         </div>
-                        <a href="#">Смотреть все характеристики</a>
-                        <div class="btn-block">
-                            <a href="#" class="btn btn-primary" role="button">Купить</a>
+                    {% endfor %}
+                </div>
+            </div>
+            <div role="tabpanel" id="special" class="tab-pane fade in" aria-labelledby="special-tab">
+                <div class="lightSlider">
+                    {% for product in products_special %}
+                        <div class="col-sm-6 col-md-6">
+                            {% include 'catalogue/partials/product.html' %}
                         </div>
-                    </div>
-                    </div>
-                    </div>
-                {% endverbatim products %}
+                    {% endfor %}
+                </div>
+            </div>
+            <div role="tabpanel" id="recommended" class="tab-pane fade in" aria-labelledby="recommended-tab">
+                <div class="lightSlider">
+                    {% for product in products_recommend %}
+                        <div class="col-sm-6 col-md-6">
+                            {% include 'catalogue/partials/product.html' %}
+                        </div>
+                    {% endfor %}
+                </div>
             </div>
         </div>
     </div>

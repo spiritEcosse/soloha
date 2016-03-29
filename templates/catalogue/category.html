@@ -352,8 +352,10 @@
     </div>
 
     <div class="row items">
-        {% for prod in products %}
-            {% include "catalogue/partials/product_json.html" %}
+        {% for product in products %}
+            <div class="col-sm-6 col-md-6">
+                {% include "catalogue/partials/product.html" %}
+            </div>
         {% endfor %}
         <div class="clearfix"></div>
         <div class="col-xs-6 col-xs-offset-8 wrapper">
@@ -361,10 +363,13 @@
                 ПОКАЗАТЬ ЕЩЕ
             </a>
         </div>
-
-        {% include "catalogue/partials/pagination.html" %}
+        <div>
+            {% include "partials/pagination.html" %}
+        </div>
     </div>
-    <p class="nonefound">{% trans "No products found." %}</p>
+    {% if not products %}
+        <p class="nonefound">{% trans "No products found." %}</p>
+    {% endif %}
 {% endblock %}
 
 {% block post_content %}
