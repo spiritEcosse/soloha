@@ -7,30 +7,7 @@ from django.forms import Textarea
 from django import forms
 from django.contrib.admin import widgets
 
-from oscar.core.loading import get_model
 
-from django.contrib import admin
-
-from oscar.apps.catalogue.admin import ProductAdmin as CoreProductAdmin
-
-from django.db import models
-
-# admin.site.register(Product)
-
-# class ProductFilterRelationshipInline(admin.TabularInline):
-#     model = FeedCategoryRelationship
-#     extra = 1
-
-# class ProductAdmin(admin.ModelAdmin):
-#     inlines = (ProductFilterRelationshipInline,)
-
-# class FilterAdmin(admin.ModelAdmin):
-#     inlines = (ProductFilterRelationshipInline,)
-#     prepopulated_fields = { "slug": ("name",) }
-
-
-# admin.site.register(ProductFilterRelationship, ProductFilterRelationshipInline)
-from oscar.apps.catalogue.admin import *  # noqa
 Filter = get_model('catalogue', 'Filter')
 AttributeOption = get_model('catalogue', 'AttributeOption')
 AttributeOptionGroup = get_model('catalogue', 'AttributeOptionGroup')
