@@ -223,55 +223,53 @@
                             </div>
                             <div id="navbar_menu" class="collapse navbar-collapse">
                                 <ul class="nav navbar-nav">
-                                    {% verbatim categories %}
-                                        <li class="dropdown" ng-cloak ng-show="categories.length" ng-repeat="category in categories">
-                                            <a role="button" class="dropdown-toggle" data-toggle="dropdown" ng-cloak>
-                                                <img ng-cloak src="{{ category.data.icon }}" class="img-responsive icon"/>
-                                                {{ category.data.name }}
-                                            </a>
-                                            <div class="arrow"></div>
-                                            <div class="dropdown-menu" ng-if="category.children.length" role="menu" ng-click="$event.stopPropagation();" >
-                                                <div class="yamm-content">
-                                                    <div class="col-xs-12">
-                                                        <ul class="list-group nav nav-tabs tabs-left">
-                                                            <uib-tabset active="active" vertical="true">
-                                                                <uib-tab index="$index" ng-repeat="sub_categories in category.children" active="tab.active" disable="tab.disabled">
-                                                                    <uib-tab-heading heading="{{ sub_categories.data.name }}">
-                                                                        <div class="pull-left wrap-head">{{ sub_categories.data.name }}</div>
-                                                                        <div class="pull-right"><span class="glyphicon glyphicon-menu-right pull-right"></span></div>
-                                                                    </uib-tab-heading>
-                                                                    <div class="tab-pane">
-                                                                        <div class="panel panel-default">
-                                                                            <div class="panel-heading">
-                                                                                <a href="{{ sub_categories.data.absolute_url }}">{{ sub_categories.data.name }}</a>
-                                                                            </div>
-                                                                            <div class="panel-body" ng-if="sub_categories.children.length">
-                                                                                <ul class="list-group">
-                                                                                    <li class="list-group-item" ng-repeat="sub_sub_categories in sub_categories.children">
-                                                                                        <a href="{{ sub_sub_categories.data.absolute_url }}">{{ sub_sub_categories.data.name }}</a>
-                                                                                    </li>
-                                                                                </ul>
-                                                                            </div>
+                                    <li class="dropdown" ng-show="categories.length" ng-repeat="category in categories">
+                                        <a role="button" class="dropdown-toggle" data-toggle="dropdown">
+                                            <img src="{{ category.data.icon }}" class="img-responsive icon"/>
+                                            {{ category.data.name }}
+                                        </a>
+                                        <div class="arrow"></div>
+                                        <div class="dropdown-menu" ng-if="category.children.length" role="menu" ng-click="$event.stopPropagation();" >
+                                            <div class="yamm-content">
+                                                <div class="col-xs-12">
+                                                    <ul class="list-group nav nav-tabs tabs-left">
+                                                        <uib-tabset active="active" vertical="true">
+                                                            <uib-tab index="$index" ng-repeat="sub_categories in category.children" active="tab.active" disable="tab.disabled">
+                                                                <uib-tab-heading heading="{{ sub_categories.data.name }}">
+                                                                    <div class="pull-left wrap-head">{{ sub_categories.data.name }}</div>
+                                                                    <div class="pull-right"><span class="glyphicon glyphicon-menu-right pull-right"></span></div>
+                                                                </uib-tab-heading>
+                                                                <div class="tab-pane">
+                                                                    <div class="panel panel-default">
+                                                                        <div class="panel-heading">
+                                                                            <a href="{{ sub_categories.data.absolute_url }}">{{ sub_categories.data.name }}</a>
+                                                                        </div>
+                                                                        <div class="panel-body" ng-if="sub_categories.children.length">
+                                                                            <ul class="list-group">
+                                                                                <li class="list-group-item" ng-repeat="sub_sub_categories in sub_categories.children">
+                                                                                    <a href="{{ sub_sub_categories.data.absolute_url }}">{{ sub_sub_categories.data.name }}</a>
+                                                                                </li>
+                                                                            </ul>
                                                                         </div>
                                                                     </div>
-                                                                </uib-tab>
-                                                                <li class="text-center uib-tab nav-item ng-isolate-scope">
-                                                                    <a ng-href="{{ category.data.absolute_url }}">
-                                                                        {{ category.data.name }}
-                                                                        <span class="glyphicon glyphicon-menu-right"></span>
-                                                                    </a>
-                                                                </li>
-                                                            </uib-tabset>
-                                                        </ul>
-                                                    </div>
-                                                    <div class="col-xs-12 text-right image" ng-if="category.data.image_banner && category.data.link_banner">
-                                                        <img ng-src="{{ category.data.image_banner }}" class="img-responsive pull-right" title="{{ category.data.name }}" alt="{{ category.data.name }}"/>
-                                                        <a class="btn btn-default btn-menu btn-xs" ng-href="{{ category.data.link_banner }}">Хочу</a>
-                                                    </div>
+                                                                </div>
+                                                            </uib-tab>
+                                                            <li class="text-center uib-tab nav-item ng-isolate-scope">
+                                                                <a ng-href="{{ category.data.absolute_url }}">
+                                                                    {{ category.data.name }}
+                                                                    <span class="glyphicon glyphicon-menu-right"></span>
+                                                                </a>
+                                                            </li>
+                                                        </uib-tabset>
+                                                    </ul>
+                                                </div>
+                                                <div class="col-xs-12 text-right image" ng-if="category.data.image_banner && category.data.link_banner">
+                                                    <img ng-src="{{ category.data.image_banner }}" class="img-responsive pull-right" title="{{ category.data.name }}" alt="{{ category.data.name }}"/>
+                                                    <a class="btn btn-default btn-menu btn-xs" ng-href="{{ category.data.link_banner }}">Хочу</a>
                                                 </div>
                                             </div>
-                                        </li>
-                                    {% endverbatim categories %}
+                                        </div>
+                                    </li>
                                 </ul>
                             </div>
                         </div>

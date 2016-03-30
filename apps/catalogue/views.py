@@ -10,6 +10,7 @@ from django.db.models.query import Prefetch
 import json
 
 Product = get_model('catalogue', 'product')
+Category = get_model('catalogue', 'category')
 
 
 class ProductCategoryView(CoreProductCategoryView):
