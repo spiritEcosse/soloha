@@ -25,14 +25,13 @@ class CategoryProducts(views.JSONResponseMixin, views.AjaxResponseMixin, Multipl
     def post(self, request, *args, **kwargs):
         data = json.loads(self.request.body)
         # self.kwargs[self.page_kwarg] = data.get('page', 1)
-        self.kwargs[self.sorting_type_kwarg] = data.get('sorting_type', 1)
+        self.kwargs[self.sorting_type_kwarg] = data.get('sorting_type', 'stockrecords__price_excl_tax')
         self.object_list = self.get_queryset(product_pk=data['product_pk'])
 
     def get_queryset(self, **kwargs):
         queryset = super(CategoryProducts, self).get_queryset().filter(products=kwargs['product_pk'])
         return queryset.prefetch_related(
-            Prefetch('price'),
-            Prefetch('popularity')
+            Prefetch('categories')
         ).oreder_by(kwargs['sorting_type'])
 
     def post_ajax(self, request, *args, **kwargs):
@@ -59,7 +58,7 @@ class CategoryProducts(views.JSONResponseMixin, views.AjaxResponseMixin, Multipl
 
     def get_context_data_json(self, **kwargs):
         context = dict()
-        context['products'] = [product.get_values() for product in self.object_list]
+        context['products'] = [product.id for product in self.object_list]
         return context
 
 
