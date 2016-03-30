@@ -447,7 +447,7 @@ class CustomAbstractProduct(models.Model):
         selector = Selector()
         strategy = selector.strategy()
         info = strategy.fetch_for_product(self)
-        values['price'] = str(info.price.incl_tax)
+        values['price'] = str(info.stockrecord.price_excl_tax)
         options = {'size': (220, 165), 'crop': True}
 
         image = getattr(self.primary_image(), 'original', IMAGE_NOT_FOUND)
