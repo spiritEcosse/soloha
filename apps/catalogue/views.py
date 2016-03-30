@@ -12,6 +12,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 import json
 
 Product = get_model('catalogue', 'product')
+Category = get_model('catalogue', 'category')
 
 
 class ProductCategoryView(CoreProductCategoryView):

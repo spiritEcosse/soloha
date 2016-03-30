@@ -15,11 +15,10 @@
                 {% block product_image %}
                     <div class="image_container">
                         {% with image=product.primary_image %}
-                            {% thumbnail image.original "220x165" crop="center" as thumb %}
-                                <a class="image" href="{{ product.get_absolute_url }}">
-                                    <img src="{{ thumb.url }}" alt="{{ product.get_title }}" title="{{ product.get_title }}">
-                                </a>
-                            {% endthumbnail %}
+                            {% thumbnail image.original 220x165 crop as thumb %}
+                            <a class="image" href="{{ product.get_absolute_url }}">
+                                <img src="{{ thumb.url }}" alt="{{ product.get_title }}" title="{{ product.get_title }}">
+                            </a>
                         {% endwith %}
                     </div>
                 {% endblock %}

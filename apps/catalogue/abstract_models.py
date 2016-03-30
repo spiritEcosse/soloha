@@ -11,12 +11,15 @@ from oscar.apps.catalogue.abstract_models import *  # noqa
 
 @python_2_unicode_compatible
 class CustomAbstractProduct(models.Model):
+    # Title is mandatory for canonical products but optional for child products
+    title = models.CharField(pgettext_lazy(u'Product title', u'Title'), max_length=255, blank=True)
+    slug = models.SlugField(_('Slug'), max_length=255, unique=False)
     enable = models.BooleanField(verbose_name=_('Enable'), default=True)
     h1 = models.CharField(verbose_name=_('h1'), blank=True, max_length=255)
     meta_title = models.CharField(verbose_name=_('Meta tag: title'), blank=True, max_length=255)
     meta_description = models.TextField(verbose_name=_('Meta tag: description'), blank=True)
     meta_keywords = models.TextField(verbose_name=_('Meta tag: keywords'), blank=True)
-    filters = models.ManyToManyField('catalogue.Filter', verbose_name=_('Filters of product'))
+    description = models.TextField(_('Description'), blank=True)
 
     STANDALONE, PARENT, CHILD = 'standalone', 'parent', 'child'
     STRUCTURE_CHOICES = (
@@ -43,10 +46,14 @@ class CustomAbstractProduct(models.Model):
                     "stand-alone product (i.e. there is only one version of"
                     " this product)."))
 
-    # Title is mandatory for canonical products but optional for child products
-    title = models.CharField(pgettext_lazy(u'Product title', u'Title'), max_length=255, blank=True)
-    slug = models.SlugField(_('Slug'), max_length=255, unique=False)
-    description = models.TextField(_('Description'), blank=True)
+    date_created = models.DateTimeField(_("Date created"), auto_now_add=True)
+
+    # This field is used by Haystack to reindex search
+    date_updated = models.DateTimeField(
+        _("Date updated"), auto_now=True, db_index=True)
+
+    categories = models.ManyToManyField('catalogue.Category', verbose_name=_("Categories"), blank=True, null=True)
+    filters = models.ManyToManyField('catalogue.Filter', verbose_name=_('Filters of product'), blank=True, null=True)
 
     #: "Kind" of product, e.g. T-Shirt, Book, etc.
     #: None for child products, they inherit their parent's product class
@@ -77,14 +84,6 @@ class CustomAbstractProduct(models.Model):
     # Denormalised product rating - used by reviews app.
     # Product has no ratings if rating is None
     rating = models.FloatField(_('Rating'), null=True, editable=False)
-
-    date_created = models.DateTimeField(_("Date created"), auto_now_add=True)
-
-    # This field is used by Haystack to reindex search
-    date_updated = models.DateTimeField(
-        _("Date updated"), auto_now=True, db_index=True)
-
-    categories = models.ManyToManyField('catalogue.Category', verbose_name=_("Categories"))
 
     #: Determines if a product may be used in an offer. It is illegal to
     #: discount some types of product (e.g. ebooks) and this field helps
@@ -385,9 +384,10 @@ class CustomAbstractProduct(models.Model):
             # the ProductImage class so this missing image can be used
             # interchangeably in templates.  Strategy pattern ftw!
             return {
-                'original': self.get_missing_image(),
+                'original': IMAGE_NOT_FOUND,
                 'caption': '',
-                'is_missing': True}
+                'is_missing': True
+            }
 
     # Updating methods
 
@@ -521,8 +521,9 @@ class CustomAbstractCategory(MPTTModel):
         sufficiently useful to keep around.
         """
         names = [category.name for category in self.get_ancestors_and_self()]
-        return self._full_name_separator.join(names)
+        return self._full_name_separator.join(map(str, names))
 
+    @property
     def full_slug(self):
         """
         Returns a string of this category's slug concatenated with the slugs
@@ -533,7 +534,7 @@ class CustomAbstractCategory(MPTTModel):
         include it's ancestors' slugs.
         """
         slugs = [category.slug for category in self.get_ancestors_and_self()]
-        return self._slug_separator.join(slugs)
+        return self._slug_separator.join(map(str, slugs))
 
     def generate_slug(self):
         """
@@ -618,11 +619,8 @@ class CustomAbstractCategory(MPTTModel):
             image_banner = get_thumbnailer(self.image_banner).get_thumbnail(options).url
         return image_banner
 
-    # def get_absolute_url(self):
-    #     return reverse('catalog:category', kwargs={'slug': self.full_slug()})
-
     def get_absolute_url(self):
-        return reverse('category', kwargs={'category_slug': self.full_slug()})
+        return reverse('category', kwargs={'category_slug': self.full_slug})
 
     @classmethod
     def get_annotated_list_qs_depth(cls, parent=None, max_depth=None):
