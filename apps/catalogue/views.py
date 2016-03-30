@@ -25,43 +25,31 @@ class CategoryProducts(views.JSONResponseMixin, views.AjaxResponseMixin, Multipl
 
     def post(self, request, *args, **kwargs):
         data = json.loads(self.request.body)
-        # self.kwargs[self.page_kwarg] = data.get('page', 1)
-        self.kwargs[self.sorting_type_kwarg] = data.get('sorting_type', 1)
-        self.object_list = self.get_queryset(product_pk=data['product_pk'])
+        self.kwargs['product_category'] = data.get('product_category')
+        self.kwargs['sorting_type'] = data.get('sorting_type', 'stockrecords__price_excl_tax')
+        self.object_list = self.get_queryset()
+        # self.object_list = self.get_queryset(product_pk=data['product_pk'])
 
     def get_queryset(self, **kwargs):
-        queryset = super(CategoryProducts, self).get_queryset().filter(products=kwargs['product_pk'])
-        return queryset.prefetch_related(
-            Prefetch('price'),
-            Prefetch('popularity')
-        ).oreder_by(kwargs['sorting_type'])
+        # queryset = super(CategoryProducts, self).get_queryset().filter(products=kwargs['product_pk'])
+        queryset = super(CategoryProducts, self).get_queryset()
+        return queryset.select_related('product_class')\
+            .prefetch_related(
+                Prefetch('categories'),
+                Prefetch('images'),
+                Prefetch('stockrecords'),).order_by(self.kwargs['sorting_type'])
+        # TODO make this work only('id', 'name', "stockrecords__price_excl_tax", 'slug', 'images', 'product_class').
+
 
     def post_ajax(self, request, *args, **kwargs):
         super(CategoryProducts, self).post_ajax(request, *args, **kwargs)
         return self.render_json_response(self.get_context_data_json())
 
-    # def get_paginator_values(self, **kwargs):
-    #     queryset = kwargs.pop('object_list', self.object_list)
-    #     page_size = self.get_paginate_by(queryset)
-    #     paginator_values = {
-    #         'is_paginated': False,
-    #     }
-    #
-    #     if page_size:
-    #         paginator, page, queryset, is_paginated = self.paginate_queryset(queryset, page_size)
-    #         paginator_values = {
-    #             'page_range': paginator.page_range,
-    #             'is_paginated': is_paginated,
-    #             'previous_page_number': page.previous_page_number() if page.has_previous() else None,
-    #             'next_page_number': page.next_page_number() if page.has_next() else None,
-    #             'page_number': page.number,
-    #         }
-    #     return paginator_values
-
     def get_context_data_json(self, **kwargs):
         context = dict()
         context['products'] = [product.get_values() for product in self.object_list]
         return context
+
 
 
 class ProductDetailView(CoreProductDetailView):

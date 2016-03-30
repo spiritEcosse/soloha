@@ -418,27 +418,64 @@ class TestCatalog(TestCase):
         Test sorting products by popularity, price descending and price ascending
         Returns: sorted products
         """
-        data = {
-            "product_category": 'test_category',
-            "sorting_type": 'stockrecords__price_excl_tax'
+        test_catalogue.create_product_bulk()
+        # create_product(title='prod1', price=3)
+
+
+        sorting_dict = {
+            'product_category': 'test_category',
+            'sorting_type': 'stockrecords__price_excl_tax'
         }
-        product_category = data.get('product_category', 'test_category')
-        sorting_type = data.get('sorting_type', 'stockrecords__price_excl_tax')
-        # sorting_types = {
-        #     "popularity": "",
-        #     "price_asc":  "price",
-        #     "price_desc": "-price"
-        # }
 
-        # with self.assertNumQueries(5):
-        response = self.client.post(reverse('category: products'), product_category, sorting_type, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        # with self.assertNumQueries(10):
+        response = self.client.post(reverse('catalogue:products'),
+                                        json.dumps(sorting_dict),
+                                        content_type='application/json',
+                                        HTTP_X_REQUESTED_WITH='XMLHttpRequest')
         self.assertEqual(200, response.status_code)
-        object_list = Product.objects.prefetch_related(
-            Prefetch('categories')
-        ).order_by('stockrecords__price_excl_tax')
-        products_id = [product.id for product in object_list]
+        object_list = Product.objects.select_related('product_class').prefetch_related(
+            Prefetch('categories'),
+            Prefetch('images'),
+            # Prefetch('product_options'),
+            # Prefetch('product_class__options'),
+            Prefetch('stockrecords'),
+            ).order_by(sorting_dict['sorting_type'])
+        context = dict()
+        context['products'] = [product.get_values() for product in object_list]
+        self.assertJSONEqual(json.dumps(context), response.content)
 
+        sorting_dict['sorting_type'] = '-stockrecords__price_excl_tax'
+        response = self.client.post(reverse('catalogue:products'),
+                                    json.dumps(sorting_dict),
+                                    content_type='application/json',
+                                    HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEqual(200, response.status_code)
+        object_list = Product.objects.select_related('product_class').prefetch_related(
+            Prefetch('categories'),
+            Prefetch('images'),
+            Prefetch('product_options'),
+            Prefetch('product_class__options'),
+            Prefetch('stockrecords'),
+            ).order_by(sorting_dict['sorting_type'])
 
-        self.assertJSONEqual(json.dumps(data[product_category]), product_category)
-        self.assertJSONEqual(json.dumps(data[sorting_type]), sorting_type)
-        self.assertJSONEqual(json.dumps(products_id), response.content)
+        context = dict()
+        context['products'] = [product.get_values() for product in object_list]
+        self.assertJSONEqual(json.dumps(context), response.content)
+
+        sorting_dict['sorting_type'] = 'rating'
+        response = self.client.post(reverse('catalogue:products'),
+                                    json.dumps(sorting_dict),
+                                    content_type='application/json',
+                                    HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEqual(200, response.status_code)
+        object_list = Product.objects.select_related('product_class').prefetch_related(
+            Prefetch('categories'),
+            Prefetch('images'),
+            Prefetch('product_options'),
+            Prefetch('product_class__options'),
+            Prefetch('stockrecords'),
+            ).order_by(sorting_dict['sorting_type'])
+
+        context = dict()
+        context['products'] = [product.get_values() for product in object_list]
+        self.assertJSONEqual(json.dumps(context), response.content)
