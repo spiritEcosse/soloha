@@ -1,8 +1,12 @@
 {% extends 'layout.html' %}
 {% load staticfiles %}
 {% load i18n %}
+{% load basket_tags %}
+{% load promotion_tags %}
+{% load category_tags %}
+{% load product_tags %}
 
-{% block ngController %}ng-controller="Home" ng-cloak{% endblock ngController %}
+{% block ngController %}ng-controller="Home"{% endblock ngController %}
 
 {% block extrascripts %}
     {{ block.super }}
@@ -63,7 +67,7 @@
                 <div class="lightSlider">
                     {% for product in products_new %}
                         <div class="col-sm-6 col-md-6">
-                            {% include "catalogue/partials/product.html" %}
+                            {% include 'catalogue/partials/product.html' %}
                         </div>
                     {% endfor %}
                 </div>

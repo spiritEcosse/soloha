@@ -2,7 +2,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.utils.html import strip_entities
 from easy_thumbnails.files import get_thumbnailer
-from soloha.settings import IMAGE_NOT_FOUND
+from soloha.settings import IMAGE_NOT_FOUND, MEDIA_ROOT
 from easy_thumbnails.exceptions import (
     InvalidImageFormatError, EasyThumbnailsError)
 from mptt.models import MPTTModel, TreeForeignKey
@@ -378,16 +378,12 @@ class CustomAbstractProduct(models.Model):
             # the ProductManager
             images = images.order_by('display_order')
         try:
-            return images[0]
+            return images[0].original.name or IMAGE_NOT_FOUND
         except IndexError:
             # We return a dict with fields that mirror the key properties of
             # the ProductImage class so this missing image can be used
             # interchangeably in templates.  Strategy pattern ftw!
-            return {
-                'original': IMAGE_NOT_FOUND,
-                'caption': '',
-                'is_missing': True
-            }
+            return self.get_missing_image().name
 
     # Updating methods
 

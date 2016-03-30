@@ -1,5 +1,6 @@
 from oscar.test import factories
 from oscar.core.loading import get_model
+from soloha.settings import OSCAR_MISSING_IMAGE_URL
 
 ProductCategory = get_model('catalogue', 'productcategory')
 Category = get_model('catalogue', 'category')
@@ -38,6 +39,7 @@ class Test(object):
 
         for num in xrange(1, 10):
             product = factories.create_product(title='Product {}'.format(num))
+            factories.create_product_image(product=product, original=OSCAR_MISSING_IMAGE_URL)
             category_123 = Category.objects.get(name='Category-123')
             category_3 = Category.objects.get(name='Category-3')
             category_32 = Category.objects.get(name='Category-32')
@@ -53,6 +55,7 @@ class Test(object):
 
         for num in xrange(40, 50):
             product = factories.create_product(title='Product {}'.format(num))
+            factories.create_product_image(product=product, original=OSCAR_MISSING_IMAGE_URL)
             category_321 = Category.objects.get(name='Category-321')
             product.categories.add(category_321)
 

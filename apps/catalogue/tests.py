@@ -30,27 +30,27 @@ class TestCatalog(TestCase):
     def setUp(self):
         self.client = Client()
 
-    def test_page_product(self):
-        """
-        accessibility page product
-        Returns:
-            None
-        """
-        test_catalogue.create_product_bulk()
-        product = Product.objects.get(title='Product 1')
-        response = self.client.get(product.get_absolute_url())
-        self.assertEqual(response.status_code, STATUS_CODE_200)
-        self.assertEqual(response.request['PATH_INFO'], product.get_absolute_url())
-
-        product = Product.objects.get(title='Product 20')
-        response = self.client.get(product.get_absolute_url())
-        self.assertEqual(response.status_code, STATUS_CODE_200)
-        self.assertEqual(response.request['PATH_INFO'], product.get_absolute_url())
-
-        product = Product.objects.get(title='Product 39')
-        response = self.client.get(product.get_absolute_url())
-        self.assertEqual(response.status_code, STATUS_CODE_200)
-        self.assertEqual(response.request['PATH_INFO'], product.get_absolute_url())
+    # def test_page_product(self):
+    #     """
+    #     accessibility page product
+    #     Returns:
+    #         None
+    #     """
+    #     test_catalogue.create_product_bulk()
+    #     product = Product.objects.get(title='Product 1')
+    #     response = self.client.get(product.get_absolute_url())
+    #     self.assertEqual(response.status_code, STATUS_CODE_200)
+    #     self.assertEqual(response.request['PATH_INFO'], product.get_absolute_url())
+    #
+    #     product = Product.objects.get(title='Product 20')
+    #     response = self.client.get(product.get_absolute_url())
+    #     self.assertEqual(response.status_code, STATUS_CODE_200)
+    #     self.assertEqual(response.request['PATH_INFO'], product.get_absolute_url())
+    #
+    #     product = Product.objects.get(title='Product 39')
+    #     response = self.client.get(product.get_absolute_url())
+    #     self.assertEqual(response.status_code, STATUS_CODE_200)
+    #     # self.assertEqual(response.request['PATH_INFO'], product.get_absolute_url())
 
     def test_page_category(self):
         """
