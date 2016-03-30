@@ -157,4 +157,3 @@ class TestHomePage(TestCase):
     #     ).order_by('-recommendation__date_created')[:MAX_COUNT_PRODUCT]
     #     products = [recommend.recommendation.get_values() for recommend in object_list]
     #     self.assertJSONEqual(json.dumps(products), response.content)
-#

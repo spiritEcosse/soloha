@@ -387,30 +387,32 @@ class TestCatalog(TestCase):
     #     }
     #     return context
 
-
     def test_sorting_products(self):
         """
         Test sorting products by popularity, price descending and price ascending
         Returns: sorted products
         """
-
-        data = json.loads(self.request.sorting_data)
-        product_pk = data.get('product_pk', 1)
-        sorting_type = data.get('sorting_type', 'price')
-        sorting_types ={
-            "popularity": "",
-            "price_asc":  "price",
-            "price_desc": "-price"
+        data = {
+            "product_category": 'test_category',
+            "sorting_type": 'stockrecords__price_excl_tax'
         }
+        product_category = data.get('product_category', 'test_category')
+        sorting_type = data.get('sorting_type', 'stockrecords__price_excl_tax')
+        # sorting_types = {
+        #     "popularity": "",
+        #     "price_asc":  "price",
+        #     "price_desc": "-price"
+        # }
 
-        with self.assertNumQueries(5):
-            response = self.client.post(reverse('promotions: category'), product_pk, sorting_type, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        # with self.assertNumQueries(5):
+        response = self.client.post(reverse('category: products'), product_category, sorting_type, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
         self.assertEqual(200, response.status_code)
-        object_list = Product.objects.select_related('product').prefetch_related(
-            Prefetch('product__pk'),
-            Prefetch('product__price')
-        ).order_by('-product__price')
+        object_list = Product.objects.prefetch_related(
+            Prefetch('categories')
+        ).order_by('stockrecords__price_excl_tax')
+        products_id = [product.id for product in object_list]
 
-        self.assertJSONEqual(json.dumps(data[product_pk]), product_pk)
+
+        self.assertJSONEqual(json.dumps(data[product_category]), product_category)
         self.assertJSONEqual(json.dumps(data[sorting_type]), sorting_type)
-        self.assertEqual(object_list, response.content)
+        self.assertJSONEqual(json.dumps(products_id), response.content)
