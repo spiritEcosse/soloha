@@ -15,7 +15,7 @@ from django.db.models.query import Prefetch
 from apps.catalogue.views import ProductCategoryView, CategoryProducts
 from django.core.paginator import Paginator
 from test.factories import catalogue
-from soloha.settings import MAX_COUNT_PRODUCT
+from soloha.settings import OSCAR_PRODUCTS_PER_PAGE
 
 Product = get_model('catalogue', 'product')
 ProductClass = get_model('catalogue', 'ProductClass')
@@ -66,7 +66,7 @@ class TestCatalog(TestCase):
         response = self.client.get(category.get_absolute_url())
         self.assertEqual(response.status_code, STATUS_CODE_200)
         self.assertEqual(category, response.context['category'])
-        products = Product.objects.filter(categories=category.get_descendants(include_self=True))[:MAX_COUNT_PRODUCT]
+        products = Product.objects.filter(categories=category.get_descendants(include_self=True))[:OSCAR_PRODUCTS_PER_PAGE]
         self.assertEqual(len(products), len(response.context['products']))
         self.assertListEqual(list(products), list(response.context['products']))
         self.assertEqual(response.resolver_match.func.__name__, ProductCategoryView.as_view().__name__)
@@ -77,7 +77,7 @@ class TestCatalog(TestCase):
         category = Category.objects.get(name='Category-321')
         response = self.client.get(category.get_absolute_url())
         self.assertEqual(category, response.context['category'])
-        products = Product.objects.filter(categories=category.get_descendants(include_self=True))[:MAX_COUNT_PRODUCT]
+        products = Product.objects.filter(categories=category.get_descendants(include_self=True))[:OSCAR_PRODUCTS_PER_PAGE]
         self.assertEqual(len(products), len(response.context['products']))
         self.assertListEqual(list(products), list(response.context['products']))
         self.assertEqual(response.resolver_match.func.__name__, ProductCategoryView.as_view().__name__)
@@ -89,7 +89,7 @@ class TestCatalog(TestCase):
         category = Category.objects.get(name='Category-1')
         response = self.client.get(category.get_absolute_url())
         self.assertEqual(category, response.context['category'])
-        products = Product.objects.filter(categories__in=category.get_descendants(include_self=True))[:MAX_COUNT_PRODUCT]
+        products = Product.objects.filter(categories__in=category.get_descendants(include_self=True))[:OSCAR_PRODUCTS_PER_PAGE]
         self.assertEqual(len(products), len(response.context['products']))
         self.assertListEqual(list(products), list(response.context['products']))
         self.assertEqual(response.resolver_match.func.__name__, ProductCategoryView.as_view().__name__)
@@ -101,7 +101,7 @@ class TestCatalog(TestCase):
         category = Category.objects.get(name='Category-4')
         response = self.client.get(category.get_absolute_url())
         self.assertEqual(category, response.context['category'])
-        products = Product.objects.filter(categories__in=category.get_descendants(include_self=True))[:MAX_COUNT_PRODUCT]
+        products = Product.objects.filter(categories__in=category.get_descendants(include_self=True))[:OSCAR_PRODUCTS_PER_PAGE]
         self.assertEqual(len(products), len(response.context['products']))
         self.assertListEqual(list(products), list(response.context['products']))
         self.assertEqual(response.resolver_match.func.__name__, ProductCategoryView.as_view().__name__)
@@ -113,7 +113,7 @@ class TestCatalog(TestCase):
         category = Category.objects.get(name='Category-3')
         response = self.client.get(category.get_absolute_url())
         self.assertEqual(category, response.context['category'])
-        products = Product.objects.filter(categories__in=category.get_descendants(include_self=True)).distinct()[:MAX_COUNT_PRODUCT]
+        products = Product.objects.filter(categories__in=category.get_descendants(include_self=True)).distinct()[:OSCAR_PRODUCTS_PER_PAGE]
         self.assertEqual(len(products), len(response.context['products']))
         self.assertListEqual(list(products), list(response.context['products']))
         self.assertEqual(response.resolver_match.func.__name__, ProductCategoryView.as_view().__name__)

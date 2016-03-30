@@ -38,7 +38,6 @@ class Test(object):
 
         for num in xrange(1, 10):
             product = factories.create_product(title='Product {}'.format(num))
-            factories.create_product_image(product=product)
             category_123 = Category.objects.get(name='Category-123')
             category_3 = Category.objects.get(name='Category-3')
             category_32 = Category.objects.get(name='Category-32')
@@ -46,7 +45,6 @@ class Test(object):
 
         for num in xrange(10, 20):
             product = factories.create_product(title='Product {}'.format(num))
-            factories.create_product_image(product=product)
             category_4 = Category.objects.get(name='Category-4')
             category_3 = Category.objects.get(name='Category-3')
             category_12 = Category.objects.get(name='Category-12')
@@ -55,7 +53,6 @@ class Test(object):
 
         for num in xrange(40, 50):
             product = factories.create_product(title='Product {}'.format(num))
-            factories.create_product_image(product=product)
             category_321 = Category.objects.get(name='Category-321')
             product.categories.add(category_321)
 
