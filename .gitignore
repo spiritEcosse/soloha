@@ -3,8 +3,10 @@
 *.egg-info
 /dist/
 /build/
+.idea/
 /node_modules/
 /static/bower_components/
+/static_root/*
 .env
 fabfile.py
 db.sqlite3
