@@ -37,14 +37,14 @@ class Test(object):
         self.create_categories()
 
         for num in xrange(1, 10):
-            product = factories.create_product(title='Product {}'.format(num))
+            product = factories.create_product(title='Product {}'.format(num), price=num)
             category_123 = Category.objects.get(name='Category-123')
             category_3 = Category.objects.get(name='Category-3')
             category_32 = Category.objects.get(name='Category-32')
             product.categories.add(category_3, category_32, category_123)
 
         for num in xrange(10, 20):
-            product = factories.create_product(title='Product {}'.format(num))
+            product = factories.create_product(title='Product {}'.format(num), price=num)
             category_4 = Category.objects.get(name='Category-4')
             category_3 = Category.objects.get(name='Category-3')
             category_12 = Category.objects.get(name='Category-12')
@@ -52,12 +52,12 @@ class Test(object):
             product.categories.add(category_3, category_12, category_321, category_4)
 
         for num in xrange(40, 50):
-            product = factories.create_product(title='Product {}'.format(num))
+            product = factories.create_product(title='Product {}'.format(num), price=num)
             category_321 = Category.objects.get(name='Category-321')
             product.categories.add(category_321)
 
         for num in xrange(50, 60):
-            product = factories.create_product(title='Product {}'.format(num))
+            product = factories.create_product(title='Product {}'.format(num), price=num)
             factories.create_product_image(product=product)
 
     def create_product_bulk_recommend(self):

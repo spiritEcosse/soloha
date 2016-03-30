@@ -444,10 +444,10 @@ class CustomAbstractProduct(models.Model):
         values['title'] = strip_entities(self.title)
         values['absolute_url'] = self.get_absolute_url()
 
-        # selector = Selector()
-        # strategy = selector.strategy()
-        # info = strategy.fetch_for_product(self)
-        # values['price'] = str(info.price.incl_tax)
+        selector = Selector()
+        strategy = selector.strategy()
+        info = strategy.fetch_for_product(self)
+        values['price'] = str(info.price.incl_tax)
         options = {'size': (220, 165), 'crop': True}
 
         image = getattr(self.primary_image(), 'original', IMAGE_NOT_FOUND)
