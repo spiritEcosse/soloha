@@ -1,6 +1,10 @@
 /*
  * This is based on the SelectBox.js that comes with Django admin media
+<<<<<<< HEAD
+ * 
+=======
  *
+>>>>>>> b48972b07d10652b5e7fced316aef2a354c1dd93
  */
 
 var SelectBox = {
@@ -17,13 +21,21 @@ var SelectBox = {
     redisplay: function(id) {
         // Repopulate HTML select box from cache
         var box = document.getElementById(id);
+<<<<<<< HEAD
+        
+=======
 
+>>>>>>> b48972b07d10652b5e7fced316aef2a354c1dd93
         // for some reason both these steps are neccessary to get browsers to work properly...
         for (i = 0; i < box.options.length; i++) {
             box.options[0] = null;
         }
         box.options.length = 0;
+<<<<<<< HEAD
+        
+=======
 
+>>>>>>> b48972b07d10652b5e7fced316aef2a354c1dd93
         SelectBox.sort(id);
         for (var i = 0, j = SelectBox.cache[id].length; i < j; i++) {
             var node = SelectBox.cache[id][i];
@@ -130,4 +142,8 @@ var SelectBox = {
             box.options[i].selected = 'selected';
         }
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> b48972b07d10652b5e7fced316aef2a354c1dd93

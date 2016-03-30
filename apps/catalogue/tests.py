@@ -250,6 +250,7 @@ class TestCatalog(TestCase):
     #         'image_banner': category.get_image_banner(),
     #         'link_banner': category.link_banner,
     #     }
+
     #     really = category.get_values()
     #     self.assertDictEqual(must, really)
     #
@@ -411,3 +412,33 @@ class TestCatalog(TestCase):
     # #         'page_number': page.number,
     # #     }
     # #     return context
+
+    def test_sorting_products(self):
+        """
+        Test sorting products by popularity, price descending and price ascending
+        Returns: sorted products
+        """
+        data = {
+            "product_category": 'test_category',
+            "sorting_type": 'stockrecords__price_excl_tax'
+        }
+        product_category = data.get('product_category', 'test_category')
+        sorting_type = data.get('sorting_type', 'stockrecords__price_excl_tax')
+        # sorting_types = {
+        #     "popularity": "",
+        #     "price_asc":  "price",
+        #     "price_desc": "-price"
+        # }
+
+        # with self.assertNumQueries(5):
+        response = self.client.post(reverse('category: products'), product_category, sorting_type, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEqual(200, response.status_code)
+        object_list = Product.objects.prefetch_related(
+            Prefetch('categories')
+        ).order_by('stockrecords__price_excl_tax')
+        products_id = [product.id for product in object_list]
+
+
+        self.assertJSONEqual(json.dumps(data[product_category]), product_category)
+        self.assertJSONEqual(json.dumps(data[sorting_type]), sorting_type)
+        self.assertJSONEqual(json.dumps(products_id), response.content)

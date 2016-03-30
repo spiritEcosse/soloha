@@ -62,6 +62,11 @@ class MPTTFilteredSelectMultiple(widgets.FilteredSelectMultiple):
 
     class Media:
         extend = False
+        js = (settings.STATIC_ROOT + "js/mptt_m2m_selectbox.js",
+              )
+
+    class Media:
+        extend = False
         js = (
             settings.STATIC_URL + "admin/js/core.js",
             settings.STATIC_URL + "admin/js/mptt_m2m_selectbox.js",

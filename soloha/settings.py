@@ -126,15 +126,15 @@ else:
             'POST': settings_local.DB_PORT,
             'ATOMIC_REQUESTS': settings_local.DB_ATOMIC_REQUESTS,
         },
-        'mysql': {
-            'ENGINE': settings_local.DB_BACKEND_MYSQL,
-            'NAME': settings_local.DB_NAME_MYSQL,
-            'USER': settings_local.DB_USER_MYSQL,
-            'PASSWORD': settings_local.DB_PASSWORD_MYSQL,
-            'HOST': settings_local.DB_HOST_MYSQL,
-            'POST': settings_local.DB_PORT_MYSQL,
-            'ATOMIC_REQUESTS': settings_local.DB_ATOMIC_REQUESTS_MYSQL,
-        },
+        # 'mysql': {
+            # 'ENGINE': settings_local.DB_BACKEND_MYSQL,
+        #     'NAME': settings_local.DB_NAME_MYSQL,
+        #     'USER': settings_local.DB_USER_MYSQL,
+        #     'PASSWORD': settings_local.DB_PASSWORD_MYSQL,
+        #     'HOST': settings_local.DB_HOST_MYSQL,
+        #     'POST': settings_local.DB_PORT_MYSQL,
+        #     'ATOMIC_REQUESTS': settings_local.DB_ATOMIC_REQUESTS_MYSQL,
+        # },
         # 'default': {
         #     'ENGINE': 'django.db.backends.sqlite3',
         #     'NAME': location('db.sqlite3'),
@@ -245,6 +245,8 @@ OSCAR_ORDER_STATUS_PIPELINE = {
 THUMBNAIL_DUMMY = True
 THUMBNAIL_FORCE_OVERWRITE = True
 OSCAR_DEFAULT_CURRENCY = 'UAH'
+OSCAR_PRODUCTS_PER_PAGE = 24
+# OSCAR_PRODUCT_SEARCH_HANDLER = ""
 #
 # USE_LESS = True
 #

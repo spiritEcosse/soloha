@@ -351,23 +351,25 @@
         </div>
     </div>
 
-    <div class="row items" ng-if="products.length > 0">
-        <div class="col-sm-6 col-md-6">
-            {% for prod in prod %}
+    <div class="row items">
+        {% for product in products %}
+            <div class="col-sm-6 col-md-6">
                 {% include "catalogue/partials/product.html" %}
-            {% endfor %}
-        </div>
-
+            </div>
+        {% endfor %}
         <div class="clearfix"></div>
         <div class="col-xs-6 col-xs-offset-8 wrapper">
             <a href="#" class="more_products">
                 ПОКАЗАТЬ ЕЩЕ
             </a>
         </div>
-
-        {% include "catalogue/partials/pagination.html" %}
+        <div>
+            {% include "partials/pagination.html" %}
+        </div>
     </div>
-    <p class="nonefound" ng-if="products.length == 0">{% trans "No products found." %}</p>
+    {% if not products %}
+        <p class="nonefound">{% trans "No products found." %}</p>
+    {% endif %}
 {% endblock %}
 
 {% block post_content %}
