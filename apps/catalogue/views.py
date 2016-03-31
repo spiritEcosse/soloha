@@ -22,6 +22,11 @@ class ProductCategoryView(CoreProductCategoryView):
 class CategoryProducts(views.JSONResponseMixin, views.AjaxResponseMixin, MultipleObjectMixin, View):
     model = Product
     # paginate_by = 24
+    only = ['title', 'slug', 'structure', 'product_class', 'product_options__name', 'product_options__code',
+            'product_options__type']
+
+    # TODO check only list and make selecting less fields from stockrecords.
+
 
     def post(self, request, *args, **kwargs):
         data = json.loads(self.request.body)
@@ -33,13 +38,12 @@ class CategoryProducts(views.JSONResponseMixin, views.AjaxResponseMixin, Multipl
     def get_queryset(self, **kwargs):
         # queryset = super(CategoryProducts, self).get_queryset().filter(products=kwargs['product_pk'])
         queryset = super(CategoryProducts, self).get_queryset()
-        return queryset.select_related('product_class')\
+        return queryset.only(*self.only).select_related('product_class')\
             .prefetch_related(
                 Prefetch('categories'),
                 Prefetch('images'),
-                Prefetch('stockrecords'),).order_by(self.kwargs['sorting_type'])
-        # TODO make this work only('id', 'name', "stockrecords__price_excl_tax", 'slug', 'images', 'product_class').
-
+                Prefetch('stockrecords'),
+        ).order_by(self.kwargs['sorting_type'])
 
     def post_ajax(self, request, *args, **kwargs):
         super(CategoryProducts, self).post_ajax(request, *args, **kwargs)
@@ -49,7 +53,6 @@ class CategoryProducts(views.JSONResponseMixin, views.AjaxResponseMixin, Multipl
         context = dict()
         context['products'] = [product.get_values() for product in self.object_list]
         return context
-
 
 
 class ProductDetailView(CoreProductDetailView):
