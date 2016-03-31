@@ -28,7 +28,6 @@ class CategoryProducts(views.JSONResponseMixin, views.AjaxResponseMixin, Multipl
         self.kwargs['product_category'] = data.get('product_category')
         self.kwargs['sorting_type'] = data.get('sorting_type', 'stockrecords__price_excl_tax')
         self.object_list = self.get_queryset()
-        # self.object_list = self.get_queryset(product_pk=data['product_pk'])
 
     def get_queryset(self, **kwargs):
         # queryset = super(CategoryProducts, self).get_queryset().filter(products=kwargs['product_pk'])
