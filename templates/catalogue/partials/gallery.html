@@ -9,14 +9,13 @@
     <div class="gallery">
         <ul id="lightSlider_product">
             {% for image in all_images %}
-                {% thumbnail image.original "349x251" crop="center" as thumb %}
+                {% thumbnail image.original 349x251 crop as thumb %}
                     <li data-thumb="{{ thumb.url }}">
                         <img src="{{ thumb.url }}"
                              alt="{{ product.get_title }}"
                              title="{{ product.get_title }}"
                              class="img-responsive img-thumbnail"/>
                     </li>
-                {% endthumbnail %}
             {% endfor %}
         </ul>
     </div>

@@ -92,6 +92,7 @@ TEMPLATES = [
                 'oscar.apps.checkout.context_processors.checkout',
                 'oscar.apps.customer.notifications.context_processors.notifications',
                 'oscar.core.context_processors.metadata',
+                'soloha.core.context_processors.context_data',
             ],
         },
     },
@@ -262,7 +263,7 @@ OSCAR_PRODUCTS_PER_PAGE = 24
 
 
 MAX_COUNT_PRODUCT = 20
-
+MAX_COUNT_CATEGORIES = 7
 
 LOGGING = {
     'version': 1,

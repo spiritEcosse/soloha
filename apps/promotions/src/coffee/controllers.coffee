@@ -10,32 +10,34 @@ app.controller 'Home', ['$http', '$scope', '$window', '$document', '$log', 'djan
   recommends = djangoUrl.reverse('promotions:recommend')
   news = djangoUrl.reverse('promotions:new')
 
-  $http.post(news).success (products) ->
-    $scope.products = products
-    $scope.news = products
-  .error ->
-    console.error('An error occurred during submission')
 
-  $http.post(recommends).success (products) ->
-    $scope.recommends = products
-  .error ->
-    console.error('An error occurred during submission')
+#  $http.post(news).success (products) ->
+#    $scope.products = products
+#    $scope.news = products
+#  .error ->
+#    console.error('An error occurred during submission')
+#
+
+#  $http.post(recommends).success (products) ->
+#    $scope.recommends = products
+#  .error ->
+#    console.error('An error occurred during submission')
 
   #  $http.post(hits).success (products) ->
   #    $scope.hits = products
   #  .error ->
   #    console.error('An error occurred during submission')
 
-  $scope.get_news = ->
-    $scope.products = $scope.news
-
-  $scope.get_recommends = ->
-    $scope.products = $scope.recommends
-
-  $scope.get_special = ->
-    $scope.products = []
-
-  $scope.get_hits = ->
-    $scope.products = []
+#  $scope.get_news = ->
+#    $scope.products = $scope.news
+#
+#  $scope.get_recommends = ->
+#    $scope.products = $scope.recommends
+#
+#  $scope.get_special = ->
+#    $scope.products = []
+#
+#  $scope.get_hits = ->
+#    $scope.products = []
 
 ]
