@@ -1,6 +1,8 @@
 from oscar.test import factories
 from oscar.core.loading import get_model
 from soloha.settings import OSCAR_MISSING_IMAGE_URL
+from soloha.settings import MAX_COUNT_PRODUCT, MAX_COUNT_CATEGORIES
+from django.test import TestCase
 
 ProductCategory = get_model('catalogue', 'productcategory')
 Category = get_model('catalogue', 'category')
@@ -84,6 +86,16 @@ class Test(object):
 
         for num in xrange(0, len(product_desc)):
             ProductRecommendation.objects.create(primary=product_desc[num], recommendation=product_asc[num])
+
+    def test_menu_categories(self, obj, response):
+        categories_expected = Category.objects.filter(enable=True, level=0).select_related(
+            'parent__parent'
+        ).prefetch_related('children__children')[:MAX_COUNT_CATEGORIES]
+        obj.assertEqual(str(categories_expected.query), str(response.context['categories'].query))
+        categories_expected = [category.get_values() for category in categories_expected]
+        with obj.assertNumQueries(0):
+            categories = [category.get_values() for category in response.context['categories']]
+        obj.assertListEqual(list(categories_expected), list(categories))
 
     @classmethod
     def create_order(cls):

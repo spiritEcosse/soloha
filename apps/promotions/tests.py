@@ -81,14 +81,7 @@ class TestHomePage(TestCase):
             products_order = [product.get_values() for product in response.context['products_order']]
         self.assertListEqual(products_order, products_expected)
 
-        categories_expected = Category.objects.filter(enable=True, level=0).select_related(
-            'parent__parent'
-        ).prefetch_related('children__children')[:MAX_COUNT_CATEGORIES]
-        self.assertEqual(str(categories_expected.query), str(response.context['categories'].query))
-        categories_expected = [category.get_values() for category in categories_expected]
-        with self.assertNumQueries(0):
-            categories = [category.get_values() for category in response.context['categories']]
-        self.assertListEqual(list(categories_expected), list(categories))
+        test_catalogue.test_menu_categories(obj=self, response=response)
 
     # def test_categories_menu(self):
     #     """
