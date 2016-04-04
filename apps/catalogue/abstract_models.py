@@ -508,7 +508,7 @@ class CustomAbstractCategory(MPTTModel):
         verbose_name_plural = _('Categories')
 
     def __str__(self):
-        return self.name
+        return str(self.name)
 
     @property
     def full_name(self):
