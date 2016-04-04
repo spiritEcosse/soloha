@@ -66,8 +66,7 @@ class TestCatalog(TestCase):
 
         # without products in this category has no descendants in the categories at the same time this very category and its children is not goods
         category = Category.objects.get(name='Category-2')
-        with self.assertNumQueries(6):
-            response = self.client.get(category.get_absolute_url())
+        response = self.client.get(category.get_absolute_url())
         self.assertEqual(response.status_code, STATUS_CODE_200)
         self.assertEqual(category, response.context['category'])
         products = Product.objects.filter(categories=category.get_descendants(include_self=True))[:OSCAR_PRODUCTS_PER_PAGE]
