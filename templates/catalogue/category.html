@@ -352,7 +352,7 @@
     </div>
 
     <div class="row items">
-        {% for product in products %}
+        {% for product in page_obj %}
             <div class="col-sm-6 col-md-6">
                 {% include "catalogue/partials/product.html" %}
             </div>
@@ -364,7 +364,7 @@
             </a>
         </div>
         <div>
-            {% include "partials/pagination.html" %}
+            {% include "catalogue/partials/pagination.html" %}
         </div>
     </div>
     {% if not products %}

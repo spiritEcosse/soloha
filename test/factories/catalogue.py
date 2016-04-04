@@ -60,6 +60,12 @@ class Test(object):
             product = factories.create_product(title='Product {}'.format(num), price=num)
             factories.create_product_image(product=product)
 
+        for num in xrange(60, 119):
+            product = factories.create_product(title='Product {}'.format(num), price=num)
+            factories.create_product_image(product=product)
+            category_12 = Category.objects.get(name='Category-12')
+            product.categories.add(category_12)
+
     def create_product_bulk_recommend(self):
         """
         create product bulk with model ProductRecommendation
