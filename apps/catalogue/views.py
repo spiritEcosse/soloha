@@ -111,7 +111,9 @@ class ProductCategoryView(SingleObjectMixin, generic.ListView):
 
     def get_queryset(self):
         return Product.objects.filter(enable=True, categories__in=self.object.get_descendants(include_self=True)
-                                      ).distinct().order_by(self.request.GET.get('sorting_type', '-stockrecords__price_excl_tax'))
+                                      ).distinct().order_by(self.request.GET.get(
+            'sorting_type', *Product._meta.ordering)
+        )
 
     def get_context_data(self, **kwargs):
         context = super(ProductCategoryView, self).get_context_data(**kwargs)

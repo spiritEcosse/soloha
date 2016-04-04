@@ -257,7 +257,6 @@ class TestCatalog(TestCase):
         """
         test_catalogue.create_product_bulk()
 
-        paginate_by = OSCAR_PRODUCTS_PER_PAGE
         sorting_dict = {
             'product_category': 'test_category',
             'sorting_type': 'stockrecords__price_excl_tax'
@@ -267,6 +266,7 @@ class TestCatalog(TestCase):
         self.assertions_category_with_sorting(current_page=1, sorting_type='stockrecords__price_excl_tax')
         self.assertions_category_with_sorting(current_page=2, sorting_type='stockrecords__price_excl_tax')
         self.assertions_category_with_sorting(current_page=3, sorting_type='stockrecords__price_excl_tax')
+        # TODO use price_retail
 
         # sorting by price descending
 
