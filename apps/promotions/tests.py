@@ -30,7 +30,7 @@ class TestHomePage(TestCase):
         """
         test_catalogue.create_product_bulk_recommend()
         test_catalogue.create_order()
-        with self.assertNumQueries(21):
+        with self.assertNumQueries(24):
             response = self.client.get(reverse('promotions:home'))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.resolver_match.func.__name__, HomeView.as_view().__name__)
@@ -81,7 +81,9 @@ class TestHomePage(TestCase):
             products_order = [product.get_values() for product in response.context['products_order']]
         self.assertListEqual(products_order, products_expected)
 
-        categories_expected = Category.objects.filter(enable=True, level=0).prefetch_related('children__children')[:MAX_COUNT_CATEGORIES]
+        categories_expected = Category.objects.filter(enable=True, level=0).select_related(
+            'parent__parent'
+        ).prefetch_related('children__children')[:MAX_COUNT_CATEGORIES]
         self.assertEqual(str(categories_expected.query), str(response.context['categories'].query))
         categories_expected = [category.get_values() for category in categories_expected]
         with self.assertNumQueries(0):
