@@ -1,5 +1,8 @@
 from oscar.test import factories
 from oscar.core.loading import get_model
+from soloha.settings import OSCAR_MISSING_IMAGE_URL
+from soloha.settings import MAX_COUNT_PRODUCT, MAX_COUNT_CATEGORIES
+from django.test import TestCase
 
 ProductCategory = get_model('catalogue', 'productcategory')
 Category = get_model('catalogue', 'category')
@@ -27,6 +30,15 @@ class Test(object):
         category_321 = Category.objects.create(name='Category-321', parent=category_32)
         category_33 = Category.objects.create(name='Category-33', parent=category_3)
         category_4 = Category.objects.create(name='Category-4')
+        category_5 = Category.objects.create(name='Category-5')
+        category_51 = Category.objects.create(name='Category-51')
+        category_511 = Category.objects.create(name='Category-511')
+        category_6 = Category.objects.create(name='Category-6')
+        category_61 = Category.objects.create(name='Category-61')
+        category_7 = Category.objects.create(name='Category-7')
+        category_8 = Category.objects.create(name='Category-8')
+        category_9 = Category.objects.create(name='Category-9')
+        category_10 = Category.objects.create(name='Category-10')
 
     def create_product_bulk(self):
         """
@@ -36,14 +48,15 @@ class Test(object):
         """
         self.create_categories()
 
-        for num in xrange(1, 10):
+        for num in xrange(1, 11):
             product = factories.create_product(title='Product {}'.format(num), price=num)
+            factories.create_product_image(product=product, original=OSCAR_MISSING_IMAGE_URL)
             category_123 = Category.objects.get(name='Category-123')
             category_3 = Category.objects.get(name='Category-3')
             category_32 = Category.objects.get(name='Category-32')
             product.categories.add(category_3, category_32, category_123)
 
-        for num in xrange(10, 20):
+        for num in xrange(10, 41):
             product = factories.create_product(title='Product {}'.format(num), price=num)
             category_4 = Category.objects.get(name='Category-4')
             category_3 = Category.objects.get(name='Category-3')
@@ -51,12 +64,13 @@ class Test(object):
             category_321 = Category.objects.get(name='Category-321')
             product.categories.add(category_3, category_12, category_321, category_4)
 
-        for num in xrange(40, 50):
+        for num in xrange(40, 51):
             product = factories.create_product(title='Product {}'.format(num), price=num)
+            factories.create_product_image(product=product, original=OSCAR_MISSING_IMAGE_URL)
             category_321 = Category.objects.get(name='Category-321')
             product.categories.add(category_321)
 
-        for num in xrange(50, 60):
+        for num in xrange(50, 61):
             product = factories.create_product(title='Product {}'.format(num), price=num)
             factories.create_product_image(product=product)
 
@@ -78,6 +92,16 @@ class Test(object):
 
         for num in xrange(0, len(product_desc)):
             ProductRecommendation.objects.create(primary=product_desc[num], recommendation=product_asc[num])
+
+    def test_menu_categories(self, obj, response):
+        categories_expected = Category.objects.filter(enable=True, level=0).select_related(
+            'parent__parent'
+        ).prefetch_related('children__children')[:MAX_COUNT_CATEGORIES]
+        obj.assertEqual(str(categories_expected.query), str(response.context['categories'].query))
+        categories_expected = [category.get_values() for category in categories_expected]
+        with obj.assertNumQueries(0):
+            categories = [category.get_values() for category in response.context['categories']]
+        obj.assertListEqual(list(categories_expected), list(categories))
 
     @classmethod
     def create_order(cls):

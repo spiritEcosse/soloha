@@ -2,7 +2,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.utils.html import strip_entities
 from easy_thumbnails.files import get_thumbnailer
-from soloha.settings import IMAGE_NOT_FOUND
+from soloha.settings import IMAGE_NOT_FOUND, MEDIA_ROOT
 from easy_thumbnails.exceptions import (
     InvalidImageFormatError, EasyThumbnailsError)
 from mptt.models import MPTTModel, TreeForeignKey
@@ -378,16 +378,12 @@ class CustomAbstractProduct(models.Model):
             # the ProductManager
             images = images.order_by('display_order')
         try:
-            return images[0]
+            return images[0].original.name or IMAGE_NOT_FOUND
         except IndexError:
             # We return a dict with fields that mirror the key properties of
             # the ProductImage class so this missing image can be used
             # interchangeably in templates.  Strategy pattern ftw!
-            return {
-                'original': IMAGE_NOT_FOUND,
-                'caption': '',
-                'is_missing': True
-            }
+            return self.get_missing_image().name
 
     # Updating methods
 
@@ -484,7 +480,7 @@ class CustomAbstractCategory(MPTTModel):
     name = models.CharField(_('Name'), max_length=255, db_index=True)
     slug = models.SlugField(verbose_name=_('Slug'), max_length=200, unique=True)
     enable = models.BooleanField(verbose_name=_('Enable'), default=True)
-    parent = TreeForeignKey('self', verbose_name=_('Parent'), related_name='children', blank=True, null=True, db_index=True)
+    parent = TreeForeignKey('self', verbose_name=_('Parent'), related_name='children', blank=True, null=True)
     meta_title = models.CharField(verbose_name=_('Meta tag: title'), blank=True, max_length=255)
     h1 = models.CharField(verbose_name=_('h1'), blank=True, max_length=255)
     meta_description = models.TextField(verbose_name=_('Meta tag: description'), blank=True)
@@ -500,15 +496,19 @@ class CustomAbstractCategory(MPTTModel):
     _slug_separator = '/'
     _full_name_separator = ' > '
 
+    class MPTTMeta:
+        ordering = ['tree_id', 'lft']
+
     class Meta:
         abstract = True
+        unique_together = ('slug', 'parent')
         app_label = 'catalogue'
         ordering = ('sort', 'name', 'id', )
         verbose_name = _('Category')
         verbose_name_plural = _('Categories')
 
     def __str__(self):
-        return self.full_name
+        return self.name
 
     @property
     def full_name(self):
@@ -533,8 +533,31 @@ class CustomAbstractCategory(MPTTModel):
         has been re-purposed to only store this category's slug and to not
         include it's ancestors' slugs.
         """
-        slugs = [category.slug for category in self.get_ancestors_and_self()]
+        slugs = [category.slug for category in self.get_ancestors_through_parent(include_self=True)]
         return self._slug_separator.join(map(str, slugs))
+
+    def get_ancestors_through_parent(self, include_self=True):
+        """
+        Get ancestors through the field of the parent.
+        :param include_self:
+            by default True
+            points include the current object in the category list
+        :return:
+            list of parents
+        """
+        parents = list()
+        parents = self.get_parents(obj=self, parents=parents)
+
+        if include_self is True:
+            parents += [self]
+        return parents
+
+    def get_parents(self, obj, parents):
+        if obj.parent is not None:
+            parents.append(obj.parent)
+            return self.get_parents(obj=obj.parent, parents=parents)
+        parents.reverse()
+        return parents
 
     def generate_slug(self):
         """

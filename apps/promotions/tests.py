@@ -2,7 +2,7 @@ from django.test import TestCase
 from django.test import Client
 from django.core.urlresolvers import reverse
 from oscar.test import factories
-from soloha.settings import MAX_COUNT_PRODUCT
+from soloha.settings import MAX_COUNT_PRODUCT, MAX_COUNT_CATEGORIES
 import json
 from django.db.models.query import Prefetch
 from oscar.core.loading import get_model
@@ -30,7 +30,7 @@ class TestHomePage(TestCase):
         """
         test_catalogue.create_product_bulk_recommend()
         test_catalogue.create_order()
-        with self.assertNumQueries(21):
+        with self.assertNumQueries(24):
             response = self.client.get(reverse('promotions:home'))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.resolver_match.func.__name__, HomeView.as_view().__name__)
@@ -80,6 +80,8 @@ class TestHomePage(TestCase):
         with self.assertNumQueries(0):
             products_order = [product.get_values() for product in response.context['products_order']]
         self.assertListEqual(products_order, products_expected)
+
+        test_catalogue.test_menu_categories(obj=self, response=response)
 
     # def test_categories_menu(self):
     #     """

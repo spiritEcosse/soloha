@@ -6,78 +6,78 @@
 
 {% block product %}
     <div class="thumbnail text-center">
-            <div class="caption">
-                <div class="title">
-                    {% block product_title %}
-                        <a href="{{ product.get_absolute_url }}" title="{{ product.get_title }}">{{ product.get_title|truncatewords:7 }}</a>
-                    {% endblock %}
+        <div class="caption">
+            <div class="title">
+                {% block product_title %}
+                    <a href="{{ product.get_absolute_url }}" title="{{ product.get_title }}">{{ product.get_title|truncatewords:7 }}</a>
+                {% endblock %}
+            </div>
+            {% block product_image %}
+                <div class="image_container">
+                    {% with image=product.primary_image %}
+                        {% thumbnail image 220x165 crop as thumb %}
+                        <a class="image" href="{{ product.get_absolute_url }}">
+                            <img src="{{ thumb.url }}" alt="{{ product.get_title }}" title="{{ product.get_title }}">
+                        </a>
+                    {% endwith %}
                 </div>
-                {% block product_image %}
-                    <div class="image_container">
-                        {% with image=product.primary_image %}
-                            {% thumbnail image.original 220x165 crop as thumb %}
-                            <a class="image" href="{{ product.get_absolute_url }}">
-                                <img src="{{ thumb.url }}" alt="{{ product.get_title }}" title="{{ product.get_title }}">
-                            </a>
-                        {% endwith %}
+            {% endblock %}
+            <div class="model">Артикул {{ product.id }}</div>
+            <div class="price">
+                {% block product_price %}
+                    <div class="product_price">
+                        {#                            {% include "catalogue/partials/stock_record.html" %}#}
+
+                        {% if not product.is_parent %}
+                            {% include "catalogue/partials/add_to_basket_form_compact.html" %}
+                        {% endif %}
                     </div>
                 {% endblock %}
-                <div class="model">Артикул {{ product.id }}</div>
-                <div class="price">
-                    {% block product_price %}
-                        <div class="product_price">
-{#                            {% include "catalogue/partials/stock_record.html" %}#}
-
-                            {% if not product.is_parent %}
-                                {% include "catalogue/partials/add_to_basket_form_compact.html" %}
-                            {% endif %}
-                        </div>
-                    {% endblock %}
-                                        <strong>Цена:</strong>5555
-                </div>
-                {#                <p><a href="#" class="btn btn-primary" role="button">Купить</a></p>#}
+                <strong>Цена:</strong>5555
             </div>
-            <div class="mask">
-                <div class="title">
-                    <a href="/makeup/product.html">{{ product.get_title|truncatewords:7 }}</a>
-                </div>
-                <div class="filters">
-                    <div class="rows">
-                        <div class="option_name">
-                            <span>По типу:</span>
-                        </div>
+            {#                <p><a href="#" class="btn btn-primary" role="button">Купить</a></p>#}
+        </div>
+        <div class="mask">
+            <div class="title">
+                <a href="/makeup/product.html">{{ product.get_title|truncatewords:7 }}</a>
+            </div>
+            <div class="filters">
+                <div class="rows">
+                    <div class="option_name">
+                        <span>По типу:</span>
+                    </div>
 
-                        <div class="option_value"><span>Кровати с мягким изголовьем</span></div>
-                    </div>
-                    <div class="rows">
-                        <div class="option_name">
-                            <span>По размеру:</span>
-                        </div>
-                        <div class="option_value"><span>Полуторные,Двухспальные</span></div>
-                    </div>
-                    <div class="rows">
-                        <div class="option_name">
-                            <span>Каркас:</span>
-                        </div>
-
-                        <div class="option_value"><span>Металлический</span></div>
-                    </div>
-                    <div class="rows">
-                        <div class="option_name">
-                            <span>Подъёмный механизм:</span>
-                        </div>
-
-                        <div class="option_value"><span>нет</span></div>
-                    </div>
-                    <div class="rows">
-                        <div class="option_name"><span>Ящики:</span></div>
-                        <div class="option_value"><span>нет</span></div>
-                    </div>
+                    <div class="option_value"><span>Кровати с мягким изголовьем</span></div>
                 </div>
-                <a href="#">Смотреть все характеристики</a>
-                <div class="btn-block">
-                    <a href="#" class="btn btn-primary" role="button">Купить</a>
+                <div class="rows">
+                    <div class="option_name">
+                        <span>По размеру:</span>
+                    </div>
+                    <div class="option_value"><span>Полуторные,Двухспальные</span></div>
                 </div>
+                <div class="rows">
+                    <div class="option_name">
+                        <span>Каркас:</span>
+                    </div>
+
+                    <div class="option_value"><span>Металлический</span></div>
+                </div>
+                <div class="rows">
+                    <div class="option_name">
+                        <span>Подъёмный механизм:</span>
+                    </div>
+
+                    <div class="option_value"><span>нет</span></div>
+                </div>
+                <div class="rows">
+                    <div class="option_name"><span>Ящики:</span></div>
+                    <div class="option_value"><span>нет</span></div>
+                </div>
+            </div>
+            <a href="#">Смотреть все характеристики</a>
+            <div class="btn-block">
+                <a href="#" class="btn btn-primary" role="button">Купить</a>
             </div>
         </div>
+    </div>
 {% endblock %}
