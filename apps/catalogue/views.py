@@ -22,7 +22,7 @@ import warnings
 
 Product = get_model('catalogue', 'product')
 Category = get_model('catalogue', 'category')
-
+Filter = get_model('catalogue', 'Filter')
 
 
 # class ProductCategoryView(CoreProductCategoryView):
@@ -32,6 +32,10 @@ class ProductCategoryView(SingleObjectMixin, generic.ListView):
     enforce_paths = True
     model = Category
     paginate_by = OSCAR_PRODUCTS_PER_PAGE
+
+    def __init__(self, *args, **kwargs):
+        super(ProductCategoryView, self).__init__(*args, **kwargs)
+        self.products_without_filters = None
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_category()
@@ -110,22 +114,35 @@ class ProductCategoryView(SingleObjectMixin, generic.ListView):
                 return HttpResponsePermanentRedirect(expected_path)
 
     def get_queryset(self):
-        if self.request.GET.get('filters'):
-            dict_filter = {'enable': True, 'categories__in': self.object.get_descendants(include_self=True),
-                           'filters__slug__in': self.request.GET.get('filters').split('/')}
-        else:
-            dict_filter = {'enable': True, 'categories__in': self.object.get_descendants(include_self=True)}
+        dict_filter = {'enable': True, 'categories__in': self.object.get_descendants(include_self=True)}
+        self.products_without_filters = Product.objects.filter(**dict_filter).distinct().order_by(
+            self.request.GET.get('sorting_type', *Product._meta.ordering)
+        )
+        filters = self.request.GET.get('filters')
+        if filters:
+            dict_filter['filters__slug__in'] = filters.split('/')
 
         return Product.objects.filter(**dict_filter).distinct().order_by(
             self.request.GET.get('sorting_type', *Product._meta.ordering)
         )
-        #
-        # return Product.objects.filter(
-        #     enable=True, categories__in=self.object.get_descendants(include_self=True)
 
     def get_context_data(self, **kwargs):
         context = super(ProductCategoryView, self).get_context_data(**kwargs)
+        # Filter.objects.filter(level=0, children__in=[product.filters.all() for product in self.products])
+        # [(filter, filter.parent) for filter in Filter.objects.filter(product__in=)]
+
+        # filters = []
+        # for product in self.products_without_filters:
+        #     filters.extend(product.filters.all())
+        from django.db.models import Count
+        context['filters'] = Filter.objects.filter(level=0).prefetch_related(
+            Prefetch('children', queryset=Filter.objects.filter(
+                products__in=self.products_without_filters
+            ).distinct(), to_attr='children_in_products'),
+        )
         return context
+
+# [(filter, [(filter_value, filter_value.products.count()) for filter_value in filter.children_in_products]) for filter in response.context['filters']]
 
 
 class CategoryProducts(views.JSONResponseMixin, views.AjaxResponseMixin, MultipleObjectMixin, View):
