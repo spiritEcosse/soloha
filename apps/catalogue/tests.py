@@ -88,8 +88,6 @@ class TestCatalog(TestCase):
         Returns: sorted products
         """
         test_catalogue.create_product_bulk()
-        # create_product(title='prod1', price=3)
-
 
         sorting_dict = {
             'product_category': 'test_category',
@@ -199,11 +197,24 @@ class TestCatalog(TestCase):
         self.assertions_category(category=category, dict_values=dict_values)
 
         # sorting by rating
-        dict_values = {'page': 1, 'sorting_type': 'rating', 'filters': 'shirina_1000/shirina_1200/dlina_1800/dlina_1000/type'}
+        dict_values = {'page': 1, 'sorting_type': 'rating'}
         self.assertions_category(category=category, dict_values=dict_values)
         dict_values = {'page': 2, 'sorting_type': 'rating'}
         self.assertions_category(category=category, dict_values=dict_values)
         dict_values = {'page': 3, 'sorting_type': 'rating'}
+        self.assertions_category(category=category, dict_values=dict_values)
+
+        # sorting with filters
+        dict_values = {'page': 1, 'sorting_type': 'rating', 'filters': 'shirina_1000/shirina_1200/dlina_1100/dlina_1000'}
+        self.assertions_category(category=category, dict_values=dict_values)
+
+        dict_values = {'page': 2, 'sorting_type': 'rating', 'filters': 'shirina_1000/shirina_1200/dlina_1100/dlina_1000'}
+        self.assertions_category(category=category, dict_values=dict_values)
+
+        dict_values = {'page': 1, 'sorting_type': 'rating', 'filters': ''}
+        self.assertions_category(category=category, dict_values=dict_values)
+
+        dict_values = {'page': 1, 'sorting_type': 'rating', 'filters': 'shirina_1000/shirina_1100/shirina_1200/dlina_1000/dlina_1100'}
         self.assertions_category(category=category, dict_values=dict_values)
 
         # with page not exist
@@ -215,9 +226,13 @@ class TestCatalog(TestCase):
 
     def assertions_category(self, category, dict_values={}):
         paginate_by = OSCAR_PRODUCTS_PER_PAGE
-        products = Product.objects.filter(
-            enable=True, categories__in=category.get_descendants(include_self=True)
-        ).distinct().order_by(dict_values.get('sorting_type', *Product._meta.ordering))
+        if dict_values.get('filters'):
+            dict_filter = {'enable': True, 'categories__in': category.get_descendants(include_self=True),
+                           'filters__slug__in': dict_values.get('filters').split('/')}
+        else:
+            dict_filter = {'enable': True, 'categories__in': category.get_descendants(include_self=True)}
+
+        products = Product.objects.filter(**dict_filter).distinct().order_by(dict_values.get('sorting_type', *Product._meta.ordering))
 
         response = self.client.get(category.get_absolute_url(), dict_values)
 

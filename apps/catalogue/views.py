@@ -110,18 +110,18 @@ class ProductCategoryView(SingleObjectMixin, generic.ListView):
                 return HttpResponsePermanentRedirect(expected_path)
 
     def get_queryset(self):
-        return Product.objects.filter(
-            enable=True, categories__in=self.object.get_descendants(include_self=True)
-        ).distinct().order_by(
+        if self.request.GET.get('filters'):
+            dict_filter = {'enable': True, 'categories__in': self.object.get_descendants(include_self=True),
+                           'filters__slug__in': self.request.GET.get('filters').split('/')}
+        else:
+            dict_filter = {'enable': True, 'categories__in': self.object.get_descendants(include_self=True)}
+
+        return Product.objects.filter(**dict_filter).distinct().order_by(
             self.request.GET.get('sorting_type', *Product._meta.ordering)
         )
-
-    # def get_context_data(self, **kwargs):
-    #     try:
-    #         return super(ProductCategoryView, self).get_context_data(**kwargs)
-    #     except Http404:
-    #         self.kwargs['page'] = 1
-    #         return super(ProductCategoryView, self).get_context_data(**kwargs)
+        #
+        # return Product.objects.filter(
+        #     enable=True, categories__in=self.object.get_descendants(include_self=True)
 
     def get_context_data(self, **kwargs):
         context = super(ProductCategoryView, self).get_context_data(**kwargs)
