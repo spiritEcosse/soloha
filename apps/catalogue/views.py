@@ -116,6 +116,13 @@ class ProductCategoryView(SingleObjectMixin, generic.ListView):
             self.request.GET.get('sorting_type', *Product._meta.ordering)
         )
 
+    # def get_context_data(self, **kwargs):
+    #     try:
+    #         return super(ProductCategoryView, self).get_context_data(**kwargs)
+    #     except Http404:
+    #         self.kwargs['page'] = 1
+    #         return super(ProductCategoryView, self).get_context_data(**kwargs)
+
     def get_context_data(self, **kwargs):
         context = super(ProductCategoryView, self).get_context_data(**kwargs)
         return context
