@@ -55,114 +55,6 @@ class TestCatalog(TestCase):
 
         test_catalogue.test_menu_categories(obj=self, response=response)
 
-    def test_page_category(self):
-        """
-        Check the availability of a specific category page template, type the name of the class, true to the object
-        of a category, a fixed amount of goods in the different versions of the tree search.
-        Returns:
-            None
-        """
-        test_catalogue.create_product_bulk()
-
-        # without products in this category has no descendants in the categories at the same time this very category and its children is not goods
-        category = Category.objects.get(name='Category-2')
-        response = self.client.get(category.get_absolute_url())
-        self.assertEqual(response.status_code, STATUS_CODE_200)
-        self.assertEqual(category, response.context['category'])
-        products = Product.objects.filter(enable=True, categories__in=category.get_descendants(include_self=True)).distinct()[:OSCAR_PRODUCTS_PER_PAGE]
-        self.assertEqual(len(products), len(response.context['page_obj']))
-        self.assertListEqual(list(products), list(response.context['page_obj']))
-        self.assertEqual(response.resolver_match.func.__name__, ProductCategoryView.as_view().__name__)
-        self.assertEqual(response.request['PATH_INFO'], category.get_absolute_url())
-        self.assertTemplateUsed(response, 'catalogue/category.html')
-
-        # with products in this child category are not the descendants of the categories at the same time, this category has itself in goods
-        category = Category.objects.get(name='Category-321')
-        response = self.client.get(category.get_absolute_url())
-        self.assertEqual(category, response.context['category'])
-        products = Product.objects.filter(enable=True, categories__in=category.get_descendants(include_self=True)).distinct()[:OSCAR_PRODUCTS_PER_PAGE]
-        self.assertEqual(len(products), len(response.context['page_obj']))
-        self.assertListEqual(list(products), list(response.context['page_obj']))
-        self.assertEqual(response.resolver_match.func.__name__, ProductCategoryView.as_view().__name__)
-        self.assertEqual(response.request['PATH_INFO'], category.get_absolute_url())
-        self.assertEqual(response.status_code, STATUS_CODE_200)
-        self.assertTemplateUsed(response, 'catalogue/category.html')
-
-        # with products in this category has category of descendants with itself, this category is not in goods, but its descendants have in the goods
-        category = Category.objects.get(name='Category-1')
-        response = self.client.get(category.get_absolute_url())
-        self.assertEqual(category, response.context['category'])
-        products = Product.objects.filter(enable=True, categories__in=category.get_descendants(include_self=True)).distinct()[:OSCAR_PRODUCTS_PER_PAGE]
-        self.assertEqual(len(products), len(response.context['page_obj']))
-        self.assertListEqual(list(products), list(response.context['page_obj']))
-        self.assertEqual(response.resolver_match.func.__name__, ProductCategoryView.as_view().__name__)
-        self.assertEqual(response.request['PATH_INFO'], category.get_absolute_url())
-        self.assertEqual(response.status_code, STATUS_CODE_200)
-        self.assertTemplateUsed(response, 'catalogue/category.html')
-
-        # with products with this main category has no descendants of categories at the same time, this category has itself in goods
-        category = Category.objects.get(name='Category-4')
-        response = self.client.get(category.get_absolute_url())
-        self.assertEqual(category, response.context['category'])
-        products = Product.objects.filter(enable=True, categories__in=category.get_descendants(include_self=True)).distinct()[:OSCAR_PRODUCTS_PER_PAGE]
-        self.assertEqual(len(products), len(response.context['page_obj']))
-        self.assertListEqual(list(products), list(response.context['page_obj']))
-        self.assertEqual(response.resolver_match.func.__name__, ProductCategoryView.as_view().__name__)
-        self.assertEqual(response.request['PATH_INFO'], category.get_absolute_url())
-        self.assertEqual(response.status_code, STATUS_CODE_200)
-        self.assertTemplateUsed(response, 'catalogue/category.html')
-
-        # with products in this category is that the main categories of the children with this very category and its descendants have in the goods
-        category = Category.objects.get(name='Category-3')
-        response = self.client.get(category.get_absolute_url())
-        self.assertEqual(category, response.context['category'])
-        products = Product.objects.filter(enable=True, categories__in=category.get_descendants(include_self=True)).distinct()[:OSCAR_PRODUCTS_PER_PAGE]
-        self.assertEqual(len(products), len(response.context['page_obj']))
-        self.assertListEqual(list(products), list(response.context['page_obj']))
-        self.assertEqual(response.resolver_match.func.__name__, ProductCategoryView.as_view().__name__)
-        self.assertEqual(response.request['PATH_INFO'], category.get_absolute_url())
-        self.assertEqual(response.status_code, STATUS_CODE_200)
-        self.assertTemplateUsed(response, 'catalogue/category.html')
-
-        # check pagination
-        paginate_by = OSCAR_PRODUCTS_PER_PAGE
-        category = Category.objects.get(name='Category-1')
-        response = self.client.get(category.get_absolute_url())
-        products = Product.objects.filter(enable=True, categories__in=category.get_descendants(include_self=True)).distinct()
-        p = Paginator(products, paginate_by)
-        self.assertEqual(len(p.page(1).object_list), len(response.context['page_obj']))
-        self.assertEqual(p.count, response.context['paginator'].count)
-        self.assertEqual(p.num_pages, response.context['paginator'].num_pages)
-        self.assertEqual(p.page_range, response.context['paginator'].page_range)
-
-        current_page = 2
-        response = self.client.get(category.get_absolute_url(), {'page': current_page})
-        products = Product.objects.filter(enable=True, categories__in=category.get_descendants(include_self=True)).distinct()
-        p = Paginator(products, paginate_by)
-        self.assertEqual(len(p.page(current_page).object_list), len(response.context['page_obj']))
-        self.assertEqual(p.count, response.context['paginator'].count)
-        self.assertEqual(p.num_pages, response.context['paginator'].num_pages)
-        self.assertEqual(p.page_range, response.context['paginator'].page_range)
-        # self.assertEqual(p.page(3), response.context['paginator'].page(3))
-
-        current_page = 3
-        response = self.client.get(category.get_absolute_url(), {'page': current_page})
-        products = Product.objects.filter(enable=True, categories__in=category.get_descendants(include_self=True)).distinct()
-        p = Paginator(products, paginate_by)
-        self.assertEqual(len(p.page(current_page).object_list), len(response.context['page_obj']))
-        self.assertEqual(p.count, response.context['paginator'].count)
-        self.assertEqual(p.num_pages, response.context['paginator'].num_pages)
-        self.assertEqual(p.page_range, response.context['paginator'].page_range)
-
-        # with page not exist
-        # current_page = 200
-        # response = self.client.get(category.get_absolute_url(), {'page': current_page})
-        # products = Product.objects.filter(enable=True, categories__in=category.get_descendants(include_self=True)).distinct()
-        # p = Paginator(products, paginate_by)
-        # self.assertEqual(list(p.page(1).object_list), list(response.context['page_obj']))
-
-        test_catalogue.test_menu_categories(obj=self, response=response)
-
     def test_url_catalogue(self):
         """
         accessibility page catalogue
@@ -190,7 +82,7 @@ class TestCatalog(TestCase):
         slugs = [category_1234.parent.parent.parent.slug, category_1234.parent.parent.slug, category_1234.parent.slug, category_1234.slug]
         self.assertEqual(Category._slug_separator.join(map(str, slugs)), category_1234.full_slug)
 
-    def test_sorting_products(self):
+    def test_sorting_products_post(self):
         """
         Test sorting products by popularity, price descending and price ascending
         Returns: sorted products
@@ -251,54 +143,94 @@ class TestCatalog(TestCase):
         context['products'] = [product.get_values() for product in object_list]
         self.assertJSONEqual(json.dumps(context), response.content)
 
-    def test_category_with_sorting(self):
+    def test_page_category(self):
         """
-        Test sorting products in different pages(paginator)
+        Check the availability of a specific category page template, type the name of the class, true to the object
+        of a category, a fixed amount of goods in the different versions of the tree search.
+        Returns:
+            None
         """
         test_catalogue.create_product_bulk()
+        # without products in this category has no descendants in the categories at the same time this very category and its children is not goods
+        category = Category.objects.get(name='Category-2')
+        self.assertions_category(category=category)
 
-        sorting_dict = {
-            'product_category': 'test_category',
-            'sorting_type': 'stockrecords__price_excl_tax'
-        }
+        # with products in this child category are not the descendants of the categories at the same time, this category has itself in goods
+        category = Category.objects.get(name='Category-321')
+        self.assertions_category(category=category)
+
+        # with products in this category has category of descendants with itself, this category is not in goods, but its descendants have in the goods
+        category = Category.objects.get(name='Category-1')
+        self.assertions_category(category=category)
+
+        # with products with this main category has no descendants of categories at the same time, this category has itself in goods
+        category = Category.objects.get(name='Category-4')
+        self.assertions_category(category=category)
+
+        # with products in this category is that the main categories of the children with this very category and its descendants have in the goods
+        category = Category.objects.get(name='Category-3')
+        self.assertions_category(category=category)
+
+        # check pagination
+        category = Category.objects.get(name='Category-1')
+        self.assertions_category(category=category)
+        dict_values = {'page': 1}
+        self.assertions_category(category=category, dict_values=dict_values)
+        dict_values = {'page': 2}
+        self.assertions_category(category=category, dict_values=dict_values)
+        dict_values = {'page': 3}
+        self.assertions_category(category=category, dict_values=dict_values)
 
         # Sorted by price ascending
-        self.assertions_category_with_sorting(current_page=1, sorting_type='stockrecords__price_excl_tax')
-        self.assertions_category_with_sorting(current_page=2, sorting_type='stockrecords__price_excl_tax')
-        self.assertions_category_with_sorting(current_page=3, sorting_type='stockrecords__price_excl_tax')
+        dict_values = {'page': 1, 'sorting_type': 'stockrecords__price_excl_tax'}
+        self.assertions_category(category=category, dict_values=dict_values)
+        dict_values = {'page': 2, 'sorting_type': 'stockrecords__price_excl_tax'}
+        self.assertions_category(category=category, dict_values=dict_values)
+        dict_values = {'page': 3, 'sorting_type': 'stockrecords__price_excl_tax'}
+        self.assertions_category(category=category, dict_values=dict_values)
         # TODO use price_retail
 
         # sorting by price descending
-
-        sorting_dict['sorting_type'] = '-stockrecords__price_excl_tax'
-
-        self.assertions_category_with_sorting(current_page=1, sorting_type='-stockrecords__price_excl_tax')
-        self.assertions_category_with_sorting(current_page=2, sorting_type='-stockrecords__price_excl_tax')
-        self.assertions_category_with_sorting(current_page=3, sorting_type='-stockrecords__price_excl_tax')
+        dict_values = {'page': 1, 'sorting_type': '-stockrecords__price_excl_tax'}
+        self.assertions_category(category=category, dict_values=dict_values)
+        dict_values = {'page': 2, 'sorting_type': '-stockrecords__price_excl_tax'}
+        self.assertions_category(category=category, dict_values=dict_values)
+        dict_values = {'page': 3, 'sorting_type': '-stockrecords__price_excl_tax'}
+        self.assertions_category(category=category, dict_values=dict_values)
 
         # sorting by rating
+        dict_values = {'page': 1, 'sorting_type': 'rating', 'filters': 'shirina_1000/shirina_1200/dlina_1800/dlina_1000/type'}
+        self.assertions_category(category=category, dict_values=dict_values)
+        dict_values = {'page': 2, 'sorting_type': 'rating'}
+        self.assertions_category(category=category, dict_values=dict_values)
+        dict_values = {'page': 3, 'sorting_type': 'rating'}
+        self.assertions_category(category=category, dict_values=dict_values)
 
-        sorting_dict['sorting_type'] = 'rating'
-        self.assertions_category_with_sorting(current_page=1, sorting_type='rating')
-        self.assertions_category_with_sorting(current_page=2, sorting_type='rating')
-        self.assertions_category_with_sorting(current_page=3, sorting_type='rating')
+        # with page not exist
+        # current_page = 200
+        # response = self.client.get(category.get_absolute_url(), {'page': current_page})
+        # products = Product.objects.filter(enable=True, categories__in=category.get_descendants(include_self=True)).distinct()
+        # p = Paginator(products, paginate_by)
+        # self.assertEqual(list(p.page(1).object_list), list(response.context['page_obj']))
 
-    def assertions_category_with_sorting(self, current_page, sorting_type):
+    def assertions_category(self, category, dict_values={}):
         paginate_by = OSCAR_PRODUCTS_PER_PAGE
+        products = Product.objects.filter(
+            enable=True, categories__in=category.get_descendants(include_self=True)
+        ).distinct().order_by(dict_values.get('sorting_type', *Product._meta.ordering))
 
-        category = Category.objects.get(name='Category-1')
-
-        response = self.client.get(category.get_absolute_url(),
-                           {'page': current_page, 'sorting_type': sorting_type})
-        products = Product.objects.filter(enable=True,
-                                          categories__in=category.get_descendants(include_self=True)
-                                          ).distinct().order_by(sorting_type)
+        response = self.client.get(category.get_absolute_url(), dict_values)
 
         p = Paginator(products, paginate_by)
-        self.assertEqual(len(p.page(current_page).object_list), len(response.context['page_obj']))
-        self.assertListEqual(list(p.page(current_page).object_list), list(response.context['page_obj']))
+        self.assertEqual(response.status_code, STATUS_CODE_200)
+        self.assertEqual(response.resolver_match.func.__name__, ProductCategoryView.as_view().__name__)
+        self.assertEqual(response.request['PATH_INFO'], category.get_absolute_url())
+        self.assertTemplateUsed(response, 'catalogue/category.html')
+        self.assertEqual(category, response.context['category'])
+        self.assertEqual(len(p.page(dict_values.get('page', 1)).object_list), len(response.context['page_obj']))
+        self.assertListEqual(list(p.page(dict_values.get('page', 1)).object_list), list(response.context['page_obj']))
         self.assertEqual(p.count, response.context['paginator'].count)
         self.assertEqual(p.num_pages, response.context['paginator'].num_pages)
         self.assertEqual(p.page_range, response.context['paginator'].page_range)
 
-
+        test_catalogue.test_menu_categories(obj=self, response=response)

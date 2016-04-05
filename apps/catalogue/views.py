@@ -110,9 +110,10 @@ class ProductCategoryView(SingleObjectMixin, generic.ListView):
                 return HttpResponsePermanentRedirect(expected_path)
 
     def get_queryset(self):
-        return Product.objects.filter(enable=True, categories__in=self.object.get_descendants(include_self=True)
-                                      ).distinct().order_by(self.request.GET.get(
-            'sorting_type', *Product._meta.ordering)
+        return Product.objects.filter(
+            enable=True, categories__in=self.object.get_descendants(include_self=True)
+        ).distinct().order_by(
+            self.request.GET.get('sorting_type', *Product._meta.ordering)
         )
 
     def get_context_data(self, **kwargs):
