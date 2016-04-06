@@ -15,14 +15,14 @@ ProductRecommendation = get_model('catalogue', 'ProductRecommendation')
 class HomeView(CoreHomeView):
     def get_context_data(self, **kwargs):
         context = super(HomeView, self).get_context_data(**kwargs)
-        only = ['title', 'slug', 'structure', 'product_class', 'product_options__name', 'product_options__code', 'product_options__type']
+        only = ['title', 'slug', 'structure', 'product_class', 'product_options__name', 'product_options__code', 'product_options__type', 'categories']
 
         context['products_new'] = Product.objects.only(*only).select_related('product_class').prefetch_related(
             Prefetch('images'),
             Prefetch('product_options'),
             Prefetch('product_class__options'),
             Prefetch('stockrecords'),
-            Prefetch('categories')
+            Prefetch('categories__parent__parent')
         ).order_by('-date_created')[:MAX_COUNT_PRODUCT]
 
         context['products_recommend'] = Product.objects.filter(
@@ -32,7 +32,7 @@ class HomeView(CoreHomeView):
             Prefetch('product_options'),
             Prefetch('product_class__options'),
             Prefetch('stockrecords'),
-            Prefetch('categories')
+            Prefetch('categories__parent__parent')
         ).order_by('-date_created')[:MAX_COUNT_PRODUCT]
 
         context['products_order'] = Product.objects.filter(
@@ -42,7 +42,7 @@ class HomeView(CoreHomeView):
             Prefetch('product_options'),
             Prefetch('stockrecords'),
             Prefetch('product_class__options'),
-            Prefetch('categories'),
+            Prefetch('categories__parent__parent'),
         ).order_by('-date_created')[:MAX_COUNT_PRODUCT]
 
         context['products_special'] = []

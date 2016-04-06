@@ -152,58 +152,65 @@ class TestCatalog(TestCase):
         """
         test_catalogue.create_product_bulk()
         # without products in this category has no descendants in the categories at the same time this very category and its children is not goods
+        dict_values = {'num_queries': 8}
         category = Category.objects.get(name='Category-2')
-        self.assertions_category(category=category)
+        self.assertions_category(category=category, dict_values=dict_values)
 
         # with products in this child category are not the descendants of the categories at the same time, this category has itself in goods
+        # Todo: why 22 queries ?
+        dict_values = {'num_queries': 22}
         category = Category.objects.get(name='Category-321')
-        self.assertions_category(category=category)
+        self.assertions_category(category=category, dict_values=dict_values)
 
         # with products in this category has category of descendants with itself, this category is not in goods, but its descendants have in the goods
+        dict_values = {'num_queries': 16}
         category = Category.objects.get(name='Category-1')
-        self.assertions_category(category=category)
+        self.assertions_category(category=category, dict_values=dict_values)
 
         # with products with this main category has no descendants of categories at the same time, this category has itself in goods
+        dict_values = {'num_queries': 16}
         category = Category.objects.get(name='Category-4')
-        self.assertions_category(category=category)
+        self.assertions_category(category=category, dict_values=dict_values)
 
         # with products in this category is that the main categories of the children with this very category and its descendants have in the goods
+        dict_values = {'num_queries': 16}
         category = Category.objects.get(name='Category-3')
-        self.assertions_category(category=category)
+        self.assertions_category(category=category, dict_values=dict_values)
 
         # check pagination
+        dict_values = {'num_queries': 16}
         category = Category.objects.get(name='Category-1')
-        self.assertions_category(category=category)
-        dict_values = {'page': 1}
         self.assertions_category(category=category, dict_values=dict_values)
-        dict_values = {'page': 2}
+        dict_values = {'page': 1, 'num_queries': 16}
         self.assertions_category(category=category, dict_values=dict_values)
-        dict_values = {'page': 3}
+        dict_values = {'page': 2, 'num_queries': 16}
+        self.assertions_category(category=category, dict_values=dict_values)
+        dict_values = {'page': 3, 'num_queries': 16}
         self.assertions_category(category=category, dict_values=dict_values)
 
         # Sorted by price ascending
-        dict_values = {'page': 1, 'sorting_type': 'stockrecords__price_excl_tax'}
+        dict_values = {'page': 1, 'sorting_type': 'stockrecords__price_excl_tax', 'num_queries': 16}
         self.assertions_category(category=category, dict_values=dict_values)
-        dict_values = {'page': 2, 'sorting_type': 'stockrecords__price_excl_tax'}
+        dict_values = {'page': 2, 'sorting_type': 'stockrecords__price_excl_tax', 'num_queries': 16}
         self.assertions_category(category=category, dict_values=dict_values)
-        dict_values = {'page': 3, 'sorting_type': 'stockrecords__price_excl_tax'}
+        dict_values = {'page': 3, 'sorting_type': 'stockrecords__price_excl_tax', 'num_queries': 16}
         self.assertions_category(category=category, dict_values=dict_values)
         # TODO use price_retail
 
         # sorting by price descending
-        dict_values = {'page': 1, 'sorting_type': '-stockrecords__price_excl_tax'}
+        dict_values = {'page': 1, 'sorting_type': '-stockrecords__price_excl_tax', 'num_queries': 16}
         self.assertions_category(category=category, dict_values=dict_values)
-        dict_values = {'page': 2, 'sorting_type': '-stockrecords__price_excl_tax'}
+        dict_values = {'page': 2, 'sorting_type': '-stockrecords__price_excl_tax', 'num_queries': 16}
         self.assertions_category(category=category, dict_values=dict_values)
-        dict_values = {'page': 3, 'sorting_type': '-stockrecords__price_excl_tax'}
+        dict_values = {'page': 3, 'sorting_type': '-stockrecords__price_excl_tax', 'num_queries': 16}
         self.assertions_category(category=category, dict_values=dict_values)
 
         # sorting by rating
-        dict_values = {'page': 1, 'sorting_type': 'rating', 'filters': 'shirina_1000/shirina_1200/dlina_1800/dlina_1000/type'}
+        dict_values = {'page': 1, 'sorting_type': 'rating', 'num_queries': 16, 'filters': 'shirina_1000/shirina_1200/dlina_1800/dlina_1000/type'}
         self.assertions_category(category=category, dict_values=dict_values)
-        dict_values = {'page': 2, 'sorting_type': 'rating'}
+        dict_values = {'page': 2, 'sorting_type': 'rating', 'num_queries': 16}
         self.assertions_category(category=category, dict_values=dict_values)
-        dict_values = {'page': 3, 'sorting_type': 'rating'}
+        dict_values = {'page': 3, 'sorting_type': 'rating', 'num_queries': 16}
         self.assertions_category(category=category, dict_values=dict_values)
 
         # with page not exist
@@ -215,11 +222,20 @@ class TestCatalog(TestCase):
 
     def assertions_category(self, category, dict_values={}):
         paginate_by = OSCAR_PRODUCTS_PER_PAGE
+        only = ['title', 'slug', 'structure', 'product_class', 'product_options__name', 'product_options__code', 'product_options__type', 'enable', 'categories']
+
         products = Product.objects.filter(
             enable=True, categories__in=category.get_descendants(include_self=True)
+        ).only(*only).select_related('product_class').prefetch_related(
+            Prefetch('images'),
+            Prefetch('product_options'),
+            Prefetch('product_class__options'),
+            Prefetch('stockrecords'),
+            Prefetch('categories__parent__parent')
         ).distinct().order_by(dict_values.get('sorting_type', *Product._meta.ordering))
 
-        response = self.client.get(category.get_absolute_url(), dict_values)
+        with self.assertNumQueries(dict_values['num_queries']):
+            response = self.client.get(category.get_absolute_url(), dict_values)
 
         p = Paginator(products, paginate_by)
         self.assertEqual(response.status_code, STATUS_CODE_200)

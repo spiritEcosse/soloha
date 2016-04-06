@@ -30,21 +30,21 @@ class TestHomePage(TestCase):
         """
         test_catalogue.create_product_bulk_recommend()
         test_catalogue.create_order()
-        with self.assertNumQueries(24):
+        with self.assertNumQueries(28):
             response = self.client.get(reverse('promotions:home'))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.resolver_match.func.__name__, HomeView.as_view().__name__)
         self.assertEqual(response.resolver_match.view_name, 'promotions:home')
         self.assertTemplateUsed(response, 'promotions/home.html')
 
-        only = ['title', 'slug', 'structure', 'product_class', 'product_options__name', 'product_options__code', 'product_options__type']
+        only = ['title', 'slug', 'structure', 'product_class', 'product_options__name', 'product_options__code', 'product_options__type', 'categories']
 
         products_queryset = Product.objects.only(*only).select_related('product_class').prefetch_related(
             Prefetch('images'),
             Prefetch('product_options'),
             Prefetch('product_class__options'),
             Prefetch('stockrecords'),
-            Prefetch('categories')
+            Prefetch('categories__parent__parent')
         ).order_by('-date_created')[:MAX_COUNT_PRODUCT]
         self.assertEqual(str(products_queryset.query), str(response.context['products_new'].query))
         products_expected = [product.get_values() for product in products_queryset]
@@ -58,7 +58,7 @@ class TestHomePage(TestCase):
             Prefetch('product_options'),
             Prefetch('product_class__options'),
             Prefetch('stockrecords'),
-            Prefetch('categories')
+            Prefetch('categories__parent__parent')
         ).order_by('-date_created')[:MAX_COUNT_PRODUCT]
         self.assertEqual(str(products_queryset.query), str(response.context['products_recommend'].query))
         products_expected = [product.get_values() for product in products_queryset]
@@ -72,7 +72,7 @@ class TestHomePage(TestCase):
             Prefetch('product_options'),
             Prefetch('stockrecords'),
             Prefetch('product_class__options'),
-            Prefetch('categories'),
+            Prefetch('categories__parent__parent'),
         ).order_by('-date_created')[:MAX_COUNT_PRODUCT]
         self.assertEqual(str(products_queryset.query), str(response.context['products_order'].query))
         products_expected = [product.get_values() for product in products_queryset]
