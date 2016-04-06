@@ -121,8 +121,11 @@ class CustomAbstractProduct(models.Model):
         """
         Return a product's absolute url
         """
-        return reverse('catalogue:detail',
-                       kwargs={'product_slug': self.slug, 'pk': self.id})
+        dict_values = {'slug': self.slug}
+
+        if self.categories.exists():
+            dict_values.update({'category_slug': self.categories.first().full_slug})
+        return reverse('detail', kwargs=dict_values)
 
     def clean(self):
         """
@@ -643,6 +646,14 @@ class CustomAbstractCategory(MPTTModel):
         return image_banner
 
     def get_absolute_url(self):
+        """
+        Our URL scheme means we have to look up the category's ancestors. As
+        that is a bit more expensive, we cache the generated URL. That is
+        safe even for a stale cache, as the default implementation of
+        ProductCategoryView does the lookup via primary key anyway. But if
+        you change that logic, you'll have to reconsider the caching
+        approach.
+        """
         return reverse('category', kwargs={'category_slug': self.full_slug})
 
     @classmethod

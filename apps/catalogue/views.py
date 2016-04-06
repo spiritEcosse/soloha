@@ -24,9 +24,6 @@ Product = get_model('catalogue', 'product')
 Category = get_model('catalogue', 'category')
 
 
-
-# class ProductCategoryView(CoreProductCategoryView):
-#     pass
 class ProductCategoryView(SingleObjectMixin, generic.ListView):
     template_name = 'catalogue/category.html'
     enforce_paths = True
@@ -42,42 +39,6 @@ class ProductCategoryView(SingleObjectMixin, generic.ListView):
             return potential_redirect
 
         return super(ProductCategoryView, self).get(request, *args, **kwargs)
-
-    # def get_paginator(self, queryset, per_page, orphans=0, allow_empty_first_page=True, **kwargs):
-    #     paginator = super(ProductCategoryView, self).get_paginator(queryset, per_page, orphans=orphans,
-    #                                                                allow_empty_first_page=allow_empty_first_page)
-    #     page = self.kwargs.get('page', 1)
-    #     try:
-    #         paginator.page(5)
-    #         # paginator.page(self.kwargs.get('page', 1))
-    #         # paginator.page(page)
-    #         # paginator.page(1)
-    #         # raise Exception(dir(self.paginator_class))
-    #         # paginator.page(kwargs.get('page', 1))
-    #         # return self.paginator_class(
-    #         #     queryset, per_page, orphans=orphans,
-    #         #     allow_empty_first_page=allow_empty_first_page, **kwargs)
-    #     # except PageNotAnInteger:
-    #     #     paginator.page(1)
-    #
-    #     except EmptyPage:  # or InvalidPage, but that's less precise
-    #         # raise Exception("test")
-    #         # return paginator.page(1)
-    #         # raise Exception("aa")
-    #         self.is_empty = True
-    #
-    #         # return redirect(self.object.get_absolute_url())
-    #     return paginator
-    #
-    # def dispatch(self, request, *args, **kwargs):
-    #     response = super(ProductCategoryView, self).dispatch(request, *args, **kwargs)
-    #     # raise Exception(self.is_empty)
-    #     raise Exception("test")
-    #     if getattr(self, 'is_empty', False):
-    #         return HttpResponseRedirect(self.object.get_absolute_url())
-    #         # return HttpResponseRedirect('/some/other/url/')
-    #     else:
-    #         return response
 
     def get_category(self):
         if 'pk' in self.kwargs:
@@ -110,8 +71,16 @@ class ProductCategoryView(SingleObjectMixin, generic.ListView):
                 return HttpResponsePermanentRedirect(expected_path)
 
     def get_queryset(self):
-        return Product.objects.filter(
+        only = ['title', 'slug', 'structure', 'product_class', 'product_options__name', 'product_options__code', 'product_options__type', 'enable', 'categories']
+
+        return Product.objects.only(*only).filter(
             enable=True, categories__in=self.object.get_descendants(include_self=True)
+        ).select_related('product_class').prefetch_related(
+            Prefetch('images'),
+            Prefetch('product_options'),
+            Prefetch('product_class__options'),
+            Prefetch('stockrecords'),
+            Prefetch('categories__parent__parent')
         ).distinct().order_by(
             self.request.GET.get('sorting_type', *Product._meta.ordering)
         )
