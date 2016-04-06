@@ -24,6 +24,7 @@ Product = get_model('catalogue', 'product')
 Category = get_model('catalogue', 'category')
 Filter = get_model('catalogue', 'Filter')
 
+
 class ProductCategoryView(SingleObjectMixin, generic.ListView):
     template_name = 'catalogue/category.html'
     enforce_paths = True
@@ -112,8 +113,6 @@ class ProductCategoryView(SingleObjectMixin, generic.ListView):
             ).distinct().prefetch_related('products'), to_attr='children_in_products'),
         )
         return context
-
-# [(filter, [(filter_value, filter_value.products.count()) for filter_value in filter.children_in_products]) for filter in response.context['filters']]
 
 
 class CategoryProducts(views.JSONResponseMixin, views.AjaxResponseMixin, MultipleObjectMixin, View):
