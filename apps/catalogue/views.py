@@ -47,42 +47,6 @@ class ProductCategoryView(SingleObjectMixin, generic.ListView):
 
         return super(ProductCategoryView, self).get(request, *args, **kwargs)
 
-    # def get_paginator(self, queryset, per_page, orphans=0, allow_empty_first_page=True, **kwargs):
-    #     paginator = super(ProductCategoryView, self).get_paginator(queryset, per_page, orphans=orphans,
-    #                                                                allow_empty_first_page=allow_empty_first_page)
-    #     page = self.kwargs.get('page', 1)
-    #     try:
-    #         paginator.page(5)
-    #         # paginator.page(self.kwargs.get('page', 1))
-    #         # paginator.page(page)
-    #         # paginator.page(1)
-    #         # raise Exception(dir(self.paginator_class))
-    #         # paginator.page(kwargs.get('page', 1))
-    #         # return self.paginator_class(
-    #         #     queryset, per_page, orphans=orphans,
-    #         #     allow_empty_first_page=allow_empty_first_page, **kwargs)
-    #     # except PageNotAnInteger:
-    #     #     paginator.page(1)
-    #
-    #     except EmptyPage:  # or InvalidPage, but that's less precise
-    #         # raise Exception("test")
-    #         # return paginator.page(1)
-    #         # raise Exception("aa")
-    #         self.is_empty = True
-    #
-    #         # return redirect(self.object.get_absolute_url())
-    #     return paginator
-    #
-    # def dispatch(self, request, *args, **kwargs):
-    #     response = super(ProductCategoryView, self).dispatch(request, *args, **kwargs)
-    #     # raise Exception(self.is_empty)
-    #     raise Exception("test")
-    #     if getattr(self, 'is_empty', False):
-    #         return HttpResponseRedirect(self.object.get_absolute_url())
-    #         # return HttpResponseRedirect('/some/other/url/')
-    #     else:
-    #         return response
-
     def get_category(self):
         if 'pk' in self.kwargs:
             return get_object_or_404(Category, pk=self.kwargs['pk'])
@@ -128,21 +92,12 @@ class ProductCategoryView(SingleObjectMixin, generic.ListView):
 
     def get_context_data(self, **kwargs):
         context = super(ProductCategoryView, self).get_context_data(**kwargs)
-        # Filter.objects.filter(level=0, children__in=[product.filters.all() for product in self.products])
-        # [(filter, filter.parent) for filter in Filter.objects.filter(product__in=)]
-
-        # filters = []
-        # for product in self.products_without_filters:
-        #     filters.extend(product.filters.all())
-        from django.db.models import Count
         context['filters'] = Filter.objects.filter(level=0).prefetch_related(
             Prefetch('children', queryset=Filter.objects.filter(
                 products__in=self.products_without_filters
             ).distinct(), to_attr='children_in_products'),
         )
         return context
-
-# [(filter, [(filter_value, filter_value.products.count()) for filter_value in filter.children_in_products]) for filter in response.context['filters']]
 
 
 class CategoryProducts(views.JSONResponseMixin, views.AjaxResponseMixin, MultipleObjectMixin, View):
@@ -158,12 +113,13 @@ class CategoryProducts(views.JSONResponseMixin, views.AjaxResponseMixin, Multipl
         data = json.loads(self.request.body)
         self.kwargs['product_category'] = data.get('product_category')
         self.kwargs['sorting_type'] = data.get('sorting_type', 'stockrecords__price_excl_tax')
+        self.kwargs['filters'] = data.get('filters').split('/')
         self.object_list = self.get_queryset()
-        # self.object_list = self.get_queryset(product_pk=data['product_pk'])
 
-    def get_queryset(self, **kwargs):
-        # queryset = super(CategoryProducts, self).get_queryset().filter(products=kwargs['product_pk'])
+    def get_queryset(self):
         queryset = super(CategoryProducts, self).get_queryset()
+        if self.kwargs.get('filters', False) is not False:
+            queryset = queryset.filter(filters__slug__in=self.kwargs['filters'])
         return queryset.only(*self.only).select_related('product_class') \
             .prefetch_related(
             Prefetch('categories'),

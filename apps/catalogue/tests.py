@@ -90,56 +90,67 @@ class TestCatalog(TestCase):
         test_catalogue.create_product_bulk()
 
         sorting_dict = {
-            'product_category': 'test_category',
-            'sorting_type': 'stockrecords__price_excl_tax'
+            'sorting_type': 'stockrecords__price_excl_tax',
+            # 'filters': 'shirina_1000/shirina_1200/dlina_1100/dlina_1000'
         }
+        sorting_dict['filters'] = 'shirina_1000/shirina_1200/dlina_1100/dlina_1000'
+        self.assertions_sorting(sorting_dict=sorting_dict)
+        sorting_dict['filters'] = 'shirina_1000'
+        self.assertions_sorting(sorting_dict=sorting_dict)
+        # sorting_dict['filters'] = ''
+        self.assertions_sorting(sorting_dict=sorting_dict)
+
+        sorting_dict['sorting_type'] = '-stockrecords__price_excl_tax'
+        sorting_dict['filters'] = 'shirina_1000/shirina_1200/dlina_1100/dlina_1000'
+        self.assertions_sorting(sorting_dict=sorting_dict)
+        sorting_dict['filters'] = 'shirina_1000'
+        self.assertions_sorting(sorting_dict=sorting_dict)
+        # sorting_dict['filters'] = ''
+        self.assertions_sorting(sorting_dict=sorting_dict)
+
+        sorting_dict['sorting_type'] = 'rating'
+        sorting_dict['filters'] = 'shirina_1000/shirina_1200/dlina_1100/dlina_1000'
+        self.assertions_sorting(sorting_dict=sorting_dict)
+        sorting_dict['filters'] = 'shirina_1000'
+        self.assertions_sorting(sorting_dict=sorting_dict)
+        # sorting_dict['filters'] = ''
+        self.assertions_sorting(sorting_dict=sorting_dict)
+
+    def assertions_sorting(self, sorting_dict={}):
+        paginate_by = OSCAR_PRODUCTS_PER_PAGE
+        # sorting_dict = {
+        #     'sorting_type': 'stockrecords__price_excl_tax',
+        #     'filters': 'shirina_1000/shirina_1200/dlina_1100/dlina_1000'
+        # }
 
         # with self.assertNumQueries(10):
         response = self.client.post(reverse('catalogue:products'),
-                                        json.dumps(sorting_dict),
-                                        content_type='application/json',
-                                        HTTP_X_REQUESTED_WITH='XMLHttpRequest')
-        self.assertEqual(200, response.status_code)
-        object_list = Product.objects.select_related('product_class').prefetch_related(
-            Prefetch('categories'),
-            Prefetch('images'),
-            Prefetch('stockrecords'),
-            ).order_by(sorting_dict['sorting_type'])
-        context = dict()
-        context['products'] = [product.get_values() for product in object_list]
-        self.assertJSONEqual(json.dumps(context), response.content)
-
-        sorting_dict['sorting_type'] = '-stockrecords__price_excl_tax'
-        response = self.client.post(reverse('catalogue:products'),
                                     json.dumps(sorting_dict),
                                     content_type='application/json',
                                     HTTP_X_REQUESTED_WITH='XMLHttpRequest')
         self.assertEqual(200, response.status_code)
-        object_list = Product.objects.select_related('product_class').prefetch_related(
+        object_list = Product.objects
+        if sorting_dict.get('filters', False) is not False:
+            object_list = object_list.filter(filters__slug__in=sorting_dict['filters'].split('/'))
+
+        object_list = object_list.select_related(
+            'product_class').prefetch_related(
             Prefetch('categories'),
             Prefetch('images'),
             Prefetch('stockrecords'),
-            ).order_by(sorting_dict['sorting_type'])
+        ).order_by(sorting_dict['sorting_type'])
 
         context = dict()
         context['products'] = [product.get_values() for product in object_list]
         self.assertJSONEqual(json.dumps(context), response.content)
+        p = Paginator(object_list, paginate_by)
 
-        sorting_dict['sorting_type'] = 'rating'
-        response = self.client.post(reverse('catalogue:products'),
-                                    json.dumps(sorting_dict),
-                                    content_type='application/json',
-                                    HTTP_X_REQUESTED_WITH='XMLHttpRequest')
-        self.assertEqual(200, response.status_code)
-        object_list = Product.objects.select_related('product_class').prefetch_related(
-            Prefetch('categories'),
-            Prefetch('images'),
-            Prefetch('stockrecords'),
-            ).order_by(sorting_dict['sorting_type'])
+        # self.assertEqual(len(p.page(dict_values.get('page', 1)).object_list), len(response.context['page_obj']))
+        # self.assertListEqual(list(p.page(dict_values.get('page', 1)).object_list), list(response.context['page_obj']))
+        # self.assertEqual(p.count, response.context['paginator'].count)
+        # self.assertEqual(p.num_pages, response.context['paginator'].num_pages)
+        # self.assertEqual(p.page_range, response.context['paginator'].page_range)
 
-        context = dict()
-        context['products'] = [product.get_values() for product in object_list]
-        self.assertJSONEqual(json.dumps(context), response.content)
 
     def test_page_category(self):
         """
