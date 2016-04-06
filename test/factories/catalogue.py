@@ -1,8 +1,11 @@
+# -*- coding: utf-8 -*-
+
 from oscar.test import factories
 from oscar.core.loading import get_model
 from soloha.settings import OSCAR_MISSING_IMAGE_URL
 from soloha.settings import MAX_COUNT_PRODUCT, MAX_COUNT_CATEGORIES
 from django.test import TestCase
+from apps.catalogue.models import Filter
 
 ProductCategory = get_model('catalogue', 'productcategory')
 Category = get_model('catalogue', 'category')
@@ -48,6 +51,14 @@ class Test(object):
         """
         self.create_categories()
 
+        Filter.objects.create(title=u'длина', slug='dlina')
+        Filter.objects.create(title=u'ширина', slug='shirina')
+        parent_dlina = Filter.objects.get(title=u'длина')
+        parent_shirina = Filter.objects.get(title=u'ширина')
+        for num in xrange(1000, 1400, 100):
+            Filter.objects.create(title=u'длина_{}'.format(num), slug='dlina_{}'.format(num), parent=parent_dlina)
+            Filter.objects.create(title=u'ширина_{}'.format(num), slug='shirina_{}'.format(num), parent=parent_shirina)
+
         for num in xrange(1, 11):
             product = factories.create_product(title='Product {}'.format(num), price=num)
             factories.create_product_image(product=product, original=OSCAR_MISSING_IMAGE_URL)
@@ -79,6 +90,21 @@ class Test(object):
             factories.create_product_image(product=product)
             category_12 = Category.objects.get(name='Category-12')
             product.categories.add(category_12)
+            if num < 70:
+                product.filters.add(Filter.objects.get(title=u'длина_1000'))
+                product.filters.add(Filter.objects.get(title=u'ширина_1000'))
+            elif num < 80:
+                product.filters.add(Filter.objects.get(title=u'длина_1000'))
+                product.filters.add(Filter.objects.get(title=u'ширина_1100'))
+            elif num < 90:
+                product.filters.add(Filter.objects.get(title=u'длина_1100'))
+                product.filters.add(Filter.objects.get(title=u'ширина_1000'))
+            elif num < 100:
+                product.filters.add(Filter.objects.get(title=u'длина_1200'))
+                product.filters.add(Filter.objects.get(title=u'ширина_1100'))
+            else:
+                product.filters.add(Filter.objects.get(title=u'длина_1100'))
+                product.filters.add(Filter.objects.get(title=u'ширина_1200'))
 
     def create_product_bulk_recommend(self):
         """

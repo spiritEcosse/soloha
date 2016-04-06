@@ -53,7 +53,7 @@ class CustomAbstractProduct(models.Model):
         _("Date updated"), auto_now=True, db_index=True)
 
     categories = models.ManyToManyField('catalogue.Category', related_name="products", verbose_name=_("Categories"), blank=True, null=True)
-    filters = models.ManyToManyField('catalogue.Filter', verbose_name=_('Filters of product'), blank=True, null=True)
+    filters = models.ManyToManyField('catalogue.Filter', related_name="products", verbose_name=_('Filters of product'), blank=True, null=True)
 
     #: "Kind" of product, e.g. T-Shirt, Book, etc.
     #: None for child products, they inherit their parent's product class

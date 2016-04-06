@@ -22,13 +22,17 @@ import warnings
 
 Product = get_model('catalogue', 'product')
 Category = get_model('catalogue', 'category')
-
+Filter = get_model('catalogue', 'Filter')
 
 class ProductCategoryView(SingleObjectMixin, generic.ListView):
     template_name = 'catalogue/category.html'
     enforce_paths = True
     model = Category
     paginate_by = OSCAR_PRODUCTS_PER_PAGE
+
+    def __init__(self, *args, **kwargs):
+        super(ProductCategoryView, self).__init__(*args, **kwargs)
+        self.products_without_filters = None
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_category()
@@ -71,11 +75,19 @@ class ProductCategoryView(SingleObjectMixin, generic.ListView):
                 return HttpResponsePermanentRedirect(expected_path)
 
     def get_queryset(self):
-        only = ['title', 'slug', 'structure', 'product_class', 'product_options__name', 'product_options__code', 'product_options__type', 'enable', 'categories']
+        dict_filter = {'enable': True, 'categories__in': self.object.get_descendants(include_self=True)}
+        only = ['title', 'slug', 'structure', 'product_class', 'product_options__name', 'product_options__code',
+                'product_options__type', 'enable', 'categories', 'filters']
 
-        return Product.objects.only(*only).filter(
-            enable=True, categories__in=self.object.get_descendants(include_self=True)
-        ).select_related('product_class').prefetch_related(
+        self.products_without_filters = Product.objects.only('id').filter(**dict_filter).distinct().order_by(
+            self.request.GET.get('sorting_type', *Product._meta.ordering)
+        )
+
+        filters = self.request.GET.get('filters')
+        if filters:
+            dict_filter['filters__slug__in'] = filters.split('/')
+
+        return Product.objects.only(*only).filter(**dict_filter).distinct().select_related('product_class').prefetch_related(
             Prefetch('images'),
             Prefetch('product_options'),
             Prefetch('product_class__options'),
@@ -85,16 +97,23 @@ class ProductCategoryView(SingleObjectMixin, generic.ListView):
             self.request.GET.get('sorting_type', *Product._meta.ordering)
         )
 
-    # def get_context_data(self, **kwargs):
-    #     try:
-    #         return super(ProductCategoryView, self).get_context_data(**kwargs)
-    #     except Http404:
-    #         self.kwargs['page'] = 1
-    #         return super(ProductCategoryView, self).get_context_data(**kwargs)
-
     def get_context_data(self, **kwargs):
         context = super(ProductCategoryView, self).get_context_data(**kwargs)
+        # Filter.objects.filter(level=0, children__in=[product.filters.all() for product in self.products])
+        # [(filter, filter.parent) for filter in Filter.objects.filter(product__in=)]
+
+        # filters = []
+        # for product in self.products_without_filters:
+        #     filters.extend(product.filters.all())
+        from django.db.models import Count
+        context['filters'] = Filter.objects.filter(level=0).prefetch_related(
+            Prefetch('children', queryset=Filter.objects.filter(
+                products__in=self.products_without_filters
+            ).distinct().prefetch_related('products'), to_attr='children_in_products'),
+        )
         return context
+
+# [(filter, [(filter_value, filter_value.products.count()) for filter_value in filter.children_in_products]) for filter in response.context['filters']]
 
 
 class CategoryProducts(views.JSONResponseMixin, views.AjaxResponseMixin, MultipleObjectMixin, View):
