@@ -24,15 +24,33 @@ Product = get_model('catalogue', 'product')
 Category = get_model('catalogue', 'category')
 Filter = get_model('catalogue', 'Filter')
 
-class ProductCategoryView(SingleObjectMixin, generic.ListView):
+
+class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, SingleObjectMixin, generic.ListView):
     template_name = 'catalogue/category.html'
     enforce_paths = True
-    model = Category
+    model = Product
     paginate_by = OSCAR_PRODUCTS_PER_PAGE
 
     def __init__(self, *args, **kwargs):
         super(ProductCategoryView, self).__init__(*args, **kwargs)
         self.products_without_filters = None
+
+    def post(self, request, *args, **kwargs):
+        data = json.loads(self.request.body)
+        # self.kwargs['category_slug'] = data.get('category_slug')
+        self.kwargs['sorting_type'] = data.get('sorting_type', *Product._meta.ordering)
+        self.kwargs['filters'] = data.get('filters', '')
+        self.object = self.get_category()
+        self.object_list = self.get_queryset()
+
+    def post_ajax(self, request, *args, **kwargs):
+        super(ProductCategoryView, self).post_ajax(request, *args, **kwargs)
+        return self.render_json_response(self.get_context_data_json())
+
+    def get_context_data_json(self, **kwargs):
+        context = dict()
+        context['products'] = [product.get_values() for product in self.object_list]
+        return context
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_category()
@@ -42,6 +60,8 @@ class ProductCategoryView(SingleObjectMixin, generic.ListView):
         if potential_redirect is not None:
             return potential_redirect
 
+        self.kwargs['sorting_type'] = self.request.GET.get('sorting_type', *Product._meta.ordering)
+        self.kwargs['filters'] = self.request.GET.get('filters', '')
         return super(ProductCategoryView, self).get(request, *args, **kwargs)
 
     def get_category(self):
@@ -79,23 +99,19 @@ class ProductCategoryView(SingleObjectMixin, generic.ListView):
         only = ['title', 'slug', 'structure', 'product_class', 'product_options__name', 'product_options__code',
                 'product_options__type', 'enable', 'categories', 'filters']
 
-        self.products_without_filters = Product.objects.only('id').filter(**dict_filter).distinct().order_by(
-            self.request.GET.get('sorting_type', *Product._meta.ordering)
-        )
+        if self.kwargs.get('filters'):
+            dict_filter['filters__slug__in'] = self.kwargs.get('filters').split('/')
 
-        filters = self.request.GET.get('filters')
-        if filters:
-            dict_filter['filters__slug__in'] = filters.split('/')
+        self.products_without_filters = Product.objects.only('id').filter(**dict_filter).distinct().order_by(self.kwargs.get('sorting_type'))
 
-        return Product.objects.only(*only).filter(**dict_filter).distinct().select_related('product_class').prefetch_related(
+        queryset = super(ProductCategoryView, self).get_queryset()
+        return queryset.only(*only).filter(**dict_filter).distinct().select_related('product_class').prefetch_related(
             Prefetch('images'),
             Prefetch('product_options'),
             Prefetch('product_class__options'),
             Prefetch('stockrecords'),
             Prefetch('categories__parent__parent')
-        ).distinct().order_by(
-            self.request.GET.get('sorting_type', *Product._meta.ordering)
-        )
+        ).distinct().order_by(self.kwargs.get('sorting_type'))
 
     def get_context_data(self, **kwargs):
         context = super(ProductCategoryView, self).get_context_data(**kwargs)
@@ -104,43 +120,6 @@ class ProductCategoryView(SingleObjectMixin, generic.ListView):
                 products__in=self.products_without_filters
             ).distinct().prefetch_related('products'), to_attr='children_in_products'),
         )
-        return context
-
-
-class CategoryProducts(views.JSONResponseMixin, views.AjaxResponseMixin, MultipleObjectMixin, View):
-    model = Product
-    paginate_by = OSCAR_PRODUCTS_PER_PAGE
-
-    only = ['title', 'slug', 'structure', 'product_class', 'product_options__name', 'product_options__code',
-            'product_options__type']
-
-    # TODO check only list and make selecting less fields from stockrecords.
-
-    def post(self, request, *args, **kwargs):
-        data = json.loads(self.request.body)
-        self.kwargs['product_category'] = data.get('product_category')
-        self.kwargs['sorting_type'] = data.get('sorting_type', 'stockrecords__price_excl_tax')
-        self.kwargs['filters'] = data.get('filters').split('/')
-        self.object_list = self.get_queryset()
-
-    def get_queryset(self):
-        queryset = super(CategoryProducts, self).get_queryset()
-        if self.kwargs.get('filters', False) is not False:
-            queryset = queryset.filter(filters__slug__in=self.kwargs['filters'])
-        return queryset.only(*self.only).select_related('product_class') \
-            .prefetch_related(
-            Prefetch('categories'),
-            Prefetch('images'),
-            Prefetch('stockrecords'),
-        ).order_by(self.kwargs['sorting_type'])
-
-    def post_ajax(self, request, *args, **kwargs):
-        super(CategoryProducts, self).post_ajax(request, *args, **kwargs)
-        return self.render_json_response(self.get_context_data_json())
-
-    def get_context_data_json(self, **kwargs):
-        context = dict()
-        context['products'] = [product.get_values() for product in self.object_list]
         return context
 
 

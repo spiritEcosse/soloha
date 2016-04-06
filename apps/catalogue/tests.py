@@ -12,7 +12,7 @@ from django.utils.html import strip_entities
 from django.core.urlresolvers import reverse
 import json
 from django.db.models.query import Prefetch
-from apps.catalogue.views import ProductCategoryView, CategoryProducts
+from apps.catalogue.views import ProductCategoryView
 from django.core.paginator import Paginator
 from test.factories import catalogue
 from soloha.settings import MAX_COUNT_PRODUCT, MAX_COUNT_CATEGORIES
@@ -82,76 +82,6 @@ class TestCatalog(TestCase):
         slugs = [category_1234.parent.parent.parent.slug, category_1234.parent.parent.slug, category_1234.parent.slug, category_1234.slug]
         self.assertEqual(Category._slug_separator.join(map(str, slugs)), category_1234.full_slug)
 
-    def test_sorting_products_post(self):
-        """
-        Test sorting products by popularity, price descending and price ascending
-        Returns: sorted products
-        """
-        test_catalogue.create_product_bulk()
-
-        sorting_dict = {
-            'sorting_type': 'stockrecords__price_excl_tax',
-            # 'filters': 'shirina_1000/shirina_1200/dlina_1100/dlina_1000'
-        }
-        sorting_dict['filters'] = 'shirina_1000/shirina_1200/dlina_1100/dlina_1000'
-        self.assertions_sorting(sorting_dict=sorting_dict)
-        sorting_dict['filters'] = 'shirina_1000'
-        self.assertions_sorting(sorting_dict=sorting_dict)
-        # sorting_dict['filters'] = ''
-        self.assertions_sorting(sorting_dict=sorting_dict)
-
-        sorting_dict['sorting_type'] = '-stockrecords__price_excl_tax'
-        sorting_dict['filters'] = 'shirina_1000/shirina_1200/dlina_1100/dlina_1000'
-        self.assertions_sorting(sorting_dict=sorting_dict)
-        sorting_dict['filters'] = 'shirina_1000'
-        self.assertions_sorting(sorting_dict=sorting_dict)
-        # sorting_dict['filters'] = ''
-        self.assertions_sorting(sorting_dict=sorting_dict)
-
-        sorting_dict['sorting_type'] = 'rating'
-        sorting_dict['filters'] = 'shirina_1000/shirina_1200/dlina_1100/dlina_1000'
-        self.assertions_sorting(sorting_dict=sorting_dict)
-        sorting_dict['filters'] = 'shirina_1000'
-        self.assertions_sorting(sorting_dict=sorting_dict)
-        # sorting_dict['filters'] = ''
-        self.assertions_sorting(sorting_dict=sorting_dict)
-
-    def assertions_sorting(self, sorting_dict={}):
-        paginate_by = OSCAR_PRODUCTS_PER_PAGE
-        # sorting_dict = {
-        #     'sorting_type': 'stockrecords__price_excl_tax',
-        #     'filters': 'shirina_1000/shirina_1200/dlina_1100/dlina_1000'
-        # }
-
-        # with self.assertNumQueries(10):
-        response = self.client.post(reverse('catalogue:products'),
-                                    json.dumps(sorting_dict),
-                                    content_type='application/json',
-                                    HTTP_X_REQUESTED_WITH='XMLHttpRequest')
-        self.assertEqual(200, response.status_code)
-        object_list = Product.objects
-        if sorting_dict.get('filters', False) is not False:
-            object_list = object_list.filter(filters__slug__in=sorting_dict['filters'].split('/'))
-
-        object_list = object_list.select_related(
-            'product_class').prefetch_related(
-            Prefetch('categories'),
-            Prefetch('images'),
-            Prefetch('stockrecords'),
-        ).order_by(sorting_dict['sorting_type'])
-
-        context = dict()
-        context['products'] = [product.get_values() for product in object_list]
-        self.assertJSONEqual(json.dumps(context), response.content)
-        p = Paginator(object_list, paginate_by)
-
-        # self.assertEqual(len(p.page(dict_values.get('page', 1)).object_list), len(response.context['page_obj']))
-        # self.assertListEqual(list(p.page(dict_values.get('page', 1)).object_list), list(response.context['page_obj']))
-        # self.assertEqual(p.count, response.context['paginator'].count)
-        # self.assertEqual(p.num_pages, response.context['paginator'].num_pages)
-        # self.assertEqual(p.page_range, response.context['paginator'].page_range)
-
-
     def test_page_category(self):
         """
         Check the availability of a specific category page template, type the name of the class, true to the object
@@ -188,7 +118,7 @@ class TestCatalog(TestCase):
 
         # check pagination
         dict_values = {'num_queries': 20}
-        category = Category.objects.get(name='Category-1')
+        category = Category.objects.get(name='Category-12')
         self.assertions_category(category=category, dict_values=dict_values)
         dict_values = {'page': 1, 'num_queries': 20}
         self.assertions_category(category=category, dict_values=dict_values)
@@ -223,16 +153,19 @@ class TestCatalog(TestCase):
         self.assertions_category(category=category, dict_values=dict_values)
 
         # sorting with filters
-        dict_values = {'page': 1, 'sorting_type': 'rating', 'num_queries': 20, 'filters': 'shirina_1000/shirina_1200/dlina_1100/dlina_1000'}
+        dict_values = {'page': 1, 'sorting_type': 'stockrecords__price_excl_tax', 'num_queries': 20, 'filters': 'shirina_1000/shirina_1200/dlina_1100/dlina_1000'}
         self.assertions_category(category=category, dict_values=dict_values)
 
         dict_values = {'page': 2, 'sorting_type': 'rating', 'num_queries': 20, 'filters': 'shirina_1000/shirina_1200/dlina_1100/dlina_1000'}
         self.assertions_category(category=category, dict_values=dict_values)
 
-        dict_values = {'page': 1, 'sorting_type': 'rating', 'num_queries': 20, 'filters': ''}
+        dict_values = {'page': 1, 'sorting_type': '-stockrecords__price_excl_tax', 'num_queries': 20, 'filters': ''}
         self.assertions_category(category=category, dict_values=dict_values)
 
-        dict_values = {'page': 1, 'sorting_type': 'rating', 'num_queries': 20, 'filters': 'shirina_1000/shirina_1100/shirina_1200/dlina_1000/dlina_1100'}
+        dict_values = {'page': 1, 'sorting_type': '-stockrecords__price_excl_tax', 'num_queries': 20, 'filters': 'shirina_1000/shirina_1100/shirina_1200/dlina_1000/dlina_1100'}
+        self.assertions_category(category=category, dict_values=dict_values)
+
+        dict_values = {'page': 2, 'sorting_type': 'rating', 'num_queries': 20, 'filters': 'dlina_1100'}
         self.assertions_category(category=category, dict_values=dict_values)
 
         # with page not exist
@@ -259,8 +192,8 @@ class TestCatalog(TestCase):
             Prefetch('categories__parent__parent')
         ).distinct().order_by(dict_values.get('sorting_type', *Product._meta.ordering))
 
-        with self.assertNumQueries(dict_values['num_queries']):
-            response = self.client.get(category.get_absolute_url(), dict_values)
+        # with self.assertNumQueries(dict_values['num_queries']):
+        response = self.client.get(category.get_absolute_url(), dict_values)
 
         p = Paginator(products, paginate_by)
         self.assertEqual(response.status_code, STATUS_CODE_200)
@@ -273,5 +206,16 @@ class TestCatalog(TestCase):
         self.assertEqual(p.count, response.context['paginator'].count)
         self.assertEqual(p.num_pages, response.context['paginator'].num_pages)
         self.assertEqual(p.page_range, response.context['paginator'].page_range)
-
         test_catalogue.test_menu_categories(obj=self, response=response)
+
+        # response = self.client.post(category.get_absolute_url(), dict_values)
+        response = self.client.post(category.get_absolute_url(),
+                                    json.dumps(dict_values),
+                                    content_type='application/json',
+                                    HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        # if response.request['REQUEST_METHOD'] == 'POST':
+            # raise Exception('hello')
+        context = dict()
+        context['products'] = [product.get_values() for product in products]
+        self.assertJSONEqual(json.dumps(context), response.content)
+
