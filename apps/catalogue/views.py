@@ -24,9 +24,6 @@ Product = get_model('catalogue', 'product')
 Category = get_model('catalogue', 'category')
 Filter = get_model('catalogue', 'Filter')
 
-
-# class ProductCategoryView(CoreProductCategoryView):
-#     pass
 class ProductCategoryView(SingleObjectMixin, generic.ListView):
     template_name = 'catalogue/category.html'
     enforce_paths = True
@@ -79,14 +76,24 @@ class ProductCategoryView(SingleObjectMixin, generic.ListView):
 
     def get_queryset(self):
         dict_filter = {'enable': True, 'categories__in': self.object.get_descendants(include_self=True)}
-        self.products_without_filters = Product.objects.filter(**dict_filter).distinct().order_by(
+        only = ['title', 'slug', 'structure', 'product_class', 'product_options__name', 'product_options__code',
+                'product_options__type', 'enable', 'categories', 'filters']
+
+        self.products_without_filters = Product.objects.only('id').filter(**dict_filter).distinct().order_by(
             self.request.GET.get('sorting_type', *Product._meta.ordering)
         )
+
         filters = self.request.GET.get('filters')
         if filters:
             dict_filter['filters__slug__in'] = filters.split('/')
 
-        return Product.objects.filter(**dict_filter).distinct().order_by(
+        return Product.objects.only(*only).filter(**dict_filter).distinct().select_related('product_class').prefetch_related(
+            Prefetch('images'),
+            Prefetch('product_options'),
+            Prefetch('product_class__options'),
+            Prefetch('stockrecords'),
+            Prefetch('categories__parent__parent')
+        ).distinct().order_by(
             self.request.GET.get('sorting_type', *Product._meta.ordering)
         )
 
@@ -95,7 +102,7 @@ class ProductCategoryView(SingleObjectMixin, generic.ListView):
         context['filters'] = Filter.objects.filter(level=0).prefetch_related(
             Prefetch('children', queryset=Filter.objects.filter(
                 products__in=self.products_without_filters
-            ).distinct(), to_attr='children_in_products'),
+            ).distinct().prefetch_related('products'), to_attr='children_in_products'),
         )
         return context
 
