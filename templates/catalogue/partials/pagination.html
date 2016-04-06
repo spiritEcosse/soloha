@@ -15,6 +15,8 @@
             {% for page_num in page_obj|ellipses_page_range %}
                 {% if page_num == page_obj.number%}
                     <li class="active"><a href=?page={{ page_num }}">{{ page_num }}</a></li>
+                {% elif page_num == None %}
+                    <li><a>...</a></li>
                 {% else %}
                     <li><a href="?page={{ page_num }}">{{ page_num }}</a></li>
                 {% endif %}
