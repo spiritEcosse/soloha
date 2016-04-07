@@ -54,7 +54,6 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_category()
-
         potential_redirect = self.redirect_if_necessary(
             request.path, self.object)
         if potential_redirect is not None:
@@ -99,10 +98,10 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
         only = ['title', 'slug', 'structure', 'product_class', 'product_options__name', 'product_options__code',
                 'product_options__type', 'enable', 'categories', 'filters']
 
+        self.products_without_filters = Product.objects.only('id').filter(**dict_filter).distinct().order_by(self.kwargs.get('sorting_type'))
+
         if self.kwargs.get('filters'):
             dict_filter['filters__slug__in'] = self.kwargs.get('filters').split('/')
-
-        self.products_without_filters = Product.objects.only('id').filter(**dict_filter).distinct().order_by(self.kwargs.get('sorting_type'))
 
         queryset = super(ProductCategoryView, self).get_queryset()
         return queryset.only(*only).filter(**dict_filter).distinct().select_related('product_class').prefetch_related(
