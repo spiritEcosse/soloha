@@ -20,26 +20,28 @@
 {% endblock %}
 
 {% block left-bar %}
-    <div class="heading">Подбор по параметрам</div>
-    <div class="filter">
-        <div class="items">
+    {% if filters %}
+        <div class="heading">Подбор по параметрам</div>
+        <div class="filter">
             {% for filter in filters %}
-                <div class="name">{{ filter }}</div>
-                {% for filter_value in filter.children_in_products %}
+                <div class="items">
+                    <div class="name">{{ filter }}</div>
                     <div class="values">
                         <ul class="list-group">
-                            <li class="list-group-item checkbox">
-                                <label>
-                                    <input type="checkbox"> {{ filter_value }} <span class="count">({{ filter_value.products.count }})</span>
-                                </label>
-                            </li>
+                            {% for filter_value in filter.children_in_products %}
+                                <li class="list-group-item checkbox">
+                                    <label>
+                                        <input type="checkbox"> test {{ filter_value }} <span class="count">({{ filter_value.products.count }})</span>
+                                    </label>
+                                </li>
+                            {% endfor %}
                         </ul>
                     </div>
-                {% endfor %}
+                </div>
             {% endfor %}
         </div>
-    </div>
-{% endblock %}
+    {% endif %}
+{% endblock left-bar %}
 
 {% block breadcrumbs %}
     <ol class="breadcrumb">
@@ -64,16 +66,16 @@
                 <div class="col-xs-1 prevSlide absolute" id="goToPrevSlide"></div>
                 <div class="col-xs-22 col-xs-offset-1">
                     <div class="lightSlider">
-                            <a href="{{ category.get_absolute_url }}">
-                                {% for children in category.children.all %}
+                        <a href="{{ category.get_absolute_url }}">
+                            {% for children in category.children.all %}
                                 <div class="col-xs-12 col-sm-4 item text-center">
                                     <a href="{{ children.get_absolute_url }}">
                                         <img src="/media/images/make_up/almeriya1-200x100-.png" class="img-responsive"/>
                                         <div class="title">{{ children }}</div>
                                     </a>
                                 </div>
-                                {% endfor %}
-                            </a>
+                            {% endfor %}
+                        </a>
                     </div>
                 </div>
                 <div class="col-xs-1 nextSlide absolute" id="goToNextSlide"></div>
@@ -134,24 +136,25 @@
     </div>
 
     <div class="row items">
-        {% for product in page_obj %}
-            <div class="col-sm-6 col-md-6">
-                {% include "catalogue/partials/product.html" %}
+        {% if page_obj %}
+            {% for product in page_obj %}
+                <div class="col-sm-6 col-md-6">
+                    {% include "catalogue/partials/product.html" %}
+                </div>
+            {% endfor %}
+            <div class="clearfix"></div>
+            <div class="col-xs-6 col-xs-offset-8 wrapper">
+                <a href="#" class="more_products">
+                    ПОКАЗАТЬ ЕЩЕ
+                </a>
             </div>
-        {% endfor %}
-        <div class="clearfix"></div>
-        <div class="col-xs-6 col-xs-offset-8 wrapper">
-            <a href="#" class="more_products">
-                ПОКАЗАТЬ ЕЩЕ
-            </a>
-        </div>
-        <div>
-            {% include "catalogue/partials/pagination.html" %}
-        </div>
+            <div>
+                {% include "catalogue/partials/pagination.html" %}
+            </div>
+        {% else %}
+            <div class="nonefound col-xs-24">{% trans "No products found." %}</div>
+        {% endif %}
     </div>
-    {% if not page_obj %}
-        <p class="nonefound">{% trans "No products found." %}</p>
-    {% endif %}
 {% endblock %}
 
 {% block post_content %}
