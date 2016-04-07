@@ -120,7 +120,7 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
         queryset_filters = Filter.objects.filter(products__in=self.products_without_filters).distinct().prefetch_related('products')
         context['filters'] = Filter.objects.filter(level=0, children__in=queryset_filters).prefetch_related(
             Prefetch('children', queryset=queryset_filters, to_attr='children_in_products'),
-        )
+        ).distinct()
         return context
 
 
