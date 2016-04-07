@@ -34,6 +34,8 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
     def __init__(self, *args, **kwargs):
         super(ProductCategoryView, self).__init__(*args, **kwargs)
         self.products_without_filters = None
+        self.object = None
+        self.object_list = None
 
     def post(self, request, *args, **kwargs):
         data = json.loads(self.request.body)
@@ -114,10 +116,9 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
 
     def get_context_data(self, **kwargs):
         context = super(ProductCategoryView, self).get_context_data(**kwargs)
-        context['filters'] = Filter.objects.filter(level=0).prefetch_related(
-            Prefetch('children', queryset=Filter.objects.filter(
-                products__in=self.products_without_filters
-            ).distinct().prefetch_related('products'), to_attr='children_in_products'),
+        queryset_filters = Filter.objects.filter(products__in=self.products_without_filters).distinct().prefetch_related('products')
+        context['filters'] = Filter.objects.filter(level=0, children__in=queryset_filters).prefetch_related(
+            Prefetch('children', queryset=queryset_filters, to_attr='children_in_products'),
         )
         return context
 
@@ -135,4 +136,3 @@ class ProductDetailView(CoreProductDetailView):
         else:
             context['product_not_availability'] = _('Product is not available.')
         return context
-
