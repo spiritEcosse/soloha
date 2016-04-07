@@ -91,7 +91,13 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
         if self.enforce_paths:
             # Categories are fetched by primary key to allow slug changes.
             # If the slug has changed, issue a redirect.
-            expected_path = category.get_absolute_url()
+
+            expected_path = category.get_absolute_url(self.kwargs)
+            # raise Exception(self.kwargs.get('filters'))
+            # if self.kwargs.get('filter_slug'):
+            #     expected_path += 'filter/{}/'.format(self.kwargs['filter_slug'])
+
+            # raise Exception(expected_path)
             if expected_path != urlquote(current_path):
                 return HttpResponsePermanentRedirect(expected_path)
 
@@ -120,6 +126,7 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
         context['filters'] = Filter.objects.filter(level=0, children__in=queryset_filters).prefetch_related(
             Prefetch('children', queryset=queryset_filters, to_attr='children_in_products'),
         ).distinct()
+        context['filter_slug'] = self.kwargs.get('filter_slug', '')
         return context
 
 

@@ -25,13 +25,14 @@
         <div class="filter">
             {% for filter in filters %}
                 <div class="items">
-                    <div class="name">{{ filter }}</div>
+                    <div class="name" >{{ filter }}</div>
                     <div class="values">
                         <ul class="list-group">
                             {% for filter_value in filter.children_in_products %}
                                 <li class="list-group-item checkbox">
                                     <label>
-                                        <input type="checkbox"> test {{ filter_value }} <span class="count">({{ filter_value.products.count }})</span>
+{#                                        <a href="{{ category.get_absolute_url }}"><input type="checkbox"> {{ filter_value }} <span class="count">({{ filter_value.products.count }})</span></a>#}
+                                        <a href="{{ category.get_absolute_url }}filter/{{ filter_value.slug }}/"><input type="checkbox"> {{ filter_value }} <span class="count">({{ filter_value.products.count }})</span></a>
                                     </label>
                                 </li>
                             {% endfor %}
