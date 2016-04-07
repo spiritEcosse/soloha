@@ -22,6 +22,7 @@ Product = get_model('catalogue', 'product')
 ProductClass = get_model('catalogue', 'ProductClass')
 Category = get_model('catalogue', 'category')
 ProductCategory = get_model('catalogue', 'ProductCategory')
+Filter = get_model('catalogue', 'Filter')
 test_catalogue = catalogue.Test()
 
 STATUS_CODE_200 = 200
@@ -92,9 +93,9 @@ class TestCatalog(TestCase):
         """
         test_catalogue.create_product_bulk()
         # without products in this category has no descendants in the categories at the same time this very category and its children is not goods
-        dict_values = {'num_queries': 10}
-        category = Category.objects.get(name='Category-2')
-        self.assertions_category(category=category, dict_values=dict_values)
+        # dict_values = {'num_queries': 10}
+        # category = Category.objects.get(name='Category-2')
+        # self.assertions_category(category=category, dict_values=dict_values)
 
         # with products in this child category are not the descendants of the categories at the same time, this category has itself in goods
         # Todo: why 24 queries ?
@@ -120,6 +121,9 @@ class TestCatalog(TestCase):
         # check pagination
         dict_values = {'num_queries': 20}
         category = Category.objects.get(name='Category-12')
+        category_1 = Category.objects.get(name='Category-1')
+        category_2 = Category.objects.get(name='Category-2')
+        category_321 = Category.objects.get(name='Category-321')
         self.assertions_category(category=category, dict_values=dict_values)
         dict_values = {'page': 1, 'num_queries': 20}
         self.assertions_category(category=category, dict_values=dict_values)
@@ -156,18 +160,30 @@ class TestCatalog(TestCase):
         # sorting with filters
         dict_values = {'page': 1, 'sorting_type': 'stockrecords__price_excl_tax', 'num_queries': 20, 'filters': 'shirina_1000/shirina_1200/dlina_1100/dlina_1000'}
         self.assertions_category(category=category, dict_values=dict_values)
+        self.assertions_category(category=category_1, dict_values=dict_values)
+        self.assertions_category(category=category_2, dict_values=dict_values)
+        self.assertions_category(category=category_321, dict_values=dict_values)
 
         dict_values = {'page': 2, 'sorting_type': 'rating', 'num_queries': 20, 'filters': 'shirina_1000/shirina_1200/dlina_1100/dlina_1000'}
         self.assertions_category(category=category, dict_values=dict_values)
 
         dict_values = {'page': 1, 'sorting_type': '-stockrecords__price_excl_tax', 'num_queries': 20, 'filters': ''}
         self.assertions_category(category=category, dict_values=dict_values)
+        self.assertions_category(category=category_1, dict_values=dict_values)
+        self.assertions_category(category=category_2, dict_values=dict_values)
+        self.assertions_category(category=category_321, dict_values=dict_values)
 
         dict_values = {'page': 1, 'sorting_type': '-stockrecords__price_excl_tax', 'num_queries': 20, 'filters': 'shirina_1000/shirina_1100/shirina_1200/dlina_1000/dlina_1100'}
         self.assertions_category(category=category, dict_values=dict_values)
 
         dict_values = {'page': 2, 'sorting_type': 'rating', 'num_queries': 20, 'filters': 'dlina_1100'}
         self.assertions_category(category=category, dict_values=dict_values)
+
+        dict_values = {'page': 1, 'sorting_type': 'rating', 'num_queries': 20, 'filters': 'dlina_1100'}
+        self.assertions_category(category=category_1, dict_values=dict_values)
+        self.assertions_category(category=category_2, dict_values=dict_values)
+        self.assertions_category(category=category_321, dict_values=dict_values)
+
 
         # with page not exist
         # current_page = 200
@@ -196,6 +212,16 @@ class TestCatalog(TestCase):
         # with self.assertNumQueries(dict_values['num_queries']):
         response = self.client.get(category.get_absolute_url(), dict_values)
 
+        sorting_type = dict_values.get('sorting_type', *Product._meta.ordering)
+
+        products_without_filters = Product.objects.only('id').filter(**dict_filter).distinct().order_by(
+            sorting_type)
+
+        queryset_filters = Filter.objects.filter(products__in=products_without_filters).distinct().prefetch_related('products')
+        filters = Filter.objects.filter(level=0).prefetch_related(
+            Prefetch('children', queryset=queryset_filters, to_attr='children_in_products'),
+        ).distinct()
+
         p = Paginator(products, paginate_by)
         self.assertEqual(response.status_code, STATUS_CODE_200)
         self.assertEqual(response.resolver_match.func.__name__, ProductCategoryView.as_view().__name__)
@@ -207,6 +233,8 @@ class TestCatalog(TestCase):
         self.assertEqual(p.count, response.context['paginator'].count)
         self.assertEqual(p.num_pages, response.context['paginator'].num_pages)
         self.assertEqual(p.page_range, response.context['paginator'].page_range)
+        self.assertEqual(list(filters), list(response.context['filters']))
+
         test_catalogue.test_menu_categories(obj=self, response=response)
 
         # response = self.client.post(category.get_absolute_url(), dict_values)
