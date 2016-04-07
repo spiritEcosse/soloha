@@ -53,6 +53,7 @@ class TestCatalog(TestCase):
         self.assertEqual(response.status_code, STATUS_CODE_200)
         self.assertEqual(response.request['PATH_INFO'], product.get_absolute_url())
 
+        # [attr for attr in ProductAttribute.objects.filter(product__parent=product).distinct()]
         test_catalogue.test_menu_categories(obj=self, response=response)
 
     def test_url_catalogue(self):
