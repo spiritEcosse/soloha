@@ -58,66 +58,22 @@
 {% block headertext %}{{ category.name }}{% endblock %}
 
 {% block content %}
-    <div class="row categories" ng-init="category={'pk': '{{ category.pk }}'}">
+    <div class="row categories">
         <div class="col-xs-18 col-sm-21">
             <div class="row relative">
                 <div class="col-xs-1 prevSlide absolute" id="goToPrevSlide"></div>
                 <div class="col-xs-22 col-xs-offset-1">
                     <div class="lightSlider">
-                        <div class="col-xs-12 col-sm-4 item text-center">
                             <a href="{{ category.get_absolute_url }}">
-                                <img src="/media/images/make_up/almeriya1-200x100-.png" class="img-responsive"/>
-                                <div class="title">Деревянные кровати</div>
+                                {% for children in category.children.all %}
+                                <div class="col-xs-12 col-sm-4 item text-center">
+                                    <a href="{{ children.get_absolute_url }}">
+                                        <img src="/media/images/make_up/almeriya1-200x100-.png" class="img-responsive"/>
+                                        <div class="title">{{ children }}</div>
+                                    </a>
+                                </div>
+                                {% endfor %}
                             </a>
-                        </div>
-                        <div class="col-xs-12 col-sm-4 item text-center">
-                            <a href="{{ category.get_absolute_url }}">
-                                <img src="/media/images/make_up/almeriya1-200x100-.png" class="img-responsive"/>
-                                <div class="title">Деревянные кровати</div>
-                            </a>
-                        </div>
-                        <div class="col-xs-12 col-sm-4 item text-center">
-                            <a href="{{ category.get_absolute_url }}">
-                                <img src="/media/images/make_up/almeriya1-200x100-.png" class="img-responsive"/>
-                                <div class="title">Деревянные кровати</div>
-                            </a>
-                        </div>
-                        <div class="col-xs-12 col-sm-4 item text-center">
-                            <a href="{{ category.get_absolute_url }}">
-                                <img src="/media/images/make_up/almeriya1-200x100-.png" class="img-responsive"/>
-                                <div class="title">Деревянные кровати</div>
-                            </a>
-                        </div>
-                        <div class="col-xs-12 col-sm-4 item text-center">
-                            <a href="{{ category.get_absolute_url }}">
-                                <img src="/media/images/make_up/almeriya1-200x100-.png" class="img-responsive"/>
-                                <div class="title">Деревянные кровати</div>
-                            </a>
-                        </div>
-                        <div class="col-xs-12 col-sm-4 item text-center">
-                            <a href="{{ category.get_absolute_url }}">
-                                <img src="/media/images/make_up/almeriya1-200x100-.png" class="img-responsive"/>
-                                <div class="title">Деревянные кровати</div>
-                            </a>
-                        </div>
-                        <div class="col-xs-12 col-sm-4 item text-center">
-                            <a href="{{ category.get_absolute_url }}">
-                                <img src="/media/images/make_up/almeriya1-200x100-.png" class="img-responsive"/>
-                                <div class="title">Деревянные кровати</div>
-                            </a>
-                        </div>
-                        <div class="col-xs-12 col-sm-4 item text-center">
-                            <a href="{{ category.get_absolute_url }}">
-                                <img src="/media/images/make_up/almeriya1-200x100-.png" class="img-responsive"/>
-                                <div class="title">Деревянные кровати</div>
-                            </a>
-                        </div>
-                        <div class="col-xs-12 col-sm-4 item text-center">
-                            <a href="{{ category.get_absolute_url }}">
-                                <img src="/media/images/make_up/almeriya1-200x100-.png" class="img-responsive"/>
-                                <div class="title">Деревянные кровати</div>
-                            </a>
-                        </div>
                     </div>
                 </div>
                 <div class="col-xs-1 nextSlide absolute" id="goToNextSlide"></div>
@@ -193,7 +149,7 @@
             {% include "catalogue/partials/pagination.html" %}
         </div>
     </div>
-    {% if not products %}
+    {% if not page_obj %}
         <p class="nonefound">{% trans "No products found." %}</p>
     {% endif %}
 {% endblock %}
