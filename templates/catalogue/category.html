@@ -33,21 +33,15 @@
                             {% for filter_value in filter.children_in_products %}
                                 <li class="list-group-item checkbox">
                                     <label>
-{#                                        {% if filter_value.get_absolute_url not in filter_slug %}#}
-{#                                        <a href="{% concatenate category filter_slug filter_value %}">#}
-{#                                        <input type="checkbox" checked> {{ filter_value.title }} <span class="count">({{ filter_value.products.count }})</span>#}
-{#                                        </a>#}
-                                         {% if filter_value.get_absolute_url in filter_slug %}
-                                             <a href="{% subtraction category filter_slug filter_value %}">
-                                                 <input type="checkbox" checked/>
-                                                 {{ filter_value.title }}
-                                                 <span class="count">({{ filter_value.products.count }})</span>
-                                             </a>
-                                         {% else %}
                                          <a href="{% concatenate category filter_slug filter_value %}">
-                                        <input type="checkbox"> {{ filter_value.title }} <span class="count">({{ filter_value.products.count }})</span>
-                                        </a>
-                                        {% endif %}
+                                         {% if filter_value.get_absolute_url in filter_slug %}
+                                             <input type="checkbox" checked/>
+                                         {% else %}
+                                             <input type="checkbox"/>
+                                         {% endif %}
+                                             {{ filter_value.title }}
+                                             <span class="count">({{ filter_value.products.count }})</span>
+                                         </a>
                                     </label>
                                 </li>
                             {% endfor %}
@@ -144,9 +138,13 @@
         <div class="col-xs-16">
             <span class="text">Сортировать:</span>
             <div class="btn-group btn-group-md" role="group" aria-label="Sort">
-                <a href="#" type="button" class="btn btn-default btn-danger">По популярности</a>
-                <a href="#" type="button" class="btn btn-default">Сначала дорогие</a>
-                <a href="#" type="button" class="btn btn-default">Сначала дешевые</a>
+                {% for sorting_type in sort_types %}
+                    {% if sorting_type.2 %}
+                        <a href="{{ sorting_type.0 }}" type="button" class="btn btn-default btn-danger">{{ sorting_type.1 }}</a>
+                    {% else %}
+                        <a href="{{ sorting_type.0 }}" type="button" class="btn btn-default"> {{ sorting_type.1 }}</a>
+                    {% endif %}
+                {% endfor %}
             </div>
         </div>
     </div>

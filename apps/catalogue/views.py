@@ -23,6 +23,8 @@ import warnings
 Product = get_model('catalogue', 'product')
 Category = get_model('catalogue', 'category')
 Filter = get_model('catalogue', 'Filter')
+AttributeOptionGroup = get_model('catalogue', 'AttributeOptionGroup')
+AttributeOption = get_model('catalogue', 'AttributeOption')
 
 
 class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, SingleObjectMixin, generic.ListView):
@@ -88,15 +90,8 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
 
     def redirect_if_necessary(self, current_path, category):
         if self.enforce_paths:
-            # Categories are fetched by primary key to allow slug changes.
-            # If the slug has changed, issue a redirect.
-
             expected_path = category.get_absolute_url(self.kwargs)
-            # raise Exception(self.kwargs.get('filters'))
-            # if self.kwargs.get('filter_slug'):
-            #     expected_path += 'filter/{}/'.format(self.kwargs['filter_slug'])
 
-            # raise Exception(expected_path)
             if expected_path != urlquote(current_path):
                 return HttpResponsePermanentRedirect(expected_path)
 
@@ -126,6 +121,15 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
             Prefetch('children', queryset=queryset_filters, to_attr='children_in_products'),
         ).distinct()
         context['filter_slug'] = self.kwargs.get('filter_slug', '')
+        context['sort_types'] = []
+        sort_types = [('-views_count', _('By popularity')), ('-stockrecords__price_excl_tax', _('By price descending')),
+                      ('stockrecords__price_excl_tax', _('By price ascending'))]
+        for link, text in sort_types:
+            is_active = False
+            if self.kwargs.get('sorting_type', '') == link:
+                is_active = True
+            sorting_url = '{}?sorting_type={}'.format(self.request.path, link)
+            context['sort_types'].append((sorting_url, text, is_active))
         return context
 
 
@@ -141,4 +145,11 @@ class ProductDetailView(CoreProductDetailView):
             context['currency'] = info.price.currency
         else:
             context['product_not_availability'] = _('Product is not available.')
+
+        attributes = AttributeOptionGroup.objects.filter(productattribute__product__parent=self.object).prefetch_related(
+            Prefetch('options',
+                     queryset=AttributeOption.objects.filter(productattributevalue__product__parent=self.object).distinct(),
+                     to_attr='attribute_value')
+        ).distinct()
+        context['attributes'] = attributes
         return context

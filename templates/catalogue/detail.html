@@ -163,27 +163,27 @@
                             </div>
                         </div>
                     </div>
-                    {#                    <div class="col-xs-24 col-sm-24 col-md-14 options">#}
-                    {#                        <span class="relation">*Цена зависит от выбранных параметров:</span>#}
-                    {#                        {% for attribute in attributes %}#}
-                    {#                            <div class="panel panel-default">#}
-                    {#                                <div class="panel-heading">#}
-                    {#                                    <div class="row option">#}
-                    {#                                        <div class="col-xs-15 name">#}
-                    {#                                            {{ attribute.name }}#}
-                    {#                                        </div>#}
-                    {#                                        <div class="col-xs-11 pull-right values">#}
-                    {#                                            <select class="form-control input-md">#}
-                    {#                                                {% for value in attribute.productattributevalue_set.all %}#}
-                    {#                                                    <option>{{ value.value_option.option }}</option>#}
-                    {#                                                {% endfor %}#}
-                    {#                                            </select>#}
-                    {#                                        </div>#}
-                    {#                                    </div>#}
-                    {#                                </div>#}
-                    {#                            </div>#}
-                    {#                        {% endfor %}#}
-                    {#                    </div>#}
+                                        <div class="col-xs-24 col-sm-24 col-md-14 options">
+                                            <span class="relation">*Цена зависит от выбранных параметров:</span>
+                                            {% for attribute in attributes %}
+                                                <div class="panel panel-default">
+                                                    <div class="panel-heading">
+                                                        <div class="row option">
+                                                            <div class="col-xs-15 name">
+                                                                {{ attribute.name }}
+                                                            </div>
+                                                            <div class="col-xs-11 pull-right values">
+                                                                <select class="form-control input-md">
+                                                                    {% for value in attribute.attribute_value %}
+                                                                        <option>{{ value.option }}</option>
+                                                                    {% endfor %}
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            {% endfor %}
+                                        </div>
                     <div class="col-xs-24 tab-content-info">
                         <div class="panel panel-default info" id="options">
                             <div class="panel-heading text-center">

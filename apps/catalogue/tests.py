@@ -15,7 +15,8 @@ from django.db.models.query import Prefetch
 from apps.catalogue.views import ProductCategoryView
 from django.core.paginator import Paginator
 from test.factories import catalogue
-from templatetags.filters_concatenation import concatenate, subtraction
+from templatetags.filters_concatenation import concatenate
+from django.utils.translation import ugettext_lazy as _
 from soloha.settings import MAX_COUNT_PRODUCT, MAX_COUNT_CATEGORIES
 from soloha.settings import OSCAR_PRODUCTS_PER_PAGE
 
@@ -24,6 +25,8 @@ ProductClass = get_model('catalogue', 'ProductClass')
 Category = get_model('catalogue', 'category')
 ProductCategory = get_model('catalogue', 'ProductCategory')
 Filter = get_model('catalogue', 'Filter')
+AttributeOptionGroup = get_model('catalogue', 'AttributeOptionGroup')
+AttributeOption = get_model('catalogue', 'AttributeOption')
 test_catalogue = catalogue.Test()
 
 STATUS_CODE_200 = 200
@@ -55,8 +58,11 @@ class TestCatalog(TestCase):
         self.assertEqual(response.status_code, STATUS_CODE_200)
         self.assertEqual(response.request['PATH_INFO'], product.get_absolute_url())
 
-        # AttributeOptionGroup.objects.filter(productattribute__product__parent=product).prefetch_related(Prefetch('options', queryset=AttributeOption.objects.filter(productattributevalue__product__parent=product).distinct(), to_attr='attr_val')).distinct()
-        # [(attr_opt, [value.productattributevalue_set.first() for value in attr_opt.attr_val]) for attr_opt in AttributeOptionGroup.objects.filter(productattribute__product__parent=product).prefetch_related(Prefetch('options', queryset=AttributeOption.objects.filter(productattributevalue__product__parent=product).distinct(), to_attr='attr_val')).distinct()]
+        attributes = AttributeOptionGroup.objects.filter(productattribute__product__parent=product).prefetch_related(
+            Prefetch('options',
+                     queryset=AttributeOption.objects.filter(productattributevalue__product__parent=product).distinct(),
+                     to_attr='attr_val')
+        ).distinct()
         test_catalogue.test_menu_categories(obj=self, response=response)
 
     def test_url_catalogue(self):
@@ -186,6 +192,15 @@ class TestCatalog(TestCase):
         self.assertions_category(category=category_2, dict_values=dict_values)
         self.assertions_category(category=category_321, dict_values=dict_values)
 
+        response = self.client.get(category.get_absolute_url(), dict_values)
+
+        sort_types = [('-views_count', _('By popularity')), ('-stockrecords__price_excl_tax', _('By price descending')),
+                      ('stockrecords__price_excl_tax', _('By price ascending'))]
+        for link, text in sort_types:
+            if dict_values['sorting_type'] == link:
+                sorting_url = '{}?sorting_type={}'.format(category.get_absolute_url(), link)
+                self.assertIn(response, '<a class="btn btn-default btn-danger" type="button" href="{0}">{1}</a>'.format(sorting_url, text))
+
 
         # with page not exist
         # current_page = 200
@@ -255,41 +270,26 @@ class TestCatalog(TestCase):
         # without filter slugs
         filter_slugs = ''
         self.assertions_filter_concatenate(category, filter_slugs, filter)
-        self.assertions_filter_subtraction(category, filter_slugs, filter)
 
         # with one filter in filter slugs
         filter_slugs = 'shirina_1100'
         self.assertions_filter_concatenate(category, filter_slugs, filter)
-        self.assertions_filter_subtraction(category, filter_slugs, filter)
 
         # with many filters in filter slugs
         filter_slugs = 'shirina_1100/shirina_1200/shirina_1300/dlina_1000/dlina_1200'
         self.assertions_filter_concatenate(category, filter_slugs, filter)
-        self.assertions_filter_subtraction(category, filter_slugs, filter)
 
     def assertions_filter_concatenate(self, category, filter_slugs, filter):
         link_concatenate = concatenate(category, filter_slugs, filter)
-        filter_slug = filter.get_absolute_url()
         if filter_slugs:
             filter_slugs = filter_slugs.split('/')
         else:
             filter_slugs = []
-        if filter_slug not in filter_slugs:
-            filter_slugs.append(filter_slug)
-        filter_slugs = '/'.join(filter_slugs)
+        if filter.get_absolute_url() in filter_slugs:
+            filter_slugs.remove(filter.get_absolute_url())
+        else:
+            filter_slugs.append(filter.get_absolute_url())
+        filter_slugs = '/'.join((filter_slugs))
         absolute_url = category.get_absolute_url({'filter_slug': filter_slugs})
         self.assertEqual(absolute_url, link_concatenate)
 
-    def assertions_filter_subtraction(self, category, filter_slugs, filter):
-        link_subtraction = subtraction(category, filter_slugs, filter)
-        category_absolute_url = category.get_absolute_url()
-        filter_slug = filter.get_absolute_url()
-        if not filter_slugs:
-            absolute_url = category_absolute_url
-        else:
-            filter_slugs = filter_slugs.split('/')
-            if filter_slug in filter_slugs:
-                filter_slugs.remove(filter_slug)
-            filter_slugs = '/'.join(filter_slugs)
-            absolute_url = category.get_absolute_url({'filter_slug': filter_slugs})
-        self.assertEqual(absolute_url, link_subtraction)

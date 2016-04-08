@@ -20,6 +20,7 @@ class CustomAbstractProduct(models.Model):
     meta_description = models.TextField(verbose_name=_('Meta tag: description'), blank=True)
     meta_keywords = models.TextField(verbose_name=_('Meta tag: keywords'), blank=True)
     description = models.TextField(_('Description'), blank=True)
+    views_count = models.IntegerField(verbose_name='views count', editable=False, default=0)
 
     STANDALONE, PARENT, CHILD = 'standalone', 'parent', 'child'
     STRUCTURE_CHOICES = (
@@ -101,7 +102,7 @@ class CustomAbstractProduct(models.Model):
     class Meta:
         abstract = True
         app_label = 'catalogue'
-        ordering = ['-date_created']
+        ordering = ['-views_count']
         verbose_name = _('Product')
         verbose_name_plural = _('Products')
 
