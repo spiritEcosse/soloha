@@ -15,7 +15,7 @@ from django.utils.http import urlquote
 from soloha.settings import OSCAR_PRODUCTS_PER_PAGE
 from django.shortcuts import get_object_or_404, redirect
 from django.http import HttpResponseRedirect
-
+from django.db.models import F
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger, InvalidPage
 import json
 import warnings
@@ -120,6 +120,8 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
         ).distinct().order_by(self.kwargs.get('sorting_type'))
 
     def get_context_data(self, **kwargs):
+        # Category.objects.filter(pk=self.object.pk).update(popular=F('popular') + 1)
+
         context = super(ProductCategoryView, self).get_context_data(**kwargs)
         queryset_filters = Filter.objects.filter(products__in=self.products_without_filters).distinct().prefetch_related('products')
         context['filters'] = Filter.objects.filter(level=0, children__in=queryset_filters).prefetch_related(

@@ -86,6 +86,11 @@ class TestCatalog(TestCase):
         slugs = [category_1234.parent.parent.parent.slug, category_1234.parent.parent.slug, category_1234.parent.slug, category_1234.slug]
         self.assertEqual(Category._slug_separator.join(map(str, slugs)), category_1234.full_slug)
 
+    def test_create_product(self):
+        with self.assertRaises(Exception):
+            Product.objects.create('Product-1')
+        self.assertRaises()
+
     def test_page_category(self):
         """
         Check the availability of a specific category page template, type the name of the class, true to the object

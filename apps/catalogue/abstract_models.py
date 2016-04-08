@@ -12,8 +12,8 @@ from oscar.apps.catalogue.abstract_models import *  # noqa
 @python_2_unicode_compatible
 class CustomAbstractProduct(models.Model):
     # Title is mandatory for canonical products but optional for child products
-    title = models.CharField(pgettext_lazy(u'Product title', u'Title'), max_length=255, blank=True)
-    slug = models.SlugField(_('Slug'), max_length=255, unique=False)
+    title = models.CharField(pgettext_lazy(u'Product title', u'Title'), max_length=255)
+    slug = models.SlugField(_('Slug'), max_length=255, unique=True)
     enable = models.BooleanField(verbose_name=_('Enable'), default=True)
     h1 = models.CharField(verbose_name=_('h1'), blank=True, max_length=255)
     meta_title = models.CharField(verbose_name=_('Meta tag: title'), blank=True, max_length=255)
