@@ -54,7 +54,8 @@ class TestCatalog(TestCase):
         self.assertEqual(response.status_code, STATUS_CODE_200)
         self.assertEqual(response.request['PATH_INFO'], product.get_absolute_url())
 
-        # [attr for attr in ProductAttribute.objects.filter(product__parent=product).distinct()]
+        # AttributeOptionGroup.objects.filter(productattribute__product__parent=product).prefetch_related(Prefetch('options', queryset=AttributeOption.objects.filter(productattributevalue__product__parent=product).distinct(), to_attr='attr_val')).distinct()
+        # [(attr_opt, [value.productattributevalue_set.first() for value in attr_opt.attr_val]) for attr_opt in AttributeOptionGroup.objects.filter(productattribute__product__parent=product).prefetch_related(Prefetch('options', queryset=AttributeOption.objects.filter(productattributevalue__product__parent=product).distinct(), to_attr='attr_val')).distinct()]
         test_catalogue.test_menu_categories(obj=self, response=response)
 
     def test_url_catalogue(self):
