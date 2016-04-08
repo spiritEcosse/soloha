@@ -7,6 +7,8 @@
 {% load staticfiles %}
 {% load i18n %}
 
+{% load filters_concatenation%}
+
 {% block title %}
     {{ category.meta_title }} | {{ block.super }}
 {% endblock %}
@@ -31,7 +33,21 @@
                             {% for filter_value in filter.children_in_products %}
                                 <li class="list-group-item checkbox">
                                     <label>
-                                        <input type="checkbox" href=""> test {{ filter_value }} <span class="count">({{ filter_value.products.count }})</span>
+{#                                        {% if filter_value.get_absolute_url not in filter_slug %}#}
+{#                                        <a href="{% concatenate category filter_slug filter_value %}">#}
+{#                                        <input type="checkbox" checked> {{ filter_value.title }} <span class="count">({{ filter_value.products.count }})</span>#}
+{#                                        </a>#}
+                                         {% if filter_value.get_absolute_url in filter_slug %}
+                                             <a href="{% subtraction category filter_slug filter_value %}">
+                                                 <input type="checkbox" checked/>
+                                                 {{ filter_value.title }}
+                                                 <span class="count">({{ filter_value.products.count }})</span>
+                                             </a>
+                                         {% else %}
+                                         <a href="{% concatenate category filter_slug filter_value %}">
+                                        <input type="checkbox"> {{ filter_value.title }} <span class="count">({{ filter_value.products.count }})</span>
+                                        </a>
+                                        {% endif %}
                                     </label>
                                 </li>
                             {% endfor %}

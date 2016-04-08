@@ -199,8 +199,8 @@ class TestCatalog(TestCase):
                 'product_options__type', 'enable', 'categories', 'filters']
         dict_filter = {'enable': True, 'categories__in': category.get_descendants(include_self=True)}
 
-        if dict_values.get('filters'):
-            dict_filter['filters__slug__in'] = dict_values.get('filters').split('/')
+        if dict_values.get('filter_slug'):
+            dict_filter['filters__slug__in'] = dict_values.get('filter_slug').split('/')
 
         products = Product.objects.filter(**dict_filter).only(*only).distinct().select_related('product_class').prefetch_related(
             Prefetch('images'),
@@ -248,40 +248,47 @@ class TestCatalog(TestCase):
 
     def test_filters_concatenation(self):
         test_catalogue.create_product_bulk()
-        filter_slugs = ''
         category = Category.objects.get(name='Category-12')
         filter = Filter.objects.get(slug='shirina_1000')
 
+        # without filter slugs
+        filter_slugs = ''
+        self.assertions_filter_concatenate(category, filter_slugs, filter)
+        self.assertions_filter_subtraction(category, filter_slugs, filter)
+
+        # with one filter in filter slugs
+        filter_slugs = 'shirina_1100'
+        self.assertions_filter_concatenate(category, filter_slugs, filter)
+        self.assertions_filter_subtraction(category, filter_slugs, filter)
+
+        # with many filters in filter slugs
+        filter_slugs = 'shirina_1100/shirina_1200/shirina_1300/dlina_1000/dlina_1200'
+        self.assertions_filter_concatenate(category, filter_slugs, filter)
+        self.assertions_filter_subtraction(category, filter_slugs, filter)
+
+    def assertions_filter_concatenate(self, category, filter_slugs, filter):
         link_concatenate = concatenate(category, filter_slugs, filter)
-        link_subtraction = subtraction(category, filter_slugs, filter)
         filter_slug = filter.get_absolute_url()
         if filter_slugs:
             filter_slugs = filter_slugs.split('/')
         else:
             filter_slugs = []
-        filter_slugs.append(filter_slug)
+        if filter_slug not in filter_slugs:
+            filter_slugs.append(filter_slug)
         filter_slugs = '/'.join(filter_slugs)
-        expected_link_concatenate = category.get_absolute_url({'filter_slug': filter_slugs})
-        expected_link_subtraction = category.get_absolute_url()
-        self.assertEqual(expected_link_concatenate, link_concatenate)
-        self.assertEqual(expected_link_subtraction, link_subtraction)
+        absolute_url = category.get_absolute_url({'filter_slug': filter_slugs})
+        self.assertEqual(absolute_url, link_concatenate)
 
-        filter_slugs = 'shirina_1100/shirina_1200/shirina_1300/dlina_1000/dlina_1200'
-        link_concatenate = concatenate(category, filter_slugs, filter)
+    def assertions_filter_subtraction(self, category, filter_slugs, filter):
         link_subtraction = subtraction(category, filter_slugs, filter)
-        expected_link_concatenate = '{}/filter/{}/{}'.format(category.get_absolute_url(), filter_slugs, filter.get_absolute_url())
-        filter_slugs = filter_slugs.replace(filter.get_absolute_url()+'/', '')
-        expected_link_subtraction = '{}/filter/{}'.format(category.get_absolute_url(), filter_slugs)
-        self.assertEqual(expected_link_concatenate, link_concatenate)
-        self.assertEqual(expected_link_subtraction, link_subtraction)
-
-        filter_slugs = 'shirina_1000'
-        link_concatenate = concatenate(category, filter_slugs, filter)
-        link_subtraction = subtraction(category, filter_slugs, filter)
-        expected_link_concatenate = '{}/filter/{}/{}'.format(category.get_absolute_url(), filter_slugs, filter.get_absolute_url())
-        filter_slugs = filter_slugs.replace(filter.get_absolute_url()+'/', '')
-        expected_link_subtraction = '{}/filter/{}'.format(category.get_absolute_url(), filter_slugs)
-        self.assertEqual(expected_link_concatenate, link_concatenate)
-        self.assertEqual(expected_link_subtraction, link_subtraction)
-
-
+        category_absolute_url = category.get_absolute_url()
+        filter_slug = filter.get_absolute_url()
+        if not filter_slugs:
+            absolute_url = category_absolute_url
+        else:
+            filter_slugs = filter_slugs.split('/')
+            if filter_slug in filter_slugs:
+                filter_slugs.remove(filter_slug)
+            filter_slugs = '/'.join(filter_slugs)
+            absolute_url = category.get_absolute_url({'filter_slug': filter_slugs})
+        self.assertEqual(absolute_url, link_subtraction)

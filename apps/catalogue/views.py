@@ -62,7 +62,6 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
             return potential_redirect
 
         self.kwargs['sorting_type'] = self.request.GET.get('sorting_type', *Product._meta.ordering)
-        self.kwargs['filters'] = self.request.GET.get('filters', '')
         return super(ProductCategoryView, self).get(request, *args, **kwargs)
 
     def get_category(self):
@@ -108,8 +107,8 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
 
         self.products_without_filters = Product.objects.only('id').filter(**dict_filter).distinct().order_by(self.kwargs.get('sorting_type'))
 
-        if self.kwargs.get('filters'):
-            dict_filter['filters__slug__in'] = self.kwargs.get('filters').split('/')
+        if self.kwargs.get('filter_slug'):
+            dict_filter['filters__slug__in'] = self.kwargs.get('filter_slug').split('/')
 
         queryset = super(ProductCategoryView, self).get_queryset()
         return queryset.only(*only).filter(**dict_filter).distinct().select_related('product_class').prefetch_related(
