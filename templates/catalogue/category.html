@@ -138,11 +138,11 @@
         <div class="col-xs-16">
             <span class="text">Сортировать:</span>
             <div class="btn-group btn-group-md" role="group" aria-label="Sort">
-                {% for sorting_type in sort_types %}
-                    {% if sorting_type.2 %}
-                        <a href="{{ sorting_type.0 }}" type="button" class="btn btn-default btn-danger">{{ sorting_type.1 }}</a>
+                {% for sorting_url, name, is_active in sort_types %}
+                    {% if is_active %}
+                        <a href="{{ sorting_url }}" type="button" class="btn btn-default btn-danger">{{ name }}</a>
                     {% else %}
-                        <a href="{{ sorting_type.0 }}" type="button" class="btn btn-default"> {{ sorting_type.1 }}</a>
+                        <a href="{{ sorting_url }}" type="button" class="btn btn-default"> {{ name }}</a>
                     {% endif %}
                 {% endfor %}
             </div>
