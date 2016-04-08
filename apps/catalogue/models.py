@@ -22,7 +22,8 @@ if not is_model_registered('catalogue', 'Category'):
 
 if not is_model_registered('catalogue', 'Filter'):
     class Filter(AbstractFilter):
-        pass
+        def get_absolute_url(self):
+            return self.slug
 
     __all__.append('Filter')
 

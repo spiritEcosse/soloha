@@ -125,6 +125,7 @@ class CustomAbstractProduct(models.Model):
 
         if self.categories.exists():
             dict_values.update({'category_slug': self.categories.first().full_slug})
+
         return reverse('detail', kwargs=dict_values)
 
     def clean(self):
@@ -647,7 +648,7 @@ class CustomAbstractCategory(MPTTModel):
             image_banner = get_thumbnailer(self.image_banner).get_thumbnail(options).url
         return image_banner
 
-    def get_absolute_url(self):
+    def get_absolute_url(self, values={}):
         """
         Our URL scheme means we have to look up the category's ancestors. As
         that is a bit more expensive, we cache the generated URL. That is
@@ -656,7 +657,11 @@ class CustomAbstractCategory(MPTTModel):
         you change that logic, you'll have to reconsider the caching
         approach.
         """
-        return reverse('category', kwargs={'category_slug': self.full_slug})
+        dict_values = {'category_slug': self.full_slug}
+        if values.get('filter_slug'):
+            dict_values.update({'filter_slug': values.get('filter_slug')})
+
+        return reverse('category', kwargs=dict_values)
 
     @classmethod
     def get_annotated_list_qs_depth(cls, parent=None, max_depth=None):

@@ -62,7 +62,6 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
             return potential_redirect
 
         self.kwargs['sorting_type'] = self.request.GET.get('sorting_type', *Product._meta.ordering)
-        self.kwargs['filters'] = self.request.GET.get('filters', '')
         return super(ProductCategoryView, self).get(request, *args, **kwargs)
 
     def get_category(self):
@@ -91,7 +90,13 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
         if self.enforce_paths:
             # Categories are fetched by primary key to allow slug changes.
             # If the slug has changed, issue a redirect.
-            expected_path = category.get_absolute_url()
+
+            expected_path = category.get_absolute_url(self.kwargs)
+            # raise Exception(self.kwargs.get('filters'))
+            # if self.kwargs.get('filter_slug'):
+            #     expected_path += 'filter/{}/'.format(self.kwargs['filter_slug'])
+
+            # raise Exception(expected_path)
             if expected_path != urlquote(current_path):
                 return HttpResponsePermanentRedirect(expected_path)
 
@@ -102,8 +107,8 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
 
         self.products_without_filters = Product.objects.only('id').filter(**dict_filter).distinct().order_by(self.kwargs.get('sorting_type'))
 
-        if self.kwargs.get('filters'):
-            dict_filter['filters__slug__in'] = self.kwargs.get('filters').split('/')
+        if self.kwargs.get('filter_slug'):
+            dict_filter['filters__slug__in'] = self.kwargs.get('filter_slug').split('/')
 
         queryset = super(ProductCategoryView, self).get_queryset()
         return queryset.only(*only).filter(**dict_filter).distinct().select_related('product_class').prefetch_related(
@@ -120,6 +125,7 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
         context['filters'] = Filter.objects.filter(level=0, children__in=queryset_filters).prefetch_related(
             Prefetch('children', queryset=queryset_filters, to_attr='children_in_products'),
         ).distinct()
+        context['filter_slug'] = self.kwargs.get('filter_slug', '')
         return context
 
 

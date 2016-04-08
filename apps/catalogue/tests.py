@@ -15,6 +15,7 @@ from django.db.models.query import Prefetch
 from apps.catalogue.views import ProductCategoryView
 from django.core.paginator import Paginator
 from test.factories import catalogue
+from templatetags.filters_concatenation import concatenate, subtraction
 from soloha.settings import MAX_COUNT_PRODUCT, MAX_COUNT_CATEGORIES
 from soloha.settings import OSCAR_PRODUCTS_PER_PAGE
 
@@ -199,8 +200,8 @@ class TestCatalog(TestCase):
                 'product_options__type', 'enable', 'categories', 'filters']
         dict_filter = {'enable': True, 'categories__in': category.get_descendants(include_self=True)}
 
-        if dict_values.get('filters'):
-            dict_filter['filters__slug__in'] = dict_values.get('filters').split('/')
+        if dict_values.get('filter_slug'):
+            dict_filter['filters__slug__in'] = dict_values.get('filter_slug').split('/')
 
         products = Product.objects.filter(**dict_filter).only(*only).distinct().select_related('product_class').prefetch_related(
             Prefetch('images'),
@@ -219,7 +220,7 @@ class TestCatalog(TestCase):
             sorting_type)
 
         queryset_filters = Filter.objects.filter(products__in=products_without_filters).distinct().prefetch_related('products')
-        filters = Filter.objects.filter(level=0).prefetch_related(
+        filters = Filter.objects.filter(level=0, children__in=queryset_filters).prefetch_related(
             Prefetch('children', queryset=queryset_filters, to_attr='children_in_products'),
         ).distinct()
 
@@ -238,14 +239,57 @@ class TestCatalog(TestCase):
 
         test_catalogue.test_menu_categories(obj=self, response=response)
 
-        # response = self.client.post(category.get_absolute_url(), dict_values)
         response = self.client.post(category.get_absolute_url(),
                                     json.dumps(dict_values),
                                     content_type='application/json',
                                     HTTP_X_REQUESTED_WITH='XMLHttpRequest')
-        # if response.request['REQUEST_METHOD'] == 'POST':
-            # raise Exception('hello')
         context = dict()
         context['products'] = [product.get_values() for product in products]
         self.assertJSONEqual(json.dumps(context), response.content)
 
+    def test_filters_concatenation(self):
+        test_catalogue.create_product_bulk()
+        category = Category.objects.get(name='Category-12')
+        filter = Filter.objects.get(slug='shirina_1000')
+
+        # without filter slugs
+        filter_slugs = ''
+        self.assertions_filter_concatenate(category, filter_slugs, filter)
+        self.assertions_filter_subtraction(category, filter_slugs, filter)
+
+        # with one filter in filter slugs
+        filter_slugs = 'shirina_1100'
+        self.assertions_filter_concatenate(category, filter_slugs, filter)
+        self.assertions_filter_subtraction(category, filter_slugs, filter)
+
+        # with many filters in filter slugs
+        filter_slugs = 'shirina_1100/shirina_1200/shirina_1300/dlina_1000/dlina_1200'
+        self.assertions_filter_concatenate(category, filter_slugs, filter)
+        self.assertions_filter_subtraction(category, filter_slugs, filter)
+
+    def assertions_filter_concatenate(self, category, filter_slugs, filter):
+        link_concatenate = concatenate(category, filter_slugs, filter)
+        filter_slug = filter.get_absolute_url()
+        if filter_slugs:
+            filter_slugs = filter_slugs.split('/')
+        else:
+            filter_slugs = []
+        if filter_slug not in filter_slugs:
+            filter_slugs.append(filter_slug)
+        filter_slugs = '/'.join(filter_slugs)
+        absolute_url = category.get_absolute_url({'filter_slug': filter_slugs})
+        self.assertEqual(absolute_url, link_concatenate)
+
+    def assertions_filter_subtraction(self, category, filter_slugs, filter):
+        link_subtraction = subtraction(category, filter_slugs, filter)
+        category_absolute_url = category.get_absolute_url()
+        filter_slug = filter.get_absolute_url()
+        if not filter_slugs:
+            absolute_url = category_absolute_url
+        else:
+            filter_slugs = filter_slugs.split('/')
+            if filter_slug in filter_slugs:
+                filter_slugs.remove(filter_slug)
+            filter_slugs = '/'.join(filter_slugs)
+            absolute_url = category.get_absolute_url({'filter_slug': filter_slugs})
+        self.assertEqual(absolute_url, link_subtraction)
