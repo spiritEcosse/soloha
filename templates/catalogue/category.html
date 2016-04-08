@@ -31,8 +31,7 @@
                             {% for filter_value in filter.children_in_products %}
                                 <li class="list-group-item checkbox">
                                     <label>
-{#                                        <a href="{{ category.get_absolute_url }}"><input type="checkbox"> {{ filter_value }} <span class="count">({{ filter_value.products.count }})</span></a>#}
-                                        <a href="{{ category.get_absolute_url }}filter/{{ filter_value.slug }}/"><input type="checkbox"> {{ filter_value }} <span class="count">({{ filter_value.products.count }})</span></a>
+                                        <input type="checkbox" href=""> test {{ filter_value }} <span class="count">({{ filter_value.products.count }})</span>
                                     </label>
                                 </li>
                             {% endfor %}

@@ -94,9 +94,9 @@ class TestCatalog(TestCase):
         """
         test_catalogue.create_product_bulk()
         # without products in this category has no descendants in the categories at the same time this very category and its children is not goods
-        # dict_values = {'num_queries': 10}
-        # category = Category.objects.get(name='Category-2')
-        # self.assertions_category(category=category, dict_values=dict_values)
+        dict_values = {'num_queries': 10}
+        category = Category.objects.get(name='Category-2')
+        self.assertions_category(category=category, dict_values=dict_values)
 
         # with products in this child category are not the descendants of the categories at the same time, this category has itself in goods
         # Todo: why 24 queries ?

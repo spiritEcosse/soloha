@@ -476,6 +476,8 @@ class AbstractFilter(MPTTModel):
         verbose_name_plural = _('Filters')
 
     def __str__(self):
+        if self.parent:
+            return u'{}->{}'.format(self.parent, self.title)
         return self.title
 
 
