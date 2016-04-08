@@ -3,7 +3,7 @@ from django import template
 register = template.Library()
 
 
-@register.filter(name='concatenate')
+@register.filter(name='subtraction')
 def subtraction(category, filter_slugs, filter):
     category_absolute_url = category.get_absolute_url()
     filter_slug = filter.get_absolute_url()
@@ -17,9 +17,8 @@ def subtraction(category, filter_slugs, filter):
     return absolute_url
     # return "{0}/filter/{1}/".format(category_absolute_url, filter_slugs)
 
-@register.filter(name='subtraction')
+@register.filter(name='concatenate')
 def concatenate(category, filter_slugs, filter):
-    category_absolute_url = category.get_absolute_url()
     filter_slug = filter.get_absolute_url()
     if filter_slugs:
         filter_slugs = filter_slugs.split('/')
