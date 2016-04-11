@@ -52,10 +52,6 @@ class Migration(migrations.Migration):
             name='category',
             options={'ordering': ('sort', 'name', 'id'), 'verbose_name': 'Category', 'verbose_name_plural': 'Categories'},
         ),
-        migrations.RemoveField(
-            model_name='category',
-            name='url',
-        ),
         migrations.AddField(
             model_name='category',
             name='enable',
@@ -137,9 +133,18 @@ class Migration(migrations.Migration):
             field=models.SlugField(unique=True, max_length=200, verbose_name='Slug'),
         ),
         migrations.AlterField(
+            model_name='product',
+            name='categories',
+            field=models.ManyToManyField(related_name='products', null=True, verbose_name='Categories', to='catalogue.Category', blank=True),
+        ),
+        migrations.AlterField(
             model_name='productattribute',
             name='code',
             field=models.SlugField(max_length=128, verbose_name='Code', validators=[django.core.validators.RegexValidator(regex=b'^[a-zA-Z_][0-9a-zA-Z_]*$', message="Code can only contain the letters a-z, A-Z, digits, and underscores, and can't start with a digit"), oscar.core.validators.non_python_keyword]),
+        ),
+        migrations.AlterUniqueTogether(
+            name='category',
+            unique_together=set([('slug', 'parent')]),
         ),
         migrations.AddField(
             model_name='productcategory',
@@ -151,10 +156,14 @@ class Migration(migrations.Migration):
             name='product',
             field=models.ForeignKey(verbose_name='Product', to='catalogue.Product'),
         ),
+        migrations.RemoveField(
+            model_name='category',
+            name='url',
+        ),
         migrations.AddField(
             model_name='product',
             name='filters',
-            field=models.ManyToManyField(to='catalogue.Filter', verbose_name='Filters of product'),
+            field=models.ManyToManyField(related_name='products', null=True, verbose_name='Filters of product', to='catalogue.Filter', blank=True),
         ),
         migrations.AlterUniqueTogether(
             name='productcategory',

@@ -53,7 +53,8 @@ class CustomAbstractProduct(models.Model):
         _("Date updated"), auto_now=True, db_index=True)
 
     categories = models.ManyToManyField('catalogue.Category', related_name="products", verbose_name=_("Categories"), blank=True, null=True)
-    filters = models.ManyToManyField('catalogue.Filter', related_name="products", verbose_name=_('Filters of product'), blank=True, null=True)
+    filters = models.ManyToManyField('catalogue.Feature', related_name="filter_products", verbose_name=_('Filters of product'), blank=True, null=True)
+    attr_features = models.ManyToManyField('catalogue.Feature', through='ProductFeature', verbose_name=_('Attribute of product'), related_name='feature_attr_products', blank=True, null=True)
 
     #: "Kind" of product, e.g. T-Shirt, Book, etc.
     #: None for child products, they inherit their parent's product class
@@ -460,7 +461,7 @@ class CustomAbstractProduct(models.Model):
 
 
 @python_2_unicode_compatible
-class AbstractFilter(MPTTModel):
+class AbstractFeature(MPTTModel):
     title = models.CharField(max_length=255)
     slug = models.SlugField(verbose_name=_('Slug'), max_length=255, unique=True)
     parent = TreeForeignKey('self', verbose_name=_('Parent'), related_name='children', blank=True, null=True, db_index=True)
@@ -472,8 +473,8 @@ class AbstractFilter(MPTTModel):
         abstract = True
         unique_together = ('slug', 'parent', )
         ordering = ('sort', 'title', 'id', )
-        verbose_name = _('Filter')
-        verbose_name_plural = _('Filters')
+        verbose_name = _('Feature')
+        verbose_name_plural = _('Features')
 
     def __str__(self):
         if self.parent:
@@ -753,3 +754,38 @@ class CustomAbstractCategory(MPTTModel):
             options = {'size': (50, 31), 'crop': True}
             icon = get_thumbnailer(self.icon).get_thumbnail(options).url
         return icon
+
+
+class VersionFeature(models.Model):
+    image = models.ImageField()
+    product = models.ManyToManyField('catalogue.Product', verbose_name=_('Product for value attribute'),
+                                     related_name='version_features',)
+    version = models.ForeignKey('catalogue.Version', verbose_name=_('Version of product'),
+                                related_name='version_features', on_delete=models.DO_NOTHING)
+    feature = models.ForeignKey('catalogue.Feature', verbose_name=_('Attribute'),
+                                related_name='version_features', on_delete=models.DO_NOTHING)
+
+
+class ProductVersion(models.Model):
+    attributes = models.ManyToManyField('catalogue.Feature', through='catalogue.VersionFeature',
+                                        verbose_name=_('Attributes'), related_name='product_versions')
+    product = models.ForeignKey('catalogue.Product', related_name='versions', on_delete=models.DO_NOTHING)
+# ? stockrecords = Stockrecord
+
+
+class ProductFeature(models.Model):
+    sort = models.IntegerField(_('Sort'), blank=True, null=True, default=0)
+    info = models.CharField(_('Block info'), max_length=255, blank=True)
+    product = models.ForeignKey('catalogue.Product', _('Product'), on_delete=models.DO_NOTHING)
+    attribute = models.ForeignKey('catalogue.Feature', _('Attribute'), on_delete=models.DO_NOTHING)
+
+
+class Stockrecord:
+    product_version = models.ForeignKey(ProductVersion)
+    product = models.ForeignKey(
+      'catalogue.Product', related_name="stockrecords",
+      verbose_name=_("Product"))
+    partner = models.ForeignKey(
+      'partner.Partner', verbose_name=_("Partner"),
+      related_name='stockrecords')
+# m-m ?     product_version = model.ManyToMany(ProductVersion)
