@@ -42,7 +42,9 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
     def post(self, request, *args, **kwargs):
         data = json.loads(self.request.body)
         # self.kwargs['category_slug'] = data.get('category_slug')
+
         self.kwargs['sorting_type'] = data.get('sorting_type', *Product._meta.ordering)
+
         self.kwargs['filters'] = data.get('filters', '')
         self.object = self.get_category()
         self.object_list = self.get_queryset()
@@ -63,7 +65,11 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
         if potential_redirect is not None:
             return potential_redirect
 
-        self.kwargs['sorting_type'] = self.request.GET.get('sorting_type', *Product._meta.ordering)
+        dict_new_sorting_types = {'popularity': '-views_count', 'price_ascending': 'stockrecords__price_excl_tax',
+                                  'price_descending': '-stockrecords__price_excl_tax'}
+        self.kwargs['sorting_type'] = dict_new_sorting_types.get(self.request.GET.get('sorting_type'), '-views_count')
+        # self.kwargs['sorting_type'] = self.request.GET.get('sorting_type', *Product._meta.ordering)
+        # raise Exception(self.kwargs['sorting_type'])
         return super(ProductCategoryView, self).get(request, *args, **kwargs)
 
     def get_category(self):
@@ -99,7 +105,6 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
         dict_filter = {'enable': True, 'categories__in': self.object.get_descendants(include_self=True)}
         only = ['title', 'slug', 'structure', 'product_class', 'product_options__name', 'product_options__code',
                 'product_options__type', 'enable', 'categories', 'filters']
-
         self.products_without_filters = Product.objects.only('id').filter(**dict_filter).distinct().order_by(self.kwargs.get('sorting_type'))
 
         if self.kwargs.get('filter_slug'):
@@ -112,7 +117,7 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
             Prefetch('product_class__options'),
             Prefetch('stockrecords'),
             Prefetch('categories__parent__parent')
-        ).distinct().order_by(self.kwargs.get('sorting_type'))
+        ).distinct().order_by(self.kwargs['sorting_type'])
 
     def get_context_data(self, **kwargs):
         context = super(ProductCategoryView, self).get_context_data(**kwargs)
@@ -122,14 +127,16 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
         ).distinct()
         context['filter_slug'] = self.kwargs.get('filter_slug', '')
         context['sort_types'] = []
-        sort_types = [('-views_count', _('By popularity')), ('-stockrecords__price_excl_tax', _('By price descending')),
-                      ('stockrecords__price_excl_tax', _('By price ascending'))]
-        for link, text in sort_types:
+        sort_types = [('-views_count', _('By_popularity'), 'popularity'),
+                      ('-stockrecords__price_excl_tax', _('By price descending'), 'price_descending'),
+                      ('stockrecords__price_excl_tax', _('By price ascending'), 'price_ascending')]
+        for type, text, link in sort_types:
             is_active = False
-            if self.kwargs.get('sorting_type', '') == link:
+            if self.kwargs.get('sorting_type', '') == type:
                 is_active = True
             sorting_url = '{}?sorting_type={}'.format(self.request.path, link)
-            context['sort_types'].append((sorting_url, text, is_active))
+            sort_link = 'sorting_type={}'.format(link)
+            context['sort_types'].append((sorting_url, text, is_active, sort_link))
         return context
 
 

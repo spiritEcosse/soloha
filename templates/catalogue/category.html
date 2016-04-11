@@ -33,15 +33,19 @@
                             {% for filter_value in filter.children_in_products %}
                                 <li class="list-group-item checkbox">
                                     <label>
-                                         <a href="{% concatenate category filter_slug filter_value %}">
-                                         {% if filter_value.get_absolute_url in filter_slug %}
-                                             <input type="checkbox" checked/>
-                                         {% else %}
-                                             <input type="checkbox"/>
-                                         {% endif %}
-                                             {{ filter_value.title }}
-                                             <span class="count">({{ filter_value.products.count }})</span>
-                                         </a>
+                                        {% for sorting_url, text, is_active, link in sort_types %}
+                                            {% if is_active %}
+                                                <a href="{% concatenate category filter_slug filter_value %}{{ link }}">
+                                            {% endif %}
+                                        {% endfor %}
+                                        {% if filter_value.get_absolute_url in filter_slug %}
+                                            <input type="checkbox" checked/>
+                                        {% else %}
+                                            <input type="checkbox"/>
+                                        {% endif %}
+                                        {{ filter_value.title }}
+                                        <span class="count">({{ filter_value.products.count }})</span>
+                                        </a>
                                     </label>
                                 </li>
                             {% endfor %}
