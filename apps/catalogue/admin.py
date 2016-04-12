@@ -8,7 +8,7 @@ from django import forms
 from django.contrib.admin import widgets
 
 
-Filter = get_model('catalogue', 'Filter')
+Feature = get_model('catalogue', 'Feature')
 AttributeOption = get_model('catalogue', 'AttributeOption')
 AttributeOptionGroup = get_model('catalogue', 'AttributeOptionGroup')
 Category = get_model('catalogue', 'Category')
@@ -21,7 +21,7 @@ ProductImage = get_model('catalogue', 'ProductImage')
 ProductRecommendation = get_model('catalogue', 'ProductRecommendation')
 
 
-class FilterAdmin(tree_editor.TreeEditor):
+class FeatureAdmin(tree_editor.TreeEditor):
     list_display = ('title', 'slug', 'parent', )
     list_filter = ('title', 'slug', 'parent')
     prepopulated_fields = {"slug": ("title",)}
@@ -49,7 +49,7 @@ class ProductClassAdmin(admin.ModelAdmin):
 
 class ProductForm(forms.ModelForm):
     filters = MPTTModelMultipleChoiceField(
-                    Filter.objects.all(),
+                    Feature.objects.all(),
                     widget=MPTTFilteredSelectMultiple("Filters", False, attrs={'rows':'10'})
                 )
     categories = MPTTModelMultipleChoiceField(
@@ -58,7 +58,7 @@ class ProductForm(forms.ModelForm):
                 )
 
     class Meta:
-        model = Filter
+        model = Feature
         fields = '__all__'
 
 
@@ -124,4 +124,4 @@ admin.site.register(AttributeOptionGroup, AttributeOptionGroupAdmin)
 admin.site.register(Option, OptionAdmin)
 admin.site.register(ProductImage)
 admin.site.register(Category, CategoryAdmin)
-admin.site.register(Filter, FilterAdmin)
+admin.site.register(Feature, FeatureAdmin)

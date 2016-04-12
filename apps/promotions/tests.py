@@ -30,18 +30,17 @@ class TestHomePage(TestCase):
         """
         test_catalogue.create_product_bulk_recommend()
         test_catalogue.create_order()
-        with self.assertNumQueries(28):
+        with self.assertNumQueries(23):
             response = self.client.get(reverse('promotions:home'))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.resolver_match.func.__name__, HomeView.as_view().__name__)
         self.assertEqual(response.resolver_match.view_name, 'promotions:home')
         self.assertTemplateUsed(response, 'promotions/home.html')
 
-        only = ['title', 'slug', 'structure', 'product_class', 'product_options__name', 'product_options__code', 'product_options__type', 'categories']
+        only = ['title', 'slug', 'structure', 'product_class', 'categories']
 
         products_queryset = Product.objects.only(*only).select_related('product_class').prefetch_related(
             Prefetch('images'),
-            Prefetch('product_options'),
             Prefetch('product_class__options'),
             Prefetch('stockrecords'),
             Prefetch('categories__parent__parent')
@@ -55,7 +54,6 @@ class TestHomePage(TestCase):
 
         products_queryset = Product.objects.only(*only).filter(productrecommendation__isnull=False).select_related('product_class').prefetch_related(
             Prefetch('images'),
-            Prefetch('product_options'),
             Prefetch('product_class__options'),
             Prefetch('stockrecords'),
             Prefetch('categories__parent__parent')
@@ -69,7 +67,6 @@ class TestHomePage(TestCase):
 
         products_queryset = Product.objects.only(*only).filter(line__isnull=False).select_related('product_class').prefetch_related(
             Prefetch('images'),
-            Prefetch('product_options'),
             Prefetch('stockrecords'),
             Prefetch('product_class__options'),
             Prefetch('categories__parent__parent'),

@@ -1,6 +1,7 @@
 from oscar.core.loading import is_model_registered
 from oscar.apps.catalogue.abstract_models import *  # noqa
-from apps.catalogue.abstract_models import CustomAbstractProduct, AbstractFilter, CustomAbstractCategory
+from apps.catalogue.abstract_models import CustomAbstractProduct, AbstractFeature, CustomAbstractCategory, \
+    AbstractProductVersion, AbstractVersionAttribute, AbstractProductFeature, AbstractProductOptions
 
 __all__ = ['ProductAttributesContainer']
 
@@ -12,6 +13,29 @@ if not is_model_registered('catalogue', 'ProductClass'):
 
     __all__.append('ProductClass')
 
+if not is_model_registered('catalogue', 'AbstractProductFeature'):
+    class ProductFeature(AbstractProductFeature):
+        pass
+
+    __all__.append(ProductFeature)
+
+if not is_model_registered('catalogue', 'ProductOptions'):
+    class ProductOptions(AbstractProductOptions):
+        pass
+
+    __all__.append(ProductOptions)
+
+if not is_model_registered('catalogue', 'ProductVersion'):
+    class ProductVersion(AbstractProductVersion):
+        pass
+
+    __all__.append(ProductVersion)
+
+if not is_model_registered('catalogue', 'VersionAttribute'):
+    class VersionAttribute(AbstractVersionAttribute):
+        pass
+
+    __all__.append('VersionAttribute')
 
 if not is_model_registered('catalogue', 'Category'):
     class Category(CustomAbstractCategory):
@@ -20,10 +44,9 @@ if not is_model_registered('catalogue', 'Category'):
     __all__.append('Category')
 
 
-if not is_model_registered('catalogue', 'Filter'):
-    class Filter(AbstractFilter):
-        def get_absolute_url(self):
-            return self.slug
+if not is_model_registered('catalogue', 'Feature'):
+    class Feature(AbstractFeature):
+        pass
 
     __all__.append('Filter')
 

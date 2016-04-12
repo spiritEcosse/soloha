@@ -64,7 +64,7 @@ INSTALLED_APPS = \
         'feincms',
         'easy_thumbnails',
         # 'smart_load_tag',
-    ] + get_core_apps(['apps.catalogue', 'apps.promotions'])
+    ] + get_core_apps(['apps.catalogue', 'apps.promotions', 'apps.partner'])
 
 SITE_ID = 1
 

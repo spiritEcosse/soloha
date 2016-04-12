@@ -22,7 +22,7 @@ import warnings
 
 Product = get_model('catalogue', 'product')
 Category = get_model('catalogue', 'category')
-Filter = get_model('catalogue', 'Filter')
+Feature = get_model('catalogue', 'Feature')
 
 
 class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, SingleObjectMixin, generic.ListView):
@@ -102,9 +102,7 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
 
     def get_queryset(self):
         dict_filter = {'enable': True, 'categories__in': self.object.get_descendants(include_self=True)}
-        only = ['title', 'slug', 'structure', 'product_class', 'product_options__name', 'product_options__code',
-                'product_options__type', 'enable', 'categories', 'filters']
-
+        only = ['title', 'slug', 'structure', 'product_class', 'categories']
         self.products_without_filters = Product.objects.only('id').filter(**dict_filter).distinct().order_by(self.kwargs.get('sorting_type'))
 
         if self.kwargs.get('filter_slug'):
@@ -113,7 +111,6 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
         queryset = super(ProductCategoryView, self).get_queryset()
         return queryset.only(*only).filter(**dict_filter).distinct().select_related('product_class').prefetch_related(
             Prefetch('images'),
-            Prefetch('product_options'),
             Prefetch('product_class__options'),
             Prefetch('stockrecords'),
             Prefetch('categories__parent__parent')
@@ -123,8 +120,9 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
         # Category.objects.filter(pk=self.object.pk).update(popular=F('popular') + 1)
 
         context = super(ProductCategoryView, self).get_context_data(**kwargs)
-        queryset_filters = Filter.objects.filter(products__in=self.products_without_filters).distinct().prefetch_related('products')
-        context['filters'] = Filter.objects.filter(level=0, children__in=queryset_filters).prefetch_related(
+        queryset_filters = Feature.objects.filter(filter_products__in=self.products_without_filters).distinct().prefetch_related('filter_products')
+
+        context['filters'] = Feature.objects.filter(level=0, children__in=queryset_filters).prefetch_related(
             Prefetch('children', queryset=queryset_filters, to_attr='children_in_products'),
         ).distinct()
         context['filter_slug'] = self.kwargs.get('filter_slug', '')
