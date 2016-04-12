@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('catalogue', '0008_auto_20160404_0753'),
+        ('catalogue', '0006_auto_20160412_1316'),
     ]
 
     operations = [
@@ -19,15 +19,5 @@ class Migration(migrations.Migration):
             model_name='product',
             name='views_count',
             field=models.IntegerField(default=0, verbose_name=b'views count', editable=False),
-        ),
-        migrations.AlterField(
-            model_name='product',
-            name='categories',
-            field=models.ManyToManyField(related_name='products', null=True, verbose_name='Categories', to='catalogue.Category', blank=True),
-        ),
-        migrations.AlterField(
-            model_name='product',
-            name='filters',
-            field=models.ManyToManyField(related_name='products', null=True, verbose_name='Filters of product', to='catalogue.Filter', blank=True),
         ),
     ]
