@@ -68,8 +68,6 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
         dict_new_sorting_types = {'popularity': '-views_count', 'price_ascending': 'stockrecords__price_excl_tax',
                                   'price_descending': '-stockrecords__price_excl_tax'}
         self.kwargs['sorting_type'] = dict_new_sorting_types.get(self.request.GET.get('sorting_type'), '-views_count')
-        # self.kwargs['sorting_type'] = self.request.GET.get('sorting_type', *Product._meta.ordering)
-        # raise Exception(self.kwargs['sorting_type'])
         return super(ProductCategoryView, self).get(request, *args, **kwargs)
 
     def get_category(self):
@@ -127,7 +125,7 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
         ).distinct()
         context['filter_slug'] = self.kwargs.get('filter_slug', '')
         context['sort_types'] = []
-        sort_types = [('-views_count', _('By_popularity'), 'popularity'),
+        sort_types = [('-views_count', _('By popularity'), 'popularity'),
                       ('-stockrecords__price_excl_tax', _('By price descending'), 'price_descending'),
                       ('stockrecords__price_excl_tax', _('By price ascending'), 'price_ascending')]
         for type, text, link in sort_types:

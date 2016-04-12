@@ -35,7 +35,7 @@
                                     <label>
                                         {% for sorting_url, text, is_active, link in sort_types %}
                                             {% if is_active %}
-                                                <a href="{% concatenate category filter_slug filter_value %}{{ link }}">
+                                                <a href="{% concatenate category filter_slug filter_value %}?{{ link }}">
                                             {% endif %}
                                         {% endfor %}
                                         {% if filter_value.get_absolute_url in filter_slug %}

@@ -126,12 +126,11 @@ class TestCatalog(TestCase):
         category = Category.objects.get(name='Category-3')
         self.assertions_category(category=category, dict_values=dict_values)
 
-        # check pagination
+    def test_page_category_paginator(self):
+        test_catalogue.create_product_bulk()
+
         dict_values = {'num_queries': 20}
         category = Category.objects.get(name='Category-12')
-        category_1 = Category.objects.get(name='Category-1')
-        category_2 = Category.objects.get(name='Category-2')
-        category_321 = Category.objects.get(name='Category-321')
         self.assertions_category(category=category, dict_values=dict_values)
         dict_values = {'page': 1, 'num_queries': 20}
         self.assertions_category(category=category, dict_values=dict_values)
@@ -140,14 +139,23 @@ class TestCatalog(TestCase):
         dict_values = {'page': 3, 'num_queries': 20}
         self.assertions_category(category=category, dict_values=dict_values)
 
-        # sorting with filters
-        dict_values = {'page': 1, 'sorting_type': 'price_ascending', 'num_queries': 20, 'filters': 'shirina_1000/shirina_1200/dlina_1100/dlina_1000'}
+    def test_page_category_sorting_with_filters(self):
+        test_catalogue.create_product_bulk()
+
+        category = Category.objects.get(name='Category-12')
+        category_1 = Category.objects.get(name='Category-1')
+        category_2 = Category.objects.get(name='Category-2')
+        category_321 = Category.objects.get(name='Category-321')
+
+        dict_values = {'page': 1, 'sorting_type': 'price_ascending', 'num_queries': 20,
+                       'filters': 'shirina_1000/shirina_1200/dlina_1100/dlina_1000'}
         self.assertions_category(category=category, dict_values=dict_values)
         self.assertions_category(category=category_1, dict_values=dict_values)
         self.assertions_category(category=category_2, dict_values=dict_values)
         self.assertions_category(category=category_321, dict_values=dict_values)
 
-        dict_values = {'page': 2, 'sorting_type': 'popularity', 'num_queries': 20, 'filters': 'shirina_1000/shirina_1200/dlina_1100/dlina_1000'}
+        dict_values = {'page': 2, 'sorting_type': 'popularity', 'num_queries': 20,
+                       'filters': 'shirina_1000/shirina_1200/dlina_1100/dlina_1000'}
         self.assertions_category(category=category, dict_values=dict_values)
 
         dict_values = {'page': 1, 'sorting_type': 'price_descending', 'num_queries': 20, 'filters': ''}
@@ -156,7 +164,8 @@ class TestCatalog(TestCase):
         self.assertions_category(category=category_2, dict_values=dict_values)
         self.assertions_category(category=category_321, dict_values=dict_values)
 
-        dict_values = {'page': 1, 'sorting_type': 'price_descending', 'num_queries': 20, 'filters': 'shirina_1000/shirina_1100/shirina_1200/dlina_1000/dlina_1100'}
+        dict_values = {'page': 1, 'sorting_type': 'price_descending', 'num_queries': 20,
+                       'filters': 'shirina_1000/shirina_1100/shirina_1200/dlina_1000/dlina_1100'}
         self.assertions_category(category=category, dict_values=dict_values)
 
         dict_values = {'page': 2, 'sorting_type': 'popularity', 'num_queries': 20, 'filters': 'dlina_1100'}
@@ -165,24 +174,7 @@ class TestCatalog(TestCase):
         dict_values = {'page': 1, 'sorting_type': 'popularity', 'num_queries': 20, 'filters': 'dlina_1100'}
         self.assertions_category(category=category_1, dict_values=dict_values)
         self.assertions_category(category=category_2, dict_values=dict_values)
-        self.assertions_category(category=category_321, dict_values=dict_values)
-
-        response = self.client.get(category.get_absolute_url(), dict_values)
-
-        sort_types = [('popularity', _('By popularity')), ('price_descending', _('By price descending')),
-                      ('price_ascending', _('By price ascending'))]
-        for link, text in sort_types:
-            if dict_values['sorting_type'] == link:
-                sorting_url = '{}?sorting_type={}'.format(category.get_absolute_url(), link)
-                self.assertIn(response, '<a class="btn btn-default btn-danger" type="button" href="{0}">{1}</a>'.format(sorting_url, text))
-
-
-        # with page not exist
-        # current_page = 200
-        # response = self.client.get(category.get_absolute_url(), {'page': current_page})
-        # products = Product.objects.filter(enable=True, categories__in=category.get_descendants(include_self=True)).distinct()
-        # p = Paginator(products, paginate_by)
-        # self.assertEqual(list(p.page(1).object_list), list(response.context['page_obj']))
+        # self.assertions_category(category=category_321, dict_values=dict_values)
 
     def test_page_category_sort(self):
         test_catalogue.create_product_bulk()
@@ -223,11 +215,11 @@ class TestCatalog(TestCase):
         if dict_values.get('filter_slug'):
             dict_filter['filters__slug__in'] = dict_values.get('filter_slug').split('/')
 
+        response = self.client.get(category.get_absolute_url(), dict_values)
+
         dict_new_sorting_types = {'popularity': '-views_count', 'price_ascending': 'stockrecords__price_excl_tax',
                 'price_descending': '-stockrecords__price_excl_tax'}
         dict_values['sorting_type'] = dict_new_sorting_types.get(dict_values.get('sorting_type'), '-views_count')
-
-        # self.kwargs['sorting_type'] = dict.get(self.request.GET.get('sorting_type', 'popularity'))
 
         products = Product.objects.filter(**dict_filter).only(*only).distinct().select_related('product_class').prefetch_related(
             Prefetch('images'),
@@ -245,7 +237,6 @@ class TestCatalog(TestCase):
         ).distinct()
 
         p = Paginator(products, paginate_by)
-        response = self.client.get(category.get_absolute_url(), dict_values)
 
         # with self.assertNumQueries(dict_values['num_queries']):
         self.assertEqual(response.status_code, STATUS_CODE_200)
@@ -269,6 +260,44 @@ class TestCatalog(TestCase):
         context = dict()
         context['products'] = [product.get_values() for product in products]
         self.assertJSONEqual(json.dumps(context), response.content)
+
+    def test_page_category_sorting_buttons(self):
+        test_catalogue.create_product_bulk()
+        category = Category.objects.get(name='Category-12')
+
+        dict_values = {'page': 1, 'sorting_type': 'popularity', 'num_queries': 20,
+                       'filter_slug': 'dlina_1100'}
+        self.assertions_sorting_buttons(category=category, dict_values=dict_values)
+
+        dict_values = {'page': 1, 'sorting_type': 'price_ascending', 'num_queries': 20,
+                       'filter_slug': 'dlina_1100'}
+        self.assertions_sorting_buttons(category=category, dict_values=dict_values)
+
+        dict_values = {'page': 1, 'sorting_type': 'price_descending', 'num_queries': 20,
+                       'filter_slug': 'dlina_1100'}
+        self.assertions_sorting_buttons(category=category, dict_values=dict_values)
+
+        dict_values = {'page': 2, 'sorting_type': 'price_ascending', 'num_queries': 20}
+        self.assertions_sorting_buttons(category=category, dict_values=dict_values)
+
+        dict_values = {'page': 3, 'sorting_type': 'price_ascending', 'num_queries': 20}
+        self.assertions_sorting_buttons(category=category, dict_values=dict_values)
+
+        dict_values = {'page': 4, 'sorting_type': 'price_ascending', 'num_queries': 20}
+        self.assertions_sorting_buttons(category=category, dict_values=dict_values)
+
+    def assertions_sorting_buttons(self, category, dict_values={}):
+        response = self.client.get(category.get_absolute_url(dict_values), dict_values)
+        sort_types = [('popularity', _('By popularity')), ('price_descending', _('By price descending')),
+                      ('price_ascending', _('By price ascending'))]
+
+        dict_values['sorting_type'] = dict_values.get('sorting_type', sort_types[0][0])
+        for link, text in sort_types:
+            if dict_values['sorting_type'] == link:
+                sorting_url = '{}?sorting_type={}'.format(category.get_absolute_url(dict_values), link)
+                self.assertContains(response,
+                                    '<a class="btn btn-default btn-danger" type="button" href="{0}">{1}</a>'.format(
+                                        sorting_url, text), count=1, html=True)
 
     def test_filters_concatenation(self):
         test_catalogue.create_product_bulk()
