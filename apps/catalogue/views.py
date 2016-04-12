@@ -40,7 +40,9 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
     def post(self, request, *args, **kwargs):
         data = json.loads(self.request.body)
         # self.kwargs['category_slug'] = data.get('category_slug')
+
         self.kwargs['sorting_type'] = data.get('sorting_type', *Product._meta.ordering)
+
         self.kwargs['filters'] = data.get('filters', '')
         self.object = self.get_category()
         self.object_list = self.get_queryset()
@@ -61,7 +63,9 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
         if potential_redirect is not None:
             return potential_redirect
 
-        self.kwargs['sorting_type'] = self.request.GET.get('sorting_type', *Product._meta.ordering)
+        dict_new_sorting_types = {'popularity': '-views_count', 'price_ascending': 'stockrecords__price_excl_tax',
+                                  'price_descending': '-stockrecords__price_excl_tax'}
+        self.kwargs['sorting_type'] = dict_new_sorting_types.get(self.request.GET.get('sorting_type'), '-views_count')
         return super(ProductCategoryView, self).get(request, *args, **kwargs)
 
     def get_category(self):
@@ -88,15 +92,8 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
 
     def redirect_if_necessary(self, current_path, category):
         if self.enforce_paths:
-            # Categories are fetched by primary key to allow slug changes.
-            # If the slug has changed, issue a redirect.
-
             expected_path = category.get_absolute_url(self.kwargs)
-            # raise Exception(self.kwargs.get('filters'))
-            # if self.kwargs.get('filter_slug'):
-            #     expected_path += 'filter/{}/'.format(self.kwargs['filter_slug'])
 
-            # raise Exception(expected_path)
             if expected_path != urlquote(current_path):
                 return HttpResponsePermanentRedirect(expected_path)
 
@@ -114,7 +111,7 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
             Prefetch('product_class__options'),
             Prefetch('stockrecords'),
             Prefetch('categories__parent__parent')
-        ).distinct().order_by(self.kwargs.get('sorting_type'))
+        ).distinct().order_by(self.kwargs['sorting_type'])
 
     def get_context_data(self, **kwargs):
         # Category.objects.filter(pk=self.object.pk).update(popular=F('popular') + 1)
@@ -126,6 +123,17 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
             Prefetch('children', queryset=queryset_filters, to_attr='children_in_products'),
         ).distinct()
         context['filter_slug'] = self.kwargs.get('filter_slug', '')
+        context['sort_types'] = []
+        sort_types = [('-views_count', _('By popularity'), 'popularity'),
+                      ('-stockrecords__price_excl_tax', _('By price descending'), 'price_descending'),
+                      ('stockrecords__price_excl_tax', _('By price ascending'), 'price_ascending')]
+        for type, text, link in sort_types:
+            is_active = False
+            if self.kwargs.get('sorting_type', '') == type:
+                is_active = True
+            sorting_url = '{}?sorting_type={}'.format(self.request.path, link)
+            sort_link = 'sorting_type={}'.format(link)
+            context['sort_types'].append((sorting_url, text, is_active, sort_link))
         return context
 
 
@@ -141,4 +149,12 @@ class ProductDetailView(CoreProductDetailView):
             context['currency'] = info.price.currency
         else:
             context['product_not_availability'] = _('Product is not available.')
+
+        attributes = []
+        # attributes = AttributeOptionGroup.objects.filter(productattribute__product__parent=self.object).prefetch_related(
+        #     Prefetch('options',
+        #              queryset=AttributeOption.objects.filter(productattributevalue__product__parent=self.object).distinct(),
+        #              to_attr='attribute_value')
+        # ).distinct()
+        context['attributes'] = attributes
         return context
