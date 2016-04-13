@@ -328,8 +328,7 @@ class TestCatalog(TestCase):
 
     def assertions_filter_click(self, category, dict_values={}):
         response = self.client.get(category.get_absolute_url())
-        count = Filter.objects.filter(slug=dict_values['filter_slug'], products__in=Product.objects.all()).first().products.count()
-
+        count = Feature.objects.filter(slug=dict_values['filter_slug'], filter_products__in=Product.objects.all()).first().filter_products.count()
         filter_url = '{}?sorting_type={}'.format(category.get_absolute_url(dict_values), 'popularity')
 
         self.assertContains(response, '''<a href="{}">
@@ -343,8 +342,7 @@ class TestCatalog(TestCase):
     def assertions_filter_remove_click(self, category, dict_values={}):
         # dict_values['sorting_type'] = dict_values.get('sorting_type', 'popularity')
         response = self.client.get(category.get_absolute_url(dict_values))
-        print(category.get_absolute_url(dict_values))
-        count = Filter.objects.filter(slug=dict_values['filter_slug'], products__in=Product.objects.all()).first().products.count()
+        count = Feature.objects.filter(slug=dict_values['filter_slug'], products__in=Product.objects.all()).first().products.count()
 
         # filter_url = '{}?sorting_type={}'.format(category.get_absolute_url(), dict_values['sorting_type'])
         filter_url = '{}?sorting_type={}'.format(category.get_absolute_url(), 'popularity')
