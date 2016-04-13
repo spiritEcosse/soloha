@@ -138,24 +138,24 @@ class Test(object):
             category_321 = Category.objects.get(name='Category-321')
             if num < 70:
                 product.categories.add(category_12)
-                product.filters.add(Filter.objects.get(title=u'длина_1000'))
-                product.filters.add(Filter.objects.get(title=u'ширина_1000'))
+                product.filters.add(Feature.objects.get(title=u'длина_1000'))
+                product.filters.add(Feature.objects.get(title=u'ширина_1000'))
             elif num < 80:
                 product.categories.add(category_3)
-                product.filters.add(Filter.objects.get(title=u'длина_1000'))
-                product.filters.add(Filter.objects.get(title=u'ширина_1100'))
+                product.filters.add(Feature.objects.get(title=u'длина_1000'))
+                product.filters.add(Feature.objects.get(title=u'ширина_1100'))
             elif num < 90:
                 product.categories.add(category_321)
-                product.filters.add(Filter.objects.get(title=u'длина_1100'))
-                product.filters.add(Filter.objects.get(title=u'ширина_1000'))
+                product.filters.add(Feature.objects.get(title=u'длина_1100'))
+                product.filters.add(Feature.objects.get(title=u'ширина_1000'))
             elif num < 100:
                 product.categories.add(category_12)
-                product.filters.add(Filter.objects.get(title=u'длина_1200'))
-                product.filters.add(Filter.objects.get(title=u'ширина_1100'))
+                product.filters.add(Feature.objects.get(title=u'длина_1200'))
+                product.filters.add(Feature.objects.get(title=u'ширина_1100'))
             else:
                 product.categories.add(category_12)
-                product.filters.add(Filter.objects.get(title=u'длина_1100'))
-                product.filters.add(Filter.objects.get(title=u'ширина_1200'))
+                product.filters.add(Feature.objects.get(title=u'длина_1100'))
+                product.filters.add(Feature.objects.get(title=u'ширина_1200'))
 
     def create_product_bulk_recommend(self):
         """

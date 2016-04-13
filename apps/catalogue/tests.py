@@ -343,11 +343,10 @@ class TestCatalog(TestCase):
     def assertions_filter_click(self, category, dict_values={}):
         response = self.client.get(category.get_absolute_url())
         # count_products = Filter.objects.filter(slug=dict_values['filter_slug']).first().products.count()
-        filters = Filter.objects.filter(slug=dict_values['filter_slug'], products__in=Product.objects.filter(enable=True, categories__in=[category])).annotate(num_prod=Count('products'))
+        filters = Feature.objects.filter(slug=dict_values['filter_slug'], filter_products__in=Product.objects.filter(enable=True, categories__in=[category])).annotate(num_prod=Count('filter_products'))
         count_products = filters[0].num_prod
 
         filter_url = '{}?sorting_type={}'.format(category.get_absolute_url(dict_values), 'popularity')
-        print(count_products)
         self.assertContains(response, '''<a href="{}">
         <input type="checkbox"/>
         длина_1100
@@ -356,7 +355,7 @@ class TestCatalog(TestCase):
 
     def assertions_filter_remove_click(self, category, dict_values={}):
         response = self.client.get(category.get_absolute_url(dict_values))
-        filters = Filter.objects.filter(slug=dict_values['filter_slug'], products__in=Product.objects.filter(enable=True, categories__in=[category])).annotate(num_prod=Count('products'))
+        filters = Feature.objects.filter(slug=dict_values['filter_slug'], filter_products__in=Product.objects.filter(enable=True, categories__in=[category])).annotate(num_prod=Count('filter_products'))
         count_products = filters[0].num_prod
 
         # filter_url = '{}?sorting_type={}'.format(category.get_absolute_url(), dict_values['sorting_type'])
