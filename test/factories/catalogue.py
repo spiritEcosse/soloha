@@ -21,6 +21,7 @@ ProductRecommendation = get_model('catalogue', 'ProductRecommendation')
 Basket = get_model('basket', 'Basket')
 OrderCreator = get_class('order.utils', 'OrderCreator')
 OrderTotalCalculator = get_class('checkout.calculators', 'OrderTotalCalculator')
+ProductOptions = get_model('catalogue', 'ProductOptions')
 
 
 class Test(object):
@@ -87,6 +88,19 @@ class Test(object):
         VersionAttribute.objects.create(version=product_version_1, attribute=feature_31)
         product_version_2 = ProductVersion.objects.create(product=product)
         VersionAttribute.objects.create(version=product_version_2, attribute=feature_11)
+
+    def create_options(self, product1, product2):
+        self.create_feature()
+        option_1 = Feature.objects.get(title='Feature 1')
+        option_11 = Feature.objects.get(title='Feature 11')
+        option_21 = Feature.objects.get(title='Feature 21')
+        option_31 = Feature.objects.get(title='Feature 31')
+        option_211 = Feature.objects.get(title='Feature 211')
+        ProductOptions.objects.create(product=product1, option=option_11)
+        ProductOptions.objects.create(product=product1, option=option_21)
+        ProductOptions.objects.create(product=product1, option=option_1)
+        ProductOptions.objects.create(product=product1, option=option_211)
+        ProductOptions.objects.create(product=product2, option=option_31)
 
     def create_product_bulk(self):
         """

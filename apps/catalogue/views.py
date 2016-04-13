@@ -159,4 +159,7 @@ class ProductDetailView(CoreProductDetailView):
         #              to_attr='attribute_value')
         # ).distinct()
         context['attributes'] = attributes
+
+        context['product_options'] = Feature.objects.filter(level=0, children__product_options__product=Product.objects.get(pk=1))
+
         return context
