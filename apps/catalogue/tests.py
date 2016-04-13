@@ -12,7 +12,7 @@ from django.utils.html import strip_entities
 from django.core.urlresolvers import reverse
 import json
 from django.db.models.query import Prefetch
-from apps.catalogue.views import ProductCategoryView
+from apps.catalogue.views import ProductCategoryView, ProductDetailView
 from django.core.paginator import Paginator
 from django.db.models import Count
 from test.factories import catalogue
@@ -67,8 +67,20 @@ class TestCatalog(TestCase):
 
     def test_get_product_attributes(self):
         test_catalogue.create_product_bulk()
-        product = Product.objects.get(title='Product 1')
+        product = Product.objects.get(slug='product-1')
+        test_catalogue.create_attributes(product)
         response = self.client.get(product.get_absolute_url())
+        attributes = Feature.objects.filter(children__product_versions__product=product, level=0).prefetch_related(
+            Prefetch('children', queryset=Feature.objects.filter(level=1, product_versions__product=product).distinct(), to_attr='values')
+        ).distinct()
+        self.assertEqual(response.status_code, STATUS_CODE_200)
+        self.assertEqual(response.resolver_match.func.__name__, ProductDetailView.as_view().__name__)
+        self.assertTemplateUsed(response, 'catalogue/detail.html')
+        self.assertEqual(response.request['PATH_INFO'], product.get_absolute_url())
+        self.assertEqual(product, response.context['product'])
+        self.assertEqual(len(attributes), len(response.context['attributes']))
+        self.assertListEqual(list(attributes), list(response.context['attributes']))
+        test_catalogue.test_menu_categories(obj=self, response=response)
 
     def test_url_catalogue(self):
         """
@@ -258,8 +270,8 @@ class TestCatalog(TestCase):
         # with self.assertNumQueries(dict_values['num_queries']):
         self.assertEqual(response.status_code, STATUS_CODE_200)
         self.assertEqual(response.resolver_match.func.__name__, ProductCategoryView.as_view().__name__)
-        self.assertEqual(response.request['PATH_INFO'], category.get_absolute_url())
         self.assertTemplateUsed(response, 'catalogue/category.html')
+        self.assertEqual(response.request['PATH_INFO'], category.get_absolute_url())
         self.assertEqual(category, response.context['category'])
         self.assertEqual(len(p.page(dict_values.get('page', 1)).object_list), len(response.context['page_obj']))
         self.assertListEqual(list(p.page(dict_values.get('page', 1)).object_list), list(response.context['page_obj']))
