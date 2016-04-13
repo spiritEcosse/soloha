@@ -342,6 +342,7 @@ class TestCatalog(TestCase):
 
     def assertions_filter_click(self, category, dict_values={}):
         response = self.client.get(category.get_absolute_url())
+
         # count_products = Filter.objects.filter(slug=dict_values['filter_slug']).first().products.count()
         filters = Feature.objects.filter(slug=dict_values['filter_slug'], filter_products__in=Product.objects.filter(enable=True, categories__in=[category])).annotate(num_prod=Count('filter_products'))
         count_products = filters[0].num_prod
@@ -355,6 +356,7 @@ class TestCatalog(TestCase):
 
     def assertions_filter_remove_click(self, category, dict_values={}):
         response = self.client.get(category.get_absolute_url(dict_values))
+
         filters = Feature.objects.filter(slug=dict_values['filter_slug'], filter_products__in=Product.objects.filter(enable=True, categories__in=[category])).annotate(num_prod=Count('filter_products'))
         count_products = filters[0].num_prod
 
