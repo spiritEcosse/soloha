@@ -15,11 +15,10 @@ ProductRecommendation = get_model('catalogue', 'ProductRecommendation')
 class HomeView(CoreHomeView):
     def get_context_data(self, **kwargs):
         context = super(HomeView, self).get_context_data(**kwargs)
-        only = ['title', 'slug', 'structure', 'product_class', 'product_options__name', 'product_options__code', 'product_options__type', 'categories']
+        only = ['title', 'slug', 'structure', 'product_class', 'categories']
 
         context['products_new'] = Product.objects.only(*only).select_related('product_class').prefetch_related(
             Prefetch('images'),
-            Prefetch('product_options'),
             Prefetch('product_class__options'),
             Prefetch('stockrecords'),
             Prefetch('categories__parent__parent')
@@ -29,7 +28,6 @@ class HomeView(CoreHomeView):
             productrecommendation__isnull=False
         ).only(*only).select_related('product_class').prefetch_related(
             Prefetch('images'),
-            Prefetch('product_options'),
             Prefetch('product_class__options'),
             Prefetch('stockrecords'),
             Prefetch('categories__parent__parent')
@@ -39,7 +37,6 @@ class HomeView(CoreHomeView):
             line__isnull=False
         ).only(*only).select_related('product_class').prefetch_related(
             Prefetch('images'),
-            Prefetch('product_options'),
             Prefetch('stockrecords'),
             Prefetch('product_class__options'),
             Prefetch('categories__parent__parent'),

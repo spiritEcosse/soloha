@@ -19,14 +19,13 @@ from templatetags.filters_concatenation import concatenate
 from django.utils.translation import ugettext_lazy as _
 from soloha.settings import MAX_COUNT_PRODUCT, MAX_COUNT_CATEGORIES
 from soloha.settings import OSCAR_PRODUCTS_PER_PAGE
+from django.db import IntegrityError
 
 Product = get_model('catalogue', 'product')
 ProductClass = get_model('catalogue', 'ProductClass')
 Category = get_model('catalogue', 'category')
 ProductCategory = get_model('catalogue', 'ProductCategory')
-Filter = get_model('catalogue', 'Filter')
-AttributeOptionGroup = get_model('catalogue', 'AttributeOptionGroup')
-AttributeOption = get_model('catalogue', 'AttributeOption')
+Feature = get_model('catalogue', 'Feature')
 test_catalogue = catalogue.Test()
 
 STATUS_CODE_200 = 200
@@ -91,6 +90,13 @@ class TestCatalog(TestCase):
         category_1234 = Category.objects.get(name='Category-1234')
         slugs = [category_1234.parent.parent.parent.slug, category_1234.parent.parent.slug, category_1234.parent.slug, category_1234.slug]
         self.assertEqual(Category._slug_separator.join(map(str, slugs)), category_1234.full_slug)
+
+    def test_create_product(self):
+        message = 'UNIQUE constraint failed: catalogue_product.slug'
+
+        with self.assertRaisesMessage(expected_exception=IntegrityError, expected_message=message):
+            Product.objects.create(title='Product-1')
+            Product.objects.create(title='Product-1')
 
     def test_page_category(self):
         """
@@ -208,8 +214,7 @@ class TestCatalog(TestCase):
 
     def assertions_category(self, category, dict_values={}):
         paginate_by = OSCAR_PRODUCTS_PER_PAGE
-        only = ['title', 'slug', 'structure', 'product_class', 'product_options__name', 'product_options__code',
-                'product_options__type', 'enable', 'categories', 'filters']
+        only = ['title', 'slug', 'structure', 'product_class', 'enable', 'categories', 'filters']
         dict_filter = {'enable': True, 'categories__in': category.get_descendants(include_self=True)}
 
         if dict_values.get('filter_slug'):
@@ -223,7 +228,6 @@ class TestCatalog(TestCase):
 
         products = Product.objects.filter(**dict_filter).only(*only).distinct().select_related('product_class').prefetch_related(
             Prefetch('images'),
-            Prefetch('product_options'),
             Prefetch('product_class__options'),
             Prefetch('stockrecords'),
             Prefetch('categories__parent__parent')
@@ -231,8 +235,8 @@ class TestCatalog(TestCase):
 
         products_without_filters = Product.objects.only('id').filter(**dict_filter).distinct().order_by(dict_values['sorting_type'])
 
-        queryset_filters = Filter.objects.filter(products__in=products_without_filters).distinct().prefetch_related('products')
-        filters = Filter.objects.filter(level=0, children__in=queryset_filters).prefetch_related(
+        queryset_filters = Feature.objects.filter(filter_products__in=products_without_filters).distinct().prefetch_related('filter_products')
+        filters = Feature.objects.filter(level=0, children__in=queryset_filters).prefetch_related(
             Prefetch('children', queryset=queryset_filters, to_attr='children_in_products'),
         ).distinct()
 
@@ -354,7 +358,7 @@ class TestCatalog(TestCase):
     def test_filters_concatenation(self):
         test_catalogue.create_product_bulk()
         category = Category.objects.get(name='Category-12')
-        filter = Filter.objects.get(slug='shirina_1000')
+        filter = Feature.objects.get(slug='shirina_1000')
 
         # without filter slugs
         filter_slugs = ''

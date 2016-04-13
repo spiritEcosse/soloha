@@ -12,8 +12,8 @@ from oscar.apps.catalogue.abstract_models import *  # noqa
 @python_2_unicode_compatible
 class CustomAbstractProduct(models.Model):
     # Title is mandatory for canonical products but optional for child products
-    title = models.CharField(pgettext_lazy(u'Product title', u'Title'), max_length=255, blank=True)
-    slug = models.SlugField(_('Slug'), max_length=255, unique=False)
+    title = models.CharField(pgettext_lazy(u'Product title', u'Title'), max_length=255)
+    slug = models.SlugField(_('Slug'), max_length=255, unique=True)
     enable = models.BooleanField(verbose_name=_('Enable'), default=True)
     h1 = models.CharField(verbose_name=_('h1'), blank=True, max_length=255)
     meta_title = models.CharField(verbose_name=_('Meta tag: title'), blank=True, max_length=255)
@@ -53,8 +53,11 @@ class CustomAbstractProduct(models.Model):
     date_updated = models.DateTimeField(
         _("Date updated"), auto_now=True, db_index=True)
 
-    categories = models.ManyToManyField('catalogue.Category', related_name="products", verbose_name=_("Categories"), blank=True, null=True)
-    filters = models.ManyToManyField('catalogue.Filter', related_name="products", verbose_name=_('Filters of product'), blank=True, null=True)
+    categories = models.ManyToManyField('catalogue.Category', related_name="products", verbose_name=_("Categories"), blank=True)
+    filters = models.ManyToManyField('catalogue.Feature', related_name="filter_products", verbose_name=_('Filters of product'), blank=True)
+    attributes = models.ManyToManyField('catalogue.Feature', through='ProductFeature', verbose_name=_('Attribute of product'), related_name="attr_products", blank=True)
+    characteristics = models.ManyToManyField('catalogue.Feature', verbose_name='Characteristics', related_name='characteristic_products', blank=True)
+    options = models.ManyToManyField('catalogue.Feature', through='ProductOptions', related_name='option_products', verbose_name='Additional options')
 
     #: "Kind" of product, e.g. T-Shirt, Book, etc.
     #: None for child products, they inherit their parent's product class
@@ -62,19 +65,19 @@ class CustomAbstractProduct(models.Model):
         'catalogue.ProductClass', null=True, blank=True, on_delete=models.PROTECT,
         verbose_name=_('Product type'), related_name="products",
         help_text=_("Choose what type of product this is"))
-    attributes = models.ManyToManyField(
-        'catalogue.ProductAttribute',
-        through='catalogue.ProductAttributeValue',
-        verbose_name=_("Attributes"),
-        help_text=_("A product attribute is something that this product may "
-                    "have, such as a size, as specified by its class"))
+    # attributes = models.ManyToManyField(
+    #     'catalogue.ProductAttribute',
+    #     through='catalogue.ProductAttributeValue',
+    #     verbose_name=_("Attributes"),
+    #     help_text=_("A product attribute is something that this product may "
+    #                 "have, such as a size, as specified by its class"))
     #: It's possible to have options product class-wide, and per product.
-    product_options = models.ManyToManyField(
-        'catalogue.Option', blank=True, verbose_name=_("Product options"),
-        help_text=_("Options are values that can be associated with a item "
-                    "when it is added to a customer's basket.  This could be "
-                    "something like a personalised message to be printed on "
-                    "a T-shirt."))
+    # product_options = models.ManyToManyField(
+    #     'catalogue.Option', blank=True, verbose_name=_("Product options"),
+    #     help_text=_("Options are values that can be associated with a item "
+    #                 "when it is added to a customer's basket.  This could be "
+    #                 "something like a personalised message to be printed on "
+    #                 "a T-shirt."))
 
     recommended_products = models.ManyToManyField(
         'catalogue.Product', through='catalogue.ProductRecommendation', blank=True,
@@ -108,7 +111,7 @@ class CustomAbstractProduct(models.Model):
 
     def __init__(self, *args, **kwargs):
         super(CustomAbstractProduct, self).__init__(*args, **kwargs)
-        self.attr = ProductAttributesContainer(product=self)
+        # self.attr = ProductAttributesContainer(product=self)
 
     def __str__(self):
         if self.title:
@@ -204,7 +207,7 @@ class CustomAbstractProduct(models.Model):
         if not self.slug:
             self.slug = slugify(self.get_title())
         super(CustomAbstractProduct, self).save(*args, **kwargs)
-        self.attr.save()
+        # self.attr.save()
 
     # Properties
 
@@ -461,7 +464,7 @@ class CustomAbstractProduct(models.Model):
 
 
 @python_2_unicode_compatible
-class AbstractFilter(MPTTModel):
+class AbstractFeature(MPTTModel):
     title = models.CharField(max_length=255)
     slug = models.SlugField(verbose_name=_('Slug'), max_length=255, unique=True)
     parent = TreeForeignKey('self', verbose_name=_('Parent'), related_name='children', blank=True, null=True, db_index=True)
@@ -473,13 +476,16 @@ class AbstractFilter(MPTTModel):
         abstract = True
         unique_together = ('slug', 'parent', )
         ordering = ('sort', 'title', 'id', )
-        verbose_name = _('Filter')
-        verbose_name_plural = _('Filters')
+        verbose_name = _('Feature')
+        verbose_name_plural = _('Features')
 
     def __str__(self):
         if self.parent:
             return u'{}->{}'.format(self.parent, self.title)
         return self.title
+
+    def get_absolute_url(self):
+        return self.slug
 
 
 @python_2_unicode_compatible
@@ -495,10 +501,10 @@ class CustomAbstractCategory(MPTTModel):
     sort = models.IntegerField(blank=True, null=True, default=0)
     icon = models.ImageField(_('Icon'), upload_to='categories', blank=True, null=True, max_length=255)
     created = models.DateTimeField(auto_now_add=True)
-    image_banner = models.ImageField(_('Image banner'), upload_to='categories', blank=True, null=True, max_length=255)
+    image_banner = models.ImageField(_('Image banner'), upload_to='categories/%Y/%m/%d/', blank=True, null=True, max_length=255)
     link_banner = models.URLField(_('Link banner'), blank=True, null=True, max_length=255)
     description = models.TextField(_('Description'), blank=True)
-    image = models.ImageField(_('Image'), upload_to='categories', blank=True, null=True, max_length=255)
+    image = models.ImageField(_('Image'), upload_to='categories/%Y/%m/%d/', blank=True, null=True, max_length=255)
 
     _slug_separator = '/'
     _full_name_separator = ' > '
@@ -754,3 +760,71 @@ class CustomAbstractCategory(MPTTModel):
             options = {'size': (50, 31), 'crop': True}
             icon = get_thumbnailer(self.icon).get_thumbnail(options).url
         return icon
+
+
+@python_2_unicode_compatible
+class AbstractVersionAttribute(models.Model):
+    image = models.ImageField(_('Image'), upload_to='products/version/attribute/%Y/%m/%d/', blank=True, null=True, max_length=255)
+    product = models.ManyToManyField('catalogue.Product', verbose_name=_('Product'),
+                                     related_name='version_attributes', blank=True)
+    version = models.ForeignKey('catalogue.ProductVersion', verbose_name=_('Version of product'),
+                                related_name='version_attributes')
+    attribute = models.ForeignKey('catalogue.Feature', verbose_name=_('Attribute'),
+                                  related_name='version_attributes')
+
+    class Meta:
+        abstract = True
+        app_label = 'catalogue'
+        verbose_name = _('Version attribute')
+        verbose_name_plural = _('Version attributes')
+
+    def __str__(self):
+        return '{} - {}'.format(self.version, self.attribute)
+
+
+@python_2_unicode_compatible
+class AbstractProductVersion(models.Model):
+    attributes = models.ManyToManyField('catalogue.Feature', through='catalogue.VersionAttribute',
+                                        verbose_name=_('Attributes'), related_name='product_versions')
+    product = models.ForeignKey('catalogue.Product', related_name='versions', on_delete=models.DO_NOTHING)
+
+    class Meta:
+        abstract = True
+        app_label = 'catalogue'
+        verbose_name = _('Product version')
+        verbose_name_plural = _('Product versions')
+
+    def __str__(self):
+        return self.product
+
+
+@python_2_unicode_compatible
+class AbstractProductFeature(models.Model):
+    sort = models.IntegerField(_('Sort'), blank=True, null=True, default=0)
+    info = models.CharField(_('Block info'), max_length=255, blank=True)
+    product = models.ForeignKey('catalogue.Product', verbose_name=_('Product'), related_name='product_features', on_delete=models.DO_NOTHING)
+    feature = models.ForeignKey('catalogue.Feature', verbose_name=_('Feature'), related_name='product_features', on_delete=models.DO_NOTHING)
+
+    class Meta:
+        abstract = True
+        app_label = 'catalogue'
+        verbose_name = _('Product feature')
+        verbose_name_plural = _('Product features')
+
+    def __str__(self):
+        return '{} - {}'.format(self.product, self.feature)
+
+
+@python_2_unicode_compatible
+class AbstractProductOptions(models.Model):
+    product = models.ForeignKey('catalogue.Product', related_name='product_options')
+    option = models.ForeignKey('catalogue.Feature', related_name='product_options')
+
+    class Meta:
+        abstract = True
+        app_label = 'catalogue'
+        verbose_name = _('Product option')
+        verbose_name_plural = _('Product options')
+
+    def __str__(self):
+        return '{} - {}'.format(self.product, self.feature)
