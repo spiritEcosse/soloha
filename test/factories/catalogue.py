@@ -89,20 +89,26 @@ class Test(object):
             product = factories.create_product(title='Product {}'.format(num), price=num)
             factories.create_product_image(product=product)
             category_12 = Category.objects.get(name='Category-12')
-            product.categories.add(category_12)
+            category_3 = Category.objects.get(name='Category-3')
+            category_321 = Category.objects.get(name='Category-321')
             if num < 70:
+                product.categories.add(category_12)
                 product.filters.add(Filter.objects.get(title=u'длина_1000'))
                 product.filters.add(Filter.objects.get(title=u'ширина_1000'))
             elif num < 80:
+                product.categories.add(category_3)
                 product.filters.add(Filter.objects.get(title=u'длина_1000'))
                 product.filters.add(Filter.objects.get(title=u'ширина_1100'))
             elif num < 90:
+                product.categories.add(category_321)
                 product.filters.add(Filter.objects.get(title=u'длина_1100'))
                 product.filters.add(Filter.objects.get(title=u'ширина_1000'))
             elif num < 100:
+                product.categories.add(category_12)
                 product.filters.add(Filter.objects.get(title=u'длина_1200'))
                 product.filters.add(Filter.objects.get(title=u'ширина_1100'))
             else:
+                product.categories.add(category_12)
                 product.filters.add(Filter.objects.get(title=u'длина_1100'))
                 product.filters.add(Filter.objects.get(title=u'ширина_1200'))
 

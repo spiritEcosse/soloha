@@ -9,6 +9,7 @@ from braces import views
 from django.views.generic.list import MultipleObjectMixin
 from django.views.generic.detail import SingleObjectMixin
 from django.db.models.query import Prefetch
+from django.db.models import Count
 from django.http import HttpResponsePermanentRedirect, Http404
 from django.shortcuts import get_object_or_404
 from django.utils.http import urlquote
@@ -121,7 +122,8 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
         context = super(ProductCategoryView, self).get_context_data(**kwargs)
         queryset_filters = Filter.objects.filter(products__in=self.products_without_filters).distinct().prefetch_related('products')
         context['filters'] = Filter.objects.filter(level=0, children__in=queryset_filters).prefetch_related(
-            Prefetch('children', queryset=queryset_filters, to_attr='children_in_products'),
+            Prefetch('children', queryset=queryset_filters.annotate(num_prod=Count('products')),
+                     to_attr='children_in_products'),
         ).distinct()
         context['filter_slug'] = self.kwargs.get('filter_slug', '')
         context['sort_types'] = []
