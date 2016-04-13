@@ -469,7 +469,6 @@ class AbstractFeature(MPTTModel):
     slug = models.SlugField(verbose_name=_('Slug'), max_length=255, unique=True)
     parent = TreeForeignKey('self', verbose_name=_('Parent'), related_name='children', blank=True, null=True, db_index=True)
     sort = models.IntegerField(blank=True, null=True, default=0)
-    enable = models.BooleanField(verbose_name=_('Enable'), default=True)
     created = models.DateTimeField(auto_now_add=True)
 
     class Meta:
