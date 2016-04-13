@@ -308,7 +308,7 @@ class TestCatalog(TestCase):
 
         dict_values = {'page': 1, 'num_queries': 20, 'filter_slug': 'dlina_1100'}
         self.assertions_filter_click(category=category, dict_values=dict_values)
-        # self.assertions_filter_remove_click(category=category, dict_values=dict_values)
+        self.assertions_filter_remove_click(category=category, dict_values=dict_values)
 
         dict_values = {'page': 1, 'sorting_type': 'price_ascending', 'num_queries': 20, 'filter_slug': 'dlina_1100'}
         self.assertions_filter_click(category=category, dict_values=dict_values)
@@ -316,11 +316,11 @@ class TestCatalog(TestCase):
 
         dict_values = {'page': 1, 'sorting_type': 'price_descending', 'num_queries': 20, 'filter_slug': 'dlina_1100'}
         self.assertions_filter_click(category=category, dict_values=dict_values)
-        # self.assertions_filter_remove_click(category=category, dict_values=dict_values)
+        self.assertions_filter_remove_click(category=category, dict_values=dict_values)
 
         dict_values = {'page': 1, 'sorting_type': 'popularity', 'num_queries': 20, 'filter_slug': 'dlina_1100'}
         self.assertions_filter_click(category=category, dict_values=dict_values)
-        # self.assertions_filter_remove_click(category=category, dict_values=dict_values)
+        self.assertions_filter_remove_click(category=category, dict_values=dict_values)
 
     def assertions_filter_click(self, category, dict_values={}):
         response = self.client.get(category.get_absolute_url())
@@ -329,7 +329,7 @@ class TestCatalog(TestCase):
         filter_url = '{}?sorting_type={}'.format(category.get_absolute_url(dict_values), 'popularity')
 
         self.assertContains(response, '''<a href="{}">
-        <input type="checkbox">
+        <input type="checkbox"/>
         длина_1100
         <span class="count">({})</span>
         </a>'''.format(filter_url, count), count=1, html=True)
@@ -337,22 +337,19 @@ class TestCatalog(TestCase):
         # self.assertIn('<a href="{}">'.format(filter_url), response.content)
 
     def assertions_filter_remove_click(self, category, dict_values={}):
-        dict_values['sorting_type'] = dict_values.get('sorting_type', 'popularity')
+        # dict_values['sorting_type'] = dict_values.get('sorting_type', 'popularity')
         response = self.client.get(category.get_absolute_url(dict_values))
         print(category.get_absolute_url(dict_values))
         count = Filter.objects.filter(slug=dict_values['filter_slug'], products__in=Product.objects.all()).first().products.count()
 
-        # filter_url = '{}'.format(category.get_absolute_url())
-        filter_url = '{}?sorting_type={}'.format(category.get_absolute_url(), dict_values['sorting_type'])
-        # filter_url = '{}?sorting_type={}'.format(category.get_absolute_url(), 'popularity')
+        # filter_url = '{}?sorting_type={}'.format(category.get_absolute_url(), dict_values['sorting_type'])
+        filter_url = '{}?sorting_type={}'.format(category.get_absolute_url(), 'popularity')
 
         self.assertContains(response, '''<a href="{}">
-        <input type="checkbox" checked="">
+        <input type="checkbox" checked/>
         длина_1100
         <span class="count">({})</span>
         </a>'''.format(filter_url, count), count=1, html=True)
-
-        # self.assertIn('<a href="{}">'.format(filter_url), response.content)
 
     def test_filters_concatenation(self):
         test_catalogue.create_product_bulk()
