@@ -64,6 +64,11 @@ class TestCatalog(TestCase):
         # ).distinct()
         test_catalogue.test_menu_categories(obj=self, response=response)
 
+    def test_get_product_attributes(self):
+        test_catalogue.create_product_bulk()
+        product = Product.objects.get(title='Product 1')
+        response = self.client.get(product.get_absolute_url())
+
     def test_url_catalogue(self):
         """
         accessibility page catalogue
@@ -97,6 +102,13 @@ class TestCatalog(TestCase):
         with self.assertRaisesMessage(expected_exception=IntegrityError, expected_message=message):
             Product.objects.create(title='Product-1')
             Product.objects.create(title='Product-1')
+
+    def test_create_feature(self):
+        message = 'UNIQUE constraint failed: catalogue_feature.slug'
+
+        with self.assertRaisesMessage(expected_exception=IntegrityError, expected_message=message):
+            Feature.objects.create(title='Feature-1')
+            Feature.objects.create(title='Feature-1')
 
     def test_page_category(self):
         """

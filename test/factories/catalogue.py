@@ -10,10 +10,13 @@ from oscar.core.loading import get_class, get_model
 from decimal import Decimal as D
 
 Free = get_class('shipping.methods', 'Free')
-ProductCategory = get_model('catalogue', 'productcategory')
+ProductCategory = get_model('catalogue', 'ProductCategory')
 Category = get_model('catalogue', 'category')
 Product = get_model('catalogue', 'product')
+ProductFeature = get_model('catalogue', 'ProductFeature')
+ProductVersion = get_model('catalogue', 'ProductVersion')
 Feature = get_model('catalogue', 'Feature')
+VersionAttribute = get_model('catalogue', 'VersionAttribute')
 ProductRecommendation = get_model('catalogue', 'ProductRecommendation')
 Basket = get_model('basket', 'Basket')
 OrderCreator = get_class('order.utils', 'OrderCreator')
@@ -49,6 +52,41 @@ class Test(object):
         category_8 = Category.objects.create(name='Category-8')
         category_9 = Category.objects.create(name='Category-9')
         category_10 = Category.objects.create(name='Category-10')
+
+    def create_feature(self):
+        feature_1 = Feature.objects.create(title='Feature 1')
+        feature_11 = Feature.objects.create(title='Feature 11', parent=feature_1)
+        feature_2 = Feature.objects.create(title='Feature 2')
+        feature_21 = Feature.objects.create(title='Feature 21', parent=feature_2)
+        feature_211 = Feature.objects.create(title='Feature 211', parent=feature_21)
+        feature_3 = Feature.objects.create(title='Feature 3')
+        feature_31 = Feature.objects.create(title='Feature 31', parent=feature_3)
+        feature_4 = Feature.objects.create(title='Feature 4')
+        feature_41 = Feature.objects.create(title='Feature 41', parent=feature_4)
+        feature_5 = Feature.objects.create(title='Feature 5')
+        feature_51 = Feature.objects.create(title='Feature 51', parent=feature_5)
+        feature_6 = Feature.objects.create(title='Feature 6')
+        feature_61 = Feature.objects.create(title='Feature 61', parent=feature_6)
+        feature_7 = Feature.objects.create(title='Feature 7')
+        feature_71 = Feature.objects.create(title='Feature 71', parent=feature_7)
+        feature_8 = Feature.objects.create(title='Feature 8')
+        feature_81 = Feature.objects.create(title='Feature 81', parent=feature_8)
+        feature_9 = Feature.objects.create(title='Feature 9')
+        feature_91 = Feature.objects.create(title='Feature 91', parent=feature_9)
+        feature_10 = Feature.objects.create(title='Feature 10')
+        feature_101 = Feature.objects.create(title='Feature 101', parent=feature_10)
+
+    def create_attributes(self, product):
+        self.create_feature()
+        feature_11 = Feature.objects.get(title='Feature 11')
+        feature_21 = Feature.objects.get(title='Feature 21')
+        feature_31 = Feature.objects.get(title='Feature 31')
+        product_version_1 = ProductVersion.objects.create(product=product)
+        VersionAttribute.objects.create(version=product_version_1, attribute=feature_11)
+        VersionAttribute.objects.create(version=product_version_1, attribute=feature_21)
+        VersionAttribute.objects.create(version=product_version_1, attribute=feature_31)
+        product_version_2 = ProductVersion.objects.create(product=product)
+        VersionAttribute.objects.create(version=product_version_2, attribute=feature_11)
 
     def create_product_bulk(self):
         """

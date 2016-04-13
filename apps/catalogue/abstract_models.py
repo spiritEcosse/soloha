@@ -484,6 +484,12 @@ class AbstractFeature(MPTTModel):
             return u'{}->{}'.format(self.parent, self.title)
         return self.title
 
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.title)
+
+        super(AbstractFeature, self).save(*args, **kwargs)
+
     def get_absolute_url(self):
         return self.slug
 
@@ -774,12 +780,13 @@ class AbstractVersionAttribute(models.Model):
 
     class Meta:
         abstract = True
+        unique_together = ('version', 'attribute', )
         app_label = 'catalogue'
         verbose_name = _('Version attribute')
         verbose_name_plural = _('Version attributes')
 
     def __str__(self):
-        return '{} - {}'.format(self.version, self.attribute)
+        return '{}, {} - {}'.format(self.pk, self.version.product.title, self.attribute.title)
 
 
 @python_2_unicode_compatible
@@ -795,7 +802,7 @@ class AbstractProductVersion(models.Model):
         verbose_name_plural = _('Product versions')
 
     def __str__(self):
-        return self.product
+        return '{}, Version of product - {}'.format(self.pk, self.product.title)
 
 
 @python_2_unicode_compatible
@@ -812,7 +819,7 @@ class AbstractProductFeature(models.Model):
         verbose_name_plural = _('Product features')
 
     def __str__(self):
-        return '{} - {}'.format(self.product, self.feature)
+        return '{}, {} - {}'.format(self.pk, self.product.title, self.feature.title)
 
 
 @python_2_unicode_compatible
@@ -827,4 +834,4 @@ class AbstractProductOptions(models.Model):
         verbose_name_plural = _('Product options')
 
     def __str__(self):
-        return '{} - {}'.format(self.product, self.feature)
+        return '{}, {} - {}'.format(self.pk, self.product.title, self.feature.title)
