@@ -7,7 +7,8 @@ app = angular.module "#{app_name}.controllers"
 
 app.controller 'Catalogue', ['$http', '$scope', '$location', '$window', '$document', '$log', 'djangoUrl', ($http, $scope, $location, $window, $document, $log, djangoUrl) ->
   products_url = djangoUrl.reverse('catalogue:products')
-
+  
+  $scope.name = 'test'
 #  $scope.$watch "category", () ->
 #    $http.post(products_url, {category_pk: $scope.category.pk}).success (data) ->
 #      $scope.products = data.products

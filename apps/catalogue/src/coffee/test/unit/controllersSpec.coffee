@@ -1,3 +1,7 @@
 'use strict'
 
-#describe 'Catalogue controllers', () ->
+describe 'Catalogue controllers', () ->
+  name = 'test'
+  expect(name).toBe('test')
+#  'test'.toBe('test')
+
