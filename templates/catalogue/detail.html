@@ -217,25 +217,11 @@
                                     <div class="col-xs-12 values pull-right">
                                         <div class="checkbox">
                                             <label class="block">
-                                                <input type="checkbox" value="">
                                                 <select class="form-control">
-                                                    <option>Большие ящики (2 шт) ясень (+ 2225 грн)</option>
-                                                    <option>2</option>
-                                                    <option>3</option>
-                                                    <option>4</option>
-                                                    <option>5</option>
-                                                </select>
-                                            </label>
-                                        </div>
-                                        <div class="checkbox">
-                                            <label>
-                                                <input type="checkbox" value="">
-                                                <select class="form-control">
-                                                    <option>Маленькие ящики (4 шт) ясень (+ 3000 грн)</option>
-                                                    <option>2</option>
-                                                    <option>3</option>
-                                                    <option>4</option>
-                                                    <option>5</option>
+                                                    <option>--не выбрано--</option>
+                                                    {% for option in product_options %}
+                                                        <option> {{ option }} </option>
+                                                    {% endfor %}
                                                 </select>
                                             </label>
                                         </div>

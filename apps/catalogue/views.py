@@ -152,6 +152,8 @@ class ProductDetailView(CoreProductDetailView):
         else:
             context['product_not_availability'] = _('Product is not available.')
 
+        context['product_options'] = Feature.objects.filter(level=0, children__product_options__product=Product.objects.get(pk=1))
+
         context['attributes'] = Feature.objects.filter(children__product_versions__product=self.object, level=0).prefetch_related(
             Prefetch('children', queryset=Feature.objects.filter(level=1, product_versions__product=self.object).distinct(), to_attr='values')
         ).distinct()

@@ -353,6 +353,7 @@ class TestCatalog(TestCase):
 
     def assertions_filter_click(self, category, dict_values={}):
         response = self.client.get(category.get_absolute_url())
+
         # count_products = Filter.objects.filter(slug=dict_values['filter_slug']).first().products.count()
         filters = Feature.objects.filter(slug=dict_values['filter_slug'], filter_products__in=Product.objects.filter(enable=True, categories__in=[category])).annotate(num_prod=Count('filter_products'))
         count_products = filters[0].num_prod
@@ -366,6 +367,7 @@ class TestCatalog(TestCase):
 
     def assertions_filter_remove_click(self, category, dict_values={}):
         response = self.client.get(category.get_absolute_url(dict_values))
+
         filters = Feature.objects.filter(slug=dict_values['filter_slug'], filter_products__in=Product.objects.filter(enable=True, categories__in=[category])).annotate(num_prod=Count('filter_products'))
         count_products = filters[0].num_prod
 
@@ -409,3 +411,17 @@ class TestCatalog(TestCase):
         absolute_url = category.get_absolute_url({'filter_slug': filter_slugs})
         self.assertEqual(absolute_url, link_concatenate)
 
+    def test_product_options(self):
+        test_catalogue.create_product_bulk()
+
+        product1 = Product.objects.get(pk=1)
+        product2 = Product.objects.get(pk=2)
+
+        test_catalogue.create_options(product1, product2)
+
+        response = self.client.get(product1.get_absolute_url())
+        product_options = Feature.objects.filter(level=0, children__product_options__product=product1)
+
+        self.assertEqual(response.status_code, STATUS_CODE_200)
+        self.assertEqual(len(product_options), len(response.context['product_options']))
+        self.assertListEqual(list(product_options), list(response.context['product_options']))

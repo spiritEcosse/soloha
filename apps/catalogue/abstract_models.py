@@ -813,6 +813,7 @@ class AbstractProductFeature(models.Model):
 
     class Meta:
         abstract = True
+        unique_together = ('product', 'feature', )
         app_label = 'catalogue'
         verbose_name = _('Product feature')
         verbose_name_plural = _('Product features')
@@ -829,8 +830,9 @@ class AbstractProductOptions(models.Model):
     class Meta:
         abstract = True
         app_label = 'catalogue'
+        unique_together = ('product', 'option', )
         verbose_name = _('Product option')
         verbose_name_plural = _('Product options')
 
     def __str__(self):
-        return '{}, {} - {}'.format(self.pk, self.product.title, self.feature.title)
+        return '{}, {} - {}'.format(self.pk, self.product.title, self.option.title)
