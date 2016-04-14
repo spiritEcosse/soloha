@@ -3,7 +3,6 @@
 from django.test import TestCase
 from django.test import Client
 from oscar.core.loading import get_class, get_model
-from oscar.test.factories import create_product
 from oscar.apps.catalogue.categories import create_from_breadcrumbs
 from easy_thumbnails.files import get_thumbnailer
 from soloha.settings import IMAGE_NOT_FOUND
@@ -15,7 +14,7 @@ from django.db.models.query import Prefetch
 from apps.catalogue.views import ProductCategoryView, ProductDetailView
 from django.core.paginator import Paginator
 from django.db.models import Count
-from test.factories import catalogue
+from python_test.factories import catalogue
 from templatetags.filters_concatenation import concatenate
 from django.utils.translation import ugettext_lazy as _
 from soloha.settings import MAX_COUNT_PRODUCT, MAX_COUNT_CATEGORIES

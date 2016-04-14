@@ -63,6 +63,17 @@
 }).call(this);
 
 (function() {
+
+
+}).call(this);
+
+(function() {
+  'use strict';
+
+
+}).call(this);
+
+(function() {
   'use strict';
 
   /* Controllers */

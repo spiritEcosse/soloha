@@ -7,7 +7,7 @@ import json
 from django.db.models.query import Prefetch
 from oscar.core.loading import get_model
 from oscar.apps.catalogue.categories import create_from_breadcrumbs
-from test.factories import catalogue
+from python_test.factories import catalogue
 from apps.promotions.views import HomeView
 
 Category = get_model('catalogue', 'category')
