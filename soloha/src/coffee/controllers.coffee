@@ -3,7 +3,7 @@
 ### Controllers ###
 
 app_name = "soloha"
-app = angular.module "#{app_name}.controllers", []
+app = angular.module app_name, []
 
 app.factory('superCache', ['$cacheFactory', ($cacheFactory) ->
   return $cacheFactory 'super-cache'

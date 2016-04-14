@@ -3,10 +3,12 @@
 ### Controllers ###
 
 app_name = "soloha"
-app = angular.module "#{app_name}.controllers"
+app = angular.module app_name, []
 
 app.controller 'Catalogue', ['$http', '$scope', '$location', '$window', '$document', '$log', 'djangoUrl', ($http, $scope, $location, $window, $document, $log, djangoUrl) ->
   products_url = djangoUrl.reverse('catalogue:products')
+
+  $scope.product = 'as'
 
 #  $scope.$watch "category", () ->
 #    $http.post(products_url, {category_pk: $scope.category.pk}).success (data) ->
