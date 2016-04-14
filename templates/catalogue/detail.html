@@ -118,7 +118,7 @@
                                     {% if price %}
                                         цена:
                                         <span class="number">
-                                            {{ price }} {{ currency }}
+                                            <span ng-bind="product.price()">{{ price }} {{ currency }}
     {#                                    {% block product_stock_record %}#}
     {#                                        {% include "catalogue/partials/stock_record.html" with verbose=1 %}#}
     {#                                    {% endblock %}#}

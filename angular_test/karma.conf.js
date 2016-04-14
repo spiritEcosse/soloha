@@ -25,8 +25,10 @@ module.exports = function(config){
             'static/bower_components/angular-resource/angular-resource.js',
             'static/bower_components/angular-animate/angular-animate.js',
             'static/bower_components/angular-mocks/angular-mocks.js',
+            // '.env/lib/python2.7/site-packages/djangular/static/djangular/js/django-angular.js',
             'soloha/**/*.coffee',
-            'apps/**/*.coffee'
+            'apps/**/*.coffee',
+            'angular_test/apps/**/*.coffee'
         ],
 
         autoWatch : true,

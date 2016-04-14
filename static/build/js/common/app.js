@@ -6,7 +6,7 @@
 
   app_name = 'soloha';
 
-  app = angular.module(app_name, ["" + app_name + ".controllers", 'ng.django.urls', 'ui.bootstrap']);
+  app = angular.module(app_name, ['ng.django.urls', 'ui.bootstrap']);
 
   app.config([
     '$httpProvider', function($httpProvider) {
@@ -26,7 +26,7 @@
 
   app_name = "soloha";
 
-  app = angular.module("" + app_name + ".controllers", []);
+  app = angular.module(app_name, []);
 
   app.factory('superCache', [
     '$cacheFactory', function($cacheFactory) {
@@ -51,30 +51,13 @@
 
   app_name = "soloha";
 
-  app = angular.module("" + app_name + ".controllers");
+  app = angular.module(app_name, []);
 
   app.controller('Catalogue', [
-    '$http', '$scope', '$location', '$window', '$document', '$log', 'djangoUrl', function($http, $scope, $location, $window, $document, $log, djangoUrl) {
-      var products_url;
-      products_url = djangoUrl.reverse('catalogue:products');
-      return $scope.name = 'test';
+    '$http', '$scope', '$location', '$window', '$document', '$log', function($http, $scope, $location, $window, $document, $log) {
+      return $scope.product = 'as';
     }
   ]);
-
-}).call(this);
-
-(function() {
-
-
-}).call(this);
-
-(function() {
-  'use strict';
-  describe('Catalogue controllers', function() {
-    var name;
-    name = 'test';
-    return expect(name).toBe('test');
-  });
 
 }).call(this);
 
@@ -86,7 +69,7 @@
 
   app_name = "soloha";
 
-  app = angular.module("" + app_name + ".controllers");
+  app = angular.module("" + app_name + ".controllers", []);
 
   app.controller('Home', [
     '$http', '$scope', '$window', '$document', '$log', 'djangoUrl', function($http, $scope, $window, $document, $log, djangoUrl) {
