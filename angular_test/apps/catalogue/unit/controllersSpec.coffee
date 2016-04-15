@@ -4,12 +4,17 @@ describe 'Catalogue', () ->
   beforeEach(module('soloha'))
   $controller = undefined
 
-  beforeEach inject (_$controller_) ->
+  beforeEach inject (_$controller_, $injector) ->
     $controller = _$controller_
+    Product = $injector.get('Product')
 
-  it 'should change price by attribute', () ->
+  it 'should change price by attribute', inject (Product) ->
     $scope = {}
-    controller = $controller 'Product', { $scope: $scope}
-#    expect(scope.product).toEqual(Product.get({pk: 1}))
+    product = Product.get(pk: 1)
+    product.$promise.then (data) ->
+      product.pk = data.pk
+
+    controller = $controller 'Product', { $scope: $scope }
+    expect($scope.product.pk).toEqual(product.pk)
 
   
