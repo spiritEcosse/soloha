@@ -24,7 +24,7 @@
 
   app = angular.module(app_name, []);
 
-  catalogue = angular.module('Catalogue', ['ngResource']);
+  catalogue = angular.module(app, ['ngResource']);
 
   catalogue.factory('Product', [
     '$resource', function($resource) {
@@ -46,6 +46,7 @@
     '$http', '$scope', '$window', '$document', '$location', function($http, $scope, $window, $document, $location) {
       $scope.product = [];
       $scope.product.price = '12';
+      $scope.models = Product.query();
       return $http.post($location.absUrl()).success(function(data) {
         return console.log(data);
       }).error(function() {
