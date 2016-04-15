@@ -32,12 +32,6 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
     model = Product
     paginate_by = OSCAR_PRODUCTS_PER_PAGE
 
-    def __init__(self, *args, **kwargs):
-        super(ProductCategoryView, self).__init__(*args, **kwargs)
-        self.products_without_filters = None
-        self.object = None
-        self.object_list = None
-
     def post(self, request, *args, **kwargs):
         data = json.loads(self.request.body)
         # self.kwargs['category_slug'] = data.get('category_slug')
@@ -139,7 +133,20 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
         return context
 
 
-class ProductDetailView(CoreProductDetailView):
+class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CoreProductDetailView):
+    def post(self, request, *args, **kwargs):
+        data = json.loads(self.request.body)
+        self.object = self.get_object()
+
+    def post_ajax(self, request, *args, **kwargs):
+        super(ProductDetailView, self).post_ajax(request, *args, **kwargs)
+        return self.render_json_object_response(self.get_context_data_json())
+
+    def get_context_data_json(self, **kwargs):
+        context = dict()
+        context['attributes'] = self.get_attributes()
+        return context
+
     def get_context_data(self, **kwargs):
         context = super(ProductDetailView, self).get_context_data(**kwargs)
         selector = Selector()
@@ -152,9 +159,11 @@ class ProductDetailView(CoreProductDetailView):
         else:
             context['product_not_availability'] = _('Product is not available.')
 
-        context['product_options'] = Feature.objects.filter(level=0, children__product_options__product=Product.objects.get(pk=1))
+        context['product_options'] = Feature.objects.filter(level=0, children__product_options__product=self.object)
+        context['attributes'] = self.get_attributes()
+        return context
 
-        context['attributes'] = Feature.objects.filter(children__product_versions__product=self.object, level=0).prefetch_related(
+    def get_attributes(self):
+        return Feature.objects.only('title', 'pk').filter(children__product_versions__product=self.object, level=0).prefetch_related(
             Prefetch('children', queryset=Feature.objects.filter(level=1, product_versions__product=self.object).distinct(), to_attr='values')
         ).distinct()
-        return context

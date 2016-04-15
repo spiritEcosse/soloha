@@ -5,12 +5,12 @@
 app_name = "soloha"
 app = angular.module app_name, []
 
-app.factory('superCache', ['$cacheFactory', ($cacheFactory) ->
-  return $cacheFactory 'super-cache'
-])
+#app.factory('superCache', ['$cacheFactory', ($cacheFactory) ->
+#  return $cacheFactory 'super-cache'
+#])
 
-app.controller 'Header', ['$http', '$scope', '$location', '$window', '$document', '$log', '$cacheFactory', 'djangoUrl', ($http, $scope, $location, $window, $document, $log, $cacheFactory, djangoUrl) ->
-  categories = djangoUrl.reverse('promotions:categories')
+#app.controller 'Header', ['$http', '$scope', '$location', '$window', '$document', '$log', '$cacheFactory', ($http, $scope, $location, $window, $document, $log, $cacheFactory) ->
+#  categories = djangoUrl.reverse('promotions:categories')
 #  cache = $cacheFactory('superCache')
 #
 #  if !cache.get("categories")
@@ -22,6 +22,6 @@ app.controller 'Header', ['$http', '$scope', '$location', '$window', '$document'
 #      console.log('An error occurred during submission')
 #  else
 #    $scope.categories = cache.get("categories")
-]
+#]
 
 
