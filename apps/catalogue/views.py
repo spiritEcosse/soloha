@@ -22,6 +22,7 @@ import json
 import warnings
 from django.core import serializers
 from djangular.views.crud import NgCRUDView
+from oscar.core.loading import get_class
 
 Product = get_model('catalogue', 'product')
 Category = get_model('catalogue', 'category')
@@ -174,6 +175,5 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
         return Feature.objects.filter(level=0, children__product_options__product=self.object)
 
 
-class MyCRUDView(NgCRUDView):
+class ProductCRUDView(NgCRUDView):
     model = Product
-
