@@ -55,7 +55,8 @@
 
   app.controller('Catalogue', [
     '$http', '$scope', '$location', '$window', '$document', '$log', function($http, $scope, $location, $window, $document, $log) {
-      return $scope.product = 'as';
+      $scope.product = 'as';
+      return $http.get('http://127.0.0.1:8000/category-1/category-12/category-123/product-1');
     }
   ]);
 
