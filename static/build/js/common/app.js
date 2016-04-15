@@ -64,7 +64,7 @@
 
   app_name = "soloha";
 
-  app = angular.module("" + app_name + ".controllers", []);
+  app = angular.module(app_name + ".controllers", []);
 
   app.controller('Home', [
     '$http', '$scope', '$window', '$document', '$log', 'djangoUrl', function($http, $scope, $window, $document, $log, djangoUrl) {
