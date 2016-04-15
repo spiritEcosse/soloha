@@ -27,6 +27,7 @@ from oscar.core.loading import get_class
 Product = get_model('catalogue', 'product')
 Category = get_model('catalogue', 'category')
 Feature = get_model('catalogue', 'Feature')
+ProductOptions = get_model('catalogue', 'ProductOptions')
 
 
 class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, SingleObjectMixin, generic.ListView):
@@ -177,3 +178,8 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
 
 class ProductCRUDView(NgCRUDView):
     model = Product
+
+
+class ProductOptionsCRUDView(NgCRUDView):
+    model = ProductOptions
+

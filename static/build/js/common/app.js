@@ -40,16 +40,25 @@
     }
   ]);
 
+  app.factory('ProductOptions', [
+    '$resource', function($resource) {
+      return $resource('/catalogue/crud/product_options/', {
+        'pk': '@pk'
+      });
+    }
+  ]);
+
   app.controller('Product', [
     '$http', '$scope', '$window', '$document', '$location', 'Product', function($http, $scope, $window, $document, $location, Product) {
-      $scope.pk = 2;
+      var res;
       $scope.product = Product.get({
-        pk: $scope.pk
+        pk: 2
+      });
+      res = Promise.resolve($scope.product);
+      $scope.product.$promise.then(function(data) {
+        return $scope.product.pk = data.pk;
       });
       console.log($scope.product.pk);
-      $scope.product.$promise.then(function(product) {
-        return $scope.product.pk = product.pk;
-      });
       return $http.post($location.absUrl()).success(function(data) {
         return console.log(data);
       }).error(function() {
