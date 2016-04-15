@@ -20,6 +20,7 @@ from django.db.models import F
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger, InvalidPage
 import json
 import warnings
+from django.core import serializers
 
 Product = get_model('catalogue', 'product')
 Category = get_model('catalogue', 'category')
@@ -135,16 +136,15 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
 
 class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CoreProductDetailView):
     def post(self, request, *args, **kwargs):
-        data = json.loads(self.request.body)
         self.object = self.get_object()
 
     def post_ajax(self, request, *args, **kwargs):
         super(ProductDetailView, self).post_ajax(request, *args, **kwargs)
-        return self.render_json_object_response(self.get_context_data_json())
+        return self.render_json_response(self.get_context_data_json())
 
     def get_context_data_json(self, **kwargs):
         context = dict()
-        context['attributes'] = self.get_attributes()
+        context['attributes'] = serializers.serialize("json", self.get_attributes(), **kwargs)
         return context
 
     def get_context_data(self, **kwargs):
