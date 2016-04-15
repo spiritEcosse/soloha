@@ -3,14 +3,7 @@
 ### Controllers ###
 
 app_name = 'soloha'
-app = angular.module app_name, []
-
-catalogue = angular.module('Catalogue', [ 'ngResource' ])
-catalogue.factory 'Product', [
-  '$resource'
-  ($resource) ->
-    $resource '/crud/Product/', { 'pk': '@pk' }, {}
-]
+app = angular.module app_name, ['ngResource']
 
 app.config ['$httpProvider', ($httpProvider) ->
   $httpProvider.defaults.xsrfCookieName = 'csrftoken'
@@ -18,9 +11,13 @@ app.config ['$httpProvider', ($httpProvider) ->
   $httpProvider.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest'
 ]
 
-app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location', ($http, $scope, $window, $document, $location) ->
-  $scope.product = []
-  $scope.product.price = '12'
+app.factory 'Product', ['$resource', ($resource) ->
+    $resource '/catalogue/crud/product/', { 'pk': '@pk' }, {}
+]
+
+app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location', 'Product', ($http, $scope, $window, $document, $location, Product) ->
+  $scope.product = Product.get({pk: 3})
+  console.log($scope.product)
 
   $http.post($location.absUrl()).success (data) ->
     console.log(data)

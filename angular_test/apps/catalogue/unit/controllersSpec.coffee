@@ -9,7 +9,7 @@ describe 'Catalogue', () ->
 
   it 'should change price by attribute', () ->
     $scope = {}
-    controller = $controller 'Product', { $scope: $scope }
-    expect($scope.product.price).toEqual('12')
+    controller = $controller 'Product', { $scope: $scope}
+#    expect(scope.product).toEqual(Product.get({pk: 1}))
 
   

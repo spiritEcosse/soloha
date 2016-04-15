@@ -18,21 +18,11 @@
   'use strict';
 
   /* Controllers */
-  var app, app_name, catalogue;
+  var app, app_name;
 
   app_name = 'soloha';
 
-  app = angular.module(app_name, []);
-
-  catalogue = angular.module('Catalogue', ['ngResource']);
-
-  catalogue.factory('Product', [
-    '$resource', function($resource) {
-      return $resource('/crud/Product/', {
-        'pk': '@pk'
-      }, {});
-    }
-  ]);
+  app = angular.module(app_name, ['ngResource']);
 
   app.config([
     '$httpProvider', function($httpProvider) {
@@ -42,10 +32,20 @@
     }
   ]);
 
+  app.factory('Product', [
+    '$resource', function($resource) {
+      return $resource('/catalogue/crud/product/', {
+        'pk': '@pk'
+      }, {});
+    }
+  ]);
+
   app.controller('Product', [
-    '$http', '$scope', '$window', '$document', '$location', function($http, $scope, $window, $document, $location) {
-      $scope.product = [];
-      $scope.product.price = '12';
+    '$http', '$scope', '$window', '$document', '$location', 'Product', function($http, $scope, $window, $document, $location, Product) {
+      $scope.product = Product.get({
+        pk: 3
+      });
+      console.log($scope.product);
       return $http.post($location.absUrl()).success(function(data) {
         return console.log(data);
       }).error(function() {
@@ -64,7 +64,7 @@
 
   app_name = "soloha";
 
-  app = angular.module(app_name + ".controllers", []);
+  app = angular.module("" + app_name + ".controllers", []);
 
   app.controller('Home', [
     '$http', '$scope', '$window', '$document', '$log', 'djangoUrl', function($http, $scope, $window, $document, $log, djangoUrl) {
