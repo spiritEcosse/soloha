@@ -18,11 +18,21 @@
   'use strict';
 
   /* Controllers */
-  var app, app_name;
+  var app, app_name, catalogue;
 
   app_name = 'soloha';
 
   app = angular.module(app_name, []);
+
+  catalogue = angular.module('Catalogue', ['ngResource']);
+
+  catalogue.factory('Product', [
+    '$resource', function($resource) {
+      return $resource('/crud/Product/', {
+        'pk': '@pk'
+      }, {});
+    }
+  ]);
 
   app.config([
     '$httpProvider', function($httpProvider) {

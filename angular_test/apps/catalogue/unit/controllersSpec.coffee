@@ -12,3 +12,4 @@ describe 'Catalogue', () ->
     controller = $controller 'Product', { $scope: $scope }
     expect($scope.product.price).toEqual('12')
 
+  

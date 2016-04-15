@@ -10,28 +10,14 @@
     "grunt": "^0.4.5",
     "grunt-coffee-build": "^1.4.12",
     "grunt-contrib": "^0.11.0",
-<<<<<<< HEAD
     "grunt-contrib-coffee": "^0.10.0",
     "grunt-contrib-less": "^0.11.0",
-=======
-    "grunt-contrib-coffee": "^0.13.0",
-    "grunt-contrib-less": "^1.2.0",
-    "install": "^0.6.1",
->>>>>>> d62f5ca2f3a2163d6318b9dd31131e64b8a0e650
     "jasmine-core": "^2.4.1",
     "karma": "^0.13.22",
     "karma-chrome-launcher": "^0.2.3",
     "karma-coffee-preprocessor": "^0.3.0",
     "karma-firefox-launcher": "^0.1.7",
-<<<<<<< HEAD
     "karma-jasmine": "~0.3.8"
-=======
-    "karma-ie-launcher": "^0.2.0",
-    "karma-jasmine": "^0.3.8",
-    "karma-opera-launcher": "^0.3.0",
-    "karma-phantomjs-launcher": "^1.0.0",
-    "karma-safari-launcher": "^0.1.1"
->>>>>>> d62f5ca2f3a2163d6318b9dd31131e64b8a0e650
   },
   "scripts": {
     "prestart": "npm install",

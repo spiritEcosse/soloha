@@ -5,6 +5,7 @@ from oscar.core.loading import get_class
 detail_view = get_class('catalogue.views', 'ProductDetailView')
 catalogue_view = get_class('catalogue.views', 'CatalogueView')
 category_view = get_class('catalogue.views', 'ProductCategoryView')
+MyCRUDView = get_class('catalogue.views', 'MyCRUDView')
 
 
 class Soloha(app.Shop):
@@ -15,6 +16,7 @@ class Soloha(app.Shop):
             url(r'^(?P<category_slug>[\w-]+(/(?!filter)[\w-]+(?!filter))*)(?:/filter/(?P<filter_slug>[\w-]+(/[\w-]+)*))*/$', category_view.as_view(), name='category'),
             url(r'^(?P<slug>[\w-]+)$', detail_view.as_view(), name='detail'),
             url(r'^(?P<category_slug>[\w-]+(/[\w-]+)*)/(?P<slug>[\w-]+)$', detail_view.as_view(), name='detail'),
+            url(r'^crud/Product/?$', MyCRUDView.as_view(), name='my_crud_view'),
             # url(r'^(?P<category_slug>[\w-]+(/[\w-]+)*)/$', category_view.as_view(), name='category'),
         ]
         return urlpatterns

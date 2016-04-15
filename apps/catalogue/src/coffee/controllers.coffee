@@ -5,6 +5,13 @@
 app_name = 'soloha'
 app = angular.module app_name, []
 
+catalogue = angular.module('Catalogue', [ 'ngResource' ])
+catalogue.factory 'Product', [
+  '$resource'
+  ($resource) ->
+    $resource '/crud/Product/', { 'pk': '@pk' }, {}
+]
+
 app.config ['$httpProvider', ($httpProvider) ->
   $httpProvider.defaults.xsrfCookieName = 'csrftoken'
   $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken'

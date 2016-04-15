@@ -21,6 +21,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger, Invali
 import json
 import warnings
 from django.core import serializers
+from djangular.views.crud import NgCRUDView
 
 Product = get_model('catalogue', 'product')
 Category = get_model('catalogue', 'category')
@@ -145,6 +146,7 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
     def get_context_data_json(self, **kwargs):
         context = dict()
         context['attributes'] = serializers.serialize("json", self.get_attributes(), **kwargs)
+        context['options'] = serializers.serialize("json", self.get_options(), **kwargs)
         return context
 
     def get_context_data(self, **kwargs):
@@ -159,7 +161,7 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
         else:
             context['product_not_availability'] = _('Product is not available.')
 
-        context['product_options'] = Feature.objects.filter(level=0, children__product_options__product=self.object)
+        context['options'] = self.get_options()
         context['attributes'] = self.get_attributes()
         return context
 
@@ -167,3 +169,11 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
         return Feature.objects.only('title', 'pk').filter(children__product_versions__product=self.object, level=0).prefetch_related(
             Prefetch('children', queryset=Feature.objects.filter(level=1, product_versions__product=self.object).distinct(), to_attr='values')
         ).distinct()
+
+    def get_options(self):
+        return Feature.objects.filter(level=0, children__product_options__product=self.object)
+
+
+class MyCRUDView(NgCRUDView):
+    model = Product
+

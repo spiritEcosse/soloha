@@ -420,8 +420,8 @@ class TestCatalog(TestCase):
         test_catalogue.create_options(product1, product2)
 
         response = self.client.get(product1.get_absolute_url())
-        product_options = Feature.objects.filter(level=0, children__product_options__product=product1)
+        options = Feature.objects.filter(level=0, children__product_options__product=product1)
 
         self.assertEqual(response.status_code, STATUS_CODE_200)
-        self.assertEqual(len(product_options), len(response.context['product_options']))
-        self.assertListEqual(list(product_options), list(response.context['product_options']))
+        self.assertEqual(len(options), len(response.context['options']))
+        self.assertListEqual(list(options), list(response.context['options']))
