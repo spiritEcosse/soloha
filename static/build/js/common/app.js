@@ -2,58 +2,42 @@
   'use strict';
 
   /* Declare app level module which depends on filters, and services */
+
+
+}).call(this);
+
+
+/* Controllers */
+
+(function() {
+
+
+}).call(this);
+
+(function() {
+  'use strict';
+
+  /* Controllers */
   var app, app_name;
 
   app_name = 'soloha';
 
-  app = angular.module(app_name, ['ng.django.urls', 'ui.bootstrap']);
+  app = angular.module(app_name, []);
 
   app.config([
-    '$httpProvider', '$locationProvider', function($httpProvider, $locationProvider) {
+    '$httpProvider', function($httpProvider) {
       $httpProvider.defaults.xsrfCookieName = 'csrftoken';
       $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
-      $httpProvider.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
-      $locationProvider.html5Mode({
-        enabled: true,
-        requireBase: false
-      });
-      return $locationProvider.hashPrefix('!');
+      return $httpProvider.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
     }
   ]);
 
-}).call(this);
-
-(function() {
-  'use strict';
-
-  /* Controllers */
-  var app, app_name;
-
-  app_name = "soloha";
-
-  app = angular.module(app_name, []);
-
-}).call(this);
-
-(function() {
-  'use strict';
-
-  /* Controllers */
-  var app, app_name;
-
-  app_name = "soloha";
-
-  app = angular.module(app_name, []);
-
   app.controller('Product', [
-    '$http', '$scope', '$location', '$window', '$document', '$log', function($http, $scope, $location, $window, $document, $log) {
+    '$http', '$scope', '$window', '$document', '$location', function($http, $scope, $window, $document, $location) {
       $scope.product = [];
       $scope.product.price = '12';
-      console.log($location.absUrl());
       return $http.post($location.absUrl()).success(function(data) {
-        console.log(data);
-        $scope.products = data.products;
-        return $scope.paginator = data.paginator;
+        return console.log(data);
       }).error(function() {
         return console.error('An error occurred during submission');
       });
