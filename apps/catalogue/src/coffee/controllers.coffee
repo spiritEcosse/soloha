@@ -12,12 +12,13 @@ app.config ['$httpProvider', ($httpProvider) ->
 ]
 
 app.factory 'Product', ['$resource', ($resource) ->
-    $resource '/catalogue/crud/product/', { 'pk': '@pk' }, {}
+  $resource '/catalogue/crud/product/', { 'pk': '@pk' }
 ]
 
 app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location', 'Product', ($http, $scope, $window, $document, $location, Product) ->
-  $scope.product = Product.get({pk: 3})
-  console.log($scope.product)
+  $scope.product = Product.get(pk: 1)
+  $scope.product.$promise.then (product) ->
+    $scope.product.pk = product.pk
 
   $http.post($location.absUrl()).success (data) ->
     console.log(data)
