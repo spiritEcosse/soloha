@@ -1,9 +1,9 @@
-'use strict'
+#'use strict'
 
 ### Controllers ###
 
-app_name = "soloha"
-app = angular.module app_name, []
+#app_name = "soloha"
+#app = angular.module "#{app_name}.controllers", []
 
 #app.factory('superCache', ['$cacheFactory', ($cacheFactory) ->
 #  return $cacheFactory 'super-cache'
