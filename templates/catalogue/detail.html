@@ -57,13 +57,13 @@
             </ul>
         {% endblock breadcrumbs %}
         <h1 class="line-bottom row">{{ product.get_title }}</h1>
+        {% csrf_token %}
 
         {% if user.is_authenticated and user.is_staff %}
             <a class="pull-right hidden-xs" href="{% url 'dashboard:catalogue-product' pk=product.id %}">
                 <small><i class="icon-edit"></i> {% trans "Edit this product" %}</small>
             </a>
         {% endif %}
-        {% csrf_token %}
         <div class="row">
             <div class="col-xs-17 col-sm-8 col-md-9 scrollspy">
                 {% block product_gallery %}
@@ -121,7 +121,7 @@
                                     {% if price %}
                                         цена:
                                         <span class="number">
-                                            <span ng-bind="product.price()">{{ price }} {{ currency }}
+                                        <span ng-bind="product.price()">{{ price }} {{ currency }}
     {#                                    {% block product_stock_record %}#}
     {#                                        {% include "catalogue/partials/stock_record.html" with verbose=1 %}#}
     {#                                    {% endblock %}#}

@@ -2,22 +2,21 @@
 
 ### Controllers ###
 
-app_name = "soloha"
+app_name = 'soloha'
 app = angular.module app_name, []
 
-app.controller 'Product', ['$http', '$scope', '$location', '$window', '$document', '$log',
-  ($http, $scope, $location, $window, $document, $log) ->
-    $scope.product = []
-    $scope.product.price = '12'
+app.config ['$httpProvider', ($httpProvider) ->
+  $httpProvider.defaults.xsrfCookieName = 'csrftoken'
+  $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken'
+  $httpProvider.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest'
+]
 
-    console.log($location.absUrl())
+app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location', ($http, $scope, $window, $document, $location) ->
+  $scope.product = []
+  $scope.product.price = '12'
 
-    $http.post('http://127.0.0.1:8000/category-1/category-12/category-123/product-1', message='test')
-
-    $http.post($location.absUrl()).success (data) ->
-      console.log(data)
-      $scope.products = data.products
-      $scope.paginator = data.paginator
-    .error ->
-      console.error('An error occurred during submission')
+  $http.post($location.absUrl()).success (data) ->
+    console.log(data)
+  .error ->
+    console.error('An error occurred during submission')
 ]
