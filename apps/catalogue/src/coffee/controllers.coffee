@@ -5,15 +5,17 @@
 app_name = "soloha"
 app = angular.module app_name, []
 
-app.controller 'Catalogue', ['$http', '$scope', '$location', '$window', '$document', '$log', 'djangoUrl', ($http, $scope, $location, $window, $document, $log, djangoUrl) ->
-  products_url = djangoUrl.reverse('catalogue:products')
+app.controller 'Product', ['$http', '$scope', '$location', '$window', '$document', '$log',
+  ($http, $scope, $location, $window, $document, $log) ->
+    $scope.product = []
+    $scope.product.price = '12'
 
-  $scope.product = 'as'
+    console.log($location.absUrl())
 
-#  $scope.$watch "category", () ->
-#    $http.post(products_url, {category_pk: $scope.category.pk}).success (data) ->
-#      $scope.products = data.products
-#      $scope.paginator = data.paginator
-#    .error ->
-#      console.error('An error occurred during submission')
+    $http.post($location.absUrl()).success (data) ->
+      console.log(data)
+      $scope.products = data.products
+      $scope.paginator = data.paginator
+    .error ->
+      console.error('An error occurred during submission')
 ]
