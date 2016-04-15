@@ -36,18 +36,19 @@
     '$resource', function($resource) {
       return $resource('/catalogue/crud/product/', {
         'pk': '@pk'
-      }, {});
+      });
     }
   ]);
 
   app.controller('Product', [
     '$http', '$scope', '$window', '$document', '$location', 'Product', function($http, $scope, $window, $document, $location, Product) {
-      $scope.data = {};
-      $scope.product = Product.query();
-      $scope.product.$promise.then(function(results) {
-        return console.log(Product.query({
-          pk: 1
-        }));
+      $scope.pk = 2;
+      $scope.product = Product.get({
+        pk: $scope.pk
+      });
+      console.log($scope.product.pk);
+      $scope.product.$promise.then(function(product) {
+        return $scope.product.pk = product.pk;
       });
       return $http.post($location.absUrl()).success(function(data) {
         return console.log(data);
