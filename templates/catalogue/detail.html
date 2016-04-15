@@ -10,6 +10,8 @@
 {% load purchase_info_tags %}
 {% load thumbnail %}
 
+{% block ngController %}ng-controller="Product" {% endblock ngController %}
+
 {% block title %}
     {{ product.title }} | {{ block.super }}
 {% endblock %}
@@ -23,6 +25,7 @@
 {% endblock %}
 
 {% block extrascripts %}
+    {{ block.super }}
     <script src="{% static 'bower_components/lightslider/dist/js/lightslider.min.js' %}"></script>
     <script src="{% static 'src/js/product.js' %}"></script>
 {% endblock extrascripts %}
@@ -60,7 +63,7 @@
                 <small><i class="icon-edit"></i> {% trans "Edit this product" %}</small>
             </a>
         {% endif %}
-
+        {% csrf_token %}
         <div class="row">
             <div class="col-xs-17 col-sm-8 col-md-9 scrollspy">
                 {% block product_gallery %}

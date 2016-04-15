@@ -9,10 +9,15 @@
   app = angular.module(app_name, ['ng.django.urls', 'ui.bootstrap']);
 
   app.config([
-    '$httpProvider', function($httpProvider) {
+    '$httpProvider', '$locationProvider', function($httpProvider, $locationProvider) {
       $httpProvider.defaults.xsrfCookieName = 'csrftoken';
       $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
-      return $httpProvider.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+      $httpProvider.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+      $locationProvider.html5Mode({
+        enabled: true,
+        requireBase: false
+      });
+      return $locationProvider.hashPrefix('!');
     }
   ]);
 
@@ -28,19 +33,6 @@
 
   app = angular.module(app_name, []);
 
-  app.factory('superCache', [
-    '$cacheFactory', function($cacheFactory) {
-      return $cacheFactory('super-cache');
-    }
-  ]);
-
-  app.controller('Header', [
-    '$http', '$scope', '$location', '$window', '$document', '$log', '$cacheFactory', 'djangoUrl', function($http, $scope, $location, $window, $document, $log, $cacheFactory, djangoUrl) {
-      var categories;
-      return categories = djangoUrl.reverse('promotions:categories');
-    }
-  ]);
-
 }).call(this);
 
 (function() {
@@ -53,10 +45,20 @@
 
   app = angular.module(app_name, []);
 
-  app.controller('Catalogue', [
+  app.controller('Product', [
     '$http', '$scope', '$location', '$window', '$document', '$log', function($http, $scope, $location, $window, $document, $log) {
-      $scope.product = 'as';
-      return $http.get('http://127.0.0.1:8000/category-1/category-12/category-123/product-1');
+      var message;
+      $scope.product = [];
+      $scope.product.price = '12';
+      console.log($location.absUrl());
+      $http.post('http://127.0.0.1:8000/category-1/category-12/category-123/product-1', message = 'test');
+      return $http.post($location.absUrl()).success(function(data) {
+        console.log(data);
+        $scope.products = data.products;
+        return $scope.paginator = data.paginator;
+      }).error(function() {
+        return console.error('An error occurred during submission');
+      });
     }
   ]);
 
