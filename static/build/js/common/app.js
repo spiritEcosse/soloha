@@ -58,7 +58,6 @@
       $scope.product.$promise.then(function(data) {
         return $scope.product.pk = data.pk;
       });
-      console.log($scope.product.pk);
       return $http.post($location.absUrl()).success(function(data) {
         return console.log(data);
       }).error(function() {

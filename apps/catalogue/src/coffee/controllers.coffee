@@ -20,12 +20,12 @@ app.factory 'ProductOptions', ['$resource', ($resource) ->
 ]
 
 app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location', 'Product', ($http, $scope, $window, $document, $location, Product) ->
+
   $scope.product = Product.get(pk: 2)
   res = Promise.resolve($scope.product)
   $scope.product.$promise.then (data) ->
     $scope.product.pk = data.pk
 
-  console.log($scope.product.pk)
   $http.post($location.absUrl()).success (data) ->
     console.log(data)
   .error ->

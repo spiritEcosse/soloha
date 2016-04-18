@@ -15,7 +15,7 @@ describe 'Catalogue', () ->
     product.$promise.then (data) ->
           product.pk = data.pk
 
-    console.log(product.pk)
+#    console.log(product.pk)
     controller = $controller 'Product', { $scope: $scope }
     expect($scope.product.pk).toEqual(product.pk)
 

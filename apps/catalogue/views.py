@@ -23,6 +23,8 @@ import warnings
 from django.core import serializers
 from djangular.views.crud import NgCRUDView
 from oscar.core.loading import get_class
+from django.db.models import Q
+
 
 Product = get_model('catalogue', 'product')
 Category = get_model('catalogue', 'category')
@@ -173,7 +175,7 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
         ).distinct()
 
     def get_options(self):
-        return Feature.objects.filter(level=0, children__product_options__product=self.object)
+        return Feature.objects.filter(Q(level=0), Q(product_options__product=self.object) | Q(children__product_options__product=self.object)).distinct()
 
 
 class ProductCRUDView(NgCRUDView):
