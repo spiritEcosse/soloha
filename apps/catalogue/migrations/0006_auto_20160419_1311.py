@@ -22,7 +22,6 @@ class Migration(migrations.Migration):
                 ('title', models.CharField(max_length=255)),
                 ('slug', models.SlugField(unique=True, max_length=255, verbose_name='Slug')),
                 ('sort', models.IntegerField(default=0, null=True, blank=True)),
-                ('enable', models.BooleanField(default=True, verbose_name='Enable')),
                 ('created', models.DateTimeField(auto_now_add=True)),
                 ('lft', models.PositiveIntegerField(editable=False, db_index=True)),
                 ('rght', models.PositiveIntegerField(editable=False, db_index=True)),
@@ -103,6 +102,10 @@ class Migration(migrations.Migration):
             name='category',
             options={'ordering': ('sort', 'name', 'id'), 'verbose_name': 'Category', 'verbose_name_plural': 'Categories'},
         ),
+        migrations.AlterModelOptions(
+            name='product',
+            options={'ordering': ['-views_count'], 'verbose_name': 'Product', 'verbose_name_plural': 'Products'},
+        ),
         migrations.RemoveField(
             model_name='product',
             name='product_options',
@@ -181,6 +184,11 @@ class Migration(migrations.Migration):
             model_name='product',
             name='meta_title',
             field=models.CharField(max_length=255, verbose_name='Meta tag: title', blank=True),
+        ),
+        migrations.AddField(
+            model_name='product',
+            name='views_count',
+            field=models.IntegerField(default=0, verbose_name=b'views count', editable=False),
         ),
         migrations.AlterField(
             model_name='category',
@@ -264,6 +272,18 @@ class Migration(migrations.Migration):
             model_name='product',
             name='filters',
             field=models.ManyToManyField(related_name='filter_products', verbose_name='Filters of product', to='catalogue.Feature', blank=True),
+        ),
+        migrations.AlterUniqueTogether(
+            name='versionattribute',
+            unique_together=set([('version', 'attribute')]),
+        ),
+        migrations.AlterUniqueTogether(
+            name='productoptions',
+            unique_together=set([('product', 'option')]),
+        ),
+        migrations.AlterUniqueTogether(
+            name='productfeature',
+            unique_together=set([('product', 'feature')]),
         ),
         migrations.AlterUniqueTogether(
             name='productcategory',

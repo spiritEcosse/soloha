@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('catalogue', '0006_auto_20160412_1316'),
+        ('catalogue', '0006_auto_20160419_1311'),
         ('partner', '0003_auto_20150604_1450'),
     ]
 
@@ -31,5 +31,10 @@ class Migration(migrations.Migration):
             model_name='stockrecord',
             name='product_version',
             field=models.ForeignKey(related_name='stockrecords', verbose_name='Product version', blank=True, to='catalogue.ProductVersion', null=True),
+        ),
+        migrations.AlterField(
+            model_name='stockrecord',
+            name='partner',
+            field=models.ForeignKey(related_name='stockrecords', verbose_name='Partner', blank=True, to='partner.Partner', null=True),
         ),
     ]
