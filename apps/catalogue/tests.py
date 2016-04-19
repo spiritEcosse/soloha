@@ -498,7 +498,6 @@ class TestCatalog(TestCase, LiveServerTestCase):
             '%s%s' % (self.live_server_url,  product1.get_absolute_url())
         )
 
-        # TODO check when we will have price
         price_without_options = self.firefox.find_element_by_xpath(".//*[@id='section3']/div/div[1]/div/div[2]/div[1]/span").text
         if len(price_without_options) == 0:
             raise Exception("price can't be empty")
@@ -511,7 +510,6 @@ class TestCatalog(TestCase, LiveServerTestCase):
         option1 = self.firefox.find_element_by_xpath(".//*[@id='options']/div[2]/div/div/label/select/option[4]")
         option1.click()
 
-        # TODO check when price will depend on selected option
         price_option1 = self.firefox.find_element_by_xpath(".//*[@id='section3']/div/div[1]/div/div[2]/div[1]/span").text
         if price_without_options == price_option1:
             self.assertNotEqual(price_without_options, price_option1)

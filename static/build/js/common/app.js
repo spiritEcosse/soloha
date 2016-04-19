@@ -35,6 +35,13 @@
   app.controller('Product', [
     '$http', '$scope', '$window', '$document', '$location', 'Product', function($http, $scope, $window, $document, $location, Product) {
       $scope.product = [];
+      $http.get($location.absUrl()).then(function(response) {
+        $scope.options = response.data.options;
+        $scope.price = response.data.price;
+        return $scope.options;
+      });
+      $scope.product.price = 222;
+      console.log('test');
       return $http.post($location.absUrl()).success(function(data) {
         return console.log(data);
       }).error(function() {

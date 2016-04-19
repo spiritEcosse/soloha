@@ -151,7 +151,7 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
         context = dict()
         attributes = self.get_attributes()
         context['attributes'] = attributes
-        context['options'] = serializers.serialize("json", self.get_options(), **kwargs)
+        context['options'] = [{prod_option.option.pk: prod_option.price_retail} for prod_option in ProductOptions.objects.filter(product=self.object)]
         return context
 
     def get_context_data(self, **kwargs):
