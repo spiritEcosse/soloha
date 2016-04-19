@@ -21,12 +21,14 @@ from soloha.settings import MAX_COUNT_PRODUCT, MAX_COUNT_CATEGORIES
 from soloha.settings import OSCAR_PRODUCTS_PER_PAGE
 from django.db import IntegrityError
 import functools
-from django.test import LiveServerTestCase
-from selenium import webdriver
 from oscar.apps.partner.strategy import Selector
 from selenium.webdriver.support.select import Select
 import time
 from selenium.webdriver.support.ui import WebDriverWait
+from selenium import webdriver
+from django.test import LiveServerTestCase
+from django.core import serializers
+from django.db.models import Q
 
 Product = get_model('catalogue', 'product')
 ProductClass = get_model('catalogue', 'ProductClass')
@@ -38,36 +40,7 @@ test_catalogue = catalogue.Test()
 STATUS_CODE_200 = 200
 
 
-def run_through_drivers(driver_pool='drivers'):
-    def wrapped(test_func):
-        @functools.wraps(test_func)
-        def decorated(test_case, *args, **kwargs):
-            test_class = test_case.__class__
-            web_driver_pool = getattr(test_class, driver_pool)
-            for web_driver in web_driver_pool:
-                setattr(test_case, 'selenium', web_driver)
-                test_func(test_case, *args, **kwargs)
-        return decorated
-    return wrapped
-
-
-class WebDriverList(list):
-    """
-    A sequence that has a `.quit` method that will run on each item in the list.
-    Used to easily "quit" a list of WebDrivers.
-    """
-
-    def __init__(self, *drivers):
-        super(WebDriverList, self).__init__(drivers)
-
-    def quit(self):
-        for driver in self:
-            driver.quit()
-
-
-class TestCatalog(LiveServerTestCase):
-    selenium = None
-
+class TestCatalog(TestCase, LiveServerTestCase):
     def setUp(self):
         self.client = Client()
         self.firefox = webdriver.Firefox()
@@ -77,6 +50,10 @@ class TestCatalog(LiveServerTestCase):
     def tearDown(self):
         self.firefox.quit()
         super(TestCatalog, self).tearDown()
+
+        self.firefox = webdriver.Firefox()
+        self.firefox.maximize_window()
+        super(TestCatalog, self).setUp()
 
     def test_page_product(self):
         """
@@ -499,8 +476,55 @@ class TestCatalog(LiveServerTestCase):
         test_catalogue.create_options(product1, product2)
 
         response = self.client.get(product1.get_absolute_url())
-        options = Feature.objects.filter(level=0, children__product_options__product=product1)
+        options = Feature.objects.filter(Q(level=0), Q(product_options__product=product1) | Q(children__product_options__product=product1)).distinct()
 
         self.assertEqual(response.status_code, STATUS_CODE_200)
         self.assertEqual(len(options), len(response.context['options']))
         self.assertListEqual(list(options), list(response.context['options']))
+
+    def tearDown(self):
+        # Call tearDown to close the web browser
+        self.firefox.quit()
+        super(TestCatalog, self).tearDown()
+
+    def test_product_options_selenium(self):
+        """
+        product options selenium test
+        """
+        test_catalogue.create_product_bulk()
+
+        product1 = Product.objects.get(pk=1)
+        product2 = Product.objects.get(pk=2)
+
+        test_catalogue.create_options(product1, product2)
+
+        self.firefox.get(
+            '%s%s' % (self.live_server_url,  product1.get_absolute_url())
+        )
+
+        # TODO check when we will have price
+        # price_without_options = self.firefox.find_element_by_xpath(".//*[@id='section3']/div/div[1]/div/div[2]/div[1]/span").text
+        # if len(price_without_options) == 0:
+        #     raise Exception("price can't be empty")
+        self.assertIn("Product 1", self.firefox.title)
+
+        options_db = [option.title for option in Feature.objects.filter(Q(level=0), Q(product_options__product=product1) | Q(children__product_options__product=product1)).distinct()]
+        options_on_page = self.firefox.find_element_by_xpath(".//*[@id='options']/div[2]/div/div/label/select").text.split('\n')[1:]
+        self.assertListEqual(options_db, options_on_page)
+
+        option1 = self.firefox.find_element_by_xpath(".//*[@id='options']/div[2]/div/div/label/select/option[4]")
+        option1.click()
+
+        # TODO check when price will depend on selected option
+        # price_option1 = self.firefox.find_element_by_xpath(".//*[@id='section3']/div/div[1]/div/div[2]/div[1]/span").text
+        # if price_without_options == price_option1:
+        #     self.assertNotEqual(price_without_options, price_option1)
+
+        # parent = Feature.objects.get(title=options_db[0])
+        # options_db_level1 = [option.title for option in Feature.objects.filter(level=1, parent=parent.pk)]
+        # options_on_page_level1 = self.firefox.find_element_by_xpath(".//*[@id='options']/div[2]/div[2]/div[2]/div/label/select/option[2]").text
+
+
+
+
+

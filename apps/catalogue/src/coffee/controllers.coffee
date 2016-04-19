@@ -19,3 +19,5 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
   .error ->
     console.error('An error occurred during submission')
 ]
+
+

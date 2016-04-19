@@ -136,10 +136,12 @@ class Test(object):
         option_21 = Feature.objects.get(title='Feature 21')
         option_31 = Feature.objects.get(title='Feature 31')
         option_211 = Feature.objects.get(title='Feature 211')
+        option_9 = Feature.objects.get(title='Feature 9')
         ProductOptions.objects.create(product=product1, option=option_11)
         ProductOptions.objects.create(product=product1, option=option_21)
         ProductOptions.objects.create(product=product1, option=option_1)
         ProductOptions.objects.create(product=product1, option=option_211)
+        ProductOptions.objects.create(product=product1, option=option_9)
         ProductOptions.objects.create(product=product2, option=option_31)
 
     def create_product_bulk(self):

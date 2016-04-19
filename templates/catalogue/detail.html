@@ -194,41 +194,18 @@
                                 Выбрать дополнительные опции:
                             </div>
                             <div class="panel-body">
+                            <div class="col-xs-6">
                                 <div class="row option">
-                                    <div class="col-xs-12 name">
-                                        Дополнительные опции:
-                                    </div>
-                                    <div class="col-xs-12 values pull-right">
-                                        <div class="checkbox">
-                                            <label>
-                                                <input type="checkbox" value="">
-                                                Нестандартный размер (+ 20%)
-                                            </label>
-                                        </div>
-                                        <div class="checkbox">
-                                            <label>
-                                                <input type="checkbox" value="">
-                                                Патинирование<span class="glyphicon glyphicon-info-sign btn-xs"></span>
-                                                <span class="add_to_price">(+ 4%)</span>
-                                            </label>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row option">
-                                    <div class="col-xs-12 name">
-                                        Комплектация:
-                                    </div>
-                                    <div class="col-xs-12 values pull-right">
-                                        <div class="checkbox">
                                             <label class="block">
                                                 <select class="form-control">
                                                     <option>--не выбрано--</option>
-                                                    {% for option in product_options %}
+                                                    {% for option in options %}
                                                         <option> {{ option }} </option>
                                                     {% endfor %}
                                                 </select>
                                             </label>
                                         </div>
+                            </div>
                                     </div>
                                 </div>
                             </div>
