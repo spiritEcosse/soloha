@@ -51,10 +51,6 @@ class TestCatalog(TestCase, LiveServerTestCase):
         self.firefox.quit()
         super(TestCatalog, self).tearDown()
 
-        self.firefox = webdriver.Firefox()
-        self.firefox.maximize_window()
-        super(TestCatalog, self).setUp()
-
     def test_page_product(self):
         """
         accessibility page product
@@ -98,7 +94,7 @@ class TestCatalog(TestCase, LiveServerTestCase):
         info = strategy.fetch_for_product(product)
 
         if info.availability.is_available_to_buy:
-            expect_price = str(info.stockrecord.price_retail)
+            expect_price = str(info.stockrecord.incl_tax)
         else:
             expect_price = _('Product is not available.')
 
