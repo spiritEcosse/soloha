@@ -158,6 +158,7 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
         selector = Selector()
         strategy = selector.strategy()
         info = strategy.fetch_for_product(self.object)
+        info.availability.num_available = 10
 
         if info.availability.is_available_to_buy:
             context['price'] = info.price.incl_tax
