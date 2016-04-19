@@ -163,7 +163,7 @@ class Test(object):
             price_excl_tax = D('9.99')
         if partner_sku is None:
             partner_sku = 'sku_%d_%d' % (product_option.id, random.randint(0, 10000))
-        return self.product_option.stockrecords.create(
+        return product_option.stockrecords.create(
             partner=partner, partner_sku=partner_sku,
             price_currency=currency,
             price_excl_tax=price_excl_tax, num_in_stock=num_in_stock)
