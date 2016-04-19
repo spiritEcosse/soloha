@@ -90,7 +90,7 @@ class Test(object):
     def create_stockrecord(cls, product=None, price_excl_tax=None, partner_sku=None,
                            num_in_stock=None, partner_name=None,
                            currency=OSCAR_DEFAULT_CURRENCY,
-                           partner_users=None, product_version=None):
+                           partner_users=None, product_version=None, product_option=None):
         if product is None:
             product = factories.create_product(title='Product 1000')
         partner, __ = Partner.objects.get_or_create(name=partner_name or '')
@@ -106,6 +106,8 @@ class Test(object):
 
         if product_version is not None:
             obj = product_version
+        elif product_option is not None:
+            obj = product_option
 
         return obj.stockrecords.create(
             partner=partner, product=product, partner_sku=partner_sku,
@@ -175,26 +177,6 @@ class Test(object):
         ProductOptions.objects.create(product=product1, option=option_211)
         ProductOptions.objects.create(product=product1, option=option_9)
         ProductOptions.objects.create(product=product2, option=option_31)
-
-    def create_stockrecord(self, product_option=None, price_excl_tax=None, partner_sku=None,
-                           num_in_stock=None, partner_name=None,
-                           currency=settings.OSCAR_DEFAULT_CURRENCY,
-                           partner_users=None):
-
-        # if product_option is None:
-        #     product_option = create_product()
-        partner, __ = Partner.objects.get_or_create(name=partner_name or '')
-        if partner_users:
-            for user in partner_users:
-                partner.users.add(user)
-        if price_excl_tax is None:
-            price_excl_tax = D('9.99')
-        if partner_sku is None:
-            partner_sku = 'sku_%d_%d' % (product_option.id, random.randint(0, 10000))
-        return product_option.stockrecords.create(
-            partner=partner, partner_sku=partner_sku,
-            price_currency=currency,
-            price_excl_tax=price_excl_tax, num_in_stock=num_in_stock)
 
     def create_product_bulk(self):
         """
