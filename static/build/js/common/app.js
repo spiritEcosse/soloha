@@ -32,22 +32,9 @@
     }
   ]);
 
-  app.factory('Product', [
-    '$resource', function($resource) {
-      return $resource('/catalogue/crud/product/', {
-        'pk': '@pk'
-      });
-    }
-  ]);
-
   app.controller('Product', [
     '$http', '$scope', '$window', '$document', '$location', 'Product', function($http, $scope, $window, $document, $location, Product) {
-      $scope.product = Product.get({
-        pk: 1
-      });
-      $scope.product.$promise.then(function(product) {
-        return $scope.product.pk = product.pk;
-      });
+      $scope.product = [];
       return $http.post($location.absUrl()).success(function(data) {
         return console.log(data);
       }).error(function() {

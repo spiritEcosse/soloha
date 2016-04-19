@@ -167,13 +167,9 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
         return context
 
     def get_attributes(self):
-        return Feature.objects.only('title', 'pk').filter(children__product_versions__product=self.object, level=0).prefetch_related(
-            Prefetch('children', queryset=Feature.objects.filter(level=1, product_versions__product=self.object).distinct(), to_attr='values')
+        return Feature.objects.only('title', 'pk', 'slug').filter(children__product_versions__product=self.object, level=0).prefetch_related(
+            Prefetch('children', queryset=Feature.objects.only('title', 'pk', 'slug').filter(level=1, product_versions__product=self.object).distinct(), to_attr='values')
         ).distinct()
 
     def get_options(self):
         return Feature.objects.filter(level=0, children__product_options__product=self.object)
-
-
-class ProductCRUDView(NgCRUDView):
-    model = Product
