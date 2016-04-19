@@ -66,6 +66,10 @@ class Migration(migrations.Migration):
             name='ProductOptions',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('plus', models.BooleanField(default=False, verbose_name='Plus on price')),
+                ('percent', models.IntegerField(default=0, null=True, verbose_name='Percent', blank=True)),
+                ('price_retail', models.DecimalField(verbose_name='Price (retail)', max_digits=12, decimal_places=2)),
+                ('cost_price', models.DecimalField(verbose_name='Cost Price', max_digits=12, decimal_places=2)),
                 ('option', models.ForeignKey(related_name='product_options', to='catalogue.Feature')),
             ],
             options={
@@ -78,6 +82,8 @@ class Migration(migrations.Migration):
             name='ProductVersion',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('price_retail', models.DecimalField(verbose_name='Price (retail)', max_digits=12, decimal_places=2)),
+                ('cost_price', models.DecimalField(verbose_name='Cost Price', max_digits=12, decimal_places=2)),
             ],
             options={
                 'abstract': False,

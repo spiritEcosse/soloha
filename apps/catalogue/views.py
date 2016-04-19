@@ -149,7 +149,8 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
 
     def get_context_data_json(self, **kwargs):
         context = dict()
-        context['attributes'] = serializers.serialize("json", self.get_attributes(), **kwargs)
+        attributes = self.get_attributes()
+        context['attributes'] = attributes
         context['options'] = serializers.serialize("json", self.get_options(), **kwargs)
         return context
 

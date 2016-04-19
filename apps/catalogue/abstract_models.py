@@ -793,6 +793,8 @@ class AbstractProductVersion(models.Model):
     attributes = models.ManyToManyField('catalogue.Feature', through='catalogue.VersionAttribute',
                                         verbose_name=_('Attributes'), related_name='product_versions')
     product = models.ForeignKey('catalogue.Product', related_name='versions', on_delete=models.DO_NOTHING)
+    price_retail = models.DecimalField(_("Price (retail)"), decimal_places=2, max_digits=12)
+    cost_price = models.DecimalField(_("Cost Price"), decimal_places=2, max_digits=12)
 
     class Meta:
         abstract = True
@@ -826,6 +828,10 @@ class AbstractProductFeature(models.Model):
 class AbstractProductOptions(models.Model):
     product = models.ForeignKey('catalogue.Product', related_name='product_options')
     option = models.ForeignKey('catalogue.Feature', related_name='product_options')
+    plus = models.BooleanField(verbose_name=_('Plus on price'), default=False)
+    percent = models.IntegerField(verbose_name=_('Percent'), null=True, blank=True, default=0)
+    price_retail = models.DecimalField(_("Price (retail)"), decimal_places=2, max_digits=12)
+    cost_price = models.DecimalField(_("Cost Price"), decimal_places=2, max_digits=12)
 
     class Meta:
         abstract = True
