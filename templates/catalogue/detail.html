@@ -117,32 +117,33 @@
                                 <div class="pull-right">Под заказ</div>
                             </div>
                             <div class="panel-body">
-                                <div class="text-center wrapper-number">
-                                    {% if price %}
+                            {% with class_price="number" %}
+                                {% if price %}
+                                    <div class="text-center wrapper-number">
                                         цена:
-                                        <span class="number">
-                                        <span>{{ price }} {{ currency }}
+                                        <span class="{{ class_price }}" ng-bind="product.price()">{{ price }} {{ currency }}
     {#                                    {% block product_stock_record %}#}
     {#                                        {% include "catalogue/partials/stock_record.html" with verbose=1 %}#}
     {#                                    {% endblock %}#}
                                         </span>
-                                    {% else %}
-                                        {{ product_not_availability }}
-                                    {% endif %}
-                                </div>
-                                <div class="row">
-                                    <div class="wrapper-btn-primary col-xs-12">
-                                        <button class="btn btn-block btn-primary">
-                                            Купить
-                                            {#                                            {% block product_basket_form %}#}
-                                            {#                                                {% include "catalogue/partials/add_to_basket_form.html" %}#}
-                                            {#                                            {% endblock %}#}
-                                        </button>
                                     </div>
-                                    <div class="wrapper-btn-faster col-xs-12">
-                                        <button class="btn btn-block btn-faster btn-primary">Купить в 1 клик</button>
+                                    <div class="row">
+                                        <div class="wrapper-btn-primary col-xs-12">
+                                            <button class="btn btn-block btn-primary">
+                                                Купить
+                                                {#                                            {% block product_basket_form %}#}
+                                                {#                                                {% include "catalogue/partials/add_to_basket_form.html" %}#}
+                                                {#                                            {% endblock %}#}
+                                            </button>
+                                        </div>
+                                        <div class="wrapper-btn-faster col-xs-12">
+                                            <button class="btn btn-block btn-faster btn-primary">Купить в 1 клик</button>
+                                        </div>
                                     </div>
-                                </div>
+                                {% else %}
+                                    <div class="wrapper-number"><span class="{{ class_price }}">{{ product_not_availability }}</span></div>
+                                {% endif %}
+                            {% endwith %}
                             </div>
                             <div class="panel-footer">
                                 <div class="row text-center">
@@ -178,13 +179,13 @@
                                         <div class="col-xs-11 pull-right values">
                                             <select class="form-control input-md">
                                                 {% for value in attribute.values %}
-                                                    <option>{{ value.title }}</option>
+                                                    <option value="{{ value.pk }}">{{ value.title }}</option>
                                                 {% endfor %}
                                             </select>
                                         </div>
                                     </div>
                                 </div>
-                            </div>a
+                            </div>
                         {% endfor %}
                     </div>
                     <div class="col-xs-24 tab-content-info">

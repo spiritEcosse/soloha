@@ -20,11 +20,15 @@ from django.utils.translation import ugettext_lazy as _
 from soloha.settings import MAX_COUNT_PRODUCT, MAX_COUNT_CATEGORIES
 from soloha.settings import OSCAR_PRODUCTS_PER_PAGE
 from django.db import IntegrityError
+import functools
+from oscar.apps.partner.strategy import Selector
+from selenium.webdriver.support.select import Select
+import time
+from selenium.webdriver.support.ui import WebDriverWait
 from selenium import webdriver
 from django.test import LiveServerTestCase
 from django.core import serializers
 from django.db.models import Q
-
 
 Product = get_model('catalogue', 'product')
 ProductClass = get_model('catalogue', 'ProductClass')
@@ -39,6 +43,13 @@ STATUS_CODE_200 = 200
 class TestCatalog(TestCase, LiveServerTestCase):
     def setUp(self):
         self.client = Client()
+        self.firefox = webdriver.Firefox()
+        self.firefox.maximize_window()
+        super(TestCatalog, self).setUp()
+
+    def tearDown(self):
+        self.firefox.quit()
+        super(TestCatalog, self).tearDown()
 
         self.firefox = webdriver.Firefox()
         self.firefox.maximize_window()
@@ -73,11 +84,47 @@ class TestCatalog(TestCase, LiveServerTestCase):
         # ).distinct()
         test_catalogue.test_menu_categories(obj=self, response=response)
 
+    def test_page_product_attributes_selenium(self):
+        """
+        test page product with attributes by selenium
+        :return:
+        """
+        only = ['title', 'pk', 'slug']
+        test_catalogue.create_product_bulk()
+        product = Product.objects.get(slug='product-1')
+        test_catalogue.create_attributes(product)
+        selector = Selector()
+        strategy = selector.strategy()
+        info = strategy.fetch_for_product(product)
+
+        if info.availability.is_available_to_buy:
+            expect_price = str(info.stockrecord.price_retail)
+        else:
+            expect_price = _('Product is not available.')
+
+        attributes = Feature.objects.only(*only).filter(children__product_versions__product=product, level=0).prefetch_related(
+            Prefetch('children', queryset=Feature.objects.only(*only).filter(level=1, product_versions__product=product).distinct(), to_attr='values')
+        ).distinct()
+
+        self.firefox.get('%s%s' % (self.live_server_url, product.get_absolute_url()))
+        price = self.firefox.find_element_by_css_selector('div#section3 .price .wrapper-number span').text
+        self.assertEqual(price, expect_price)
+        attribute_1 = self.firefox.find_element_by_css_selector('.options .panel-default:nth-child(3)')
+
+        expect_attribute_1 = attributes[1]
+        attribute_1_name = attribute_1.find_element_by_css_selector('.name').text
+        self.assertEqual(attribute_1_name, expect_attribute_1.title)
+        attribute_1_values = attribute_1.find_element_by_css_selector('select')
+        self.assertListEqual(attribute_1_values.text.split('\n'), [value.title for value in expect_attribute_1.values])
+        Select(attribute_1_values).select_by_value('{}'.format(expect_attribute_1.values[2].pk))
+        time.sleep(5)
+
     def test_get_product_attributes(self):
         test_catalogue.create_product_bulk()
         product = Product.objects.get(slug='product-1')
         test_catalogue.create_attributes(product)
         response = self.client.get(product.get_absolute_url())
+
         attributes = Feature.objects.filter(children__product_versions__product=product, level=0).prefetch_related(
             Prefetch('children', queryset=Feature.objects.filter(level=1, product_versions__product=product).distinct(), to_attr='values')
         ).distinct()
@@ -423,8 +470,8 @@ class TestCatalog(TestCase, LiveServerTestCase):
     def test_product_options(self):
         test_catalogue.create_product_bulk()
 
-        product1 = Product.objects.get(pk=1)
-        product2 = Product.objects.get(pk=2)
+        product1 = Product.objects.get(slug='product-1')
+        product2 = Product.objects.get(slug='product-2')
 
         test_catalogue.create_options(product1, product2)
 

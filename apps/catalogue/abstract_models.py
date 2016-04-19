@@ -160,8 +160,8 @@ class CustomAbstractProduct(models.Model):
         to the sub method appropriate for the product's structure.
         """
         getattr(self, '_clean_%s' % self.structure)()
-        if not self.is_parent:
-            self.attr.validate_attributes()
+        # if not self.is_parent:
+        #     self.attr.validate_attributes()
 
     def _clean_standalone(self):
         """

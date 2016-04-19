@@ -32,32 +32,9 @@
     }
   ]);
 
-  app.factory('Product', [
-    '$resource', function($resource) {
-      return $resource('/catalogue/crud/product/', {
-        'pk': '@pk'
-      });
-    }
-  ]);
-
-  app.factory('ProductOptions', [
-    '$resource', function($resource) {
-      return $resource('/catalogue/crud/product_options/', {
-        'pk': '@pk'
-      });
-    }
-  ]);
-
   app.controller('Product', [
     '$http', '$scope', '$window', '$document', '$location', 'Product', function($http, $scope, $window, $document, $location, Product) {
-      var res;
-      $scope.product = Product.get({
-        pk: 2
-      });
-      res = Promise.resolve($scope.product);
-      $scope.product.$promise.then(function(data) {
-        return $scope.product.pk = data.pk;
-      });
+      $scope.product = [];
       return $http.post($location.absUrl()).success(function(data) {
         return console.log(data);
       }).error(function() {

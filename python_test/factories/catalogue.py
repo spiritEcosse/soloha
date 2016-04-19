@@ -63,9 +63,12 @@ class Test(object):
         feature_11 = Feature.objects.create(title='Feature 11', parent=feature_1)
         feature_2 = Feature.objects.create(title='Feature 2')
         feature_21 = Feature.objects.create(title='Feature 21', parent=feature_2)
+        feature_22 = Feature.objects.create(title='Feature 22', parent=feature_2)
+        feature_23 = Feature.objects.create(title='Feature 23', parent=feature_2)
         feature_211 = Feature.objects.create(title='Feature 211', parent=feature_21)
         feature_3 = Feature.objects.create(title='Feature 3')
         feature_31 = Feature.objects.create(title='Feature 31', parent=feature_3)
+        feature_32 = Feature.objects.create(title='Feature 32', parent=feature_3)
         feature_4 = Feature.objects.create(title='Feature 4')
         feature_41 = Feature.objects.create(title='Feature 41', parent=feature_4)
         feature_5 = Feature.objects.create(title='Feature 5')
@@ -85,13 +88,50 @@ class Test(object):
         self.create_feature()
         feature_11 = Feature.objects.get(title='Feature 11')
         feature_21 = Feature.objects.get(title='Feature 21')
+        feature_22 = Feature.objects.get(title='Feature 22')
+        feature_23 = Feature.objects.get(title='Feature 23')
         feature_31 = Feature.objects.get(title='Feature 31')
+        feature_32 = Feature.objects.get(title='Feature 32')
         product_version_1 = ProductVersion.objects.create(product=product)
+
+        # price = 100
+        # partner_users = None
+        # partner_sku = None
+        # partner_name = None
+        # num_in_stock = None
+        # stockrecord_fields = [price, partner_sku, partner_name, num_in_stock, partner_users]
+        #
+        # if any([field is not None for field in stockrecord_fields]):
+        #     factories.create_stockrecord(
+        #         product_version_1, price_excl_tax=price, num_in_stock=num_in_stock,
+        #         partner_users=partner_users, partner_sku=partner_sku,
+        #         partner_name=partner_name)
+
         VersionAttribute.objects.create(version=product_version_1, attribute=feature_11)
         VersionAttribute.objects.create(version=product_version_1, attribute=feature_21)
+        VersionAttribute.objects.create(version=product_version_1, attribute=feature_22)
+        VersionAttribute.objects.create(version=product_version_1, attribute=feature_23)
         VersionAttribute.objects.create(version=product_version_1, attribute=feature_31)
         product_version_2 = ProductVersion.objects.create(product=product)
+
+        # price = 200
+        # partner_users = None
+        # partner_sku = None
+        # partner_name = None
+        # num_in_stock = None
+        # stockrecord_fields = [price, partner_sku, partner_name, num_in_stock, partner_users]
+        #
+        # if any([field is not None for field in stockrecord_fields]):
+        #     factories.create_stockrecord(
+        #         product_version_2, price_excl_tax=price, num_in_stock=num_in_stock,
+        #         partner_users=partner_users, partner_sku=partner_sku,
+        #         partner_name=partner_name)
+
         VersionAttribute.objects.create(version=product_version_2, attribute=feature_11)
+        VersionAttribute.objects.create(version=product_version_2, attribute=feature_21)
+        VersionAttribute.objects.create(version=product_version_2, attribute=feature_22)
+        VersionAttribute.objects.create(version=product_version_2, attribute=feature_23)
+        VersionAttribute.objects.create(version=product_version_2, attribute=feature_32)
 
     def create_options(self, product1, product2):
         self.create_feature()
