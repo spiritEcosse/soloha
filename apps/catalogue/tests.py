@@ -456,9 +456,9 @@ class TestCatalog(TestCase, LiveServerTestCase):
         )
 
         # TODO check when we will have price
-        # price_without_options = self.firefox.find_element_by_xpath(".//*[@id='section3']/div/div[1]/div/div[2]/div[1]/span").text
-        # if len(price_without_options) == 0:
-        #     raise Exception("price can't be empty")
+        price_without_options = self.firefox.find_element_by_xpath(".//*[@id='section3']/div/div[1]/div/div[2]/div[1]/span").text
+        if len(price_without_options) == 0:
+            raise Exception("price can't be empty")
         self.assertIn("Product 1", self.firefox.title)
 
         options_db = [option.title for option in Feature.objects.filter(Q(level=0), Q(product_options__product=product1) | Q(children__product_options__product=product1)).distinct()]
@@ -469,9 +469,9 @@ class TestCatalog(TestCase, LiveServerTestCase):
         option1.click()
 
         # TODO check when price will depend on selected option
-        # price_option1 = self.firefox.find_element_by_xpath(".//*[@id='section3']/div/div[1]/div/div[2]/div[1]/span").text
-        # if price_without_options == price_option1:
-        #     self.assertNotEqual(price_without_options, price_option1)
+        price_option1 = self.firefox.find_element_by_xpath(".//*[@id='section3']/div/div[1]/div/div[2]/div[1]/span").text
+        if price_without_options == price_option1:
+            self.assertNotEqual(price_without_options, price_option1)
 
         # parent = Feature.objects.get(title=options_db[0])
         # options_db_level1 = [option.title for option in Feature.objects.filter(level=1, parent=parent.pk)]
