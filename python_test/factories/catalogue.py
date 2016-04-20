@@ -30,6 +30,7 @@ OrderTotalCalculator = get_class('checkout.calculators', 'OrderTotalCalculator')
 ProductOptions = get_model('catalogue', 'ProductOptions')
 Partner = get_model('partner', 'Partner')
 
+
 class Test(object):
     @classmethod
     def create_categories(cls):
@@ -94,45 +95,15 @@ class Test(object):
         feature_23 = Feature.objects.get(title='Feature 23')
         feature_31 = Feature.objects.get(title='Feature 31')
         feature_32 = Feature.objects.get(title='Feature 32')
-        product_version_1 = ProductVersion.objects.create(product=product)
-
-        # price = 100
-        # partner_users = None
-        # partner_sku = None
-        # partner_name = None
-        # num_in_stock = None
-        # stockrecord_fields = [price, partner_sku, partner_name, num_in_stock, partner_users]
-        #
-        # if any([field is not None for field in stockrecord_fields]):
-        #     factories.create_stockrecord(
-        #         product_version_1, price_excl_tax=price, num_in_stock=num_in_stock,
-        #         partner_users=partner_users, partner_sku=partner_sku,
-        #         partner_name=partner_name)
+        product_version_1 = ProductVersion.objects.create(product=product, price_retail=D('10.10'), cost_price=D('8'))
 
         VersionAttribute.objects.create(version=product_version_1, attribute=feature_11)
         VersionAttribute.objects.create(version=product_version_1, attribute=feature_21)
-        VersionAttribute.objects.create(version=product_version_1, attribute=feature_22)
-        VersionAttribute.objects.create(version=product_version_1, attribute=feature_23)
         VersionAttribute.objects.create(version=product_version_1, attribute=feature_31)
-        product_version_2 = ProductVersion.objects.create(product=product)
-
-        # price = 200
-        # partner_users = None
-        # partner_sku = None
-        # partner_name = None
-        # num_in_stock = None
-        # stockrecord_fields = [price, partner_sku, partner_name, num_in_stock, partner_users]
-        #
-        # if any([field is not None for field in stockrecord_fields]):
-        #     factories.create_stockrecord(
-        #         product_version_2, price_excl_tax=price, num_in_stock=num_in_stock,
-        #         partner_users=partner_users, partner_sku=partner_sku,
-        #         partner_name=partner_name)
+        product_version_2 = ProductVersion.objects.create(product=product, price_retail=D('11.10'), cost_price=D('3'))
 
         VersionAttribute.objects.create(version=product_version_2, attribute=feature_11)
         VersionAttribute.objects.create(version=product_version_2, attribute=feature_21)
-        VersionAttribute.objects.create(version=product_version_2, attribute=feature_22)
-        VersionAttribute.objects.create(version=product_version_2, attribute=feature_23)
         VersionAttribute.objects.create(version=product_version_2, attribute=feature_32)
 
     def create_options(self, product1, product2):

@@ -24,10 +24,11 @@ from django.core import serializers
 from djangular.views.crud import NgCRUDView
 from oscar.core.loading import get_class
 from django.db.models import Q
-
+from soloha import settings
 
 Product = get_model('catalogue', 'product')
 Category = get_model('catalogue', 'category')
+ProductVersion = get_model('catalogue', 'ProductVersion')
 Feature = get_model('catalogue', 'Feature')
 ProductOptions = get_model('catalogue', 'ProductOptions')
 
@@ -149,26 +150,58 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
 
     def get_context_data_json(self, **kwargs):
         context = dict()
-        attributes = self.get_attributes()
-        context['attributes'] = attributes
-        context['options'] = serializers.serialize("json", self.get_options(), **kwargs)
+
+        product_versions = dict()
+        for product_version in self.get_prod_versions_queryset():
+            product_versions[','.join(map(str, sorted([attr.pk for attr in product_version.attributes.all()])))] = product_version.price_retail
+
+        list_attr = []
+        for attr in self.get_attributes():
+            values = [{'id': value.pk, 'name': value.title} for value in attr.values]
+            list_attr.append({'pk': attr.pk, 'slug': attr.slug, 'title': attr.title, 'values': values})
+
+        context['attributes'] = list_attr
+        context['product_versions'] = product_versions
+        context['options'] = [{prod_option.option.pk: prod_option.price_retail} for prod_option in ProductOptions.objects.filter(product=self.object)]
+        self.get_price(context)
         return context
+
+    def get_prod_versions_queryset(self):
+        return ProductVersion.objects.filter(product=self.object).order_by('pk')
 
     def get_context_data(self, **kwargs):
         context = super(ProductDetailView, self).get_context_data(**kwargs)
-        selector = Selector()
-        strategy = selector.strategy()
-        info = strategy.fetch_for_product(self.object)
-        info.availability.num_available = 10
 
-        if info.availability.is_available_to_buy:
-            context['price'] = info.price.incl_tax
-            context['currency'] = info.price.currency
-        else:
-            context['product_not_availability'] = _('Product is not available.')
-
-        context['options'] = self.get_options()
+        self.get_price(context)
+        context['attribute_prod_version'] = self.get_prod_versions_queryset().first()
         context['attributes'] = self.get_attributes()
+        context['options'] = self.get_options()
+        return context
+
+    def get_price(self, context):
+        """
+        get main price for product
+        :param context: get context data
+        :return:
+            context
+        """
+        first_prod_version = self.get_prod_versions_queryset().first()
+
+        # ToDo make it possible to check whether the product is available for sale
+        if not first_prod_version:
+            selector = Selector()
+            strategy = selector.strategy()
+            info = strategy.fetch_for_product(self.object)
+            info.availability.num_available = 10
+
+            if info.availability.is_available_to_buy:
+                context['price'] = info.price.incl_tax
+                context['currency'] = info.price.currency
+            else:
+                context['product_not_availability'] = _('Product is not available.')
+        else:
+            context['price'] = first_prod_version.price_retail
+            context['currency'] = settings.OSCAR_DEFAULT_CURRENCY
         return context
 
     def get_attributes(self):

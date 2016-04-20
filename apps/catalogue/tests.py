@@ -29,11 +29,13 @@ from selenium import webdriver
 from django.test import LiveServerTestCase
 from django.core import serializers
 from django.db.models import Q
+import hashlib
 
 Product = get_model('catalogue', 'product')
 ProductClass = get_model('catalogue', 'ProductClass')
 Category = get_model('catalogue', 'category')
 ProductCategory = get_model('catalogue', 'ProductCategory')
+ProductVersion = get_model('catalogue', 'ProductVersion')
 Feature = get_model('catalogue', 'Feature')
 test_catalogue = catalogue.Test()
 
@@ -48,6 +50,7 @@ class TestCatalog(TestCase, LiveServerTestCase):
         super(TestCatalog, self).setUp()
 
     def tearDown(self):
+        # Call tearDown to close the web browser
         self.firefox.quit()
         super(TestCatalog, self).tearDown()
 
@@ -94,7 +97,7 @@ class TestCatalog(TestCase, LiveServerTestCase):
         info = strategy.fetch_for_product(product)
 
         if info.availability.is_available_to_buy:
-            expect_price = str(info.stockrecord.incl_tax)
+            expect_price = info.price.incl_tax
         else:
             expect_price = _('Product is not available.')
 
@@ -105,15 +108,29 @@ class TestCatalog(TestCase, LiveServerTestCase):
         self.firefox.get('%s%s' % (self.live_server_url, product.get_absolute_url()))
         price = self.firefox.find_element_by_css_selector('div#section3 .price .wrapper-number span').text
         self.assertEqual(price, expect_price)
-        attribute_1 = self.firefox.find_element_by_css_selector('.options .panel-default:nth-child(3)')
+        css_selector = '.options .panel-default:nth-child({})'
+        attribute_1 = self.firefox.find_element_by_css_selector(css_selector.format(2))
 
         expect_attribute_1 = attributes[1]
         attribute_1_name = attribute_1.find_element_by_css_selector('.name').text
         self.assertEqual(attribute_1_name, expect_attribute_1.title)
         attribute_1_values = attribute_1.find_element_by_css_selector('select')
+
+        dict_attr = dict()
+        for product_version in ProductVersion.objects.filter(product=product):
+            dict_attr[','.join(map(str, sorted([attr.pk for attr in product_version.attributes.all()])))] = product_version.price_retail
+
         self.assertListEqual(attribute_1_values.text.split('\n'), [value.title for value in expect_attribute_1.values])
         Select(attribute_1_values).select_by_value('{}'.format(expect_attribute_1.values[2].pk))
         time.sleep(5)
+
+        selected_attr = []
+        for num in xrange(1, len(attributes) + 1):
+            selector = Select(self.firefox.find_element_by_css_selector('%s select' % css_selector.format(num)))
+            selected_attr.append(int(selector.first_selected_option.get_attribute('value')))
+
+        expected_price = dict_attr.get(','.join(map(str, selected_attr)))
+        self.assertEqual(price, expected_price)
 
     def test_get_product_attributes(self):
         test_catalogue.create_product_bulk()
@@ -477,11 +494,6 @@ class TestCatalog(TestCase, LiveServerTestCase):
         self.assertEqual(response.status_code, STATUS_CODE_200)
         self.assertEqual(len(options), len(response.context['options']))
         self.assertListEqual(list(options), list(response.context['options']))
-
-    def tearDown(self):
-        # Call tearDown to close the web browser
-        self.firefox.quit()
-        super(TestCatalog, self).tearDown()
 
     def test_product_options_selenium(self):
         """

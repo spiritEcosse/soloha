@@ -121,11 +121,11 @@
                                 {% if price %}
                                     <div class="text-center wrapper-number">
                                         цена:
-                                        <span class="{{ class_price }}" ng-bind="product.price()">{{ price }} {{ currency }}
+                                            <span ng-bind="product.price" class="{{ class_price }}">{{ price }}</span>
+                                            <span ng-bind="product.currency">{{ currency }}</span>
     {#                                    {% block product_stock_record %}#}
     {#                                        {% include "catalogue/partials/stock_record.html" with verbose=1 %}#}
     {#                                    {% endblock %}#}
-                                        </span>
                                     </div>
                                     <div class="row">
                                         <div class="wrapper-btn-primary col-xs-12">
@@ -141,7 +141,7 @@
                                         </div>
                                     </div>
                                 {% else %}
-                                    <div class="wrapper-number"><span class="{{ class_price }}">{{ product_not_availability }}</span></div>
+                                    <div class="wrapper-number"><span class="{{ class_price }}" ng-bind="product.product_not_availability">{{ product_not_availability }}</span></div>
                                 {% endif %}
                             {% endwith %}
                             </div>
@@ -169,24 +169,26 @@
                     </div>
                     <div class="col-xs-24 col-sm-24 col-md-14 options">
                         <span class="relation">*Цена зависит от выбранных параметров:</span>
-                        {% for attribute in attributes %}
-                            <div class="panel panel-default">
-                                <div class="panel-heading">
-                                    <div class="row option">
-                                        <div class="col-xs-15 name">
-                                            {{ attribute.title }}
-                                        </div>
-                                        <div class="col-xs-11 pull-right values">
-                                            <select class="form-control input-md">
-                                                {% for value in attribute.values %}
-                                                    <option value="{{ value.pk }}">{{ value.title }}</option>
-                                                {% endfor %}
-                                            </select>
+                        <div class="list_attr">
+                            {% for attribute in attributes %}
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <div class="row option">
+                                            <div class="col-xs-15 name">
+                                                {{ attribute.title }}
+                                            </div>
+                                            <div class="col-xs-11 pull-right values">
+                                                <select id="attribute-{{ attribute.slug }}" class="form-control input-md">
+                                                    {% for value in attribute.values %}
+                                                        <option value="{{ value.pk }}">{{ value.title }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        {% endfor %}
+                            {% endfor %}
+                        </div>
                     </div>
                     <div class="col-xs-24 tab-content-info">
                         <div class="panel panel-default info" id="options">
