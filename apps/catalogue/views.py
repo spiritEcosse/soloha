@@ -148,10 +148,12 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
         return self.render_json_response(self.get_context_data_json())
 
     def get_context_data_json(self, **kwargs):
-        context = dict()
-        attributes = self.get_attributes()
-        context['attributes'] = attributes
-        context['options'] = [{prod_option.option.pk: prod_option.price_retail} for prod_option in ProductOptions.objects.filter(product=self.object)]
+        # context = dict()
+        context= {"options": {}}
+        for prod_option in ProductOptions.objects.filter(product=self.object):
+            context["options"][prod_option.option.pk] = prod_option.price_retail
+        # context['options'] = [{prod_option.option.pk: prod_option.price_retail} for prod_option in ProductOptions.objects.filter(product=self.object)]
+        # context['options'] = [{prod_option.option.pk: prod_option.price_retail} for prod_option in ProductOptions.objects.filter(product=self.object)]
         return context
 
     def get_context_data(self, **kwargs):

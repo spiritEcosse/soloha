@@ -28,7 +28,6 @@
     {{ block.super }}
     <script src="{% static 'bower_components/lightslider/dist/js/lightslider.min.js' %}"></script>
     <script src="{% static 'src/js/product.js' %}"></script>
-    <script src="apps/catalogue/src/coffee/controllers.coffee"></script>
 {% endblock extrascripts %}
 
 {% block main %}
@@ -120,9 +119,13 @@
                             <div class="panel-body">
                             {% with class_price="number" %}
                                 {% if price %}
-                                    <div class="text-center wrapper-number">
+                                    <div class="text-center wrapper-number" >
                                         цена:
-                                        <span class="{{ class_price }}" ng-bind="product.price()">{{ price }} {{ currency }}
+{#                                        {%  for option in options %}#}
+{#                                            {{ price }}#}
+{#                                        {% endfor %}#}
+                                        <span class="{{ class_price }}" ng-bind="new_price">
+{#                                        <span class="{{ class_price }}" ng-bind="product.price()">{{ price }} {{ currency }}#}
     {#                                    {% block product_stock_record %}#}
     {#                                        {% include "catalogue/partials/stock_record.html" with verbose=1 %}#}
     {#                                    {% endblock %}#}
@@ -198,13 +201,15 @@
                             <div class="col-xs-6">
                                 <div class="row option">
                                             <label class="block">
-                                                <select class="form-control">
+                                                <select class="form-control" ng-model="confirmed" ng-change="change_price()"> <!--ng-options="option for option in options" >-->
                                                     <option>--не выбрано--</option>
                                                     {% for option in options %}
-                                                        <option> {{ option }} </option>
+                                                        <option value="{{ option.id }}"> {{ option }}</option>
                                                     {% endfor %}
                                                 </select>
                                             </label>
+
+
                                         </div>
                             </div>
                                     </div>

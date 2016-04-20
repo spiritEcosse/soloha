@@ -498,7 +498,8 @@ class TestCatalog(TestCase, LiveServerTestCase):
             '%s%s' % (self.live_server_url,  product1.get_absolute_url())
         )
 
-        price_without_options = self.firefox.find_element_by_xpath(".//*[@id='section3']/div/div[1]/div/div[2]/div[1]/span").text
+        # price_without_options = self.firefox.find_element_by_xpath(".//*[@id='section3']/div/div[1]/div/div[2]/div[1]/span").text
+        price_without_options = self.firefox.find_element_by_xpath(".//*[@id='section3']/div[1]/div[1]/div/div[2]/div[1]/span").text
         if len(price_without_options) == 0:
             raise Exception("price can't be empty")
         self.assertIn("Product 1", self.firefox.title)

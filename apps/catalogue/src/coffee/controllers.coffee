@@ -11,19 +11,17 @@ app.config ['$httpProvider', ($httpProvider) ->
   $httpProvider.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest'
 ]
 
-app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location', 'Product', ($http, $scope, $window, $document, $location, Product) ->
+app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location', ($http, $scope, $window, $document, $location) ->
   $scope.product = []
-
-  $http.get($location.absUrl()).then (response) ->
-    $scope.options = response.data.options
-    $scope.price = response.data.price
-    return $scope.options
-
-  $scope.product.price = 222
-  console.log('test')
 
   $http.post($location.absUrl()).success (data) ->
     console.log(data)
+    $scope.new_price = 1
+    $scope.options = data.options
+    $scope.change_price = ->
+      $scope.option_id = $scope.confirmed
+      if $scope.options[$scope.option_id]
+        $scope.new_price += parseFloat($scope.options[$scope.option_id])
   .error ->
     console.error('An error occurred during submission')
 ]

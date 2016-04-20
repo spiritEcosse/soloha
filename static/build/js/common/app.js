@@ -33,17 +33,18 @@
   ]);
 
   app.controller('Product', [
-    '$http', '$scope', '$window', '$document', '$location', 'Product', function($http, $scope, $window, $document, $location, Product) {
+    '$http', '$scope', '$window', '$document', '$location', function($http, $scope, $window, $document, $location) {
       $scope.product = [];
-      $http.get($location.absUrl()).then(function(response) {
-        $scope.options = response.data.options;
-        $scope.price = response.data.price;
-        return $scope.options;
-      });
-      $scope.product.price = 222;
-      console.log('test');
       return $http.post($location.absUrl()).success(function(data) {
-        return console.log(data);
+        console.log(data);
+        $scope.new_price = 1;
+        $scope.options = data.options;
+        return $scope.change_price = function() {
+          $scope.option_id = $scope.confirmed;
+          if ($scope.options[$scope.option_id]) {
+            return $scope.new_price += parseFloat($scope.options[$scope.option_id]);
+          }
+        };
       }).error(function() {
         return console.error('An error occurred during submission');
       });
