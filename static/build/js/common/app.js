@@ -33,12 +33,26 @@
   ]);
 
   app.controller('Product', [
-    '$http', '$scope', '$window', '$document', '$location', function($http, $scope, $window, $document, $location) {
+    '$http', '$scope', '$window', '$document', '$location', '$compile', function($http, $scope, $window, $document, $location, $compile) {
+      var attributes, product_versions, selected_attributes;
       $scope.product = [];
+      $scope.product.values = [];
+      $scope.product.attributes = [];
+      selected_attributes = [];
+      attributes = [];
+      product_versions = [];
       $scope.new_price = 1;
+      $http.post($location.absUrl(), {
+        'option_id': $scope.option_id,
+        'parent': $scope.parent
+      }).success(function(data) {
+        $scope.options = data.options;
+        return $scope.options_children = data.options_children;
+      }).error(function() {
+        return console.error('An error occurred during submission');
+      });
       $scope.change_price = function() {
         $scope.option_id = $scope.confirmed;
-        console.log($scope.option_id);
         if ($scope.options[$scope.option_id]) {
           $scope.new_price += parseFloat($scope.options[$scope.option_id]);
         } else {
@@ -49,16 +63,43 @@
           'parent': $scope.parent
         }).success(function(data) {
           $scope.options = data.options;
-          return $scope.options_children = data.options_children;
+          if (Object.keys(data.options_children).length !== 0) {
+            console.log(data.options_children);
+            $scope.options_children = data.options_children;
+            return angular.element(document.getElementById('options-0')).append($compile('<select class="form-control" ng-model="data[options_children.65]" ng-change="change_price()" ng-options="option for option in options_children" ></select>')($scope));
+          }
         }).error(function() {
           return console.error('An error occurred during submission');
         });
       };
-      return $http.post($location.absUrl()).success(function(data) {
-        return $scope.options = data.options;
+      $http.post($location.absUrl()).success(function(data) {
+        if (data.price) {
+          $scope.product.price = data.price;
+        } else {
+          $scope.product.product_not_availability = data.product_not_availability;
+        }
+        product_versions = data.product_versions;
+        return angular.forEach(data.attributes, function(attr) {
+          var el;
+          attributes.push(attr.pk);
+          $scope.product.values[attr.pk] = attr.values;
+          $scope.product.attributes[attr.pk] = $scope.product.values[attr.pk][0];
+          el = angular.element(document).find('#attribute-' + attr.pk);
+          el.attr('ng-model', 'product.attributes[' + attr.pk + ']');
+          el.attr('ng-options', 'value.title for value in product.values[' + attr.pk + '] track by value.id');
+          el.attr('ng-change', 'update_price()');
+          return $compile(el)($scope);
+        });
       }).error(function() {
         return console.error('An error occurred during submission');
       });
+      return $scope.update_price = function() {
+        selected_attributes = [];
+        angular.forEach(attributes, function(key) {
+          return selected_attributes.push($scope.product.attributes[key].id);
+        });
+        return $scope.product.price = product_versions[selected_attributes.toString()];
+      };
     }
   ]);
 
