@@ -44,19 +44,18 @@
       $http.post($location.absUrl()).success(function(data) {
         if (data.price) {
           $scope.product.price = data.price;
-          $scope.product.currency = data.currency;
         } else {
           $scope.product.product_not_availability = data.product_not_availability;
         }
         product_versions = data.product_versions;
         return angular.forEach(data.attributes, function(attr) {
           var el;
-          attributes.push(attr.slug);
-          $scope.product.values[attr.slug] = attr.values;
-          $scope.product.attributes[attr.slug] = $scope.product.values[attr.slug][0];
-          el = angular.element(document).find('#attribute-' + attr.slug);
-          el.attr('ng-model', 'product.attributes.' + attr.slug);
-          el.attr('ng-options', 'value.name for value in product.values.' + attr.slug);
+          attributes.push(attr.pk);
+          $scope.product.values[attr.pk] = attr.values;
+          $scope.product.attributes[attr.pk] = $scope.product.values[attr.pk][0];
+          el = angular.element(document).find('#attribute-' + attr.pk);
+          el.attr('ng-model', 'product.attributes[' + attr.pk + ']');
+          el.attr('ng-options', 'value.title for value in product.values[' + attr.pk + '] track by value.id');
           el.attr('ng-change', 'update_price()');
           return $compile(el)($scope);
         });
@@ -68,8 +67,7 @@
         angular.forEach(attributes, function(key) {
           return selected_attributes.push($scope.product.attributes[key].id);
         });
-        $scope.product.price = product_versions[selected_attributes.toString()];
-        return console.log($scope.product.price);
+        return $scope.product.price = product_versions[selected_attributes.toString()];
       };
     }
   ]);

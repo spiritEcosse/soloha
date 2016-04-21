@@ -157,7 +157,7 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
 
         list_attr = []
         for attr in self.get_attributes():
-            values = [{'id': value.pk, 'name': value.title} for value in attr.values]
+            values = [{'id': value.pk, 'title': value.title} for value in attr.values]
             list_attr.append({'pk': attr.pk, 'slug': attr.slug, 'title': attr.title, 'values': values})
 
         context['attributes'] = list_attr
@@ -192,7 +192,6 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
             selector = Selector()
             strategy = selector.strategy()
             info = strategy.fetch_for_product(self.object)
-            info.availability.num_available = 10
 
             if info.availability.is_available_to_buy:
                 context['price'] = info.price.incl_tax

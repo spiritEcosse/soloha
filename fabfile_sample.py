@@ -15,6 +15,20 @@ REQUIREMENTS_FILE = 'requirements.txt'
 media = 'media/'
 
 
+def env():
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "%s.settings" % PROJECT_NAME)
+    activate_env = os.path.expanduser(os.path.join(BASE_DIR, ".env/bin/activate_this.py"))
+    execfile(activate_env, dict(__file__=activate_env))
+
+
+def test():
+    env()
+    local('./manage.py collectstatic --noinput')
+    local("./manage.py makemigrations")
+    local("./manage.py migrate")
+    local('./manage.py test')
+
+
 def deploy():
     """
     deploy project on remote server

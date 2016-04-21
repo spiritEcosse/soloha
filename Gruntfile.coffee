@@ -1,9 +1,11 @@
+
 module.exports = (grunt) ->
   grunt.initConfig(
     pkg: grunt.file.readJSON('package.json')
     coffee:
       compile:
         files:
+          'static_root/build/js/common/app.js': ['soloha/src/coffee/*.coffee', 'apps/**/*.coffee'],
           'static/build/js/common/app.js': ['soloha/src/coffee/*.coffee', 'apps/**/*.coffee']
     less:
       development:
@@ -27,7 +29,6 @@ module.exports = (grunt) ->
         dest: ''
   )
 
-  
   grunt.loadNpmTasks 'grunt-contrib-coffee'
   grunt.loadNpmTasks 'grunt-contrib-less'
   #  grunt.loadNpmTasks('grunt-yui-compressor')

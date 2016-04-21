@@ -11,6 +11,7 @@ app.config ['$httpProvider', ($httpProvider) ->
   $httpProvider.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest'
 ]
 
+
 app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location', '$compile', ($http, $scope, $window, $document, $location, $compile) ->
   $scope.product = []
   $scope.product.values = []
@@ -22,18 +23,17 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
   $http.post($location.absUrl()).success (data) ->
     if data.price
       $scope.product.price = data.price
-      $scope.product.currency = data.currency
     else
       $scope.product.product_not_availability = data.product_not_availability
     product_versions = data.product_versions
 
     angular.forEach data.attributes, (attr) ->
-      attributes.push(attr.slug)
-      $scope.product.values[attr.slug] = attr.values
-      $scope.product.attributes[attr.slug] = $scope.product.values[attr.slug][0]
-      el = angular.element(document).find('#attribute-' + attr.slug)
-      el.attr('ng-model', 'product.attributes.' + attr.slug)
-      el.attr('ng-options', 'value.name for value in product.values.' + attr.slug)
+      attributes.push(attr.pk)
+      $scope.product.values[attr.pk] = attr.values
+      $scope.product.attributes[attr.pk] = $scope.product.values[attr.pk][0]
+      el = angular.element(document).find('#attribute-' + attr.pk)
+      el.attr('ng-model', 'product.attributes[' + attr.pk + ']')
+      el.attr('ng-options', 'value.title for value in product.values[' + attr.pk + '] track by value.id')
       el.attr('ng-change', 'update_price()')
       $compile(el)($scope)
   .error ->
@@ -44,7 +44,4 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
     angular.forEach attributes, (key) ->
       selected_attributes.push($scope.product.attributes[key].id)
     $scope.product.price = product_versions[selected_attributes.toString()]
-    console.log($scope.product.price)
 ]
-
-
