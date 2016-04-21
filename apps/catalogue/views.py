@@ -142,18 +142,25 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
 class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CoreProductDetailView):
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
+        if self.request.body:
+            data = json.loads(self.request.body)
+            self.kwargs['option_id'] = data.get('option_id')
+            self.kwargs['parent'] = data.get('parent', None)
+        else:
+            self.kwargs['option_id'] = None
+            self.kwargs['parent'] = None
 
     def post_ajax(self, request, *args, **kwargs):
         super(ProductDetailView, self).post_ajax(request, *args, **kwargs)
         return self.render_json_response(self.get_context_data_json())
 
     def get_context_data_json(self, **kwargs):
-        # context = dict()
-        context= {"options": {}}
-        for prod_option in ProductOptions.objects.filter(product=self.object):
+        context = {"options": {}, "options_children": {}}
+        for prod_option in ProductOptions.objects.filter(product=self.object).distinct():
             context["options"][prod_option.option.pk] = prod_option.price_retail
-        # context['options'] = [{prod_option.option.pk: prod_option.price_retail} for prod_option in ProductOptions.objects.filter(product=self.object)]
-        # context['options'] = [{prod_option.option.pk: prod_option.price_retail} for prod_option in ProductOptions.objects.filter(product=self.object)]
+        if self.kwargs['parent']:
+            for children_option in Feature.objects.filter(parent=self.kwargs['option_id'], product_options__product=self.object).distinct().values():
+                context["options_children"][children_option['id']] = children_option['title']
         return context
 
     def get_context_data(self, **kwargs):
@@ -180,3 +187,4 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
 
     def get_options(self):
         return Feature.objects.filter(Q(level=0), Q(product_options__product=self.object) | Q(children__product_options__product=self.object)).distinct()
+

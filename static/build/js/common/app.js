@@ -35,16 +35,27 @@
   app.controller('Product', [
     '$http', '$scope', '$window', '$document', '$location', function($http, $scope, $window, $document, $location) {
       $scope.product = [];
+      $scope.new_price = 1;
+      $scope.change_price = function() {
+        $scope.option_id = $scope.confirmed;
+        console.log($scope.option_id);
+        if ($scope.options[$scope.option_id]) {
+          $scope.new_price += parseFloat($scope.options[$scope.option_id]);
+        } else {
+          $scope.parent = true;
+        }
+        return $http.post($location.absUrl(), {
+          'option_id': $scope.option_id,
+          'parent': $scope.parent
+        }).success(function(data) {
+          $scope.options = data.options;
+          return $scope.options_children = data.options_children;
+        }).error(function() {
+          return console.error('An error occurred during submission');
+        });
+      };
       return $http.post($location.absUrl()).success(function(data) {
-        console.log(data);
-        $scope.new_price = 1;
-        $scope.options = data.options;
-        return $scope.change_price = function() {
-          $scope.option_id = $scope.confirmed;
-          if ($scope.options[$scope.option_id]) {
-            return $scope.new_price += parseFloat($scope.options[$scope.option_id]);
-          }
-        };
+        return $scope.options = data.options;
       }).error(function() {
         return console.error('An error occurred during submission');
       });

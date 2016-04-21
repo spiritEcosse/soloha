@@ -200,20 +200,20 @@
                             <div class="panel-body">
                             <div class="col-xs-6">
                                 <div class="row option">
-                                            <label class="block">
-                                                <select class="form-control" ng-model="confirmed" ng-change="change_price()"> <!--ng-options="option for option in options" >-->
-                                                    <option>--не выбрано--</option>
-                                                    {% for option in options %}
-                                                        <option value="{{ option.id }}"> {{ option }}</option>
-                                                    {% endfor %}
-                                                </select>
-                                            </label>
-
-
-                                        </div>
-                            </div>
-                                    </div>
+                                    <label class="block">
+                                        <select class="form-control" ng-model="confirmed" ng-change="change_price()"> <!--ng-options="option for option in options" >-->
+                                            <option>--не выбрано--</option>
+                                            {% for option in options %}
+                                                <option value="{{ option.id }}"> {{ option }}</option>
+                                            {% endfor %}
+                                        </select>
+                                        <select class="form-control" ng-if="parent == true" ng-model="children" ng-change="change_price()" ng-options="option for option in options_children" >
+                                        </select>
+                                    </label>
                                 </div>
+                            </div>
+                            </div>
+                        </div>
                             </div>
                         </div>
                         <div class="panel panel-default characteristics" id="characteristics">

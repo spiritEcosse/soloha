@@ -14,14 +14,25 @@ app.config ['$httpProvider', ($httpProvider) ->
 app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location', ($http, $scope, $window, $document, $location) ->
   $scope.product = []
 
+  $scope.new_price = 1
+
+  $scope.change_price = ->
+    $scope.option_id = $scope.confirmed
+
+    console.log($scope.option_id)
+    if $scope.options[$scope.option_id]
+      $scope.new_price += parseFloat($scope.options[$scope.option_id])
+    else
+      $scope.parent = true
+    $http.post($location.absUrl(), {'option_id': $scope.option_id, 'parent': $scope.parent}).success (data) ->
+      $scope.options = data.options
+      $scope.options_children = data.options_children
+    .error ->
+      console.error('An error occurred during submission')
+
+
   $http.post($location.absUrl()).success (data) ->
-    console.log(data)
-    $scope.new_price = 1
     $scope.options = data.options
-    $scope.change_price = ->
-      $scope.option_id = $scope.confirmed
-      if $scope.options[$scope.option_id]
-        $scope.new_price += parseFloat($scope.options[$scope.option_id])
   .error ->
     console.error('An error occurred during submission')
 ]
