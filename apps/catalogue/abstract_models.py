@@ -816,6 +816,7 @@ class AbstractProductFeature(models.Model):
     class Meta:
         abstract = True
         unique_together = ('product', 'feature', )
+        ordering = ['sort', 'feature__title']
         app_label = 'catalogue'
         verbose_name = _('Product feature')
         verbose_name_plural = _('Product features')

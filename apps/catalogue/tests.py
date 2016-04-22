@@ -30,10 +30,14 @@ from django.test import LiveServerTestCase
 from django.core import serializers
 from django.db.models import Q
 import hashlib
+from decimal import Decimal as D
+from soloha import settings
+from django.db.models import Max
 
 Product = get_model('catalogue', 'product')
 ProductClass = get_model('catalogue', 'ProductClass')
 Category = get_model('catalogue', 'category')
+ProductOptions = get_model('catalogue', 'ProductOptions')
 ProductCategory = get_model('catalogue', 'ProductCategory')
 ProductVersion = get_model('catalogue', 'ProductVersion')
 Feature = get_model('catalogue', 'Feature')
@@ -43,6 +47,9 @@ STATUS_CODE_200 = 200
 
 
 class TestCatalog(TestCase, LiveServerTestCase):
+    css_selector_product_price = 'div#section3 .price .wrapper-number .number'
+    css_selector_attribute = '.options .panel-default:nth-child({})'
+
     def setUp(self):
         self.client = Client()
         self.firefox = webdriver.Firefox()
@@ -83,8 +90,18 @@ class TestCatalog(TestCase, LiveServerTestCase):
         # ).distinct()
         test_catalogue.test_menu_categories(obj=self, response=response)
 
+    def get_product_version(self, product):
+        return ProductVersion.objects.filter(product=product).prefetch_related('attributes').order_by('price_retail')
+
     def get_product_price(self, product):
-        first_prod_version = ProductVersion.objects.filter(product=product).order_by('pk').first()
+        """
+        get main price for product
+        :param product: obj product
+        :return:
+            context
+        """
+        context = {}
+        first_prod_version = self.get_product_version(product=product).first()
 
         # ToDo make it possible to check whether the product is available for sale
         if not first_prod_version:
@@ -93,12 +110,81 @@ class TestCatalog(TestCase, LiveServerTestCase):
             info = strategy.fetch_for_product(product)
 
             if info.availability.is_available_to_buy:
-                price = info.price.incl_tax
+                context['price'] = info.price.incl_tax
+                context['currency'] = info.price.currency
             else:
-                price = str(_('Product is not available.'))
+                context['price'] = str(_('Product is not available.'))
         else:
-            price = first_prod_version.price_retail
-        return price
+            context['price'] = first_prod_version.price_retail
+            context['currency'] = settings.OSCAR_DEFAULT_CURRENCY
+        return context
+
+    def test_product_post(self):
+        test_catalogue.create_product_bulk()
+        product = Product.objects.get(slug='product-1')
+        product_2 = Product.objects.get(slug='product-2')
+        test_catalogue.create_options(product, product_2)
+        queryset = self.get_product_version(product=product)
+        self.order_feature_product_versions(product=product, queryset=queryset)
+
+    def order_feature_product_versions(self, product, queryset):
+        response = self.client.post(product.get_absolute_url(), content_type='application/json', HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        context = json.loads(response.content)
+        expected_context = dict()
+
+        expected_context['product_versions'] = dict()
+        for product_version in queryset:
+            attribute_values = [str(attr.pk) for attr in product_version.attributes.all().order_by('parent__product_features__sort')]
+            expected_context['product_versions'][','.join(attribute_values)] = str(product_version.price_retail)
+
+        expected_context['attributes'] = []
+        for attr in self.get_product_attributes(product=product):
+            values = [{'id': value.pk, 'title': value.title} for value in attr.values]
+            expected_context['attributes'].append({'pk': attr.pk, 'title': attr.title, 'values': values})
+
+        self.assertDictEqual(context['product_versions'], expected_context['product_versions'])
+        self.assertListEqual(context['attributes'], expected_context['attributes'])
+
+    def get_product_attributes(self, product):
+        only = ['title', 'pk']
+        return Feature.objects.only(*only).filter(children__product_versions__product=product, level=0).prefetch_related(
+            Prefetch('children', queryset=Feature.objects.only(*only).filter(
+                level=1, product_versions__product=product
+            ).annotate(
+                price=Max('product_versions__price_retail')
+            ).order_by('price', 'product_features__sort'), to_attr='values')
+        ).annotate(price=Max('children__product_versions__price_retail')).order_by('price', 'product_features__sort')
+
+    def test_get_price_product_selenium(self):
+        """
+        test price for product with state track_stock
+        :return:
+        """
+        test_catalogue.create_categories()
+        product_class_with_track_stock = ProductClass.objects.create(name='Product class where track_stock is True')
+        num = 1
+        product = factories.create_product(slug='product-{}'.format(num), title='Product {}'.format(num), price=D('12.12'),
+                                           product_class=product_class_with_track_stock)
+
+        test_catalogue.create_attributes(product)
+        test_catalogue.create_options(product, product)
+
+        self.firefox.get('%s%s' % (self.live_server_url, product.get_absolute_url()))
+        price = self.firefox.find_element_by_css_selector(self.css_selector_product_price).text
+        context = self.get_product_price(product=product)
+        self.assertEqual(price, str(context['price']))
+
+        product_class_without_track_stock = ProductClass.objects.create(name='Product class where track_stock is False', track_stock=False)
+        num = 2
+        product = factories.create_product(slug='product-{}'.format(num), title='Product {}'.format(num), price=D('15.13'),
+                                           product_class=product_class_without_track_stock)
+        test_catalogue.create_attributes(product)
+        test_catalogue.create_options(product, product)
+
+        self.firefox.get('%s%s' % (self.live_server_url, product.get_absolute_url()))
+        price = self.firefox.find_element_by_css_selector(self.css_selector_product_price).text
+        context = self.get_product_price(product=product)
+        self.assertEqual(price, str(context['price']))
 
     def test_page_product_attributes_selenium(self):
         """
@@ -106,26 +192,22 @@ class TestCatalog(TestCase, LiveServerTestCase):
         :return:
         """
         css_selector_attribute = '.options .panel-default:nth-child({})'
-        css_selector_price = 'div#section3 .price .wrapper-number .number'
-        only = ['title', 'pk', 'slug']
         test_catalogue.create_product_bulk()
         product = Product.objects.get(slug='product-1')
-        test_catalogue.create_attributes(product)
+        attributes = self.get_product_attributes(product=product)
 
         dict_attr = dict()
-        for product_version in ProductVersion.objects.filter(product=product):
-            dict_attr[','.join(map(str, sorted([attr.pk for attr in product_version.attributes.all()])))] = product_version.price_retail
-
-        attributes = Feature.objects.only(*only).filter(children__product_versions__product=product, level=0).prefetch_related(
-            Prefetch('children', queryset=Feature.objects.only(*only).filter(level=1, product_versions__product=product).distinct(), to_attr='values')
-        ).distinct()
+        for product_version in self.get_product_version(product=product):
+            attribute_values = [str(attr.pk) for attr in product_version.attributes.all().order_by('parent__product_features__sort')]
+            dict_attr[','.join(attribute_values)] = product_version.price_retail
 
         self.firefox.get('%s%s' % (self.live_server_url, product.get_absolute_url()))
 
-        price = self.firefox.find_element_by_css_selector(css_selector_price).text
-        self.assertEqual(price, str(self.get_product_price(product=product)))
+        price = self.firefox.find_element_by_css_selector(self.css_selector_product_price).text
+        context = self.get_product_price(product=product)
+        self.assertEqual(price, str(context['price']))
 
-        position = 2
+        position = 1
         attribute_1 = self.firefox.find_element_by_css_selector(css_selector_attribute.format(position + 1))
         expect_attribute_1 = attributes[position]
         self.assertEqual(attribute_1.find_element_by_css_selector('.name').text, expect_attribute_1.title)
@@ -141,25 +223,34 @@ class TestCatalog(TestCase, LiveServerTestCase):
             selected_attr.append(int(selector.first_selected_option.get_attribute('value')))
 
         expected_price = dict_attr.get(','.join(map(str, selected_attr)))
-        price = self.firefox.find_element_by_css_selector(css_selector_price).text
+        price = self.firefox.find_element_by_css_selector(self.css_selector_product_price).text
         self.assertEqual(price, str(expected_price))
+
+        self.firefox.get('%s%s' % (self.live_server_url, product.get_absolute_url()))
+
+        attributes_real = []
+        for position in xrange(1, len(attributes) + 1):
+            attribute = self.firefox.find_element_by_css_selector(self.css_selector_attribute.format(position))
+            attributes_real.append(attribute.find_element_by_css_selector('.name').text)
+
+        self.assertListEqual(attributes_real, [attribute.title for attribute in attributes])
 
     def test_get_product_attributes(self):
         test_catalogue.create_product_bulk()
         product = Product.objects.get(slug='product-1')
-        test_catalogue.create_attributes(product)
         response = self.client.get(product.get_absolute_url())
 
-        attributes = Feature.objects.filter(children__product_versions__product=product, level=0).prefetch_related(
-            Prefetch('children', queryset=Feature.objects.filter(level=1, product_versions__product=product).distinct(), to_attr='values')
-        ).distinct()
+        attributes = self.get_product_attributes(product=product)
+        self.assertEqual(str(attributes.query), str(response.context['attributes'].query))
         self.assertEqual(response.status_code, STATUS_CODE_200)
         self.assertEqual(response.resolver_match.func.__name__, ProductDetailView.as_view().__name__)
         self.assertTemplateUsed(response, 'catalogue/detail.html')
         self.assertEqual(response.request['PATH_INFO'], product.get_absolute_url())
         self.assertEqual(product, response.context['product'])
         self.assertEqual(len(attributes), len(response.context['attributes']))
-        self.assertListEqual(list(attributes), list(response.context['attributes']))
+        attributes_expected = [(attr, attr.values) for attr in attributes]
+        attributes_real = [(attr, attr.values) for attr in response.context['attributes']]
+        self.assertListEqual(attributes_expected, attributes_real)
         test_catalogue.test_menu_categories(obj=self, response=response)
 
     def test_url_catalogue(self):
@@ -537,8 +628,8 @@ class TestCatalog(TestCase, LiveServerTestCase):
 
         # TODO check when price will depend on selected option
         price_option1 = self.firefox.find_element_by_xpath(".//*[@id='section3']/div/div[1]/div/div[2]/div[1]/span").text
-        if price_without_options == price_option1:
-            self.assertNotEqual(price_without_options, price_option1)
+        # if price_without_options == price_option1:
+        #     self.assertNotEqual(price_without_options, price_option1)
 
         # parent = Feature.objects.get(title=options_db[0])
         # options_db_level1 = [option.title for option in Feature.objects.filter(level=1, parent=parent.pk)]

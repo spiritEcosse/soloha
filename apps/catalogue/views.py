@@ -25,6 +25,7 @@ from djangular.views.crud import NgCRUDView
 from oscar.core.loading import get_class
 from django.db.models import Q
 from soloha import settings
+from django.db.models import Max
 
 Product = get_model('catalogue', 'product')
 Category = get_model('catalogue', 'category')
@@ -151,23 +152,22 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
     def get_context_data_json(self, **kwargs):
         context = dict()
 
-        product_versions = dict()
+        context['product_versions'] = dict()
         for product_version in self.get_prod_versions_queryset():
-            product_versions[','.join(map(str, sorted([attr.pk for attr in product_version.attributes.all()])))] = product_version.price_retail
+            attribute_values = [str(attr.pk) for attr in product_version.attributes.all().order_by('parent__product_features__sort')]
+            context['product_versions'][','.join(attribute_values)] = product_version.price_retail
 
-        list_attr = []
+        context['attributes'] = []
         for attr in self.get_attributes():
             values = [{'id': value.pk, 'title': value.title} for value in attr.values]
-            list_attr.append({'pk': attr.pk, 'slug': attr.slug, 'title': attr.title, 'values': values})
+            context['attributes'].append({'pk': attr.pk, 'title': attr.title, 'values': values})
 
-        context['attributes'] = list_attr
-        context['product_versions'] = product_versions
         context['options'] = [{prod_option.option.pk: prod_option.price_retail} for prod_option in ProductOptions.objects.filter(product=self.object)]
         self.get_price(context)
         return context
 
     def get_prod_versions_queryset(self):
-        return ProductVersion.objects.filter(product=self.object).order_by('pk')
+        return ProductVersion.objects.filter(product=self.object).prefetch_related('attributes').order_by('price_retail')
 
     def get_context_data(self, **kwargs):
         context = super(ProductDetailView, self).get_context_data(**kwargs)
@@ -197,16 +197,23 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
                 context['price'] = info.price.incl_tax
                 context['currency'] = info.price.currency
             else:
-                context['product_not_availability'] = _('Product is not available.')
+                context['product_not_availability'] = str(_('Product is not available.'))
         else:
             context['price'] = first_prod_version.price_retail
             context['currency'] = settings.OSCAR_DEFAULT_CURRENCY
         return context
 
     def get_attributes(self):
-        return Feature.objects.only('title', 'pk', 'slug').filter(children__product_versions__product=self.object, level=0).prefetch_related(
-            Prefetch('children', queryset=Feature.objects.only('title', 'pk', 'slug').filter(level=1, product_versions__product=self.object).distinct(), to_attr='values')
-        ).distinct()
+        only = ['title', 'pk']
+        return Feature.objects.only(*only).filter(
+            children__product_versions__product=self.object, level=0
+        ).prefetch_related(
+            Prefetch('children', queryset=Feature.objects.only(*only).filter(
+                level=1, product_versions__product=self.object
+            ).annotate(
+                price=Max('product_versions__price_retail')
+            ).order_by('price', 'product_features__sort'), to_attr='values')
+        ).annotate(price=Max('children__product_versions__price_retail')).order_by('price', 'product_features__sort')
 
     def get_options(self):
         return Feature.objects.filter(Q(level=0), Q(product_options__product=self.object) | Q(children__product_options__product=self.object)).distinct()
