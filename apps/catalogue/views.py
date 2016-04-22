@@ -143,6 +143,7 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
 class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CoreProductDetailView):
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
+
         if self.request.body:
             data = json.loads(self.request.body)
             self.kwargs['option_id'] = data.get('option_id')

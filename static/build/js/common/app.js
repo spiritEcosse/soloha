@@ -41,18 +41,32 @@
       selected_attributes = [];
       attributes = [];
       product_versions = [];
-      $scope.new_price = 1;
       $http.post($location.absUrl(), {
         'option_id': $scope.option_id,
         'parent': $scope.parent
       }).success(function(data) {
         $scope.options = data.options;
-        return $scope.options_children = data.options_children;
+        $scope.options_children = data.options_children;
+        if (data.price) {
+          $scope.new_price = data.price;
+        } else {
+          $scope.product.product_not_availability = data.product_not_availability;
+        }
+        return console.log(data);
       }).error(function() {
         return console.error('An error occurred during submission');
       });
       $scope.change_price = function() {
-        $scope.option_id = $scope.confirmed;
+        if ($scope.option_model) {
+          console.log($scope.options_children[$scope.option_id]);
+          if ($scope.options_children[$scope.option_id]) {
+            $scope.option_id = Object.keys($scope.options_children[$scope.option_id]).filter(function(key) {
+              return $scope.options_children[$scope.option_id][key] === $scope.option_model[$scope.option_id];
+            })[0];
+          }
+        } else {
+          $scope.option_id = $scope.confirmed;
+        }
         if ($scope.options[$scope.option_id]) {
           $scope.new_price += parseFloat($scope.options[$scope.option_id]);
         } else {
@@ -63,10 +77,12 @@
           'parent': $scope.parent
         }).success(function(data) {
           $scope.options = data.options;
+          console.log($scope.options);
           if (Object.keys(data.options_children).length !== 0) {
-            console.log(data.options_children);
-            $scope.options_children = data.options_children;
-            return angular.element(document.getElementById('options-0')).append($compile('<select class="form-control" ng-model="data[options_children.65]" ng-change="change_price()" ng-options="option for option in options_children" ></select>')($scope));
+            $scope.options_children[$scope.option_id] = data.options_children;
+            return angular.element(document.getElementById('options-0')).append($compile('<span id="' + $scope.option_id + '"> <select class="form-control" ng-model="option_model[' + $scope.option_id + ']" ng-change="change_price()" ng-options="option for option in options_children[' + $scope.option_id + ']" ></select> </span>')($scope));
+          } else {
+            return angular.element(document.getElementById('options-0')).append($compile('<div id="' + $scope.option_id + '"> <select class="form-control" ng-model="option_model[' + $scope.option_id + ']" ng-change="change_price()" ng-options="option for option in options" ></select> </div>')($scope));
           }
         }).error(function() {
           return console.error('An error occurred during submission');
