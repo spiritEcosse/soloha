@@ -143,11 +143,12 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
 class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CoreProductDetailView):
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
-
         if self.request.body:
             data = json.loads(self.request.body)
             self.kwargs['option_id'] = data.get('option_id')
             self.kwargs['parent'] = data.get('parent', None)
+            self.kwargs['list_options'] = data.get('list_options', 'test')
+            print(self.kwargs['list_options'])
         else:
             self.kwargs['option_id'] = None
             self.kwargs['parent'] = None
@@ -157,15 +158,20 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
         return self.render_json_response(self.get_context_data_json())
 
     def get_context_data_json(self, **kwargs):
-        context = {"options": {}, "options_children": {}}
+        context = {"options": {}, "options_children": {}, "list_options": {}}
         for prod_option in ProductOptions.objects.filter(product=self.object).distinct():
             context["options"][prod_option.option.pk] = prod_option.price_retail
         if self.kwargs['parent']:
             for children_option in Feature.objects.filter(parent=self.kwargs['option_id'], product_options__product=self.object).distinct().values():
                 context["options_children"][children_option['id']] = children_option['title']
+
+        for option in self.get_options():
+            context["list_options"][option.id] = option.title
+
         product_versions = dict()
         for product_version in self.get_prod_versions_queryset():
             product_versions[','.join(map(str, sorted([attr.pk for attr in product_version.attributes.all()])))] = product_version.price_retail
+
 
         list_attr = []
         for attr in self.get_attributes():

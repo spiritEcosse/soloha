@@ -200,12 +200,14 @@
                             <div class="col-xs-24">
                                 <div class="row option form-inline">
                                     <label class="block" id="options-0">
-                                        <select class="form-control input-md" ng-model="confirmed" ng-change="change_price()">
-                                            <option>--не выбрано--</option>
-                                            {% for option in options %}
-                                                <option value="{{ option.id }}"> {{ option }}</option>
-                                            {% endfor %}
-                                        </select>
+                                        <select class="form-control" ng-model="option_model[0]"
+                                                ng-change="change_price(option_id)" ng-options="option for option in list_options" ></select>
+{#                                        <select class="form-control input-md" ng-model="model[0]" ng-change="change_price(option_id)">#}
+{#                                            <option>--не выбрано--</option>#}
+{#                                            {% for option in options %}#}
+{#                                                <option value="{{ option.id }}"> {{ option }}</option>#}
+{#                                            {% endfor %}#}
+{#                                        </select>#}
                                     </label>
                                 </div>
 
