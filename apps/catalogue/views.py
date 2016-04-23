@@ -154,7 +154,7 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
 
         context['product_versions'] = dict()
         for product_version in self.get_prod_versions_queryset():
-            attribute_values = [str(attr.pk) for attr in product_version.attributes.all().order_by('parent__product_features__sort')]
+            attribute_values = [str(attr.pk) for attr in product_version.attributes.all().annotate(price=Max('product_versions__price_retail')).order_by('price', 'parent__product_features__sort')]
             context['product_versions'][','.join(attribute_values)] = product_version.price_retail
 
         context['attributes'] = []
@@ -167,6 +167,7 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
         return context
 
     def get_prod_versions_queryset(self):
+        # ToDo igor: add to order_by - 'parent__product_features__sort'
         return ProductVersion.objects.filter(product=self.object).prefetch_related('attributes').order_by('price_retail')
 
     def get_context_data(self, **kwargs):
@@ -212,7 +213,7 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
                 level=1, product_versions__product=self.object
             ).annotate(
                 price=Max('product_versions__price_retail')
-            ).order_by('price', 'product_features__sort'), to_attr='values')
+            ).order_by('price'), to_attr='values')
         ).annotate(price=Max('children__product_versions__price_retail')).order_by('price', 'product_features__sort')
 
     def get_options(self):
