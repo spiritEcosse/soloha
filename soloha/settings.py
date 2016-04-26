@@ -49,7 +49,6 @@ INSTALLED_APPS = \
          # 'bootstrap_pagination',
          # 'djangular',
          # 'ckeditor',
-
         'django.contrib.auth',
         'django.contrib.contenttypes',
         'django.contrib.sessions',
@@ -127,15 +126,15 @@ else:
             'POST': settings_local.DB_PORT,
             'ATOMIC_REQUESTS': settings_local.DB_ATOMIC_REQUESTS,
         },
-        # 'mysql': {
-            # 'ENGINE': settings_local.DB_BACKEND_MYSQL,
-        #     'NAME': settings_local.DB_NAME_MYSQL,
-        #     'USER': settings_local.DB_USER_MYSQL,
-        #     'PASSWORD': settings_local.DB_PASSWORD_MYSQL,
-        #     'HOST': settings_local.DB_HOST_MYSQL,
-        #     'POST': settings_local.DB_PORT_MYSQL,
-        #     'ATOMIC_REQUESTS': settings_local.DB_ATOMIC_REQUESTS_MYSQL,
-        # },
+        'mysql': {
+            'ENGINE': settings_local.DB_BACKEND_MYSQL,
+            'NAME': settings_local.DB_NAME_MYSQL,
+            'USER': settings_local.DB_USER_MYSQL,
+            'PASSWORD': settings_local.DB_PASSWORD_MYSQL,
+            'HOST': settings_local.DB_HOST_MYSQL,
+            'POST': settings_local.DB_PORT_MYSQL,
+            'ATOMIC_REQUESTS': settings_local.DB_ATOMIC_REQUESTS_MYSQL,
+        },
         # 'default': {
         #     'ENGINE': 'django.db.backends.sqlite3',
         #     'NAME': location('db.sqlite3'),
@@ -160,9 +159,8 @@ USE_L10N = True
 
 USE_TZ = True
 
-
 LANGUAGES = (
-    ('ru', _('Russia')),
+    ('en', _('England')),
 )
 
 # Static files (CSS, JavaScript, Images)

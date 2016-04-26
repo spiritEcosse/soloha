@@ -9,7 +9,7 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "%s.settings" % PROJECT_NAME)
 from soloha.settings_local import AUTORELOAD
 
-activate_env = os.path.expanduser(os.path.join(BASE_DIR, "/root/Envs/soloha/bin/activate_this.py"))
+activate_env = os.path.expanduser(os.path.join(BASE_DIR, "/root/.virtualenvs/soloha/bin/activate_this.py"))
 execfile(activate_env, dict(__file__=activate_env))
 
 from tornado.options import options, define, parse_command_line

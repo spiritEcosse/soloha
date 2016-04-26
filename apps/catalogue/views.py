@@ -25,7 +25,7 @@ from djangular.views.crud import NgCRUDView
 from oscar.core.loading import get_class
 from django.db.models import Q
 from soloha import settings
-from django.db.models import Max
+from django.db.models import Min
 
 Product = get_model('catalogue', 'product')
 Category = get_model('catalogue', 'category')
@@ -154,7 +154,9 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
 
         context['product_versions'] = dict()
         for product_version in self.get_prod_versions_queryset():
-            attribute_values = [str(attr.pk) for attr in product_version.attributes.all().annotate(price=Max('product_versions__price_retail')).order_by('price', 'parent__product_features__sort')]
+            attribute_values = [str(attr.pk) for attr in product_version.attributes.all().annotate(
+                price=Min('product_versions__price_retail')
+            ).order_by('price', 'parent__product_features__sort', 'parent__title', 'parent__pk')]
             context['product_versions'][','.join(attribute_values)] = product_version.price_retail
 
         context['attributes'] = []
@@ -212,9 +214,9 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
             Prefetch('children', queryset=Feature.objects.only(*only).filter(
                 level=1, product_versions__product=self.object
             ).annotate(
-                price=Max('product_versions__price_retail')
-            ).order_by('price'), to_attr='values')
-        ).annotate(price=Max('children__product_versions__price_retail')).order_by('price', 'product_features__sort')
+                price=Min('product_versions__price_retail')
+            ).order_by('price', 'title', 'pk'), to_attr='values')
+        ).annotate(price=Min('children__product_versions__price_retail')).order_by('price', 'product_features__sort', 'title', 'pk')
 
     def get_options(self):
         return Feature.objects.filter(Q(level=0), Q(product_options__product=self.object) | Q(children__product_options__product=self.object)).distinct()

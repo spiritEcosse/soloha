@@ -386,12 +386,21 @@ class CustomAbstractProduct(models.Model):
             # the ProductManager
             images = images.order_by('display_order')
         try:
-            return images[0].original.name or IMAGE_NOT_FOUND
+            image = images[0].original.name or IMAGE_NOT_FOUND
         except IndexError:
             # We return a dict with fields that mirror the key properties of
             # the ProductImage class so this missing image can be used
             # interchangeably in templates.  Strategy pattern ftw!
-            return self.get_missing_image().name
+            image = self.get_missing_image().name
+
+        #Todo igor: dry
+        if not os.path.exists('{}/{}'.format(MEDIA_ROOT, image)):
+            image = IMAGE_NOT_FOUND
+
+        #Todo igor: dry, set python Exception file not found
+        if not os.path.exists('{}/{}'.format(MEDIA_ROOT, image)):
+            raise Exception('image - "{}/{}" not found!'.format(MEDIA_ROOT, image))
+        return image
 
     # Updating methods
 
@@ -526,7 +535,7 @@ class CustomAbstractCategory(MPTTModel):
         verbose_name_plural = _('Categories')
 
     def __str__(self):
-        return str(self.name)
+        return u'{}'.format(self.name)
 
     @property
     def full_name(self):
@@ -785,7 +794,7 @@ class AbstractVersionAttribute(models.Model):
         verbose_name_plural = _('Version attributes')
 
     def __str__(self):
-        return '{}, {} - {}'.format(self.pk, self.version.product.title, self.attribute.title)
+        return u'{}, {} - {}'.format(self.pk, self.version.product.title, self.attribute.title)
 
 
 @python_2_unicode_compatible
@@ -803,7 +812,7 @@ class AbstractProductVersion(models.Model):
         verbose_name_plural = _('Product versions')
 
     def __str__(self):
-        return '{}, Version of product - {}'.format(self.pk, self.product.title)
+        return u'{}, Version of product - {}'.format(self.pk, self.product.title)
 
 
 @python_2_unicode_compatible

@@ -32,7 +32,7 @@ from django.db.models import Q
 import hashlib
 from decimal import Decimal as D
 from soloha import settings
-from django.db.models import Max
+from django.db.models import Min
 
 Product = get_model('catalogue', 'product')
 ProductClass = get_model('catalogue', 'ProductClass')
@@ -124,7 +124,9 @@ class TestCatalog(TestCase, LiveServerTestCase):
         dict_product_version_price = dict()
 
         for product_version in self.get_product_version(product=product):
-            attribute_values = [str(attr.pk) for attr in product_version.attributes.all().annotate(price=Max('product_versions__price_retail')).order_by('price', 'parent__product_features__sort')]
+            attribute_values = [str(attr.pk) for attr in product_version.attributes.all().annotate(
+                price=Min('product_versions__price_retail'),
+            ).order_by('price', 'parent__product_features__sort', 'parent__title', 'parent__pk')]
             dict_product_version_price[','.join(attribute_values)] = str(product_version.price_retail)
 
         return dict_product_version_price
@@ -156,9 +158,10 @@ class TestCatalog(TestCase, LiveServerTestCase):
             Prefetch('children', queryset=Feature.objects.only(*only).filter(
                 level=1, product_versions__product=product
             ).annotate(
-                price=Max('product_versions__price_retail')
-            ).order_by('price'), to_attr='values')
-        ).annotate(price=Max('children__product_versions__price_retail')).order_by('price', 'product_features__sort')
+                price=Min('product_versions__price_retail')
+            ).order_by('price', 'title', 'pk'), to_attr='values')
+        ).annotate(price=Min('children__product_versions__price_retail')).\
+            order_by('price', 'product_features__sort', 'title', 'pk')
 
     def test_get_price_product_selenium(self):
         """
