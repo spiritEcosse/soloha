@@ -30,6 +30,8 @@ from django.test import LiveServerTestCase
 from django.core import serializers
 from django.db.models import Q
 import hashlib
+from haystack.query import SearchQuerySet
+from haystack.inputs import AutoQuery
 
 Product = get_model('catalogue', 'product')
 ProductClass = get_model('catalogue', 'ProductClass')
@@ -543,4 +545,26 @@ class TestCatalog(TestCase, LiveServerTestCase):
         # parent = Feature.objects.get(title=options_db[0])
         # options_db_level1 = [option.title for option in Feature.objects.filter(level=1, parent=parent.pk)]
         # options_on_page_level1 = self.firefox.find_element_by_xpath(".//*[@id='options']/div[2]/div[2]/div[2]/div/label/select/option[2]").text
+
+    def test_product_search(self):
+        test_catalogue.create_product_bulk()
+
+        # Searching one product
+        dict_values = {'search_string': 'Product 1'}
+        self.assertions_product_search(dict_values=dict_values)
+
+        # Searching many products with similar names
+        dict_values = {'search_string': 'Product'}
+        self.assertions_product_search(dict_values=dict_values)
+
+    def assertions_product_search(self, dict_values={}):
+        category = Category.objects.get(name='Category-12')
+
+        response = self.client.get(category.get_absolute_url(), dict_values)
+        sqs = SearchQuerySet().filter(content=AutoQuery(dict_values['search_string']))[:5]
+
+        self.assertEqual(response.status_code, STATUS_CODE_200)
+        self.assertEqual(response.context['searched_products'], sqs)
+
+
 

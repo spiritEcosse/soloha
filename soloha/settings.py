@@ -224,14 +224,29 @@ AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
 )
 
+# HAYSTACK_CONNECTIONS = {
+#     'default': {
+#         'ENGINE': 'haystack.backends.simple_backend.SimpleEngine',
+#         # 'ENGINE': 'haystack.backends.solr_backend.SolrEngine',
+#         # 'URL': 'http://127.0.0.1:8983/solr',
+#         # 'INCLUDE_SPELLING': True,
+#     },
+# }
+
 HAYSTACK_CONNECTIONS = {
     'default': {
-        'ENGINE': 'haystack.backends.simple_backend.SimpleEngine',
-        # 'ENGINE': 'haystack.backends.solr_backend.SolrEngine',
-        # 'URL': 'http://127.0.0.1:8983/solr',
-        # 'INCLUDE_SPELLING': True,
+        'ENGINE': 'haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine',
+        'URL': 'http://127.0.0.1:9200/',
+        'INDEX_NAME': 'haystack',
+        'EXCLUDED_INDEXES': [
+            'myproject.search.search_indexes.CoreProductIndex',
+             'oscar.apps.search.search_indexes.ProductIndex',
+             ]
     },
 }
+
+HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
+
 
 OSCAR_MISSING_IMAGE_URL = 'image_not_found.jpg'
 
