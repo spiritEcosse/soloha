@@ -64,7 +64,7 @@ INSTALLED_APPS = \
         'feincms',
         'easy_thumbnails',
         # 'smart_load_tag',
-    ] + get_core_apps(['apps.catalogue', 'apps.promotions', 'apps.partner'])
+    ] + get_core_apps(['apps.catalogue', 'apps.promotions', 'apps.partner', 'apps.search',])
 
 SITE_ID = 1
 
@@ -246,7 +246,6 @@ HAYSTACK_CONNECTIONS = {
 }
 
 HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
-
 
 OSCAR_MISSING_IMAGE_URL = 'image_not_found.jpg'
 

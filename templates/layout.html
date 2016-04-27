@@ -124,8 +124,7 @@
                         {%csrf_token %}
                         <form  method="post" class="autocomplete-me">
                             <div class="input-group search">
-                                <input type="text"  ng-model="search" ng-change="update_products(search_string)" class="form-control" placeholder="Ищете что-то?">
-                                {#                                <input type="submit" value="Search!">#}
+                                <input type="text" name="search_string" id="search_string" ng-model="search" ng-change="update_products(search_string)" class="form-control" placeholder="Ищете что-то?">
                                 <div class="input-group-btn">
                                     <button class="btn btn-default dropdown-toggle" type="button" id='search-show' data-toggle="dropdown">
                                         <span class="glyphicon glyphicon-search"></span> Найти
@@ -135,7 +134,7 @@
                                         <div class="item col-xs-24" ng-repeat="product in searched_products">
                                             <a href="{{ product.href }}">
                                                 <div class="col-xs-4">
-                                                    <img src="{{ product.image }}" class="img-responsive" />
+                                                    <img src="{{ product.main_image }}" class="img-responsive" />
                                                 </div>
                                                 <div class="col-xs-20">
                                                     <div class="title">
@@ -149,7 +148,7 @@
                                             </a>
                                         </div>
                                         <div class="item col-xs-24 text-center">
-                                            <a href="product.html">
+                                            <a href="/search/?q={{ search_string }}">
                                                 <div class="col-xs-24">
                                                     <div class="title">
                                                         Все результаты поиска
@@ -160,6 +159,7 @@
                                         </div>
                                     </div>
                                     {% endverbatim %}
+
                                 </div>
                             </div>
                         </form>

@@ -235,33 +235,3 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
     def get_options(self):
         return Feature.objects.filter(Q(level=0), Q(product_options__product=self.object) | Q(children__product_options__product=self.object)).distinct()
 
-
-class ProductsSearch(views.JSONResponseMixin, views.AjaxResponseMixin, SingleObjectMixin, generic.ListView):
-    enforce_paths = True
-
-    def post(self, request, *args, **kwargs):
-        if self.request.body:
-            data = json.loads(self.request.body)
-            self.kwargs['search_string'] = data.get('search_string', '')
-        else:
-            self.kwargs['search_string'] = ''
-
-    def post_ajax(self, request, *args, **kwargs):
-        super(ProductsSearch, self).post_ajax(request, *args, **kwargs)
-        return self.render_json_response(self.get_context_data_json())
-
-    def get_context_data_json(self, **kwargs):
-        if self.kwargs['search_string']:
-            sqs = SearchQuerySet().filter(content=AutoQuery(self.kwargs['search_string']))[:5]
-        else:
-            sqs = []
-
-        context = dict()
-        context['searched_products'] = [{'id': obj.id,
-                                         'title': obj.title,
-                                         'main_image': obj.object.get_values()['image'],
-                                         'href': obj.object.get_absolute_url(),
-                                         'price': obj.object.get_values()['price']} for obj in sqs]
-        return context
-
-

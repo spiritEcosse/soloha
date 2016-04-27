@@ -5,7 +5,7 @@ from oscar.core.loading import get_class
 detail_view = get_class('catalogue.views', 'ProductDetailView')
 catalogue_view = get_class('catalogue.views', 'CatalogueView')
 category_view = get_class('catalogue.views', 'ProductCategoryView')
-search_view = get_class('catalogue.views', 'ProductsSearch')
+search_view = get_class('search.views', 'FacetedSearchView')
 
 
 class Soloha(app.Shop):

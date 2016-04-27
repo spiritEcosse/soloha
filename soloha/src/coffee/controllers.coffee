@@ -20,6 +20,7 @@ app.controller 'Header', ['$http', '$scope', '$location', '$window', '$document'
       if data.searched_products
         $scope.searched_products = data.searched_products
       console.log($scope.searched_products)
+      console.log($scope.search_string)
     .error ->
       console.error('An error occurred during submission')
 ]
