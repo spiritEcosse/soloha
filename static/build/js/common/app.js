@@ -14,7 +14,7 @@
 
   app_name = 'soloha';
 
-  app = angular.module(app_name, ['ngResource']);
+  app = angular.module(app_name, ['ngResource', 'ngRoute']);
 
   app.config([
     '$httpProvider', function($httpProvider) {
@@ -25,18 +25,16 @@
   ]);
 
   app.controller('Header', [
-    '$http', '$scope', '$location', '$window', '$document', '$log', '$cacheFactory', function($http, $scope, $location, $window, $document, $log, $cacheFactory) {
+    '$http', '$scope', '$location', '$window', '$document', '$log', '$cacheFactory', '$route', function($http, $scope, $location, $window, $document, $log, $cacheFactory, $route) {
       return $scope.update_products = function() {
         return $http.post('/search/', {
           'search_string': $scope.search
         }).success(function(data) {
-          console.log(data);
           $scope.search_string = data.search_string;
+          $scope.sorting_type = data.sorting_type;
           if (data.searched_products) {
-            $scope.searched_products = data.searched_products;
+            return $scope.searched_products = data.searched_products;
           }
-          console.log($scope.searched_products);
-          return console.log($scope.search_string);
         }).error(function() {
           return console.error('An error occurred during submission');
         });

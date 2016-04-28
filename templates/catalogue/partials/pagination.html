@@ -4,17 +4,17 @@
 
 {% if paginator.num_pages > 1 %}
     <div class="col-xs-10 text-right">
-    <nav>
-        <ul class="pagination">
-            {% if page_obj.has_previous %}
-                <li>
-                                    {% for sorting_url, text, is_active, link in sort_types %}
-                        {% if is_active %}
-                    <a href="?page={{ page_obj.previous_page_number }}" aria-label="Previous">
-                {% endif %}
-                                    {% endfor %}
-                    <span aria-hidden="true">&laquo;</span></a>
-                </li>
+        <nav>
+            <ul class="pagination">
+                {% if page_obj.has_previous %}
+                    <li>
+                        {% for sorting_url, text, is_active, link in sort_types %}
+                            {% if is_active %}
+                                <a href="?page={{ page_obj.previous_page_number }}" aria-label="Previous">
+                            {% endif %}
+                        {% endfor %}
+                        <span aria-hidden="true">&laquo;</span></a>
+                    </li>
             {% endif %}
             {% for page_num in page_obj|ellipses_page_range %}
                 {% if page_num == page_obj.number%}

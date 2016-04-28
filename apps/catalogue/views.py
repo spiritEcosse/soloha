@@ -126,7 +126,6 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
         # Category.objects.filter(pk=self.object.pk).update(popular=F('popular') + 1)
 
         context = super(ProductCategoryView, self).get_context_data(**kwargs)
-
         queryset_filters = Feature.objects.filter(filter_products__in=self.products_without_filters).distinct().prefetch_related('filter_products')
         context['filters'] = Feature.objects.filter(level=0, children__in=queryset_filters).prefetch_related(
             Prefetch('children', queryset=queryset_filters.annotate(num_prod=Count('filter_products')),
@@ -155,7 +154,6 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
             self.kwargs['option_id'] = data.get('option_id')
             self.kwargs['parent'] = data.get('parent', None)
             self.kwargs['list_options'] = data.get('list_options', 'test')
-            print(self.kwargs['list_options'])
         else:
             self.kwargs['option_id'] = None
             self.kwargs['parent'] = None

@@ -8,6 +8,10 @@ from haystack.inputs import AutoQuery
 from oscar.core.loading import get_model
 from django.db.models.query import Prefetch
 from django.conf import settings
+from django.utils.translation import ugettext_lazy as _
+from apps.catalogue.models import Feature
+from django.db.models import Count
+
 
 Product = get_model('catalogue', 'product')
 
@@ -21,11 +25,10 @@ class FacetedSearchView(views.JSONResponseMixin, views.AjaxResponseMixin, CoreFa
     paginate_by = OSCAR_PRODUCTS_PER_PAGE
 
     def post(self, request, *args, **kwargs):
+        self.kwargs['search_string'] = ''
         if self.request.body:
             data = json.loads(self.request.body)
             self.kwargs['search_string'] = data.get('search_string', '')
-        else:
-            self.kwargs['search_string'] = ''
         self.products = self.get_products()
 
     def post_ajax(self, request, *args, **kwargs):
@@ -40,12 +43,36 @@ class FacetedSearchView(views.JSONResponseMixin, views.AjaxResponseMixin, CoreFa
 
     def get(self, request, *args, **kwargs):
         self.kwargs['search_string'] = self.request.GET.get('q')
+        dict_new_sorting_types = {'popularity': '-views_count', 'price_ascending': 'stockrecords__price_excl_tax',
+                                      'price_descending': '-stockrecords__price_excl_tax'}
+
+        self.kwargs['sorting_type'] = dict_new_sorting_types.get(self.request.GET.get('sorting_type'), '-views_count')
         return super(FacetedSearchView, self).get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super(FacetedSearchView, self).get_context_data(**kwargs)
-        context['results'] = self.get_search_queryset()
+        # context['results'] = self.get_search_queryset()
         context['query'] = self.kwargs['search_string']
+
+        queryset_filters = Feature.objects.filter(filter_products__in=self.products_without_filters).distinct().prefetch_related('filter_products')
+        context['filters'] = Feature.objects.filter(level=0, children__in=queryset_filters).prefetch_related(
+            Prefetch('children', queryset=queryset_filters.annotate(num_prod=Count('filter_products')),
+                     to_attr='children_in_products'),
+        ).distinct()
+        context['filter_slug'] = self.kwargs.get('filter_slug', '')
+
+        sort_types = [('-views_count', _('By popularity'), 'popularity'),
+                      ('-stockrecords__price_excl_tax', _('By price descending'), 'price_descending'),
+                      ('stockrecords__price_excl_tax', _('By price ascending'), 'price_ascending')]
+        context['sort_types'] = []
+        for type, text, link in sort_types:
+            is_active = False
+            if self.kwargs.get('sorting_type', '') == type:
+                is_active = True
+            sorting_url = '/search/?q={}&sorting_type={}'.format(context['query'], link)
+            sort_link = 'q={}&sorting_type={}'.format(context['query'], link)
+            context['sort_types'].append((sorting_url, text, is_active, sort_link))
+
         return context
 
     def get_products(self, **kwargs):
@@ -66,6 +93,13 @@ class FacetedSearchView(views.JSONResponseMixin, views.AjaxResponseMixin, CoreFa
 
     def get_queryset(self):
         only = ['title', 'slug', 'structure', 'product_class', 'categories']
+        # dict_filter = {'enable': True, 'categories__in': products.get_descendants(include_self=True)}
+
+        # if self.kwargs.get('filter_slug'):
+        #     dict_filter['filters__slug__in'] = self.kwargs.get('filter_slug').split('/')
+
+        products_pk = [product.pk for product in self.get_search_queryset()]
+        self.products_without_filters = Product.objects.only('id').filter(id__in=products_pk).distinct().order_by(self.kwargs.get('sorting_type'))
 
         queryset = super(FacetedSearchView, self).get_queryset()
         return queryset.only(*only).distinct().select_related('product_class').prefetch_related(

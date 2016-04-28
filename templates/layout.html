@@ -121,15 +121,15 @@
                                 </div>
                             </div>
                         </nav>
-                        {%csrf_token %}
-                        <form  method="post" class="autocomplete-me">
                             <div class="input-group search">
-                                <input type="text" name="search_string" id="search_string" ng-model="search" ng-change="update_products(search_string)" class="form-control" placeholder="Ищете что-то?">
+                                <input type="text" ng-model="search" ng-change="update_products(search_string)" class="form-control" placeholder="Ищете что-то?">
+                                {% verbatim %}
                                 <div class="input-group-btn">
-                                    <button class="btn btn-default dropdown-toggle" type="button" id='search-show' data-toggle="dropdown">
+                                    <a href="/search/?q={{ search_string }}">
+                                    <button class="btn btn-default dropdown-toggle" type="button" id='search-show'> <!-- data-toggle="dropdown"> -->
                                         <span class="glyphicon glyphicon-search"></span> Найти
                                     </button>
-                                    {% verbatim %}
+                                        </a>
                                     <div class="dropdown-menu dropdown-menu-right" aria-labelledby="search-show" >
                                         <div class="item col-xs-24" ng-repeat="product in searched_products">
                                             <a href="{{ product.href }}">
@@ -159,10 +159,8 @@
                                         </div>
                                     </div>
                                     {% endverbatim %}
-
                                 </div>
                             </div>
-                        </form>
                     </div>
                     <div class="col-xs-4 col-sm-4 call hidden-xs"></div>
                 </div>
