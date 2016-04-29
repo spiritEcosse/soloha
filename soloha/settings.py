@@ -126,15 +126,15 @@ else:
             'POST': settings_local.DB_PORT,
             'ATOMIC_REQUESTS': settings_local.DB_ATOMIC_REQUESTS,
         },
-        'mysql': {
-            'ENGINE': settings_local.DB_BACKEND_MYSQL,
-            'NAME': settings_local.DB_NAME_MYSQL,
-            'USER': settings_local.DB_USER_MYSQL,
-            'PASSWORD': settings_local.DB_PASSWORD_MYSQL,
-            'HOST': settings_local.DB_HOST_MYSQL,
-            'POST': settings_local.DB_PORT_MYSQL,
-            'ATOMIC_REQUESTS': settings_local.DB_ATOMIC_REQUESTS_MYSQL,
-        },
+        # 'mysql': {
+        #     'ENGINE': settings_local.DB_BACKEND_MYSQL,
+        #     'NAME': settings_local.DB_NAME_MYSQL,
+        #     'USER': settings_local.DB_USER_MYSQL,
+        #     'PASSWORD': settings_local.DB_PASSWORD_MYSQL,
+        #     'HOST': settings_local.DB_HOST_MYSQL,
+        #     'POST': settings_local.DB_PORT_MYSQL,
+        #     'ATOMIC_REQUESTS': settings_local.DB_ATOMIC_REQUESTS_MYSQL,
+        # },
         # 'default': {
         #     'ENGINE': 'django.db.backends.sqlite3',
         #     'NAME': location('db.sqlite3'),
@@ -224,10 +224,9 @@ AUTHENTICATION_BACKENDS = (
 
 HAYSTACK_CONNECTIONS = {
     'default': {
-        'ENGINE': 'haystack.backends.simple_backend.SimpleEngine',
-        # 'ENGINE': 'haystack.backends.solr_backend.SolrEngine',
-        # 'URL': 'http://127.0.0.1:8983/solr',
-        # 'INCLUDE_SPELLING': True,
+        'ENGINE': 'haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine',
+        'URL': 'http://127.0.0.1:9200/',
+        'INDEX_NAME': 'haystack',
     },
 }
 

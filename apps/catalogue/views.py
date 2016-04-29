@@ -154,9 +154,12 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
 
         context['product_versions'] = dict()
         for product_version in self.get_prod_versions_queryset():
-            attribute_values = [str(attr.pk) for attr in product_version.attributes.all().annotate(
-                price=Min('product_versions__price_retail')
-            ).order_by('price', 'parent__product_features__sort', 'parent__title', 'parent__pk')]
+            attribute_values = [str(attr.pk) for attr in product_version.attributes.filter(
+                parent__children__product_versions__product=self.object, level=1, parent__level=0
+            ).annotate(
+                price=Min('product_versions__price_retail'),
+                count_child=Count('parent__children', distinct=True)
+            ).order_by('parent__product_features__sort', 'price', '-count_child', 'parent__title', 'parent__pk')]
             context['product_versions'][','.join(attribute_values)] = product_version.price_retail
 
         context['attributes'] = []
@@ -216,7 +219,9 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
             ).annotate(
                 price=Min('product_versions__price_retail')
             ).order_by('price', 'title', 'pk'), to_attr='values')
-        ).annotate(price=Min('children__product_versions__price_retail')).order_by('price', 'product_features__sort', 'title', 'pk')
+        ).annotate(
+            price=Min('children__product_versions__price_retail'), count_child=Count('children', distinct=True)
+        ).order_by('product_features__sort', 'price', '-count_child', 'title', 'pk')
 
     def get_options(self):
         return Feature.objects.filter(Q(level=0), Q(product_options__product=self.object) | Q(children__product_options__product=self.object)).distinct()

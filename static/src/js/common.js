@@ -11,4 +11,9 @@ $(document).ready(function() {
         e.preventDefault();
         $(this).tab('show')
     })
+
+    $('.selectpicker').selectpicker({
+        style: 'btn-info',
+        size: 4
+    });
 });

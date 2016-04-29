@@ -7,6 +7,7 @@ from easy_thumbnails.exceptions import (
     InvalidImageFormatError, EasyThumbnailsError)
 from mptt.models import MPTTModel, TreeForeignKey
 from oscar.apps.catalogue.abstract_models import *  # noqa
+from django.db import IntegrityError
 
 
 @python_2_unicode_compatible
@@ -547,8 +548,9 @@ class CustomAbstractCategory(MPTTModel):
         CharField and is hence kept for backwards compatibility. It's also
         sufficiently useful to keep around.
         """
+        #Todo category.name to str
         names = [category.name for category in self.get_ancestors_and_self()]
-        return self._full_name_separator.join(map(str, names))
+        return self._full_name_separator.join(names)
 
     @property
     def full_slug(self):
@@ -691,8 +693,7 @@ class CustomAbstractCategory(MPTTModel):
 
         :param parent:
 
-            The node whose descendants will be annotated. The node itself
-            will be included in the list. If not given, the entire tree
+            The node whose descendants will be annotated. The node itself            will be included in the list. If not given, the entire tree
             will be annotated.
 
         :param max_depth:
@@ -777,6 +778,24 @@ class CustomAbstractCategory(MPTTModel):
 
 
 @python_2_unicode_compatible
+class AbstractProductVersion(models.Model):
+    attributes = models.ManyToManyField('catalogue.Feature', through='catalogue.VersionAttribute',
+                                        verbose_name=_('Attributes'), related_name='product_versions')
+    product = models.ForeignKey('catalogue.Product', related_name='versions', on_delete=models.DO_NOTHING)
+    price_retail = models.DecimalField(_("Price (retail)"), decimal_places=2, max_digits=12)
+    cost_price = models.DecimalField(_("Cost Price"), decimal_places=2, max_digits=12)
+
+    class Meta:
+        abstract = True
+        app_label = 'catalogue'
+        verbose_name = _('Product version')
+        verbose_name_plural = _('Product versions')
+
+    def __str__(self):
+        return u'{}, Version of product - {}'.format(self.pk, self.product.title)
+
+
+@python_2_unicode_compatible
 class AbstractVersionAttribute(models.Model):
     image = models.ImageField(_('Image'), upload_to='products/version/attribute/%Y/%m/%d/', blank=True, null=True, max_length=255)
     product = models.ManyToManyField('catalogue.Product', verbose_name=_('Product'),
@@ -796,23 +815,15 @@ class AbstractVersionAttribute(models.Model):
     def __str__(self):
         return u'{}, {} - {}'.format(self.pk, self.version.product.title, self.attribute.title)
 
+    def save(self, **kwargs):
+        product_versions = self.version._meta.model.objects.filter(product=self.version.product)
+        search_attributes = (sorted(attr.pk for attr in product_version.attributes.all()) for product_version in product_versions)
+        current_attributes = list(self.version.attributes.all()) + [self.attribute]
+        current_attributes = sorted([attr.pk for attr in current_attributes])
 
-@python_2_unicode_compatible
-class AbstractProductVersion(models.Model):
-    attributes = models.ManyToManyField('catalogue.Feature', through='catalogue.VersionAttribute',
-                                        verbose_name=_('Attributes'), related_name='product_versions')
-    product = models.ForeignKey('catalogue.Product', related_name='versions', on_delete=models.DO_NOTHING)
-    price_retail = models.DecimalField(_("Price (retail)"), decimal_places=2, max_digits=12)
-    cost_price = models.DecimalField(_("Cost Price"), decimal_places=2, max_digits=12)
-
-    class Meta:
-        abstract = True
-        app_label = 'catalogue'
-        verbose_name = _('Product version')
-        verbose_name_plural = _('Product versions')
-
-    def __str__(self):
-        return u'{}, Version of product - {}'.format(self.pk, self.product.title)
+        if current_attributes in search_attributes:
+            raise IntegrityError(u'UNIQUE constraint failed: catalogue_productversion.version_id, catalogue_productversion.attribute_id'.format(self.attribute))
+        super(AbstractVersionAttribute, self).save(**kwargs)
 
 
 @python_2_unicode_compatible
@@ -831,7 +842,7 @@ class AbstractProductFeature(models.Model):
         verbose_name_plural = _('Product features')
 
     def __str__(self):
-        return '{}, {} - {}'.format(self.pk, self.product.title, self.feature.title)
+        return u'{}, {} - {}'.format(self.pk, self.product.title, self.feature.title)
 
 
 @python_2_unicode_compatible
@@ -851,4 +862,4 @@ class AbstractProductOptions(models.Model):
         verbose_name_plural = _('Product options')
 
     def __str__(self):
-        return '{}, {} - {}'.format(self.pk, self.product.title, self.option.title)
+        return u'{}, {} - {}'.format(self.pk, self.product.title, self.option.title)

@@ -1,43 +1,37 @@
 # --coding: utf-8--
 
-from django.test import TestCase
-from django.test import Client
-from oscar.core.loading import get_class, get_model
-from oscar.apps.catalogue.categories import create_from_breadcrumbs
-from easy_thumbnails.files import get_thumbnailer
-from soloha.settings import IMAGE_NOT_FOUND
-from oscar.test import factories
-from django.utils.html import strip_entities
-from django.core.urlresolvers import reverse
 import json
-from django.db.models.query import Prefetch
-from apps.catalogue.views import ProductCategoryView, ProductDetailView
-from django.core.paginator import Paginator
-from django.db.models import Count
-from python_test.factories import catalogue
-from templatetags.filters_concatenation import concatenate
-from django.utils.translation import ugettext_lazy as _
-from soloha.settings import MAX_COUNT_PRODUCT, MAX_COUNT_CATEGORIES
-from soloha.settings import OSCAR_PRODUCTS_PER_PAGE
-from django.db import IntegrityError
-import functools
-from oscar.apps.partner.strategy import Selector
-from selenium.webdriver.support.select import Select
-import time
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium import webdriver
-from django.test import LiveServerTestCase
-from django.core import serializers
-from django.db.models import Q
-import hashlib
+import random
 from decimal import Decimal as D
-from soloha import settings
+
+from django.core.paginator import Paginator
+from django.db import IntegrityError
+from django.db.models import Count
 from django.db.models import Min
+from django.db.models import Q
+from django.db.models.query import Prefetch
+from django.test import Client
+from django.test import LiveServerTestCase
+from django.test import TestCase
+from django.utils.translation import ugettext_lazy as _
+from oscar.apps.partner.strategy import Selector
+from oscar.core.loading import get_model
+from oscar.test import factories
+from selenium import webdriver
+from selenium.webdriver.support.select import Select
+
+from apps.catalogue.views import ProductCategoryView, ProductDetailView
+from python_test.factories import catalogue
+from soloha import settings
+from soloha.settings import OSCAR_PRODUCTS_PER_PAGE
+from templatetags.filters_concatenation import concatenate
+import time
 
 Product = get_model('catalogue', 'product')
 ProductClass = get_model('catalogue', 'ProductClass')
 Category = get_model('catalogue', 'category')
 ProductOptions = get_model('catalogue', 'ProductOptions')
+VersionAttribute = get_model('catalogue', 'VersionAttribute')
 ProductCategory = get_model('catalogue', 'ProductCategory')
 ProductVersion = get_model('catalogue', 'ProductVersion')
 Feature = get_model('catalogue', 'Feature')
@@ -70,7 +64,7 @@ class TestCatalog(TestCase, LiveServerTestCase):
         test_catalogue.create_product_bulk()
         product = Product.objects.get(title='Product 1')
         response = self.client.get(product.get_absolute_url())
-        self.assertEqual(response.status_code, STATUS_CODE_200)
+        self.equal = self.assertEqual(response.status_code, STATUS_CODE_200)
         self.assertEqual(response.request['PATH_INFO'], product.get_absolute_url())
 
         product = Product.objects.get(title='Product 20')
@@ -83,11 +77,6 @@ class TestCatalog(TestCase, LiveServerTestCase):
         self.assertEqual(response.status_code, STATUS_CODE_200)
         self.assertEqual(response.request['PATH_INFO'], product.get_absolute_url())
 
-        # attributes = AttributeOptionGroup.objects.filter(productattribute__product__parent=product).prefetch_related(
-        #     Prefetch('options',
-        #              queryset=AttributeOption.objects.filter(productattributevalue__product__parent=product).distinct(),
-        #              to_attr='attr_val')
-        # ).distinct()
         test_catalogue.test_menu_categories(obj=self, response=response)
 
     def get_product_version(self, product):
@@ -124,9 +113,12 @@ class TestCatalog(TestCase, LiveServerTestCase):
         dict_product_version_price = dict()
 
         for product_version in self.get_product_version(product=product):
-            attribute_values = [str(attr.pk) for attr in product_version.attributes.all().annotate(
+            attribute_values = [str(attr.pk) for attr in product_version.attributes.filter(
+                parent__children__product_versions__product=product, level=1, parent__level=0
+            ).annotate(
                 price=Min('product_versions__price_retail'),
-            ).order_by('price', 'parent__product_features__sort', 'parent__title', 'parent__pk')]
+                count_child=Count('parent__children', distinct=True)
+            ).order_by('parent__product_features__sort', 'price', '-count_child', 'parent__title', 'parent__pk')]
             dict_product_version_price[','.join(attribute_values)] = str(product_version.price_retail)
 
         return dict_product_version_price
@@ -160,8 +152,8 @@ class TestCatalog(TestCase, LiveServerTestCase):
             ).annotate(
                 price=Min('product_versions__price_retail')
             ).order_by('price', 'title', 'pk'), to_attr='values')
-        ).annotate(price=Min('children__product_versions__price_retail')).\
-            order_by('price', 'product_features__sort', 'title', 'pk')
+        ).annotate(price=Min('children__product_versions__price_retail'), count_child=Count('children', distinct=True)).\
+            order_by('product_features__sort', 'price', '-count_child', 'title', 'pk')
 
     def test_get_price_product_selenium(self):
         """
@@ -182,7 +174,7 @@ class TestCatalog(TestCase, LiveServerTestCase):
         context = self.get_product_price(product=product)
         self.assertEqual(price, str(context['price']))
 
-        product_class_without_track_stock = ProductClass.objects.create(name='Product class where track_stock is False', track_stock=False)
+        product_class_without_track_stock, created = ProductClass.objects.get_or_create(name='Product class where track_stock is False', track_stock=False)
         num = 2
         product = factories.create_product(slug='product-{}'.format(num), title='Product {}'.format(num), price=D('15.13'),
                                            product_class=product_class_without_track_stock)
@@ -190,13 +182,52 @@ class TestCatalog(TestCase, LiveServerTestCase):
         test_catalogue.create_options(product, product)
 
         self.firefox.get('%s%s' % (self.live_server_url, product.get_absolute_url()))
+        time.sleep(1)
         price = self.firefox.find_element_by_css_selector(self.css_selector_product_price).text
+        time.sleep(1)
         context = self.get_product_price(product=product)
         self.assertEqual(price, str(context['price']))
 
-    def test_page_product_attributes_selenium(self):
+    def test_page_product_attribute_dynamic_attributes(self):
         """
         test page product with attributes by selenium
+        :return:
+        """
+        test_catalogue.create_product_bulk()
+        product = factories.create_product(slug='product-attributes', title='Product attributes', price=D(random.randint(1, 10000)))
+        test_catalogue.create_dynamic_attributes(product)
+        attributes = list(self.get_product_attributes(product=product))
+        product_versions = self.get_dict_product_version_price(product=product)
+        self.firefox.get('%s%s' % (self.live_server_url, product.get_absolute_url()))
+
+        start_price = self.firefox.find_element_by_css_selector(self.css_selector_product_price).text
+        context = self.get_product_price(product=product)
+        self.assertEqual(start_price, str(context['price']))
+
+        feature_11 = Feature.objects.get(title='Feature 11')
+        feature_21 = Feature.objects.get(title='Feature 21')
+        feature_22 = Feature.objects.get(title='Feature 22')
+        feature_31 = Feature.objects.get(title='Feature 31')
+        feature_32 = Feature.objects.get(title='Feature 32')
+        feature_33 = Feature.objects.get(title='Feature 33')
+
+        price_33 = self.checkout_price_by_selected_attribute(attribute=feature_33, attributes=attributes, product_versions=product_versions)
+        price_32 = self.checkout_price_by_selected_attribute(attribute=feature_32, attributes=attributes, product_versions=product_versions)
+        price_31 = self.checkout_price_by_selected_attribute(attribute=feature_31, attributes=attributes, product_versions=product_versions)
+        price_11 = self.checkout_price_by_selected_attribute(attribute=feature_11, attributes=attributes, product_versions=product_versions)
+        price_21 = self.checkout_price_by_selected_attribute(attribute=feature_21, attributes=attributes, product_versions=product_versions)
+        price_22 = self.checkout_price_by_selected_attribute(attribute=feature_22, attributes=attributes, product_versions=product_versions)
+
+        self.checkout_price_by_selected_attribute(attribute=feature_33, attributes=attributes, product_versions=product_versions, earlier_price=price_33)
+        self.checkout_price_by_selected_attribute(attribute=feature_32, attributes=attributes, product_versions=product_versions, earlier_price=price_32)
+        self.checkout_price_by_selected_attribute(attribute=feature_31, attributes=attributes, product_versions=product_versions, earlier_price=price_31)
+        self.checkout_price_by_selected_attribute(attribute=feature_11, attributes=attributes, product_versions=product_versions, earlier_price=price_11)
+        self.checkout_price_by_selected_attribute(attribute=feature_21, attributes=attributes, product_versions=product_versions, earlier_price=price_21)
+        self.checkout_price_by_selected_attribute(attribute=feature_22, attributes=attributes, product_versions=product_versions, earlier_price=price_22)
+
+    def test_page_product_attributes_selenium(self):
+        """
+        test page product with ordered attributes by selenium
         :return:
         """
         test_catalogue.create_product_bulk()
@@ -216,6 +247,9 @@ class TestCatalog(TestCase, LiveServerTestCase):
             attributes_real.append(attribute.find_element_by_css_selector('.name').text)
 
         self.assertListEqual(attributes_real, [attribute.title for attribute in attributes])
+
+        list_price = product_versions.values()
+        self.assertEqual(start_price in list_price, True)
 
         attributes = list(attributes)
         attribute_33 = Feature.objects.get(title='Feature 33')
@@ -253,7 +287,9 @@ class TestCatalog(TestCase, LiveServerTestCase):
             selected_values.append(int(selector.first_selected_option.get_attribute('value')))
 
         expected_price = product_versions.get(','.join(map(str, selected_values)))
+        time.sleep(1)
         price = self.firefox.find_element_by_css_selector(self.css_selector_product_price).text
+        time.sleep(1)
         self.assertEqual(price, str(expected_price))
 
         if earlier_price is not None:
@@ -305,6 +341,42 @@ class TestCatalog(TestCase, LiveServerTestCase):
         category_1234 = Category.objects.get(name='Category-1234')
         slugs = [category_1234.parent.parent.parent.slug, category_1234.parent.parent.slug, category_1234.parent.slug, category_1234.slug]
         self.assertEqual(Category._slug_separator.join(map(str, slugs)), category_1234.full_slug)
+
+    def create_duplicate_version_attribute(self):
+        product, created = Product.objects.get_or_create(slug='test')
+        feature_11, created = Feature.objects.get_or_create(title='Feature 11')
+
+        message = "UNIQUE constraint failed: catalogue_versionattribute.version_id, catalogue_versionattribute.attribute_id"
+
+        with self.assertRaisesMessage(expected_exception=IntegrityError, expected_message=message):
+            price_retail = D(random.randint(1, 10000))
+            product_version_1, created = ProductVersion.objects.get_or_create(product=product, price_retail=price_retail + 100, cost_price=price_retail)
+
+            VersionAttribute.objects.create(version=product_version_1, attribute=feature_11)
+            VersionAttribute.objects.create(version=product_version_1, attribute=feature_11)
+
+    def create_duplicate_product_version_attribute(self):
+        product, created = Product.objects.get_or_create(slug='test')
+        feature_11, created = Feature.objects.get_or_create(title='Feature 11')
+        feature_21, created = Feature.objects.get_or_create(title='Feature 21')
+        feature_31, created = Feature.objects.get_or_create(title='Feature 31')
+
+        message = 'UNIQUE constraint failed: catalogue_productversion.version_id, catalogue_productversion.attribute_id'
+
+        with self.assertRaisesMessage(expected_exception=IntegrityError, expected_message=message):
+            price_retail = D(random.randint(1, 10000))
+            product_version_1, created = ProductVersion.objects.get_or_create(product=product, price_retail=price_retail + 100, cost_price=price_retail)
+
+            VersionAttribute.objects.get_or_create(version=product_version_1, attribute=feature_11)
+            VersionAttribute.objects.get_or_create(version=product_version_1, attribute=feature_21)
+            VersionAttribute.objects.get_or_create(version=product_version_1, attribute=feature_31)
+
+            price_retail = D(random.randint(1, 10000))
+            product_version_2, created = ProductVersion.objects.get_or_create(product=product, price_retail=price_retail + 100, cost_price=price_retail)
+
+            VersionAttribute.objects.get_or_create(version=product_version_2, attribute=feature_11)
+            VersionAttribute.objects.get_or_create(version=product_version_2, attribute=feature_21)
+            VersionAttribute.objects.get_or_create(version=product_version_2, attribute=feature_31)
 
     def test_create_product(self):
         message = 'UNIQUE constraint failed: catalogue_product.slug'

@@ -44,4 +44,6 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
     angular.forEach attributes, (key) ->
       selected_attributes.push($scope.product.attributes[key].id)
     $scope.product.price = product_versions[selected_attributes.toString()]
+    console.log(product_versions)
+    console.log(selected_attributes.toString())
 ]

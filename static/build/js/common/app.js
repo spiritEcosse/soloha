@@ -67,7 +67,9 @@
         angular.forEach(attributes, function(key) {
           return selected_attributes.push($scope.product.attributes[key].id);
         });
-        return $scope.product.price = product_versions[selected_attributes.toString()];
+        $scope.product.price = product_versions[selected_attributes.toString()];
+        console.log(product_versions);
+        return console.log(selected_attributes.toString());
       };
     }
   ]);

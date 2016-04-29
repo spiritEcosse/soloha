@@ -1,6 +1,7 @@
 # Packaging
 *.pyc
 *.egg-info
+local.py
 /dist/
 /build/
 .idea/
