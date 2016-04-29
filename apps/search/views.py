@@ -78,7 +78,9 @@ class FacetedSearchView(views.JSONResponseMixin, views.AjaxResponseMixin, CoreFa
     def get_products(self, **kwargs):
         sqs = []
         if self.kwargs['search_string']:
+            print(self.kwargs['search_string'])
             sqs = self.get_search_queryset()[:5]
+            print(sqs)
 
         searched_products = [{'id': obj.id,
                               'title': obj.title,
@@ -89,6 +91,7 @@ class FacetedSearchView(views.JSONResponseMixin, views.AjaxResponseMixin, CoreFa
         return searched_products
 
     def get_search_queryset(self):
+        # return SearchQuerySet().autocomplete(content_auto=self.kwargs['search_string'])
         return SearchQuerySet().filter(content=AutoQuery(self.kwargs['search_string']))
 
     def get_queryset(self):
@@ -102,7 +105,7 @@ class FacetedSearchView(views.JSONResponseMixin, views.AjaxResponseMixin, CoreFa
         self.products_without_filters = Product.objects.only('id').filter(id__in=products_pk).distinct().order_by(self.kwargs.get('sorting_type'))
 
         queryset = super(FacetedSearchView, self).get_queryset()
-        return queryset.only(*only).distinct().select_related('product_class').prefetch_related(
+        return queryset.only(*only).filter(id__in=products_pk).distinct().select_related('product_class').prefetch_related(
             Prefetch('images'),
             Prefetch('product_class__options'),
             Prefetch('stockrecords'),

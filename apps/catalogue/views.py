@@ -27,7 +27,6 @@ from oscar.core.loading import get_class
 from django.db.models import Q
 from soloha import settings
 
-from .forms import ProductsSearchForm
 from haystack.query import SearchQuerySet
 from haystack.inputs import AutoQuery
 from django.template import defaultfilters
