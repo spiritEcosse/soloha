@@ -32,6 +32,8 @@
         }).success(function(data) {
           $scope.search_string = data.search_string;
           $scope.sorting_type = data.sorting_type;
+          console.log(data.searched_products);
+          $scope.display = 'none';
           if (data.searched_products.length) {
             $scope.searched_products = data.searched_products;
             return $scope.display = 'block';

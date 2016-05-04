@@ -11,7 +11,7 @@ from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from apps.catalogue.models import Feature
 from django.db.models import Count
-
+from django.db.models import Q
 
 Product = get_model('catalogue', 'product')
 
@@ -76,11 +76,7 @@ class FacetedSearchView(views.JSONResponseMixin, views.AjaxResponseMixin, CoreFa
         return context
 
     def get_products(self, **kwargs):
-        sqs = []
-        if self.kwargs['search_string']:
-            print(self.kwargs['search_string'])
-            sqs = self.get_search_queryset()[:5]
-            print(sqs)
+        sqs = self.get_search_queryset()[:5]
 
         searched_products = [{'id': obj.id,
                               'title': obj.title,
@@ -91,8 +87,14 @@ class FacetedSearchView(views.JSONResponseMixin, views.AjaxResponseMixin, CoreFa
         return searched_products
 
     def get_search_queryset(self):
-        # return SearchQuerySet().autocomplete(content_auto=self.kwargs['search_string'])
-        return SearchQuerySet().filter(content=AutoQuery(self.kwargs['search_string']))
+        sqs_search = []
+        if self.kwargs['search_string']:
+            sqs = SearchQuerySet()
+            sqs_title = sqs.autocomplete(title_ngrams=self.kwargs['search_string'])
+            sqs_slug = sqs.autocomplete(slug_ngrams=self.kwargs['search_string'])
+            sqs_id = sqs.autocomplete(id_ngrams=self.kwargs['search_string'])
+            sqs_search = sqs_title | sqs_slug | sqs_id
+        return sqs_search
 
     def get_queryset(self):
         only = ['title', 'slug', 'structure', 'product_class', 'categories']
