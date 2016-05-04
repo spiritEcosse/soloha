@@ -27,6 +27,8 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
       $scope.product.product_not_availability = data.product_not_availability
     product_versions = data.product_versions
 
+    console.log($scope.product.price)
+
     angular.forEach data.attributes, (attr) ->
       attributes.push(attr.pk)
       $scope.product.values[attr.pk] = attr.values
@@ -44,6 +46,4 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
     angular.forEach attributes, (key) ->
       selected_attributes.push($scope.product.attributes[key].id)
     $scope.product.price = product_versions[selected_attributes.toString()]
-    console.log(product_versions)
-    console.log(selected_attributes.toString())
 ]

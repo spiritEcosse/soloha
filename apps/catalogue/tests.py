@@ -40,7 +40,7 @@ test_catalogue = catalogue.Test()
 STATUS_CODE_200 = 200
 
 
-class TestCatalog(TestCase, LiveServerTestCase):
+class TestCatalog(LiveServerTestCase):
     css_selector_product_price = 'div#section3 .price .wrapper-number .number'
     css_selector_attribute = '.options .panel-default:nth-child({})'
 
@@ -52,7 +52,9 @@ class TestCatalog(TestCase, LiveServerTestCase):
 
     def tearDown(self):
         # Call tearDown to close the web browser
+        time.sleep(2)
         self.firefox.quit()
+        time.sleep(2)
         super(TestCatalog, self).tearDown()
 
     def test_page_product(self):
@@ -105,7 +107,11 @@ class TestCatalog(TestCase, LiveServerTestCase):
             else:
                 context['price'] = str(_('Product is not available.'))
         else:
-            context['price'] = first_prod_version.price_retail
+            price = first_prod_version.price_retail
+            for attribute in first_prod_version.version_attributes.all():
+                if attribute.plus:
+                    price += attribute.price_retail
+            context['price'] = price
             context['currency'] = settings.OSCAR_DEFAULT_CURRENCY
         return context
 
@@ -113,13 +119,20 @@ class TestCatalog(TestCase, LiveServerTestCase):
         dict_product_version_price = dict()
 
         for product_version in self.get_product_version(product=product):
-            attribute_values = [str(attr.pk) for attr in product_version.attributes.filter(
-                parent__children__product_versions__product=product, level=1, parent__level=0
+            attribute_values = []
+            price = product_version.price_retail
+            version_attributes = product_version.version_attributes.filter(
+                attribute__parent__children__product_versions__product=product, attribute__level=1,
+                attribute__parent__level=0
             ).annotate(
-                price=Min('product_versions__price_retail'),
-                count_child=Count('parent__children', distinct=True)
-            ).order_by('parent__product_features__sort', 'price', '-count_child', 'parent__title', 'parent__pk')]
-            dict_product_version_price[','.join(attribute_values)] = str(product_version.price_retail)
+                price=Min('version__price_retail'),
+                count_child=Count('attribute__parent__children', distinct=True)
+            ).order_by('attribute__parent__product_features__sort', 'price', '-count_child', 'attribute__parent__title', 'attribute__parent__pk')
+            for version_attribute in version_attributes:
+                attribute_values.append(str(version_attribute.attribute.pk))
+                if version_attribute.plus:
+                    price += version_attribute.price_retail
+            dict_product_version_price[','.join(attribute_values)] = str(price)
 
         return dict_product_version_price
 
@@ -166,13 +179,11 @@ class TestCatalog(TestCase, LiveServerTestCase):
         product = factories.create_product(slug='product-{}'.format(num), title='Product {}'.format(num), price=D('12.12'),
                                            product_class=product_class_with_track_stock)
 
-        test_catalogue.create_attributes(product)
-        test_catalogue.create_options(product, product)
-
         self.firefox.get('%s%s' % (self.live_server_url, product.get_absolute_url()))
         price = self.firefox.find_element_by_css_selector(self.css_selector_product_price).text
         context = self.get_product_price(product=product)
         self.assertEqual(price, str(context['price']))
+        self.assertEqual(price, str(_('Product is not available.')))
 
         product_class_without_track_stock, created = ProductClass.objects.get_or_create(name='Product class where track_stock is False', track_stock=False)
         num = 2
@@ -184,9 +195,21 @@ class TestCatalog(TestCase, LiveServerTestCase):
         self.firefox.get('%s%s' % (self.live_server_url, product.get_absolute_url()))
         time.sleep(1)
         price = self.firefox.find_element_by_css_selector(self.css_selector_product_price).text
-        time.sleep(1)
         context = self.get_product_price(product=product)
         self.assertEqual(price, str(context['price']))
+        self.assertEqual(price, str(D('1.10')))
+
+        product_class_without_track_stock, created = ProductClass.objects.get_or_create(name='Product class where track_stock is False', track_stock=False)
+        num = 3
+        product = factories.create_product(slug='product-{}'.format(num), title='Product {}'.format(num), price=D('15.13'),
+                                           product_class=product_class_without_track_stock)
+        test_catalogue.create_attribute_option(product=product)
+        self.firefox.get('%s%s' % (self.live_server_url, product.get_absolute_url()))
+        time.sleep(1)
+        price = self.firefox.find_element_by_css_selector(self.css_selector_product_price).text
+        context = self.get_product_price(product=product)
+        self.assertEqual(price, str(context['price']))
+        self.assertEqual(price, str(D('112.20')))
 
     def test_page_product_attribute_dynamic_attributes(self):
         """
@@ -211,19 +234,61 @@ class TestCatalog(TestCase, LiveServerTestCase):
         feature_32 = Feature.objects.get(title='Feature 32')
         feature_33 = Feature.objects.get(title='Feature 33')
 
-        price_33 = self.checkout_price_by_selected_attribute(attribute=feature_33, attributes=attributes, product_versions=product_versions)
-        price_32 = self.checkout_price_by_selected_attribute(attribute=feature_32, attributes=attributes, product_versions=product_versions)
-        price_31 = self.checkout_price_by_selected_attribute(attribute=feature_31, attributes=attributes, product_versions=product_versions)
-        price_11 = self.checkout_price_by_selected_attribute(attribute=feature_11, attributes=attributes, product_versions=product_versions)
-        price_21 = self.checkout_price_by_selected_attribute(attribute=feature_21, attributes=attributes, product_versions=product_versions)
-        price_22 = self.checkout_price_by_selected_attribute(attribute=feature_22, attributes=attributes, product_versions=product_versions)
+        selectable_attributes = [feature_11, feature_21, feature_31]
+        price_11_21_31 = self.select_attribute(selectable_attributes=selectable_attributes, attributes=attributes, product_versions=product_versions)
+        self.assertEqual(str(D('2100.00')), price_11_21_31)
 
-        self.checkout_price_by_selected_attribute(attribute=feature_33, attributes=attributes, product_versions=product_versions, earlier_price=price_33)
-        self.checkout_price_by_selected_attribute(attribute=feature_32, attributes=attributes, product_versions=product_versions, earlier_price=price_32)
-        self.checkout_price_by_selected_attribute(attribute=feature_31, attributes=attributes, product_versions=product_versions, earlier_price=price_31)
-        self.checkout_price_by_selected_attribute(attribute=feature_11, attributes=attributes, product_versions=product_versions, earlier_price=price_11)
-        self.checkout_price_by_selected_attribute(attribute=feature_21, attributes=attributes, product_versions=product_versions, earlier_price=price_21)
-        self.checkout_price_by_selected_attribute(attribute=feature_22, attributes=attributes, product_versions=product_versions, earlier_price=price_22)
+        selectable_attributes = [feature_11, feature_21, feature_32]
+        price_11_21_32 = self.select_attribute(selectable_attributes=selectable_attributes, attributes=attributes, product_versions=product_versions)
+        self.assertEqual(str(D('2200.00')), price_11_21_32)
+
+        selectable_attributes = [feature_11, feature_21, feature_33]
+        price_11_21_33 = self.select_attribute(selectable_attributes=selectable_attributes, attributes=attributes, product_versions=product_versions)
+        self.assertEqual(str(D('2300.00')), price_11_21_33)
+
+        selectable_attributes = [feature_11, feature_22, feature_31]
+        price_11_22_31 = self.select_attribute(selectable_attributes=selectable_attributes, attributes=attributes, product_versions=product_versions)
+        self.assertEqual(str(D('2400.00')), price_11_22_31)
+
+        selectable_attributes = [feature_11, feature_22, feature_32]
+        price_11_22_32 = self.select_attribute(selectable_attributes=selectable_attributes, attributes=attributes, product_versions=product_versions)
+        self.assertEqual(str(D('2500.00')), price_11_22_32)
+
+        selectable_attributes = [feature_11, feature_22, feature_33]
+        price_11_22_33 = self.select_attribute(selectable_attributes=selectable_attributes, attributes=attributes, product_versions=product_versions)
+        self.assertEqual(str(D('2700.00')), price_11_22_33)
+
+        selectable_attributes = [feature_11, feature_21, feature_31]
+        self.select_attribute(selectable_attributes=selectable_attributes, attributes=attributes, product_versions=product_versions, earlier_price=price_11_21_31)
+        self.assertEqual(str(D('2100.00')), price_11_21_31)
+
+        selectable_attributes = [feature_11, feature_21, feature_32]
+        self.select_attribute(selectable_attributes=selectable_attributes, attributes=attributes, product_versions=product_versions, earlier_price=price_11_21_32)
+        self.assertEqual(str(D('2200.00')), price_11_21_32)
+
+        selectable_attributes = [feature_11, feature_21, feature_33]
+        self.select_attribute(selectable_attributes=selectable_attributes, attributes=attributes, product_versions=product_versions, earlier_price=price_11_21_33)
+        self.assertEqual(str(D('2300.00')), price_11_21_33)
+
+        selectable_attributes = [feature_11, feature_22, feature_31]
+        self.select_attribute(selectable_attributes=selectable_attributes, attributes=attributes, product_versions=product_versions, earlier_price=price_11_22_31)
+        self.assertEqual(str(D('2400.00')), price_11_22_31)
+
+        selectable_attributes = [feature_11, feature_22, feature_32]
+        self.select_attribute(selectable_attributes=selectable_attributes, attributes=attributes, product_versions=product_versions, earlier_price=price_11_22_32)
+        self.assertEqual(str(D('2500.00')), price_11_22_32)
+
+        selectable_attributes = [feature_11, feature_22, feature_33]
+        self.select_attribute(selectable_attributes=selectable_attributes, attributes=attributes, product_versions=product_versions, earlier_price=price_11_22_33)
+        self.assertEqual(str(D('2700.00')), price_11_22_33)
+
+    def select_attribute(self, selectable_attributes, attributes, product_versions, earlier_price=None):
+        last_attribute = selectable_attributes.pop()
+
+        for attribute in selectable_attributes:
+            self.checkout_price_by_selected_attribute(attribute=attribute, attributes=attributes, product_versions=product_versions)
+
+        return self.checkout_price_by_selected_attribute(attribute=last_attribute, attributes=attributes, product_versions=product_versions, earlier_price=earlier_price)
 
     def test_page_product_attributes_selenium(self):
         """

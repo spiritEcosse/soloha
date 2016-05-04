@@ -151,18 +151,7 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
 
     def get_context_data_json(self, **kwargs):
         context = dict()
-
-        context['product_versions'] = dict()
-        for product_version in self.get_prod_versions_queryset():
-            attribute_values = [str(attr.pk) for attr in product_version.attributes.filter(
-                parent__children__product_versions__product=self.object, level=1, parent__level=0
-            ).annotate(
-                price=Min('product_versions__price_retail'),
-                count_child=Count('parent__children', distinct=True)
-            ).order_by('parent__product_features__sort', 'price', '-count_child', 'parent__title', 'parent__pk')]
-            context['product_versions'][','.join(attribute_values)] = product_version.price_retail
-
-        context['attributes'] = []
+        context['product_versions'] = self.get_product_versions()
         for attr in self.get_attributes():
             values = [{'id': value.pk, 'title': value.title} for value in attr.values]
             context['attributes'].append({'pk': attr.pk, 'title': attr.title, 'values': values})
@@ -171,15 +160,35 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
         self.get_price(context)
         return context
 
-    def get_prod_versions_queryset(self):
+    def product_versions_queryset(self):
         # ToDo igor: add to order_by - 'parent__product_features__sort'
         return ProductVersion.objects.filter(product=self.object).prefetch_related('attributes').order_by('price_retail')
+    
+    def get_product_versions(self):
+        product_versions = dict()
+
+        for product_version in self.product_versions_queryset():
+            attribute_values = []
+            price = product_version.price_retail
+            version_attributes = product_version.version_attributes.filter(
+                attribute__parent__children__product_versions__product=self.object, attribute__level=1,
+                attribute__parent__level=0
+            ).annotate(
+                price=Min('version__price_retail'),
+                count_child=Count('attribute__parent__children', distinct=True)
+            ).order_by('attribute__parent__product_features__sort', 'price', '-count_child', 'attribute__parent__title', 'attribute__parent__pk')
+            for version_attribute in version_attributes:
+                attribute_values.append(str(version_attribute.attribute.pk))
+                if version_attribute.plus:
+                    price += version_attribute.price_retail
+            product_versions[','.join(attribute_values)] = str(price)
+        return product_versions
 
     def get_context_data(self, **kwargs):
         context = super(ProductDetailView, self).get_context_data(**kwargs)
 
         self.get_price(context)
-        context['attribute_prod_version'] = self.get_prod_versions_queryset().first()
+        context['product_versions'] = self.get_product_versions()
         context['attributes'] = self.get_attributes()
         context['options'] = self.get_options()
         return context
@@ -191,7 +200,7 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
         :return:
             context
         """
-        first_prod_version = self.get_prod_versions_queryset().first()
+        first_prod_version = self.product_versions_queryset().first()
 
         # ToDo make it possible to check whether the product is available for sale
         if not first_prod_version:
@@ -205,18 +214,25 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
             else:
                 context['product_not_availability'] = str(_('Product is not available.'))
         else:
-            context['price'] = first_prod_version.price_retail
+            price = first_prod_version.price_retail
+            for attribute in first_prod_version.version_attributes.all():
+                if attribute.plus:
+                    price += attribute.price_retail
+            context['price'] = price
             context['currency'] = settings.OSCAR_DEFAULT_CURRENCY
         return context
 
-    def get_attributes(self):
+    def get_attributes(self, filter_attr_val_args=None):
         only = ['title', 'pk']
+        default_filter_attr_val_args = {'level': 1, 'product_versions__product': self.object}
+
+        if filter_attr_val_args is not None:
+            default_filter_attr_val_args.update(filter_attr_val_args)
+
         return Feature.objects.only(*only).filter(
             children__product_versions__product=self.object, level=0
         ).prefetch_related(
-            Prefetch('children', queryset=Feature.objects.only(*only).filter(
-                level=1, product_versions__product=self.object
-            ).annotate(
+            Prefetch('children', queryset=Feature.objects.only(*only).filter(**default_filter_attr_val_args).annotate(
                 price=Min('product_versions__price_retail')
             ).order_by('price', 'title', 'pk'), to_attr='values')
         ).annotate(

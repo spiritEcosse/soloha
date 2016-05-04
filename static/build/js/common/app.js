@@ -48,6 +48,7 @@
           $scope.product.product_not_availability = data.product_not_availability;
         }
         product_versions = data.product_versions;
+        console.log($scope.product.price);
         return angular.forEach(data.attributes, function(attr) {
           var el;
           attributes.push(attr.pk);
@@ -67,9 +68,7 @@
         angular.forEach(attributes, function(key) {
           return selected_attributes.push($scope.product.attributes[key].id);
         });
-        $scope.product.price = product_versions[selected_attributes.toString()];
-        console.log(product_versions);
-        return console.log(selected_attributes.toString());
+        return $scope.product.price = product_versions[selected_attributes.toString()];
       };
     }
   ]);
