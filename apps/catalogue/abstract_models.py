@@ -10,6 +10,11 @@ from oscar.apps.catalogue.abstract_models import *  # noqa
 from django.db import IntegrityError
 
 
+class EnableManagerProduct(models.Manager):
+    def get_queryset(self):
+        return self.get_queryset().filter(enable=True)
+
+
 @python_2_unicode_compatible
 class CustomAbstractProduct(models.Model):
     # Title is mandatory for canonical products but optional for child products
@@ -101,6 +106,7 @@ class CustomAbstractProduct(models.Model):
             "or not"))
 
     objects = ProductManager()
+    objects_enable = EnableManagerProduct()
     browsable = BrowsableProductManager()
 
     class Meta:

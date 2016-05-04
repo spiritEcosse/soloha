@@ -3,6 +3,7 @@ from oscar.apps.catalogue.views import ProductDetailView as CoreProductDetailVie
 from oscar.apps.partner.strategy import Selector
 from django.utils.translation import ugettext_lazy as _
 from django.views import generic
+from django.shortcuts import render_to_response
 from django.views.generic import View
 from oscar.core.loading import get_model
 from braces import views
@@ -26,6 +27,11 @@ from oscar.core.loading import get_class
 from django.db.models import Q
 from soloha import settings
 from django.db.models import Min
+
+from haystack.query import SearchQuerySet
+from haystack.inputs import AutoQuery
+from django.template import defaultfilters
+from django.http import HttpResponse
 
 Product = get_model('catalogue', 'product')
 Category = get_model('catalogue', 'category')
@@ -120,7 +126,6 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
         # Category.objects.filter(pk=self.object.pk).update(popular=F('popular') + 1)
 
         context = super(ProductCategoryView, self).get_context_data(**kwargs)
-
         queryset_filters = Feature.objects.filter(filter_products__in=self.products_without_filters).distinct().prefetch_related('filter_products')
         context['filters'] = Feature.objects.filter(level=0, children__in=queryset_filters).prefetch_related(
             Prefetch('children', queryset=queryset_filters.annotate(num_prod=Count('filter_products')),
@@ -144,13 +149,29 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
 class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CoreProductDetailView):
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
+        if self.request.body:
+            data = json.loads(self.request.body)
+            self.kwargs['option_id'] = data.get('option_id')
+            self.kwargs['parent'] = data.get('parent', None)
+            self.kwargs['list_options'] = data.get('list_options', 'test')
+        else:
+            self.kwargs['option_id'] = None
+            self.kwargs['parent'] = None
 
     def post_ajax(self, request, *args, **kwargs):
         super(ProductDetailView, self).post_ajax(request, *args, **kwargs)
         return self.render_json_response(self.get_context_data_json())
 
     def get_context_data_json(self, **kwargs):
-        context = dict()
+        context = {"options": {}, "options_children": {}, "list_options": {}}
+        for prod_option in ProductOptions.objects.filter(product=self.object).distinct():
+            context["options"][prod_option.option.pk] = prod_option.price_retail
+        if self.kwargs['parent']:
+            for children_option in Feature.objects.filter(parent=self.kwargs['option_id'], product_options__product=self.object).distinct().values():
+                context["options_children"][children_option['id']] = children_option['title']
+
+        for option in self.get_options():
+            context["list_options"][option.id] = option.title
 
         context['product_versions'] = dict()
         for product_version in self.get_prod_versions_queryset():
@@ -163,6 +184,7 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
             context['product_versions'][','.join(attribute_values)] = product_version.price_retail
 
         context['attributes'] = []
+
         for attr in self.get_attributes():
             values = [{'id': value.pk, 'title': value.title} for value in attr.values]
             context['attributes'].append({'pk': attr.pk, 'title': attr.title, 'values': values})
@@ -225,3 +247,4 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
 
     def get_options(self):
         return Feature.objects.filter(Q(level=0), Q(product_options__product=self.object) | Q(children__product_options__product=self.object)).distinct()
+

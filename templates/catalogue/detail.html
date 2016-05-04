@@ -121,6 +121,7 @@
                                     {% if price %}
                                         <div class="text-center wrapper-number">
                                             цена:
+
                                             <span ng-bind="product.price" class="{{ class_price }}">{{ price }}</span>
                                             <span>{{ currency }}</span>
                                             {#                                    {% block product_stock_record %}#}
@@ -196,18 +197,27 @@
                                 Выбрать дополнительные опции:
                             </div>
                             <div class="panel-body">
-                                <div class="col-xs-24">
-                                    <div class="row option form-inline">
-                                        <label class="block">
-                                            <select class="form-control input-md">
-                                                <option>--не выбрано--</option>
-                                                {% for option in options %}
-                                                    <option> {{ option }} </option>
-                                                {% endfor %}
-                                            </select>
-                                        </label>
-                                    </div>
+                            <div class="col-xs-24">
+                                <div class="row option form-inline">
+                                    <label class="block" id="options-0">
+                                        <select class="form-control" ng-model="option_model[0]"
+                                                ng-change="change_price(option_id)" ng-options="option for option in list_options" ></select>
+{#                                        <select class="form-control input-md" ng-model="model[0]" ng-change="change_price(option_id)">#}
+{#                                            <option>--не выбрано--</option>#}
+{#                                            {% for option in options %}#}
+{#                                                <option value="{{ option.id }}"> {{ option }}</option>#}
+{#                                            {% endfor %}#}
+{#                                        </select>#}
+                                    </label>
                                 </div>
+
+                            {#                                    <select #}
+{#                                        <select class="form-control" ng-if="parent == true" ng-model="children"#}
+{#                                                ng-change="change_price()" ng-options="option for option in options_children" >#}
+{#                                        </select>#}
+                            </div>
+                            </div>
+                        </div>
                             </div>
                         </div>
                     </div>

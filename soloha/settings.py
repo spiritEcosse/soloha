@@ -63,7 +63,7 @@ INSTALLED_APPS = \
         'feincms',
         'easy_thumbnails',
         # 'smart_load_tag',
-    ] + get_core_apps(['apps.catalogue', 'apps.promotions', 'apps.partner'])
+    ] + get_core_apps(['apps.catalogue', 'apps.promotions', 'apps.partner', 'apps.search',])
 
 SITE_ID = 1
 
@@ -222,13 +222,35 @@ AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
 )
 
+# HAYSTACK_CONNECTIONS = {
+#     'default': {
+#         'ENGINE': 'haystack.backends.simple_backend.SimpleEngine',
+#         # 'ENGINE': 'haystack.backends.solr_backend.SolrEngine',
+#         # 'URL': 'http://127.0.0.1:8983/solr',
+#         # 'INCLUDE_SPELLING': True,
+#     },
+# }
+
+# HAYSTACK_CONNECTIONS = {
+#     'default': {
+#         'ENGINE': 'haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine',
+#         'URL': 'http://127.0.0.1:9200/',
+#         'INDEX_NAME': 'haystack',
+#         'EXCLUDED_INDEXES': [
+#             'myproject.search.search_indexes.CoreProductIndex',
+#              'oscar.apps.search.search_indexes.ProductIndex',
+#              ]
+#     },
+# }
 HAYSTACK_CONNECTIONS = {
     'default': {
-        'ENGINE': 'haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine',
-        'URL': 'http://127.0.0.1:9200/',
-        'INDEX_NAME': 'haystack',
+        'ENGINE': 'haystack.backends.solr_backend.SolrEngine',
+        'URL': 'http://127.0.0.1:8983/solr/',
+        # 'URL': 'http://localhost:9001/solr/default'
     },
 }
+
+# HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
 
 OSCAR_MISSING_IMAGE_URL = 'image_not_found.jpg'
 

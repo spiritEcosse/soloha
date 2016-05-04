@@ -26,6 +26,14 @@ from soloha import settings
 from soloha.settings import OSCAR_PRODUCTS_PER_PAGE
 from templatetags.filters_concatenation import concatenate
 import time
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium import webdriver
+from django.test import LiveServerTestCase
+from django.core import serializers
+from django.db.models import Q
+import hashlib
+from haystack.query import SearchQuerySet
+from haystack.inputs import AutoQuery
 
 Product = get_model('catalogue', 'product')
 ProductClass = get_model('catalogue', 'ProductClass')
@@ -696,39 +704,72 @@ class TestCatalog(TestCase, LiveServerTestCase):
         self.assertEqual(len(options), len(response.context['options']))
         self.assertListEqual(list(options), list(response.context['options']))
 
-    def test_product_options_selenium(self):
-        """
-        product options selenium test
-        """
-        test_catalogue.create_product_bulk()
-
-        product1 = Product.objects.get(pk=1)
-        product2 = Product.objects.get(pk=2)
-
-        test_catalogue.create_options(product1, product2)
-
-        self.firefox.get(
-            '%s%s' % (self.live_server_url,  product1.get_absolute_url())
-        )
-
-        # TODO check when we will have price
-        price_without_options = self.firefox.find_element_by_xpath(".//*[@id='section3']/div/div[1]/div/div[2]/div[1]/span").text
-        if len(price_without_options) == 0:
-            raise Exception("price can't be empty")
-        self.assertIn("Product 1", self.firefox.title)
-
-        options_db = [option.title for option in Feature.objects.filter(Q(level=0), Q(product_options__product=product1) | Q(children__product_options__product=product1)).distinct()]
-        options_on_page = self.firefox.find_element_by_xpath(".//*[@id='options']/div[2]/div/div/label/select").text.split('\n')[1:]
-        self.assertListEqual(options_db, options_on_page)
-
-        option1 = self.firefox.find_element_by_xpath(".//*[@id='options']/div[2]/div/div/label/select/option[4]")
-        option1.click()
-
-        # TODO check when price will depend on selected option
-        price_option1 = self.firefox.find_element_by_xpath(".//*[@id='section3']/div/div[1]/div/div[2]/div[1]/span").text
-        # if price_without_options == price_option1:
-        #     self.assertNotEqual(price_without_options, price_option1)
+    # def test_product_options_selenium(self):
+    #     """
+    #     product options selenium test
+    #     """
+    #     test_catalogue.create_product_bulk()
+    #
+    #     product1 = Product.objects.get(pk=1)
+    #     product2 = Product.objects.get(pk=2)
+    #
+    #     test_catalogue.create_options(product1, product2)
+    #
+    #     self.firefox.get(
+    #         '%s%s' % (self.live_server_url,  product1.get_absolute_url())
+    #     )
+    #
+    #     # price_without_options = self.firefox.find_element_by_xpath(".//*[@id='section3']/div/div[1]/div/div[2]/div[1]/span").text
+    #     price_without_options = self.firefox.find_element_by_xpath(".//*[@id='section3']/div[1]/div[1]/div/div[2]/div[1]/span").text
+    #     time.sleep(10)
+    #     if len(price_without_options) == 0:
+    #         raise Exception("price can't be empty")
+    #     self.assertIn("Product 1", self.firefox.title)
+    #
+    #     options_db = [option.title for option in Feature.objects.filter(Q(level=0), Q(product_options__product=product1) | Q(children__product_options__product=product1)).distinct()]
+    #     options_on_page = self.firefox.find_element_by_xpath(".//*[@id='options']/div[2]/div/div/label/select").text.split('\n')[1:]
+    #     self.assertListEqual(options_db, options_on_page)
+    #
+    #     option1 = self.firefox.find_element_by_xpath(".//*[@id='options']/div[2]/div/div/label/select/option[4]")
+    #     option1.click()
+    #
+    #     price_option1 = self.firefox.find_element_by_xpath(".//*[@id='section3']/div/div[1]/div/div[2]/div[1]/span").text
+    #     if price_without_options == price_option1:
+    #         self.assertNotEqual(price_without_options, price_option1)
 
         # parent = Feature.objects.get(title=options_db[0])
         # options_db_level1 = [option.title for option in Feature.objects.filter(level=1, parent=parent.pk)]
         # options_on_page_level1 = self.firefox.find_element_by_xpath(".//*[@id='options']/div[2]/div[2]/div[2]/div/label/select/option[2]").text
+
+    def test_product_search(self):
+        test_catalogue.create_product_bulk()
+
+        # Searching one product
+        dict_values = {'search_string': 'Product 1'}
+        self.assertions_product_search(dict_values=dict_values)
+
+        # Searching many products with similar names
+        dict_values = {'search_string': 'Product'}
+        self.assertions_product_search(dict_values=dict_values)
+
+        dict_values = {'search_string': ''}
+        self.assertions_product_search(dict_values=dict_values)
+
+        dict_values = {'search_string': '1'}
+        self.assertions_product_search(dict_values=dict_values)
+
+    def assertions_product_search(self, dict_values={}):
+        response = self.client.get('/search/?q={}'.format(dict_values['search_string']))
+        sqs_search = []
+        if dict_values['search_string']:
+            sqs = SearchQuerySet()
+            sqs_title = sqs.autocomplete(title_ngrams=dict_values['search_string'])
+            sqs_slug = sqs.autocomplete(slug_ngrams=dict_values['search_string'])
+            sqs_id = sqs.autocomplete(id_ngrams=dict_values['search_string'])
+            sqs_search = (sqs_title | sqs_slug | sqs_id)[:OSCAR_PRODUCTS_PER_PAGE]
+
+        self.assertEqual(response.status_code, STATUS_CODE_200)
+        self.assertEqual(len(response.context['product_list']), len(sqs_search))
+
+
+
