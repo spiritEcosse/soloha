@@ -6,6 +6,7 @@ from feincms.admin import tree_editor
 from django.forms import Textarea
 from django import forms
 from django.contrib.admin import widgets
+from django.contrib.sites.models import Site
 
 
 Feature = get_model('catalogue', 'Feature')
@@ -19,6 +20,7 @@ ProductAttributeValue = get_model('catalogue', 'ProductAttributeValue')
 ProductClass = get_model('catalogue', 'ProductClass')
 ProductImage = get_model('catalogue', 'ProductImage')
 ProductRecommendation = get_model('catalogue', 'ProductRecommendation')
+SiteInfo = get_model('sites', 'SiteInfo')
 
 
 class FeatureAdmin(tree_editor.TreeEditor):
@@ -125,3 +127,6 @@ admin.site.register(Option, OptionAdmin)
 admin.site.register(ProductImage)
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Feature, FeatureAdmin)
+admin.site.register(SiteInfo)
+
+admin.site.unregister(Site)

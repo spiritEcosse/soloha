@@ -2,6 +2,9 @@ from oscar.core.loading import is_model_registered
 from oscar.apps.catalogue.abstract_models import *  # noqa
 from apps.catalogue.abstract_models import CustomAbstractProduct, AbstractFeature, CustomAbstractCategory, \
     AbstractProductVersion, AbstractVersionAttribute, AbstractProductFeature, AbstractProductOptions
+from django.contrib.sites.models import Site
+from django.contrib.postgres.fields import ArrayField
+from django.forms import TextInput
 
 __all__ = ['ProductAttributesContainer']
 
@@ -105,6 +108,20 @@ if not is_model_registered('catalogue', 'ProductImage'):
         pass
 
     __all__.append('ProductImage')
+
+
+# if not is_model_registered('catalogue', 'SiteInfo'):
+class SiteInfo(Site):
+    work_time = models.CharField(max_length=1000)
+    address = models.CharField(max_length=1000)
+    phone_number = ArrayField(models.CharField(max_length=1000), blank=True)
+    email = models.EmailField(max_length=200, blank=True)
+    formfield_overrides = {
+        models.CharField: {'widget': TextInput(attrs={'size':'80'})},
+    }
+
+    class Meta:
+        app_label = 'sites'
 
 
 from oscar.apps.catalogue.models import *  # noqa
