@@ -122,7 +122,7 @@
                             </div>
                         </nav>
                             <div class="input-group search">
-                                <input type="text" ng-model="search" ng-change="update_products()" data-toggle="dropdown" href="#" class="form-control" placeholder="Ищете что-то?">
+                                <input type="text" ng-model="search"  ng-change="update_products()" data-toggle="dropdown" href="#" class="form-control" placeholder="Ищете что-то?">
                                 {% verbatim %}
                                 <div class="input-group-btn">
                                     <a href="/search/?q={{ search_string }}">
@@ -130,7 +130,7 @@
                                             <span class="glyphicon glyphicon-search"></span> Найти
                                         </button>
                                     </a>
-                                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="search-show" ng-model="display" ng-style="{ 'display': display }">
+                                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="search-show" name="search-menu" ng-model="display" ng-style="{ 'display': display }">
                                         <div class="item col-xs-24" ng-repeat="product in searched_products">
                                             <a href="{{ product.href }}">
                                                 <div class="col-xs-4">

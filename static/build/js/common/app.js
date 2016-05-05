@@ -32,11 +32,11 @@
         }).success(function(data) {
           $scope.search_string = data.search_string;
           $scope.sorting_type = data.sorting_type;
-          console.log(data.searched_products);
-          $scope.display = 'none';
-          if (data.searched_products.length) {
-            $scope.searched_products = data.searched_products;
+          $scope.searched_products = data.searched_products;
+          if ($scope.searched_products.length && $scope.search) {
             return $scope.display = 'block';
+          } else {
+            return $scope.display = 'none';
           }
         }).error(function() {
           return console.error('An error occurred during submission');

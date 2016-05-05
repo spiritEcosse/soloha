@@ -19,7 +19,6 @@ from oscar.core.loading import get_model
 from oscar.test import factories
 from selenium import webdriver
 from selenium.webdriver.support.select import Select
-
 from apps.catalogue.views import ProductCategoryView, ProductDetailView
 from python_test.factories import catalogue
 from soloha import settings
@@ -760,6 +759,27 @@ class TestCatalog(TestCase, LiveServerTestCase):
 
     def assertions_product_search(self, dict_values={}):
         response = self.client.get('/search/?q={}'.format(dict_values['search_string']))
+        sqs_search = self.get_search_queryset(dict_values=dict_values)
+
+        self.assertEqual(response.status_code, STATUS_CODE_200)
+        self.assertEqual(len(response.context['product_list']), len(sqs_search))
+
+        response = self.client.post('http://localhost:8000/search/?q=product/',
+                                    json.dumps(dict_values),
+                                    content_type='application/json',
+                                    HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+
+        context = dict()
+        context['search_string'] = dict_values['search_string']
+        sqs = self.get_search_queryset(dict_values=dict_values)[:5]
+        context['searched_products'] = [{'id': obj.id,
+                              'title': obj.title,
+                              'main_image': obj.object.get_values()['image'],
+                              'href': obj.object.get_absolute_url(),
+                              'price': obj.object.get_values()['price']} for obj in sqs]
+        self.assertJSONEqual(json.dumps(context), response.content)
+
+    def get_search_queryset(self, dict_values={}):
         sqs_search = []
         if dict_values['search_string']:
             sqs = SearchQuerySet()
@@ -767,9 +787,48 @@ class TestCatalog(TestCase, LiveServerTestCase):
             sqs_slug = sqs.autocomplete(slug_ngrams=dict_values['search_string'])
             sqs_id = sqs.autocomplete(id_ngrams=dict_values['search_string'])
             sqs_search = (sqs_title | sqs_slug | sqs_id)[:OSCAR_PRODUCTS_PER_PAGE]
+        return sqs_search
 
-        self.assertEqual(response.status_code, STATUS_CODE_200)
-        self.assertEqual(len(response.context['product_list']), len(sqs_search))
+    def test_product_search_selenium(self):
+        test_catalogue.create_product_bulk()
+        self.firefox.get('%s%s' % (self.live_server_url,  ''))
+
+        search_menu = self.firefox.find_element_by_name('search-menu')
+        self.assertEqual(search_menu.is_displayed(), False)
+
+        dict_values = {'search_string': 'product'}
+        sqs_search = self.get_search_queryset(dict_values=dict_values)
+        list_elements_sqs = [product.title for product in sqs_search[:5]]
+        first_product = sqs_search[0].title
+
+        input_field = self.firefox.find_element_by_xpath(".//*[@id='default']/div[1]/header/div[2]/div[2]/div/input")
+        input_field.send_keys(dict_values['search_string'])
+        time.sleep(10)
+
+        popup_first_element = self.firefox.find_element_by_xpath(".//*[@id='default']/div[1]/header/div[2]/div[2]/div/div/div/div[1]/a/div[2]/div[1]").text
+        self.assertEqual(search_menu.is_displayed(), True)
+        self.assertNotEqual(len(popup_first_element), 0)
+        self.assertEqual(popup_first_element, first_product)
+
+        list_elements_on_page = []
+        for i in xrange(1, 6):
+            list_elements_on_page.append(self.firefox.find_element_by_xpath(".//*[@id='default']/div[1]/header/div[2]/div[2]/div/div/div/div[{}]/a/div[2]/div[1]".format(i)).text)
+        self.assertListEqual(list_elements_on_page, list_elements_sqs)
+
+        input_field.clear()
+        self.assertEqual(search_menu.is_displayed(), False)
+
+        input_field.send_keys('product')
+        time.sleep(10)
+        self.assertEqual(search_menu.is_displayed(), True)
+
+        input_field.send_keys('tt')
+        time.sleep(10)
+        self.assertEqual(search_menu.is_displayed(), False)
+
+        # search_button = self.firefox.find_element_by_xpath(".//*[@id='search-show']")
+        # search_button.click()
+
 
 
 
