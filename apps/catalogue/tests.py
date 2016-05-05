@@ -26,6 +26,7 @@ from soloha import settings
 from soloha.settings import OSCAR_PRODUCTS_PER_PAGE
 from templatetags.filters_concatenation import concatenate
 import time
+from apps.catalogue.views import NOT_SELECTED
 
 Product = get_model('catalogue', 'product')
 ProductClass = get_model('catalogue', 'ProductClass')
@@ -219,7 +220,8 @@ class TestCatalog(LiveServerTestCase):
         test_catalogue.create_product_bulk()
         product = factories.create_product(slug='product-attributes', title='Product attributes', price=D(random.randint(1, 10000)))
         test_catalogue.create_dynamic_attributes(product)
-        attributes = list(self.get_product_attributes(product=product))
+        attributes = [{'id': 0, 'title': NOT_SELECTED}] + list(self.get_product_attributes(product=product))
+
         product_versions = self.get_dict_product_version_price(product=product)
         self.firefox.get('%s%s' % (self.live_server_url, product.get_absolute_url()))
 

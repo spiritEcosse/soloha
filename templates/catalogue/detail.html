@@ -9,7 +9,7 @@
 {% load i18n %}
 {% load purchase_info_tags %}
 {% load thumbnail %}
-
+{% load product %}
 {% block ngController %}ng-controller="Product" {% endblock ngController %}
 
 {% block title %}
@@ -179,9 +179,18 @@
                                             </div>
                                             <div class="col-xs-11 pull-right values">
                                                 <select id="attribute-{{ attribute.pk }}" class="form-control input-md">
-                                                    {% for value in attribute.values %}
-                                                        <option value="{{ value.pk }}">{{ value.title }}</option>
-                                                    {% endfor %}
+                                                    {#                                                    <optgroup label="{% trans 'Группа 1' %}">#}
+                                                    {#                                                        <option value="volvo">Volvo</option>#}
+                                                    {#                                                        <option value="saab">Saab</option>#}
+                                                    {#                                                    </optgroup>#}
+                                                    <option value="0">{{ not_selected }}</option>
+                                                    {% with select='selected' %}
+                                                        {% for value in attribute.values %}
+                                                            <option {% if value.pk in product_version_attributes %}{{ select }}{% endif %}
+                                                                    value="{{ value.pk }}">{{ value.title }}
+                                                            </option>
+                                                        {% endfor %}
+                                                    {% endwith %}
                                                 </select>
                                             </div>
                                         </div>

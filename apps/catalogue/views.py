@@ -33,6 +33,8 @@ ProductVersion = get_model('catalogue', 'ProductVersion')
 Feature = get_model('catalogue', 'Feature')
 ProductOptions = get_model('catalogue', 'ProductOptions')
 
+NOT_SELECTED = str(_('Not selected'))
+
 
 class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, SingleObjectMixin, generic.ListView):
     template_name = 'catalogue/category.html'
@@ -152,12 +154,24 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
     def get_context_data_json(self, **kwargs):
         context = dict()
         context['product_versions'] = self.get_product_versions()
+        context['attributes'] = []
+        start_option = [{'id': 0, 'title': NOT_SELECTED}]
+
         for attr in self.get_attributes():
-            values = [{'id': value.pk, 'title': value.title} for value in attr.values]
+            values = start_option + [{'id': value.pk, 'title': value.title} for value in attr.values]
             context['attributes'].append({'pk': attr.pk, 'title': attr.title, 'values': values})
 
         context['options'] = [{prod_option.option.pk: prod_option.price_retail} for prod_option in ProductOptions.objects.filter(product=self.object)]
         self.get_price(context)
+        context['not_selected'] = NOT_SELECTED
+
+        product_versions_attributes = {}
+        product_versions = self.product_versions_queryset().first()
+
+        if product_versions:
+            for attr in product_versions.attributes.all():
+                product_versions_attributes[attr.parent.pk] = {'id': attr.pk, 'title': attr.title}
+        context['product_version_attributes'] = product_versions_attributes
         return context
 
     def product_versions_queryset(self):
@@ -188,9 +202,16 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
         context = super(ProductDetailView, self).get_context_data(**kwargs)
 
         self.get_price(context)
-        context['product_versions'] = self.get_product_versions()
+        product_versions_attributes = []
+        product_versions = self.product_versions_queryset().first()
+
+        if product_versions:
+            product_versions_attributes = [attr.pk for attr in product_versions.attributes.all()]
+
+        context['product_version_attributes'] = product_versions_attributes
         context['attributes'] = self.get_attributes()
         context['options'] = self.get_options()
+        context['not_selected'] = NOT_SELECTED
         return context
 
     def get_price(self, context):
