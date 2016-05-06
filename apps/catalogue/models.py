@@ -117,7 +117,7 @@ class SiteInfo(Site):
     phone_number = ArrayField(models.CharField(max_length=1000), blank=True)
     email = models.EmailField(max_length=200, blank=True)
     formfield_overrides = {
-        models.CharField: {'widget': TextInput(attrs={'size':'80'})},
+        models.CharField: {'widget': TextInput(attrs={'size': '80'})},
     }
 
     class Meta:
