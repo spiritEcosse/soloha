@@ -11,13 +11,11 @@ from django.db.models import Min
 from django.db.models import Q
 from django.db.models.query import Prefetch
 from django.test import Client
-from django.test import LiveServerTestCase
 from django.test import TestCase
 from django.utils.translation import ugettext_lazy as _
 from oscar.apps.partner.strategy import Selector
 from oscar.core.loading import get_model
 from oscar.test import factories
-from selenium import webdriver
 from selenium.webdriver.support.select import Select
 from apps.catalogue.views import ProductCategoryView, ProductDetailView
 from python_test.factories import catalogue
@@ -25,14 +23,13 @@ from soloha import settings
 from soloha.settings import OSCAR_PRODUCTS_PER_PAGE
 from templatetags.filters_concatenation import concatenate
 import time
-from selenium.webdriver.support.ui import WebDriverWait
 from selenium import webdriver
 from django.test import LiveServerTestCase
-from django.core import serializers
 from django.db.models import Q
-import hashlib
 from haystack.query import SearchQuerySet
-from haystack.inputs import AutoQuery
+from apps.contacts.forms import Feedback
+from apps.catalogue.models import SiteInfo
+
 
 Product = get_model('catalogue', 'product')
 ProductClass = get_model('catalogue', 'ProductClass')
@@ -55,6 +52,7 @@ class TestCatalog(TestCase, LiveServerTestCase):
         self.client = Client()
         self.firefox = webdriver.Firefox()
         self.firefox.maximize_window()
+        test_catalogue.create_site_info()
         super(TestCatalog, self).setUp()
 
     def tearDown(self):
@@ -826,8 +824,33 @@ class TestCatalog(TestCase, LiveServerTestCase):
         time.sleep(10)
         self.assertEqual(search_menu.is_displayed(), False)
 
-        # search_button = self.firefox.find_element_by_xpath(".//*[@id='search-show']")
-        # search_button.click()
+    def test_form_contacts(self):
+        test_catalogue.create_product_bulk()
+
+        form_data = {'name': 'test', 'phone': '0959999999', 'email': 'wrq@gmail.com', 'comment': 'My comment'}
+        form = Feedback(data=form_data)
+        self.assertTrue(form.is_valid())
+
+    def test_form_contacts_selenium(self):
+        self.firefox.get('%s%s' % (self.live_server_url,  '/contacts/'))
+
+        submit_btn = self.firefox.find_element_by_xpath(".//*[@id='comment_form']")
+        self.assertFalse(submit_btn.is_enabled())
+
+        dict_values = {'name': 'test', 'phone': '0959999999', 'email': 'wrq@gmail.com', 'comment': 'My comment'}
+        input_email = self.firefox.find_element_by_xpath(".//*[@id='default']/div[1]/header/div[2]/div[2]/div/input")
+        input_comment = self.firefox.find_element_by_xpath(".//*[@id='default']/div[1]/header/div[2]/div[2]/div/input")
+        input_email.send_keys(dict_values['email'])
+        input_comment.send_keys(dict_values['comment'])
+
+        self.assertTrue(submit_btn.is_enabled())
+
+        # submit_btn.click()
+
+    # def test_create_site_info(self):
+    #     SiteInfo.objects.create(domain='example.com', work_time='9:00-19:00', address=('address'),
+    #                                 phone_number=(['0959999999', '0999999999']), email='test@gmail.com')
+
 
 
 

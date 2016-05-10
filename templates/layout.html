@@ -23,7 +23,11 @@
                 <div class="row top">
                     <div class="col-xs-4"></div>
                     <div class="col-xs-14 col-sm-12 col-md-14 phones">
-                        <span class="hidden-xs hidden-sm">(099)561-01-32 (098)110-04-60 (063)597-47-55 (044)362-19-40</span>
+                        <span class="hidden-xs hidden-sm">
+                            {% for phone in phone_number %}
+                                {{ phone }}
+                            {% endfor %}
+                        </span>
 
                         <div class="btn-group visible-sm visible-xs">
                             <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -270,7 +274,7 @@
                                     <span class="glyphicon glyphicon-time"></span>
                                 </div>
                                 <div class="col-xs-20 text">
-                                    Время работы: пн - пт 10.00 - 19.00 сб 11.00 - 17.00
+                                    {{ work_time }}
                                 </div>
                             </div>
                             <div class="row item line-top">
@@ -278,7 +282,7 @@
                                     <span class="glyphicon glyphicon-map-marker"></span>
                                 </div>
                                 <div class="col-xs-20 text">
-                                    г. Киев пр-т. Мира 4 выставка (1 этаж) офис 313 (3 этаж)
+                                    {{ address }}
                                 </div>
                             </div>
                             <div class="row item line-top">
@@ -286,17 +290,16 @@
                                     <span class="glyphicon glyphicon-phone-alt"></span>
                                 </div>
                                 <div class="col-xs-20 text">
-                                    (099) 561-01-32<br/>
-                                    (098) 110-04-60<br/>
-                                    (063) 597-47-55<br/>
-                                    (044) 362-19-40<br/>
+                                    {% for phone in phone_number %}
+                                    {{ phone }} <br/>
+                                    {% endfor %}
                                 </div>
                             </div>
                             <div class="row item line-top">
                                 <div class="col-xs-4 row icon">
                                     <span class="glyphicon glyphicon-envelope"></span>
                                 </div>
-                                <div class="col-xs-20 text">soloha.kiev.ua@gmail.com</div>
+                                <div class="col-xs-20 text">{{ email }}</div>
                             </div>
                         </div>
                     </div>

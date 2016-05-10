@@ -4,7 +4,7 @@
 
 app_name = 'soloha'
 #app = angular.module app_name
-app = angular.module app_name, ['ngResource', 'ngRoute']
+app = angular.module app_name, ['ngResource', 'ngRoute', 'ng.django.forms', 'ui.bootstrap', 'ngAnimate', 'duScroll']
 
 app.config ['$httpProvider', ($httpProvider) ->
   $httpProvider.defaults.xsrfCookieName = 'csrftoken'

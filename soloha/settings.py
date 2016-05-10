@@ -62,8 +62,9 @@ INSTALLED_APPS = \
         'mptt',
         'feincms',
         'easy_thumbnails',
+        'apps.contacts',
         # 'smart_load_tag',
-    ] + get_core_apps(['apps.catalogue', 'apps.promotions', 'apps.partner', 'apps.search',])
+    ] + get_core_apps(['apps.catalogue', 'apps.promotions', 'apps.partner', 'apps.search', ])
 
 SITE_ID = 1
 
@@ -103,16 +104,29 @@ WSGI_APPLICATION = 'soloha.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.8/ref/settings/#databases
 
+# if 'test' in sys.argv:
+#     DATABASES = {
+#         'default': {
+#             'ENGINE': 'django.db.backends.sqlite3',
+#             'NAME': location('db.sqlite3'),
+#             'USER': '',
+#             'PASSWORD': '',
+#             'HOST': '',
+#             'PORT': '',
+#             'ATOMIC_REQUESTS': True
+#         },
+#     }
+# else:
 if 'test' in sys.argv:
     DATABASES = {
         'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': location('db.sqlite3'),
-            'USER': '',
-            'PASSWORD': '',
-            'HOST': '',
-            'PORT': '',
-            'ATOMIC_REQUESTS': True
+            'ENGINE': settings_local.DB_BACKEND,
+            'NAME': 'novelty_test_db',
+            'USER': settings_local.DB_USER,
+            'PASSWORD': settings_local.DB_PASSWORD,
+            'HOST': settings_local.DB_HOST,
+            'POST': settings_local.DB_PORT,
+            'ATOMIC_REQUESTS': settings_local.DB_ATOMIC_REQUESTS,
         },
     }
 else:
@@ -126,7 +140,7 @@ else:
             'POST': settings_local.DB_PORT,
             'ATOMIC_REQUESTS': settings_local.DB_ATOMIC_REQUESTS,
         },
-        # 'mysql': {
+            # 'mysql': {
         #     'ENGINE': settings_local.DB_BACKEND_MYSQL,
         #     'NAME': settings_local.DB_NAME_MYSQL,
         #     'USER': settings_local.DB_USER_MYSQL,
@@ -207,6 +221,8 @@ CACHES = settings_local.CACHES
 CACHE_MIDDLEWARE_SECONDS = settings_local.CACHE_MIDDLEWARE_SECONDS
 CACHE_MIDDLEWARE_KEY_PREFIX = settings_local.CACHE_MIDDLEWARE_KEY_PREFIX
 
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
 IMAGE_NOT_FOUND = 'image_not_found.jpg'
 ADMINS = (('igor', 'shevchenkcoigor@gmail.com'),)
 DEFAULT_FROM_EMAIL = settings_local.DEFAULT_FROM_EMAIL
@@ -216,6 +232,7 @@ EMAIL_HOST_PASSWORD = settings_local.EMAIL_HOST_PASSWORD
 EMAIL_HOST = settings_local.EMAIL_HOST
 EMAIL_PORT = settings_local.EMAIL_PORT
 EMAIL_USE_TLS = settings_local.EMAIL_USE_TLS
+
 
 AUTHENTICATION_BACKENDS = (
     'oscar.apps.customer.auth_backends.EmailBackend',
