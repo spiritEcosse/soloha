@@ -27,7 +27,7 @@ from selenium import webdriver
 from django.test import LiveServerTestCase
 from django.db.models import Q
 from haystack.query import SearchQuerySet
-from apps.contacts.forms import Feedback
+from apps.contacts.views import FeedbackForm
 # from apps.catalogue.models import SiteInfo
 
 
@@ -825,11 +825,32 @@ class TestCatalog(TestCase, LiveServerTestCase):
         self.assertEqual(search_menu.is_displayed(), False)
 
     def test_form_contacts(self):
-        test_catalogue.create_product_bulk()
+        # test_catalogue.create_product_bulk()
 
-        form_data = {'name': 'test', 'phone': '0959999999', 'email': 'wrq@gmail.com', 'comment': 'My comment'}
-        form = Feedback(data=form_data)
-        self.assertTrue(form.is_valid())
+        form_data = {'confirmation_key': 1, 'name': 'test', 'phone': '0959999999', 'email': 'wrq@gmail.com', 'comment': 'My comment'}
+        form_errors = {}
+        self.assertions_form_contacts(form_data=form_data, form_errors=form_errors)
+
+        form_data = {}
+        form_errors = {'comment': [u'Please enter your message.'],
+                       'confirmation_key': [u'This field is required.'],
+                       'email': [u'Please enter your email.']}
+
+        self.assertions_form_contacts(form_data=form_data, form_errors=form_errors)
+
+        form_data = {'confirmation_key': 1, 'email': 'wrq@gmail.com', 'comment': 'My comment'}
+        form_errors = {}
+        self.assertions_form_contacts(form_data=form_data, form_errors=form_errors)
+
+        form_data = {'confirmation_key': 1, 'email': 'wrq@gmail', 'comment': 'My comment'}
+        form_errors = {'email': [u'Enter a valid email address.']}
+        self.assertions_form_contacts(form_data=form_data, form_errors=form_errors)
+        # form = FeedbackForm(data=form_data)
+        # self.assertTrue(form.errors)
+
+    def assertions_form_contacts(self, form_data={}, form_errors={}):
+        form = FeedbackForm(data=form_data)
+        self.assertDictEqual(form.errors, form_errors)
 
     def test_form_contacts_selenium(self):
         self.firefox.get('%s%s' % (self.live_server_url,  '/contacts/'))
@@ -838,18 +859,37 @@ class TestCatalog(TestCase, LiveServerTestCase):
         self.assertFalse(submit_btn.is_enabled())
 
         dict_values = {'name': 'test', 'phone': '0959999999', 'email': 'wrq@gmail.com', 'comment': 'My comment'}
-        input_email = self.firefox.find_element_by_xpath(".//*[@id='default']/div[1]/header/div[2]/div[2]/div/input")
-        input_comment = self.firefox.find_element_by_xpath(".//*[@id='default']/div[1]/header/div[2]/div[2]/div/input")
+        input_email = self.firefox.find_element_by_xpath(".//*[@id='id_email']")
+        input_comment = self.firefox.find_element_by_xpath(".//*[@id='id_comment']")
         input_email.send_keys(dict_values['email'])
         input_comment.send_keys(dict_values['comment'])
-
+        time.sleep(10)
         self.assertTrue(submit_btn.is_enabled())
 
-        # submit_btn.click()
+        submit_btn.click()
+        time.sleep(10)
+        alert_message = self.firefox.find_element_by_xpath(".// *[ @ id = 'alerts'] / alert").text
+        self.assertEqual(alert_message, 'Your message sent!')
 
-    # def test_create_site_info(self):
-    #     SiteInfo.objects.create(domain='example.com', work_time='9:00-19:00', address=('address'),
-    #                                 phone_number=(['0959999999', '0999999999']), email='test@gmail.com')
+        dict_values['email'] = 'qefqeqwfw'
+        dict_values['phone'] = '111111'
+        input_email.clear()
+        input_phone = self.firefox.find_element_by_xpath(".//*[@id='id_phone']")
+        input_email.send_keys(dict_values['email'])
+        input_phone.send_keys(dict_values['phone'])
+        time.sleep(10)
+
+        email_error = self.firefox.find_element_by_xpath(".//*[@id='default']/div[1]/div/div/div/div[2]/div/div/div[1]/form/div[4]/ul[1]/li[2]").text
+        phone_error = self.firefox.find_element_by_xpath(".//*[@id='default']/div[1]/div/div/div/div[2]/div/div/div[1]/form/div[3]/ul[1]/li[1]").text
+        errors = {'email': 'Enter a valid email address.', 'phone': 'Enter a valid phone number'}
+        self.assertEqual(email_error, errors['email'])
+        self.assertEqual(phone_error, errors['phone'])
+        self.assertFalse(submit_btn.is_enabled())
+
+
+
+
+
 
 
 
