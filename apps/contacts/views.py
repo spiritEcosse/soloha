@@ -9,7 +9,7 @@ from django.http import HttpResponse
 import json
 from django.views.generic.base import ContextMixin
 from django.contrib.sites.shortcuts import get_current_site
-from apps.catalogue.models import SiteInfo
+# from apps.catalogue.models import SiteInfo
 
 
 class FeedbackForm(NgModelFormMixin, NgFormValidationMixin, Feedback):

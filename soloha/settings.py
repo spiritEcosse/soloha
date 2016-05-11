@@ -104,29 +104,16 @@ WSGI_APPLICATION = 'soloha.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.8/ref/settings/#databases
 
-# if 'test' in sys.argv:
-#     DATABASES = {
-#         'default': {
-#             'ENGINE': 'django.db.backends.sqlite3',
-#             'NAME': location('db.sqlite3'),
-#             'USER': '',
-#             'PASSWORD': '',
-#             'HOST': '',
-#             'PORT': '',
-#             'ATOMIC_REQUESTS': True
-#         },
-#     }
-# else:
 if 'test' in sys.argv:
     DATABASES = {
         'default': {
-            'ENGINE': settings_local.DB_BACKEND,
-            'NAME': 'novelty_test_db',
-            'USER': settings_local.DB_USER,
-            'PASSWORD': settings_local.DB_PASSWORD,
-            'HOST': settings_local.DB_HOST,
-            'POST': settings_local.DB_PORT,
-            'ATOMIC_REQUESTS': settings_local.DB_ATOMIC_REQUESTS,
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': location('db.sqlite3'),
+            'USER': '',
+            'PASSWORD': '',
+            'HOST': '',
+            'PORT': '',
+            'ATOMIC_REQUESTS': True
         },
     }
 else:
