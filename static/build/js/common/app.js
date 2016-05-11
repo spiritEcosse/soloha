@@ -60,7 +60,7 @@
           console.log($scope.product.values[attr.pk][0]);
           el = angular.element(document).find('#attribute-' + attr.pk);
           el.attr('ng-model', 'product.attributes[' + attr.pk + ']');
-          el.attr('ng-options', 'value.title for value in product.values[' + attr.pk + '] track by value.id');
+          el.attr('ng-options', 'value.title group by value.group for value in product.values[' + attr.pk + '] track by value.id');
           el.attr('ng-change', 'update_price()');
           return $compile(el)($scope);
         });
@@ -70,6 +70,7 @@
       return $scope.update_price = function() {
         selected_attributes = [];
         angular.forEach(attributes, function(key) {
+          console.log($scope.product.attributes[key].id);
           if ($scope.product.attributes[key].id !== 0) {
             return selected_attributes.push($scope.product.attributes[key].id);
           }

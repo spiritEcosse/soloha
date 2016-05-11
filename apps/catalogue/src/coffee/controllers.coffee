@@ -40,7 +40,7 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
       console.log($scope.product.values[attr.pk][0])
       el = angular.element(document).find('#attribute-' + attr.pk)
       el.attr('ng-model', 'product.attributes[' + attr.pk + ']')
-      el.attr('ng-options', 'value.title for value in product.values[' + attr.pk + '] track by value.id')
+      el.attr('ng-options', 'value.title group by value.group for value in product.values[' + attr.pk + '] track by value.id')
       el.attr('ng-change', 'update_price()')
       $compile(el)($scope)
   .error ->
@@ -49,6 +49,8 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
   $scope.update_price = () ->
     selected_attributes = []
     angular.forEach attributes, (key) ->
+      console.log($scope.product.attributes[key].id)
+
       if $scope.product.attributes[key].id != 0
         selected_attributes.push($scope.product.attributes[key].id)
     #Todo igor: if selected_attributes is empty - message select - attribute for display price

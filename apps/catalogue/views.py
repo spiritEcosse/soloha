@@ -161,6 +161,8 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
             values = start_option + [{'id': value.pk, 'title': value.title} for value in attr.values]
             context['attributes'].append({'pk': attr.pk, 'title': attr.title, 'values': values})
 
+        self.get_product_attribute_values()
+
         context['options'] = [{prod_option.option.pk: prod_option.price_retail} for prod_option in ProductOptions.objects.filter(product=self.object)]
         self.get_price(context)
         context['not_selected'] = NOT_SELECTED
@@ -177,7 +179,32 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
     def product_versions_queryset(self):
         # ToDo igor: add to order_by - 'parent__product_features__sort'
         return ProductVersion.objects.filter(product=self.object).prefetch_related('attributes').order_by('price_retail')
-    
+
+    def get_product_attribute_values(self):
+        only = ['title', 'pk']
+        return Feature.objects.only(*only).filter(level=1, product_versions__product=self.object).distinct().order_by()
+
+    def get_attributes_for_attribute(self, attribute):
+        only = ['title', 'pk']
+        return Feature.objects.only(*only).filter(
+            children__product_versions__product=self.object, level=0
+        ).prefetch_related(
+            Prefetch('children', queryset=Feature.objects.only(*only).filter(
+                level=1, product_versions__product=self.object, product_versions__attributes=attribute
+            ).annotate(
+                price=Min('product_versions__price_retail')
+            ).order_by('price', 'title', 'pk'), to_attr='values_in_group'),
+            Prefetch('children', queryset=Feature.objects.only(*only).filter(
+                level=1, product_versions__product=self.object
+            ).exclude(
+                version_attributes__attribute=attribute
+            ).annotate(
+                price=Min('product_versions__price_retail')
+            ).order_by('price', 'title', 'pk'), to_attr='values_out_group')
+        ).annotate(
+            price=Min('children__product_versions__price_retail'), count_child=Count('children', distinct=True)
+        ).order_by('product_features__sort', 'price', '-count_child', 'title', 'pk')
+
     def get_product_versions(self):
         product_versions = dict()
 
