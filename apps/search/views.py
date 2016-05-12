@@ -98,20 +98,20 @@ class FacetedSearchView(views.JSONResponseMixin, views.AjaxResponseMixin, CoreFa
 
     def get_queryset(self):
         only = ['title', 'slug', 'structure', 'product_class', 'categories']
-        # dict_filter = {'enable': True, 'categories__in': products.get_descendants(include_self=True)}
-
-        # if self.kwargs.get('filter_slug'):
-        #     dict_filter['filters__slug__in'] = self.kwargs.get('filter_slug').split('/')
+        dict_filter = dict()
 
         products_pk = [product.pk for product in self.get_search_queryset()]
+        dict_filter['id__in'] = products_pk
+        if self.kwargs.get('filter_slug'):
+            dict_filter['filters__slug__in'] = self.kwargs.get('filter_slug').split('/')
         self.products_without_filters = Product.objects.only('id').filter(id__in=products_pk).distinct().order_by(self.kwargs.get('sorting_type'))
 
         queryset = super(FacetedSearchView, self).get_queryset()
-        return queryset.only(*only).filter(id__in=products_pk).distinct().select_related('product_class').prefetch_related(
+        return queryset.only(*only).filter(**dict_filter).distinct().select_related('product_class').prefetch_related(
             Prefetch('images'),
             Prefetch('product_class__options'),
             Prefetch('stockrecords'),
             Prefetch('categories__parent__parent')
-        ).distinct()
+        ).distinct().order_by(self.kwargs['sorting_type'])
 
 

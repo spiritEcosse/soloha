@@ -12,7 +12,15 @@ contacts_view = get_class('contacts.views', 'ContactsView')
 class Soloha(app.Shop):
     def get_urls(self):
         urlpatterns = [
+            # url(r'^(?P<search_string>[\w-]+(/(?!filter)[\w-]+(?!filter))*)(?:/filter/(?P<filter_slug>[\w-]+(/[\w-]+)*))*/$',
+            #     search_view.as_view(), name='category'),
+            url(r'^search/filter/(?P<filter_slug>[\w-]+(/[\w-]+)*)/', search_view.as_view()),
+
+            # url(r'^search/filter/(?P<filter_slug>[\w-]+(/[\w-]+)*)*/$',
+            #     search_view.as_view()),
+
             url(r'^search/', search_view.as_view()),
+
             url(r'^contacts/', contacts_view.as_view()),
 
         ]
