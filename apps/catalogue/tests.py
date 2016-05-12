@@ -789,7 +789,31 @@ class TestCatalog(TestCase, LiveServerTestCase):
 
     def test_product_search_selenium(self):
         test_catalogue.create_product_bulk()
-        self.firefox.get('%s%s' % (self.live_server_url,  ''))
+        product1 = Product.objects.get(slug='product-1')
+        category1 = Category.objects.get(name='Category-1')
+        category12 = Category.objects.get(name='Category-12')
+        category123 = Category.objects.get(name='Category-123')
+
+        dict_values = {'page_url': ''}
+        self.assertions_product_search_selenium(dict_values=dict_values)
+
+        dict_values['page_url'] = product1.get_absolute_url()
+        self.assertions_product_search_selenium(dict_values=dict_values)
+
+        dict_values['page_url'] = category1.get_absolute_url()
+        self.assertions_product_search_selenium(dict_values=dict_values)
+
+        dict_values['page_url'] = category12.get_absolute_url()
+        self.assertions_product_search_selenium(dict_values=dict_values)
+
+        dict_values['page_url'] = category123.get_absolute_url()
+        self.assertions_product_search_selenium(dict_values=dict_values)
+
+        dict_values['page_url'] = '/contacts/'
+        self.assertions_product_search_selenium(dict_values=dict_values)
+
+    def assertions_product_search_selenium(self, dict_values={}):
+        self.firefox.get('%s%s' % (self.live_server_url,  dict_values['page_url']))
 
         search_menu = self.firefox.find_element_by_name('search-menu')
         self.assertEqual(search_menu.is_displayed(), False)
@@ -803,14 +827,16 @@ class TestCatalog(TestCase, LiveServerTestCase):
         input_field.send_keys(dict_values['search_string'])
         time.sleep(10)
 
-        popup_first_element = self.firefox.find_element_by_xpath(".//*[@id='default']/div[1]/header/div[2]/div[2]/div/div/div/div[1]/a/div[2]/div[1]").text
+        popup_first_element = self.firefox.find_element_by_xpath(
+            ".//*[@id='default']/div[1]/header/div[2]/div[2]/div/div/div/div[1]/a/div[2]/div[1]").text
         self.assertEqual(search_menu.is_displayed(), True)
         self.assertNotEqual(len(popup_first_element), 0)
         self.assertEqual(popup_first_element, first_product)
 
         list_elements_on_page = []
         for i in xrange(1, 6):
-            list_elements_on_page.append(self.firefox.find_element_by_xpath(".//*[@id='default']/div[1]/header/div[2]/div[2]/div/div/div/div[{}]/a/div[2]/div[1]".format(i)).text)
+            list_elements_on_page.append(self.firefox.find_element_by_xpath(
+                ".//*[@id='default']/div[1]/header/div[2]/div[2]/div/div/div/div[{}]/a/div[2]/div[1]".format(i)).text)
         self.assertListEqual(list_elements_on_page, list_elements_sqs)
 
         input_field.clear()
@@ -885,6 +911,8 @@ class TestCatalog(TestCase, LiveServerTestCase):
         self.assertEqual(email_error, errors['email'])
         self.assertEqual(phone_error, errors['phone'])
         self.assertFalse(submit_btn.is_enabled())
+
+        #ToDo taras: add test for scroll
 
 
 
