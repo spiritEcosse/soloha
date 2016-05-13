@@ -634,7 +634,7 @@ class TestCatalog(TestCase, LiveServerTestCase):
         count_products = filters[0].num_prod
 
         filter_url = '{}?sorting_type={}'.format(category.get_absolute_url(dict_values), 'popularity')
-        self.assertContains(response, '''<a href="{}">
+        self.assertContains(response, u'''<a href="{}">
         <input type="checkbox"/>
         длина_1100
         <span class="count">({})</span>
@@ -805,7 +805,8 @@ class TestCatalog(TestCase, LiveServerTestCase):
             sqs_search = (sqs_title | sqs_slug | sqs_id)[:OSCAR_PRODUCTS_PER_PAGE]
         return sqs_search
 
-    def test_product_search_selenium(self):
+    # test input search field in all pages
+    def test_product_search_input_selenium(self):
         test_catalogue.create_product_bulk()
         product1 = Product.objects.get(slug='product-1')
         category1 = Category.objects.get(name='Category-1')
@@ -813,24 +814,24 @@ class TestCatalog(TestCase, LiveServerTestCase):
         category123 = Category.objects.get(name='Category-123')
 
         dict_values = {'page_url': ''}
-        self.assertions_product_search_selenium(dict_values=dict_values)
+        self.assertions_product_search_input_selenium(dict_values=dict_values)
 
         dict_values['page_url'] = product1.get_absolute_url()
-        self.assertions_product_search_selenium(dict_values=dict_values)
+        self.assertions_product_search_input_selenium(dict_values=dict_values)
 
         dict_values['page_url'] = category1.get_absolute_url()
-        self.assertions_product_search_selenium(dict_values=dict_values)
+        self.assertions_product_search_input_selenium(dict_values=dict_values)
 
         dict_values['page_url'] = category12.get_absolute_url()
-        self.assertions_product_search_selenium(dict_values=dict_values)
+        self.assertions_product_search_input_selenium(dict_values=dict_values)
 
         dict_values['page_url'] = category123.get_absolute_url()
-        self.assertions_product_search_selenium(dict_values=dict_values)
+        self.assertions_product_search_input_selenium(dict_values=dict_values)
 
         dict_values['page_url'] = '/contacts/'
-        self.assertions_product_search_selenium(dict_values=dict_values)
+        self.assertions_product_search_input_selenium(dict_values=dict_values)
 
-    def assertions_product_search_selenium(self, dict_values={}):
+    def assertions_product_search_input_selenium(self, dict_values={}):
         self.firefox.get('%s%s' % (self.live_server_url,  dict_values['page_url']))
 
         search_menu = self.firefox.find_element_by_name('search-menu')
@@ -868,9 +869,104 @@ class TestCatalog(TestCase, LiveServerTestCase):
         time.sleep(10)
         self.assertEqual(search_menu.is_displayed(), False)
 
-    def test_form_contacts(self):
-        # test_catalogue.create_product_bulk()
+    def test_search_page_sorting_buttons(self):
+        test_catalogue.create_product_bulk()
 
+        dict_values = {'search_string': 'product', 'sorting_type': 'popularity',
+                       'filter_slug': 'filter/dlina_1100/'}
+        self.assertions_search_page_sorting_buttons(dict_values=dict_values)
+
+        dict_values = {'search_string': 'product', 'sorting_type': 'price_ascending',
+                       'filter_slug': 'filter/dlina_1100/'}
+        self.assertions_search_page_sorting_buttons(dict_values=dict_values)
+
+        dict_values = {'search_string': 'product',  'filter_slug': 'filter/dlina_1100/'}
+        self.assertions_search_page_sorting_buttons(dict_values=dict_values)
+
+    def assertions_search_page_sorting_buttons(self, dict_values={}):
+        response = self.client.get('/search/{0}?q={1}&sorting_type={2}'.format(dict_values.get('filter_slug', ''),
+                                                                               dict_values.get('search_string', ''),
+                                                                               dict_values.get('sorting_type', '')))
+        sort_types = [('popularity', _('By popularity')), ('price_descending', _('By price descending')),
+                      ('price_ascending', _('By price ascending'))]
+
+        dict_values['sorting_type'] = dict_values.get('sorting_type', sort_types[0][0])
+        for link, text in sort_types:
+            if dict_values['sorting_type'] == link:
+                sorting_url = '/search/{0}?q={1}&sorting_type={2}'.format(dict_values.get('filter_slug', ''),
+                                                                         dict_values.get('search_string', ''),
+                                                                         link)
+                self.assertContains(response,
+                                    '<a class="btn btn-default btn-danger" type="button" href="{0}">{1}</a>'.format(
+                                        sorting_url, text), count=1, html=True)
+
+    def test_filter_click_search_page(self):
+        test_catalogue.create_product_bulk()
+
+        dict_values = {'search_string': 'product', 'filter_slug': 'filter/dlina_1100/'}
+        self.assertions_filter_click_search_page(dict_values=dict_values)
+        self.assertions_filter_remove_click_search_page(dict_values=dict_values)
+
+        dict_values = {'search_string': 'product', 'sorting_type': 'price_ascending', 'filter_slug': 'filter/dlina_1100/'}
+        self.assertions_filter_click_search_page(dict_values=dict_values)
+        self.assertions_filter_remove_click_search_page(dict_values=dict_values)
+
+        dict_values = {'search_string': 'product', 'sorting_type': 'price_descending', 'filter_slug': 'filter/dlina_1100/'}
+        self.assertions_filter_click_search_page(dict_values=dict_values)
+        self.assertions_filter_remove_click_search_page(dict_values=dict_values)
+
+        dict_values = {'search_string': 'product', 'sorting_type': 'popularity', 'filter_slug': 'filter/dlina_1100/'}
+        self.assertions_filter_click_search_page(dict_values=dict_values)
+        self.assertions_filter_remove_click_search_page(dict_values=dict_values)
+
+    def assertions_filter_click_search_page(self, dict_values={}):
+        response = self.client.get('/search/?q={0}&sorting_type={1}'.format(dict_values.get('search_string', ''),
+                                                                            dict_values.get('sorting_type', '')))
+
+        # products_pk = [product.pk for product in self.get_search_queryset(dict_values=dict_values)]
+        products_without_filters = Product.objects.all().distinct()
+        queryset_filters = Feature.objects.filter(filter_products__in=products_without_filters).distinct().prefetch_related('filter_products')
+        filters = Feature.objects.filter(level=0, children__in=queryset_filters).prefetch_related(
+            Prefetch('children', queryset=queryset_filters.annotate(num_prod=Count('filter_products')),
+                     to_attr='children_in_products'),
+        ).distinct()
+
+        count_products = filters[0].children_in_products[1].num_prod
+
+        filter_url = '/search/{0}?q={1}&sorting_type={2}'.format(dict_values.get('filter_slug', ''),
+                                                                 dict_values.get('search_string', ''),
+                                                                 dict_values.get('sorting_type', 'popularity'))
+        self.assertContains(response, u'''<a href="{}">
+        <input type="checkbox"/>
+        длина_1100
+        <span class="count">({})</span>
+        </a>'''.format(filter_url, count_products), count=1, html=True)
+
+    def assertions_filter_remove_click_search_page(self, dict_values={}):
+        response = self.client.get('/search/{0}?q={1}&sorting_type={2}'.format(dict_values.get('filter_slug', ''),
+                                                                               dict_values.get('search_string', ''),
+                                                                               dict_values.get('sorting_type', '')))
+
+        products_without_filters = Product.objects.all().distinct()
+
+        queryset_filters = Feature.objects.filter(filter_products__in=products_without_filters).distinct().prefetch_related('filter_products')
+        filters = Feature.objects.filter(level=0, children__in=queryset_filters).prefetch_related(
+            Prefetch('children', queryset=queryset_filters.annotate(num_prod=Count('filter_products')),
+                     to_attr='children_in_products'),
+        ).distinct()
+
+        count_products = filters[0].children_in_products[1].num_prod
+
+        filter_url = '/search/?q={0}&sorting_type={1}'.format(dict_values.get('search_string', ''),
+                                                                 dict_values.get('sorting_type', 'popularity'))
+
+        self.assertContains(response, u'''<a href="{}">
+        <input type="checkbox" checked/>
+        длина_1100
+        <span class="count">({})</span>
+        </a>'''.format(filter_url, count_products), count=1, html=True)
+
+    def test_form_contacts(self):
         form_data = {'confirmation_key': 1, 'name': 'test', 'phone': '0959999999', 'email': 'wrq@gmail.com', 'comment': 'My comment'}
         form_errors = {}
         self.assertions_form_contacts(form_data=form_data, form_errors=form_errors)
