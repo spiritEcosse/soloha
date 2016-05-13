@@ -516,10 +516,10 @@ class TestCatalog(TestCase, LiveServerTestCase):
         only = ['title', 'slug', 'structure', 'product_class', 'enable', 'categories', 'filters']
         dict_filter = {'enable': True, 'categories__in': category.get_descendants(include_self=True)}
 
+        response = self.client.get(category.get_absolute_url(), dict_values)
+
         if dict_values.get('filter_slug'):
             dict_filter['filters__slug__in'] = dict_values.get('filter_slug').split('/')
-
-        response = self.client.get(category.get_absolute_url(), dict_values)
 
         dict_new_sorting_types = {'popularity': '-views_count', 'price_ascending': 'stockrecords__price_excl_tax',
                 'price_descending': '-stockrecords__price_excl_tax'}
@@ -649,7 +649,7 @@ class TestCatalog(TestCase, LiveServerTestCase):
         # filter_url = '{}?sorting_type={}'.format(category.get_absolute_url(), dict_values['sorting_type'])
         filter_url = '{}?sorting_type={}'.format(category.get_absolute_url(), 'popularity')
 
-        self.assertContains(response, '''<a href="{}">
+        self.assertContains(response, u'''<a href="{}">
         <input type="checkbox" checked/>
         длина_1100
         <span class="count">({})</span>
@@ -941,6 +941,21 @@ class TestCatalog(TestCase, LiveServerTestCase):
         длина_1100
         <span class="count">({})</span>
         </a>'''.format(filter_url, count_products), count=1, html=True)
+
+        # context = dict()
+        # context['search_string'] = dict_values['search_string']
+        # sqs = self.get_search_queryset(dict_values=dict_values)
+        # dict_filter = dict()
+        # if dict_values('filter_slug'):
+        #     dict_filter['filters__slug__in'] = dict_values.get('filter_slug').split('/')
+        #
+        # context['searched_products'] = [{'id': obj.id,
+        #                                  'title': obj.title,
+        #                                  'main_image': obj.object.get_values()['image'],
+        #                                  'href': obj.object.get_absolute_url(),
+        #                                  'price': obj.object.get_values()['price']} for obj in sqs]
+        # # raise Exception(json.dumps(context))
+        # self.assertJSONEqual(json.dumps(context), response.content)
 
     def assertions_filter_remove_click_search_page(self, dict_values={}):
         response = self.client.get('/search/{0}?q={1}&sorting_type={2}'.format(dict_values.get('filter_slug', ''),

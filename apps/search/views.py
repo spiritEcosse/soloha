@@ -115,3 +115,4 @@ class FacetedSearchView(views.JSONResponseMixin, views.AjaxResponseMixin, CoreFa
         ).distinct().order_by(self.kwargs['sorting_type'])
 
 
+

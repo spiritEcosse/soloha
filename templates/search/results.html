@@ -39,17 +39,16 @@
                                                 {% for sorting_url, text, is_active, link in sort_types %}
                                                     {% if is_active %}
                                                         <a href="{% concatenate category filter_slug filter_value %}?{{ link }}">
-{#                                                        {{ request.get_full_path }}/#}
                                                     {% endif %}
                                                 {% endfor %}
                                                 {% if filter_value.get_absolute_url in filter_slug %}
-                                                    <input type="checkbox" checked/>
+                                                    <input type="checkbox" name="checkbox" value="value" checked/>
                                                 {% else %}
                                                     <input type="checkbox"/>
                                                 {% endif %}
                                                 {{ filter_value.title }}
                                                 <span class="count">({{ filter_value.num_prod }})</span>
-                                                </a>
+                                                                                            </a>
                                             </label>
                                         </li>
                                     {% endfor %}
