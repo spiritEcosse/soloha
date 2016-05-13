@@ -69,7 +69,7 @@ class FacetedSearchView(views.JSONResponseMixin, views.AjaxResponseMixin, CoreFa
             is_active = False
             if self.kwargs.get('sorting_type', '') == type:
                 is_active = True
-            sorting_url = '/search/?q={}&sorting_type={}'.format(context['query'], link)
+            sorting_url = '{}?q={}&sorting_type={}'.format(self.request.path, context['query'], link)
             sort_link = 'q={}&sorting_type={}'.format(context['query'], link)
             context['sort_types'].append((sorting_url, text, is_active, sort_link))
 

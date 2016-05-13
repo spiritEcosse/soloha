@@ -663,13 +663,22 @@ class TestCatalog(TestCase, LiveServerTestCase):
         # without filter slugs
         filter_slugs = ''
         self.assertions_filter_concatenate(category, filter_slugs, filter)
+        # tests filtering on page with search results, on this page category empty
+        category = ''
+        self.assertions_filter_concatenate(category, filter_slugs, filter)
 
         # with one filter in filter slugs
         filter_slugs = 'shirina_1100'
         self.assertions_filter_concatenate(category, filter_slugs, filter)
 
+        category = ''
+        self.assertions_filter_concatenate(category, filter_slugs, filter)
+
         # with many filters in filter slugs
         filter_slugs = 'shirina_1100/shirina_1200/shirina_1300/dlina_1000/dlina_1200'
+        self.assertions_filter_concatenate(category, filter_slugs, filter)
+
+        category = ''
         self.assertions_filter_concatenate(category, filter_slugs, filter)
 
     def assertions_filter_concatenate(self, category, filter_slugs, filter):
@@ -683,38 +692,16 @@ class TestCatalog(TestCase, LiveServerTestCase):
         else:
             filter_slugs.append(filter.get_absolute_url())
         filter_slugs = '/'.join((filter_slugs))
-        absolute_url = category.get_absolute_url({'filter_slug': filter_slugs})
-        self.assertEqual(absolute_url, link_concatenate)
 
-    def test_filters_concatenation_search(self):
-        test_catalogue.create_product_bulk()
-        category = ''
-        filter = Feature.objects.get(slug='shirina_1000')
-
-        # without filter slugs
-        filter_slugs = ''
-        self.assertions_filter_concatenate_search(category, filter_slugs, filter)
-
-        # with one filter in filter slugs
-        filter_slugs = 'shirina_1100'
-        self.assertions_filter_concatenate_search(category, filter_slugs, filter)
-
-        # with many filters in filter slugs
-        filter_slugs = 'shirina_1100/shirina_1200/shirina_1300/dlina_1000/dlina_1200'
-        self.assertions_filter_concatenate_search(category, filter_slugs, filter)
-
-    def assertions_filter_concatenate_search(self, category, filter_slugs, filter):
-        link_concatenate = concatenate(category, filter_slugs, filter)
-        if filter_slugs:
-            filter_slugs = filter_slugs.split('/')
+        if category:
+            absolute_url = category.get_absolute_url({'filter_slug': filter_slugs})
         else:
-            filter_slugs = []
-        if filter.get_absolute_url() in filter_slugs:
-            filter_slugs.remove(filter.get_absolute_url())
-        else:
-            filter_slugs.append(filter.get_absolute_url())
-        filter_slugs = '/'.join((filter_slugs))
-        absolute_url = u'/search/filter/{}/'.format(filter_slugs)
+            if filter_slugs and ('filter/' not in filter_slugs):
+                absolute_url = '/search/filter/' + filter_slugs + '/'
+            elif filter_slugs:
+                absolute_url = filter_slugs + '/'
+            else:
+                absolute_url = '/search/'
         self.assertEqual(absolute_url, link_concatenate)
 
     def test_product_options(self):
