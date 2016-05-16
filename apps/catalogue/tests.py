@@ -760,11 +760,14 @@ class TestCatalog(TestCase, LiveServerTestCase):
         test_catalogue.create_product_bulk()
 
         # Searching one product
-        dict_values = {'search_string': 'Product 1'}
+        dict_values = {'search_string': 'Product 1', 'page': 1}
         self.assertions_product_search(dict_values=dict_values)
 
         # Searching many products with similar names
-        dict_values = {'search_string': 'Product'}
+        dict_values = {'search_string': 'Product', 'page': 1}
+        self.assertions_product_search(dict_values=dict_values)
+
+        dict_values = {'search_string': 'Product', 'page': 2}
         self.assertions_product_search(dict_values=dict_values)
 
         dict_values = {'search_string': ''}
@@ -774,11 +777,27 @@ class TestCatalog(TestCase, LiveServerTestCase):
         self.assertions_product_search(dict_values=dict_values)
 
     def assertions_product_search(self, dict_values={}):
+        paginate_by = OSCAR_PRODUCTS_PER_PAGE
+        dict_filter = dict()
+
+        if dict_values.get('filter_slug'):
+            dict_filter['filters__slug__in'] = dict_values.get('filter_slug').split('/')
+
+        dict_new_sorting_types = {'popularity': '-views_count', 'price_ascending': 'stockrecords__price_excl_tax',
+                'price_descending': '-stockrecords__price_excl_tax'}
+        dict_values['sorting_type'] = dict_new_sorting_types.get(dict_values.get('sorting_type'), '-views_count')
+
         response = self.client.get('/search/?q={}'.format(dict_values['search_string']))
         sqs_search = self.get_search_queryset(dict_values=dict_values)
 
+        p = Paginator(sqs_search, paginate_by)
+
         self.assertEqual(response.status_code, STATUS_CODE_200)
-        self.assertEqual(len(response.context['product_list']), len(sqs_search))
+        #self.assertEqual(len(response.context['product_list']), len(sqs_search))
+
+        self.assertEqual(p.count, response.context['paginator'].count)
+        self.assertEqual(p.num_pages, response.context['paginator'].num_pages)
+        self.assertEqual(p.page_range, response.context['paginator'].page_range)
 
         response = self.client.post('http://localhost:8000/search/?q=product/',
                                     json.dumps(dict_values),
@@ -802,7 +821,7 @@ class TestCatalog(TestCase, LiveServerTestCase):
             sqs_title = sqs.autocomplete(title_ngrams=dict_values['search_string'])
             sqs_slug = sqs.autocomplete(slug_ngrams=dict_values['search_string'])
             sqs_id = sqs.autocomplete(id_ngrams=dict_values['search_string'])
-            sqs_search = (sqs_title | sqs_slug | sqs_id)[:OSCAR_PRODUCTS_PER_PAGE]
+            sqs_search = (sqs_title | sqs_slug | sqs_id) #[:OSCAR_PRODUCTS_PER_PAGE]
         return sqs_search
 
     # test input search field in all pages
@@ -969,18 +988,28 @@ class TestCatalog(TestCase, LiveServerTestCase):
 
     def test_filter_checkbox_selenium(self):
         test_catalogue.create_product_bulk()
-        dict_values = {'search_string': 'product', 'sorting_type': 'popularity'}
+        category = Category.objects.get(name='Category-12')
 
+        dict_values = {'search_string': 'product', 'sorting_type': 'popularity'}
         initial_url = ('%s%s' % (self.live_server_url, '/search/?q={0}&sorting_type={1}'.format(dict_values.get('search_string', ''),
-                                                                                                  dict_values.get('sorting_type', ''))))
+                                                                                                dict_values.get('sorting_type', ''))))
+        self.assertions_filter_checkbox_selenium(url=initial_url)
+
+        initial_url = ('%s%s%s' % (self.live_server_url, category.get_absolute_url(), '?sorting_type=popularity'))
+        self.assertions_filter_checkbox_selenium(url=initial_url)
+
+    def assertions_filter_checkbox_selenium(self, url):
+        initial_url = url
         self.firefox.get(initial_url)
-        checkbox_unchecked = self.firefox.find_element_by_xpath(".//*[@id='default']/div[1]/div/div[1]/div/div/div[2]/div[1]/div[2]/ul/li[1]/label/a/input")
+        checkbox_unchecked = self.firefox.find_element_by_xpath(
+            ".//*[@id='default']/div[1]/div/div[1]/div/div/div[2]/div[1]/div[2]/ul/li[1]/label/a/input")
         self.assertEqual(checkbox_unchecked.is_selected(), False)
         checkbox_unchecked.click()
         time.sleep(10)
         self.assertNotEqual(self.firefox.current_url, initial_url)
 
-        checkbox_checked = self.firefox.find_element_by_xpath(".//*[@id='default']/div[1]/div/div[1]/div/div/div[2]/div[1]/div[2]/ul/li[1]/label/a/input")
+        checkbox_checked = self.firefox.find_element_by_xpath(
+            ".//*[@id='default']/div[1]/div/div[1]/div/div/div[2]/div[1]/div[2]/ul/li[1]/label/a/input")
         self.assertEqual(checkbox_checked.is_selected(), True)
         checkbox_checked.click()
         time.sleep(10)
