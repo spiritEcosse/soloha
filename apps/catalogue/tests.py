@@ -635,7 +635,7 @@ class TestCatalog(TestCase, LiveServerTestCase):
 
         filter_url = '{}?sorting_type={}'.format(category.get_absolute_url(dict_values), 'popularity')
         self.assertContains(response, u'''<a href="{}">
-        <input type="checkbox"/>
+        <input type="checkbox" onclick="location.href='/category-1/category-12/filter/dlina_1100/?sorting_type=popularity'"/>
         длина_1100
         <span class="count">({})</span>
         </a>'''.format(filter_url, count_products), count=1, html=True)
@@ -650,7 +650,7 @@ class TestCatalog(TestCase, LiveServerTestCase):
         filter_url = '{}?sorting_type={}'.format(category.get_absolute_url(), 'popularity')
 
         self.assertContains(response, u'''<a href="{}">
-        <input type="checkbox" checked/>
+        <input type="checkbox"  onclick="location.href='/category-1/category-12/?sorting_type=popularity'" checked/>
         длина_1100
         <span class="count">({})</span>
         </a>'''.format(filter_url, count_products), count=1, html=True)
@@ -936,26 +936,12 @@ class TestCatalog(TestCase, LiveServerTestCase):
         filter_url = '/search/{0}?q={1}&sorting_type={2}'.format(dict_values.get('filter_slug', ''),
                                                                  dict_values.get('search_string', ''),
                                                                  dict_values.get('sorting_type', 'popularity'))
+
         self.assertContains(response, u'''<a href="{}">
-        <input type="checkbox"/>
+        <input type="checkbox" onclick="location.href='/search/filter/dlina_1100/?q=product&sorting_type={}'" value="value" name="checkbox"/>
         длина_1100
         <span class="count">({})</span>
-        </a>'''.format(filter_url, count_products), count=1, html=True)
-
-        # context = dict()
-        # context['search_string'] = dict_values['search_string']
-        # sqs = self.get_search_queryset(dict_values=dict_values)
-        # dict_filter = dict()
-        # if dict_values('filter_slug'):
-        #     dict_filter['filters__slug__in'] = dict_values.get('filter_slug').split('/')
-        #
-        # context['searched_products'] = [{'id': obj.id,
-        #                                  'title': obj.title,
-        #                                  'main_image': obj.object.get_values()['image'],
-        #                                  'href': obj.object.get_absolute_url(),
-        #                                  'price': obj.object.get_values()['price']} for obj in sqs]
-        # # raise Exception(json.dumps(context))
-        # self.assertJSONEqual(json.dumps(context), response.content)
+        </a>'''.format(filter_url, dict_values.get('sorting_type', 'popularity'), count_products), count=1, html=True)
 
     def assertions_filter_remove_click_search_page(self, dict_values={}):
         response = self.client.get('/search/{0}?q={1}&sorting_type={2}'.format(dict_values.get('filter_slug', ''),
@@ -976,10 +962,29 @@ class TestCatalog(TestCase, LiveServerTestCase):
                                                                  dict_values.get('sorting_type', 'popularity'))
 
         self.assertContains(response, u'''<a href="{}">
-        <input type="checkbox" checked/>
+        <input type="checkbox"  onclick="location.href='/search/?q=product&sorting_type={}'" checked/>
         длина_1100
         <span class="count">({})</span>
-        </a>'''.format(filter_url, count_products), count=1, html=True)
+        </a>'''.format(filter_url, dict_values.get('sorting_type', 'popularity'), count_products), count=1, html=True)
+
+    def test_filter_checkbox_selenium(self):
+        test_catalogue.create_product_bulk()
+        dict_values = {'search_string': 'product', 'sorting_type': 'popularity'}
+
+        initial_url = ('%s%s' % (self.live_server_url, '/search/?q={0}&sorting_type={1}'.format(dict_values.get('search_string', ''),
+                                                                                                  dict_values.get('sorting_type', ''))))
+        self.firefox.get(initial_url)
+        checkbox_unchecked = self.firefox.find_element_by_xpath(".//*[@id='default']/div[1]/div/div[1]/div/div/div[2]/div[1]/div[2]/ul/li[1]/label/a/input")
+        self.assertEqual(checkbox_unchecked.is_selected(), False)
+        checkbox_unchecked.click()
+        time.sleep(10)
+        self.assertNotEqual(self.firefox.current_url, initial_url)
+
+        checkbox_checked = self.firefox.find_element_by_xpath(".//*[@id='default']/div[1]/div/div[1]/div/div/div[2]/div[1]/div[2]/ul/li[1]/label/a/input")
+        self.assertEqual(checkbox_checked.is_selected(), True)
+        checkbox_checked.click()
+        time.sleep(10)
+        self.assertEqual(self.firefox.current_url, initial_url)
 
     def test_form_contacts(self):
         form_data = {'confirmation_key': 1, 'name': 'test', 'phone': '0959999999', 'email': 'wrq@gmail.com', 'comment': 'My comment'}

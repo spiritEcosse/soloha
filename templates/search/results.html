@@ -24,41 +24,41 @@
         Products matching "{{ q }}"
     {% endblocktrans %}
 {% endblock %}
-        {% block left-bar %}
-            {% if filters %}
-                <div class="heading">Подбор по параметрам</div>
-                <div class="filter">
-                    {% for filter in filters %}
-                        <div class="items">
-                            <div class="name" >{{ filter }}</div>
-                            <div class="values">
-                                <ul class="list-group">
-                                    {% for filter_value in filter.children_in_products %}
-                                        <li class="list-group-item checkbox">
-                                            <label>
-                                                {% for sorting_url, text, is_active, link in sort_types %}
-                                                    {% if is_active %}
-                                                        <a href="{% concatenate category filter_slug filter_value %}?{{ link }}">
-                                                    {% endif %}
-                                                {% endfor %}
+{% block left-bar %}
+    {% if filters %}
+        <div class="heading">Подбор по параметрам</div>
+        <div class="filter">
+            {% for filter in filters %}
+                <div class="items">
+                    <div class="name" >{{ filter }}</div>
+                    <div class="values">
+                        <ul class="list-group">
+                            {% for filter_value in filter.children_in_products %}
+                                <li class="list-group-item checkbox">
+                                    <label>
+                                        {% for sorting_url, text, is_active, link in sort_types %}
+                                            {% if is_active %}
+                                                <a href="{% concatenate category filter_slug filter_value %}?{{ link }}">
                                                 {% if filter_value.get_absolute_url in filter_slug %}
-                                                    <input type="checkbox" name="checkbox" value="value" checked/>
+                                                    <input type="checkbox" checked onclick="location.href='{% concatenate category filter_slug filter_value %}?{{ link }}'"/>
                                                 {% else %}
-                                                    <input type="checkbox"/>
+                                                    <input type="checkbox" name="checkbox" value="value" onclick="location.href='{% concatenate category filter_slug filter_value %}?{{ link }}'"/>
                                                 {% endif %}
-                                                {{ filter_value.title }}
-                                                <span class="count">({{ filter_value.num_prod }})</span>
-                                                                                            </a>
-                                            </label>
-                                        </li>
-                                    {% endfor %}
-                                </ul>
-                            </div>
-                        </div>
-                    {% endfor %}
+                                            {% endif %}
+                                        {% endfor %}
+                                        {{ filter_value.title }}
+                                        <span class="count">({{ filter_value.num_prod }})</span>
+                                        </a>
+                                    </label>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
                 </div>
-            {% endif %}
-        {% endblock left-bar %}
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endblock left-bar %}
 
 {% block content %}
     <form method="get" action="." class="form-horizontal">
