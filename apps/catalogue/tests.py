@@ -773,7 +773,31 @@ class TestCatalog(TestCase, LiveServerTestCase):
         dict_values = {'search_string': ''}
         self.assertions_product_search(dict_values=dict_values)
 
-        dict_values = {'search_string': '1'}
+        dict_values = {'search_string': '1', 'page': 1}
+        self.assertions_product_search(dict_values=dict_values)
+
+    def test_product_search_sorting_with_filters(self):
+        test_catalogue.create_product_bulk()
+
+        dict_values = {'search_string': 'product', 'page': 1, 'sorting_type': 'price_ascending', 'num_queries': 20,
+                       'filters': 'shirina_1000/shirina_1200/dlina_1100/dlina_1000'}
+        self.assertions_product_search(dict_values=dict_values)
+
+        dict_values = {'search_string': 'product', 'page': 2, 'sorting_type': 'popularity', 'num_queries': 20,
+                       'filters': 'shirina_1000/shirina_1200/dlina_1100/dlina_1000'}
+        self.assertions_product_search(dict_values=dict_values)
+
+        dict_values = {'search_string': 'product', 'page': 1, 'sorting_type': 'price_descending', 'num_queries': 20, 'filters': ''}
+        self.assertions_product_search(dict_values=dict_values)
+
+        dict_values = {'search_string': 'product', 'page': 1, 'sorting_type': 'price_descending', 'num_queries': 20,
+                       'filters': 'shirina_1000/shirina_1100/shirina_1200/dlina_1000/dlina_1100'}
+        self.assertions_product_search(dict_values=dict_values)
+
+        dict_values = {'search_string': 'product', 'page': 2, 'sorting_type': 'popularity', 'num_queries': 20, 'filters': 'dlina_1100'}
+        self.assertions_product_search(dict_values=dict_values)
+
+        dict_values = {'search_string': 'product', 'page': 1, 'sorting_type': 'popularity', 'num_queries': 20, 'filters': 'dlina_1100'}
         self.assertions_product_search(dict_values=dict_values)
 
     def assertions_product_search(self, dict_values={}):
@@ -790,14 +814,33 @@ class TestCatalog(TestCase, LiveServerTestCase):
         response = self.client.get('/search/?q={}'.format(dict_values['search_string']))
         sqs_search = self.get_search_queryset(dict_values=dict_values)
 
-        p = Paginator(sqs_search, paginate_by)
+        searched_products = [{'id': obj.id,
+                              'title': obj.title,
+                              'main_image': obj.object.get_values()['image'],
+                              'href': obj.object.get_absolute_url(),
+                              'price': obj.object.get_values()['price']} for obj in sqs_search]
+
+        products_pk = [product.pk for product in sqs_search]
+        dict_filter['id__in'] = products_pk
+        products_without_filters = Product.objects.only('id').filter(id__in=products_pk).distinct().order_by(
+            dict_values.get('sorting_type'))
+        queryset_filters = Feature.objects.filter(filter_products__in=products_without_filters).distinct().prefetch_related('filter_products')
+        filters = Feature.objects.filter(level=0, children__in=queryset_filters).prefetch_related(
+            Prefetch('children', queryset=queryset_filters, to_attr='children_in_products'),
+        ).distinct()
+
+        response_titles = [product.title for product in list(response.context['page_obj'])]
+        products_tiltes = [product['title'] for product in searched_products][:OSCAR_PRODUCTS_PER_PAGE]
+        p = Paginator(searched_products, paginate_by)
 
         self.assertEqual(response.status_code, STATUS_CODE_200)
-        #self.assertEqual(len(response.context['product_list']), len(sqs_search))
-
+        self.assertEqual(len(p.page(dict_values.get('page', 1)).object_list), len(response.context['page_obj']))
+        self.assertListEqual(products_tiltes, response_titles)
+        self.assertTemplateUsed(response, 'search/results.html')
         self.assertEqual(p.count, response.context['paginator'].count)
         self.assertEqual(p.num_pages, response.context['paginator'].num_pages)
         self.assertEqual(p.page_range, response.context['paginator'].page_range)
+        self.assertEqual(list(filters), list(response.context['filters']))
 
         response = self.client.post('http://localhost:8000/search/?q=product/',
                                     json.dumps(dict_values),
@@ -814,7 +857,8 @@ class TestCatalog(TestCase, LiveServerTestCase):
                               'price': obj.object.get_values()['price']} for obj in sqs]
         self.assertJSONEqual(json.dumps(context), response.content)
 
-    def get_search_queryset(self, dict_values={}):
+    @staticmethod
+    def get_search_queryset(dict_values={}):
         sqs_search = []
         if dict_values['search_string']:
             sqs = SearchQuerySet()
