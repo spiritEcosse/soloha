@@ -28,7 +28,7 @@ from django.test import LiveServerTestCase
 from django.db.models import Q
 from haystack.query import SearchQuerySet
 from apps.contacts.views import FeedbackForm
-# from apps.catalogue.models import SiteInfo
+from apps.catalogue.models import SiteInfo
 
 
 Product = get_model('catalogue', 'product')
@@ -52,7 +52,7 @@ class TestCatalog(TestCase, LiveServerTestCase):
         self.client = Client()
         self.firefox = webdriver.Firefox()
         self.firefox.maximize_window()
-        # test_catalogue.create_site_info()
+        test_catalogue.create_site_info()
         super(TestCatalog, self).setUp()
 
     def tearDown(self):

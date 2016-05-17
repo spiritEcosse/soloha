@@ -21,6 +21,7 @@ test_catalogue = catalogue.Test()
 class TestHomePage(TestCase):
     def setUp(self):
         self.client = Client()
+        test_catalogue.create_site_info()
 
     def test_home_view(self):
         """
@@ -30,7 +31,7 @@ class TestHomePage(TestCase):
         """
         test_catalogue.create_product_bulk_recommend()
         test_catalogue.create_order()
-        with self.assertNumQueries(23):
+        with self.assertNumQueries(24):
             response = self.client.get(reverse('promotions:home'))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.resolver_match.func.__name__, HomeView.as_view().__name__)

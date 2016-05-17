@@ -20,7 +20,7 @@ ProductAttributeValue = get_model('catalogue', 'ProductAttributeValue')
 ProductClass = get_model('catalogue', 'ProductClass')
 ProductImage = get_model('catalogue', 'ProductImage')
 ProductRecommendation = get_model('catalogue', 'ProductRecommendation')
-# SiteInfo = get_model('sites', 'SiteInfo')
+SiteInfo = get_model('sites', 'SiteInfo')
 
 
 class FeatureAdmin(tree_editor.TreeEditor):
@@ -127,6 +127,6 @@ admin.site.register(Option, OptionAdmin)
 admin.site.register(ProductImage)
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Feature, FeatureAdmin)
-# admin.site.register(SiteInfo)
+admin.site.register(SiteInfo)
 
-# admin.site.unregister(Site)
+admin.site.unregister(Site)

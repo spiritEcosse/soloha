@@ -14,7 +14,7 @@ from soloha.settings import OSCAR_DEFAULT_CURRENCY
 import random
 from oscar.apps.partner.strategy import Selector
 from django.conf import settings
-# from apps.catalogue.models import SiteInfo
+from apps.catalogue.models import SiteInfo
 
 Free = get_class('shipping.methods', 'Free')
 ProductCategory = get_model('catalogue', 'ProductCategory')
@@ -352,7 +352,7 @@ class Test(object):
         basket.set_as_submitted()
         return order
 
-    # def create_site_info(self):
-    #     SiteInfo.objects.create(domain='example.com', work_time='9:00-19:00', address=('address'),
-    #                             phone_number=(['0959999999', '0999999999']), email='test@gmail.com')
+    def create_site_info(self):
+        SiteInfo.objects.create(domain='example.com', work_time='9:00-19:00', address=('address'),
+                                phone_number='0959999999', email='test@gmail.com')
 
