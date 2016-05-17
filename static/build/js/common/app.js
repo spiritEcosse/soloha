@@ -208,7 +208,6 @@
           $http.post(".", $scope.feedback).success(function(data) {
             var duration, offset, someElement;
             if (!djangoForm.setErrors($scope.form_comment, data.errors)) {
-              console.log(data.msg);
               duration = 800;
               offset = 0;
               $scope.alerts.push({
@@ -216,7 +215,6 @@
                 type: 'success'
               });
               someElement = angular.element(document.getElementById('alerts'));
-              console.log(someElement);
               return $document.scrollToElement(someElement, offset, duration);
             }
           }).error(function() {
@@ -244,5 +242,45 @@
   app = angular.module(app_name);
 
   app.controller('Home', ['$http', '$scope', '$window', '$document', '$log', function($http, $scope, $window, $document, $log) {}]);
+
+}).call(this);
+
+(function() {
+  var app, app_name;
+
+  app_name = 'soloha';
+
+  app = angular.module(app_name);
+
+  app.config([
+    '$httpProvider', function($httpProvider) {
+      $httpProvider.defaults.xsrfCookieName = 'csrftoken';
+      $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
+      return $httpProvider.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+    }
+  ]);
+
+  app.controller('Product', [
+    '$http', '$scope', '$window', '$document', '$location', '$compile', function($http, $scope, $window, $document, $location, $compile) {
+      $scope.submit = function() {
+        return $scope.disabled = true;
+      };
+      $http.post(".", $scope.more_goods).success(function(data) {
+        var duration, offset, someElement;
+        duration = 800;
+        offset = 0;
+        $scope.alerts.push({
+          msg: data.msg,
+          type: 'success'
+        });
+        someElement = angular.element(document.getElementById('alerts'));
+        return $document.scrollToElement(someElement, offset, duration);
+      }).error(function() {
+        return console.error('An error occurred during submission');
+      });
+      $scope.disabled = false;
+      return false;
+    }
+  ]);
 
 }).call(this);

@@ -24,15 +24,11 @@ app.controller 'Contacts', ['$http', '$scope', '$window', 'djangoForm', '$docume
     if $scope.feedback
       $http.post(".", $scope.feedback).success (data) ->
         if not djangoForm.setErrors($scope.form_comment, data.errors)
-          console.log(data.msg)
           duration = 800
           offset = 0
           $scope.alerts.push({msg: data.msg, type: 'success'})
           someElement = angular.element(document.getElementById('alerts'))
-          console.log(someElement)
           $document.scrollToElement(someElement, offset, duration)
-#          $document.scrollToElement(someElement, 30, 500).then ->
-#            console.log('You just scrolled to chart-help!')
       .error ->
         console.error('An error occurred during submission')
 
@@ -40,5 +36,4 @@ app.controller 'Contacts', ['$http', '$scope', '$window', 'djangoForm', '$docume
     return false
 ]
 app.directive 'alertSuccess', ['$scope', ($scope) ->
-
 ]

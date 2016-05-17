@@ -30,10 +30,14 @@ class FacetedSearchView(views.JSONResponseMixin, views.AjaxResponseMixin, CoreFa
             data = json.loads(self.request.body)
             self.kwargs['search_string'] = data.get('search_string', '')
         self.products = self.get_products()
+        raise Exception("post")
 
     def post_ajax(self, request, *args, **kwargs):
         super(FacetedSearchView, self).post_ajax(request, *args, **kwargs)
         return self.render_json_response(self.get_context_data_json())
+
+    def ajax(self):
+        pass
 
     def get_context_data_json(self, **kwargs):
         context = dict()
