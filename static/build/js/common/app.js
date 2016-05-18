@@ -121,11 +121,9 @@
           var el, model;
           console.error('An error occurred during submission');
           angular.element(document.getElementById('options-0')).remove(ng - (model = "option_model[' + $scope.option_id + ']"));
-          console.log(el);
           angular.forEach(data.attributes, function(attr) {});
           el = angular.element($('[ng-model="option_model[' + 69 + ']" '));
           el.remove();
-          console.log(el);
           el = angular.element($('[ng-model="option_model[' + $scope.option_id + ']"'));
           el = angular.element($('[ng-model="confirmed"'));
           console.log(el.find('div').remove());
@@ -246,6 +244,29 @@
 }).call(this);
 
 (function() {
+  'use strict';
 
+  /* Controllers */
+  var app, app_name;
+
+  app_name = "soloha";
+
+  app = angular.module(app_name);
+
+  app.config([
+    '$httpProvider', function($httpProvider) {
+      $httpProvider.defaults.xsrfCookieName = 'csrftoken';
+      $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
+      return $httpProvider.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+    }
+  ]);
+
+  app.controller('Search', [
+    '$http', '$scope', '$window', '$document', '$location', function($http, $scope, $window, $document, $location) {
+      return $scope.submit = function() {
+        return http.get($location.absUrl()).success();
+      };
+    }
+  ]);
 
 }).call(this);

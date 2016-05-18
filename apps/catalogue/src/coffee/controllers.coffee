@@ -76,11 +76,9 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
 
       angular.element(document.getElementById('options-0')).remove(ng-model="option_model[' + $scope.option_id + ']")
 
-      console.log(el)
       angular.forEach data.attributes, (attr) ->
       el = angular.element($('[ng-model="option_model[' + 69 + ']" '))
       el.remove()
-      console.log(el)
       el = angular.element($('[ng-model="option_model[' + $scope.option_id + ']"'))
       el = angular.element($('[ng-model="confirmed"'))
       console.log(el.find('div').remove())

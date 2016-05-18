@@ -43,11 +43,6 @@ class ContactsView(FormView, ContextMixin):
 
     def get_context_data(self, **kwargs):
         context = super(ContactsView, self).get_context_data(**kwargs)
-        # cur_language = translation.get_language()
-        # context['class'] = ''
-        #
-        # if cur_language == 'ru':
-        #     context['class'] = 'class=lang_ru'
         return context
 
     def send_email(self, request, form, form_email, email_to):

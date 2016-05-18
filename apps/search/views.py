@@ -10,6 +10,7 @@ from django.db.models.query import Prefetch
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from apps.catalogue.models import Feature
+from django.http import HttpResponse
 from django.db.models import Count
 from django.db.models import Q
 
@@ -25,6 +26,8 @@ class FacetedSearchView(views.JSONResponseMixin, views.AjaxResponseMixin, CoreFa
     paginate_by = OSCAR_PRODUCTS_PER_PAGE
 
     def post(self, request, *args, **kwargs):
+        if request.is_ajax() and request.GET.get('q', False):
+            return self.get_ajax(request)
         self.kwargs['search_string'] = ''
         if self.request.body:
             data = json.loads(self.request.body)
@@ -35,8 +38,22 @@ class FacetedSearchView(views.JSONResponseMixin, views.AjaxResponseMixin, CoreFa
         super(FacetedSearchView, self).post_ajax(request, *args, **kwargs)
         return self.render_json_response(self.get_context_data_json())
 
-    def ajax(self):
-        pass
+    def get_ajax(self, request, *args, **kwargs):
+        self.kwargs['search_string'] = self.request.GET.get('q')
+        self.products = self.get_products()
+
+    # def ajax(self, **kwargs):
+    #     self.kwargs['search_string'] = self.request.GET.get('q')
+        # kwargs['object_list'] = kwargs.get('object_list', '')
+        # self.get_context_data()
+        # self.kwargs['search_string'] = 'my str'
+        # print self.kwargs
+        # self.kwargs['searched']
+        # self.ajax()
+        # self.get_context_data()
+        # print self.kwargs
+        # response_data = {'test_data': 'test'}
+        # return HttpResponse(json.dumps(response_data), content_type="application/json")
 
     def get_context_data_json(self, **kwargs):
         context = dict()
@@ -54,7 +71,6 @@ class FacetedSearchView(views.JSONResponseMixin, views.AjaxResponseMixin, CoreFa
 
     def get_context_data(self, **kwargs):
         context = super(FacetedSearchView, self).get_context_data(**kwargs)
-        # context['results'] = self.get_search_queryset()
         context['query'] = self.kwargs['search_string']
 
         queryset_filters = Feature.objects.filter(filter_products__in=self.products_without_filters).distinct().prefetch_related('filter_products')
@@ -78,6 +94,7 @@ class FacetedSearchView(views.JSONResponseMixin, views.AjaxResponseMixin, CoreFa
 
         if context['page_obj'].has_next():
             context['page_obj_next'] = context['paginator'].page(context['page_obj'].next_page_number())
+
         return context
 
     def get_products(self, **kwargs):
