@@ -30,7 +30,6 @@ class FacetedSearchView(views.JSONResponseMixin, views.AjaxResponseMixin, CoreFa
             data = json.loads(self.request.body)
             self.kwargs['search_string'] = data.get('search_string', '')
         self.products = self.get_products()
-        raise Exception("post")
 
     def post_ajax(self, request, *args, **kwargs):
         super(FacetedSearchView, self).post_ajax(request, *args, **kwargs)
@@ -77,6 +76,8 @@ class FacetedSearchView(views.JSONResponseMixin, views.AjaxResponseMixin, CoreFa
             sort_link = 'q={}&sorting_type={}'.format(context['query'], link)
             context['sort_types'].append((sorting_url, text, is_active, sort_link))
 
+        if context['page_obj'].has_next():
+            context['page_obj_next'] = context['paginator'].page(context['page_obj'].next_page_number())
         return context
 
     def get_products(self, **kwargs):
