@@ -26,8 +26,8 @@ class FacetedSearchView(views.JSONResponseMixin, views.AjaxResponseMixin, CoreFa
     paginate_by = OSCAR_PRODUCTS_PER_PAGE
 
     def post(self, request, *args, **kwargs):
-        if request.is_ajax() and request.GET.get('q', False):
-            return self.get_ajax(request)
+        # if request.is_ajax() and request.GET.get('q', False):
+        #     return self.get_ajax(request)
         self.kwargs['search_string'] = ''
         if self.request.body:
             data = json.loads(self.request.body)
@@ -41,18 +41,7 @@ class FacetedSearchView(views.JSONResponseMixin, views.AjaxResponseMixin, CoreFa
     def get_ajax(self, request, *args, **kwargs):
         self.kwargs['search_string'] = self.request.GET.get('q')
         self.products = self.get_products()
-
-    # def ajax(self, **kwargs):
-    #     self.kwargs['search_string'] = self.request.GET.get('q')
-        # kwargs['object_list'] = kwargs.get('object_list', '')
-        # self.get_context_data()
-        # self.kwargs['search_string'] = 'my str'
-        # print self.kwargs
-        # self.kwargs['searched']
-        # self.ajax()
-        # self.get_context_data()
-        # print self.kwargs
-        # response_data = {'test_data': 'test'}
+        self.kwargs['data_to_context'] = 'data_context'
         # return HttpResponse(json.dumps(response_data), content_type="application/json")
 
     def get_context_data_json(self, **kwargs):

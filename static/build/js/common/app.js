@@ -264,7 +264,15 @@
   app.controller('Search', [
     '$http', '$scope', '$window', '$document', '$location', function($http, $scope, $window, $document, $location) {
       return $scope.submit = function() {
-        return http.get($location.absUrl()).success();
+        return $http.post($location.absUrl(), {
+          'search_string': $scope.search_string
+        }).success(function(data) {
+          $scope.search_string = data.search_string;
+          console.log(data);
+          return console.log($location.absUrl());
+        }).error(function() {
+          return console.error('An error occurred during submission');
+        });
       };
     }
   ]);
