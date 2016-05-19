@@ -83,6 +83,7 @@ class FacetedSearchView(views.JSONResponseMixin, views.AjaxResponseMixin, CoreFa
 
         if context['page_obj'].has_next():
             context['page_obj_next'] = context['paginator'].page(context['page_obj'].next_page_number())
+            context['page_num_next'] = context['page_obj'].next_page_number()
 
         return context
 

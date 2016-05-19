@@ -1121,6 +1121,44 @@ class TestCatalog(TestCase, LiveServerTestCase):
 
         #ToDo taras: add test for scroll
 
+    # def test_show_more_goods_selenium(self):
+    #     test_catalogue.create_product_bulk()
+    #     category = Category.objects.get(name='Category-12')
+    #
+    #     dict_values = {'search_string': 'product'}
+    #     initial_url = ('%s%s' % (self.live_server_url, '/search/?q={0}'.format(dict_values.get('search_string', ''))))
+    #     self.assertions_show_more_goods_selenium(url=initial_url)
+
+    #     initial_url = ('%s%s%s' % (self.live_server_url, category.get_absolute_url(), '?sorting_type=popularity'))
+    #     self.assertions_show_more_goods_selenium(url=initial_url)
+
+    def assertions_show_more_goods_selenium(self, url):
+        initial_url = url
+        self.firefox.get(initial_url)
+        more_goods_button = self.firefox.find_element_by_xpath(".//*[@id='default']/div[1]/div/div[2]/form/div[2]/div[26]/a")
+        more_goods_button.click()
+        time.sleep(10)
+        self.assertIn('Product 1', self.firefox.page_source)
+        self.assertIn('Product 25', self.firefox.page_source)
+        self.assertIn('Product 48', self.firefox.page_source)
+        self.assertIn('Product 49', self.firefox.page_source)
+
+        more_goods_button.click()
+        time.sleep(10)
+        self.assertIn('Product 49', self.firefox.page_source)
+        self.assertIn('Product 72', self.firefox.page_source)
+        self.assertIn('Product 73', self.firefox.page_source)
+
+        # ToDo taras: make something for test paginator state
+        # self.assertInHTML("""<li class="active">
+        #                   <a href="?page=1&q=product&sorting_type=popularity">1</a>
+        #                   </li>
+        #                   <li class="active">
+        #                   <a href="?page=2&q=product&sorting_type=popularity">2</a>
+        #                   </li>""", self.firefox.page_source)
+
+
+
 
 
 
