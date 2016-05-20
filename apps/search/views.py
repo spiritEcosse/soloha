@@ -26,8 +26,8 @@ class FacetedSearchView(views.JSONResponseMixin, views.AjaxResponseMixin, CoreFa
     paginate_by = OSCAR_PRODUCTS_PER_PAGE
 
     def post(self, request, *args, **kwargs):
-        if request.is_ajax() and request.GET.get('q', False):
-            return self.get_ajax(request)
+        # if request.is_ajax() and request.GET.get('q', False):
+        #     return self.get_ajax(request)
         self.kwargs['search_string'] = ''
         if self.request.body:
             data = json.loads(self.request.body)
@@ -85,8 +85,8 @@ class FacetedSearchView(views.JSONResponseMixin, views.AjaxResponseMixin, CoreFa
 
         # raise Exception(context['paginator'].page(context['page_obj'].next_page_number()).object_list)
         if context['page_obj'].has_next():
-            # context['page_obj_next'] = context['paginator'].page(context['page_obj'].next_page_number()).object_list
-            context['page_obj_next'] = context['paginator'].page(context['page_obj'].next_page_number())
+            context['page_obj_next'] = context['paginator'].page(context['page_obj'].next_page_number()).object_list
+            # context['page_obj_next'] = context['paginator'].page(context['page_obj'].next_page_number())
             context['page_num_next'] = context['page_obj'].next_page_number()
 
         # self.kwargs['page_obj_next'] = context['page_obj']

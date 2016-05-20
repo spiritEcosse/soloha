@@ -20,7 +20,8 @@
                 {% if page_num == page_obj.number%}
                     {% for sorting_url, text, is_active, link in sort_types %}
                         {% if is_active %}
-                            <li class="active"><a href="?page={{ page_num }}&{{ link }}">{{ page_num }}</a></li>
+{#                            <li class="active"><a href="?page={{ page_num }}&{{ link }}">{{ page_num }}</a></li>#}
+                            <li class="active"><a>{{ page_num }}</a></li>
 {#                             this is for more_goods button#}
 {#                            {% if page_num_next %}#}
 {#                                <li class="active"><a href="?page={{ page_num_next }}&{{ link }}">{{ page_num_next }}</a></li>#}
