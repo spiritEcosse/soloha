@@ -10,7 +10,7 @@
                     <li>
                         {% for sorting_url, text, is_active, link in sort_types %}
                             {% if is_active %}
-                                <a href="?page={{ page_obj.previous_page_number }}" aria-label="Previous">
+                                <a href="?page={{ page_obj.previous_page_number }}&{{ link }}" aria-label="Previous">
                             {% endif %}
                         {% endfor %}
                         <span aria-hidden="true">&laquo;</span></a>
@@ -21,9 +21,10 @@
                     {% for sorting_url, text, is_active, link in sort_types %}
                         {% if is_active %}
                             <li class="active"><a href="?page={{ page_num }}&{{ link }}">{{ page_num }}</a></li>
-                            {% if page_num_next %}
-                                <li class="active"><a href="?page={{ page_num_next }}&{{ link }}">{{ page_num_next }}</a></li>
-                            {% endif %}
+{#                             this is for more_goods button#}
+{#                            {% if page_num_next %}#}
+{#                                <li class="active"><a href="?page={{ page_num_next }}&{{ link }}">{{ page_num_next }}</a></li>#}
+{#                            {% endif %}#}
                         {% endif %}
                     {% endfor %}
                 {% elif page_num == None %}
@@ -31,9 +32,10 @@
                 {% else %}
                     {% for sorting_url, text, is_active, link in sort_types %}
                         {% if is_active %}
-                            {% if page_num != page_num_next %}
+{#                            this is for more_goods button#}
+{#                            {% if page_num != page_num_next %}#}
                                 <li><a href="?page={{ page_num }}&{{ link }}">{{ page_num }}</a></li>
-                            {% endif %}
+{#                            {% endif %}#}
                         {% endif %}
                     {% endfor %}
                 {% endif %}
@@ -42,7 +44,7 @@
                 <li class="next">
                     {% for sorting_url, text, is_active, link in sort_types %}
                         {% if is_active %}
-                            <a href="?page={{ page_obj.next_page_number }}" aria-label="Next">
+                            <a href="?page={{ page_obj.next_page_number }}&{{ link }}" aria-label="Next">
                         {% endif %}
                     {% endfor %}
                     <span aria-hidden="true">&raquo;</span>

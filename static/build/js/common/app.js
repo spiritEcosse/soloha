@@ -263,11 +263,21 @@
 
   app.controller('Search', [
     '$http', '$scope', '$window', '$document', '$location', function($http, $scope, $window, $document, $location) {
+      $http.get($location.absUrl(), {
+        'search_string': $scope.search_string,
+        'test': 'test data'
+      }).success(function(data) {
+        return console.log(data);
+      }).error(function() {
+        return console.error('An error occurred during submission');
+      });
       return $scope.submit = function() {
         return $http.post($location.absUrl(), {
-          'search_string': $scope.search_string
+          'search_string': $scope.search_string,
+          'more_goods': $scope.more_goods
         }).success(function(data) {
           $scope.search_string = data.search_string;
+          $scope.more_goods = data.more_goods;
           console.log(data);
           return console.log($location.absUrl());
         }).error(function() {

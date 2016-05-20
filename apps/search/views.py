@@ -27,6 +27,7 @@ class FacetedSearchView(views.JSONResponseMixin, views.AjaxResponseMixin, CoreFa
 
     def post(self, request, *args, **kwargs):
         # if request.is_ajax() and request.GET.get('q', False):
+        #     self.kwargs['more_goods'] = 'more_goods'
         #     return self.get_ajax(request)
         self.kwargs['search_string'] = ''
         if self.request.body:
@@ -41,13 +42,14 @@ class FacetedSearchView(views.JSONResponseMixin, views.AjaxResponseMixin, CoreFa
     def get_ajax(self, request, *args, **kwargs):
         self.kwargs['search_string'] = self.request.GET.get('q')
         self.products = self.get_products()
-        self.kwargs['data_to_context'] = 'data_context'
-        # return HttpResponse(json.dumps(response_data), content_type="application/json")
+        response_data = {'data': 'response_data'}
+        return HttpResponse(json.dumps(response_data), content_type="application/json")
 
     def get_context_data_json(self, **kwargs):
         context = dict()
         context['searched_products'] = self.products
         context['search_string'] = self.kwargs['search_string']
+        # context['more_goods'] = self.kwargs.get('more_goods', '')
         return context
 
     def get(self, request, *args, **kwargs):
@@ -56,6 +58,7 @@ class FacetedSearchView(views.JSONResponseMixin, views.AjaxResponseMixin, CoreFa
                                       'price_descending': '-stockrecords__price_excl_tax'}
 
         self.kwargs['sorting_type'] = dict_new_sorting_types.get(self.request.GET.get('sorting_type'), '-views_count')
+        # self.kwargs['page'] = self.request.GET.get('page')
         return super(FacetedSearchView, self).get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -85,6 +88,7 @@ class FacetedSearchView(views.JSONResponseMixin, views.AjaxResponseMixin, CoreFa
             context['page_obj_next'] = context['paginator'].page(context['page_obj'].next_page_number())
             context['page_num_next'] = context['page_obj'].next_page_number()
 
+        self.kwargs['page_obj_next'] = context['page_obj']
         return context
 
     def get_products(self, **kwargs):
