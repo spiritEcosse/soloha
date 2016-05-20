@@ -85,6 +85,8 @@
                         {% include "catalogue/partials/product.html" %}
                     </div>
                 {% endfor %}
+                <input type="hidden" id="myVar" name="variable" value="{{ page_obj_next }}">
+
 {#                {% if page_obj_next %}#}
 {#                    {% for product in page_obj_next %}#}
 {#                        <div class="col-sm-6 col-md-6">#}
@@ -97,6 +99,7 @@
 {#                    {% csrf_token %}#}
                     <a href="#" class="more_products" ng-click="submit()"> {#  onclick="location.href='/test/'" #}
                         {% verbatim %}
+                        {{ page_obj_next }}
                             {{ search_string }}
                         {% endverbatim %}
                         ПОКАЗАТЬ ЕЩЕ

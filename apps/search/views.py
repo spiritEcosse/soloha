@@ -26,9 +26,8 @@ class FacetedSearchView(views.JSONResponseMixin, views.AjaxResponseMixin, CoreFa
     paginate_by = OSCAR_PRODUCTS_PER_PAGE
 
     def post(self, request, *args, **kwargs):
-        # if request.is_ajax() and request.GET.get('q', False):
-        #     self.kwargs['more_goods'] = 'more_goods'
-        #     return self.get_ajax(request)
+        if request.is_ajax() and request.GET.get('q', False):
+            return self.get_ajax(request)
         self.kwargs['search_string'] = ''
         if self.request.body:
             data = json.loads(self.request.body)
@@ -42,8 +41,8 @@ class FacetedSearchView(views.JSONResponseMixin, views.AjaxResponseMixin, CoreFa
     def get_ajax(self, request, *args, **kwargs):
         self.kwargs['search_string'] = self.request.GET.get('q')
         self.products = self.get_products()
-        response_data = {'data': 'response_data'}
-        return HttpResponse(json.dumps(response_data), content_type="application/json")
+        # response_data = {'dataa': 'response_data'}
+        # return HttpResponse(json.dumps(response_data), content_type="application/json")
 
     def get_context_data_json(self, **kwargs):
         context = dict()
@@ -84,11 +83,13 @@ class FacetedSearchView(views.JSONResponseMixin, views.AjaxResponseMixin, CoreFa
             sort_link = 'q={}&sorting_type={}'.format(context['query'], link)
             context['sort_types'].append((sorting_url, text, is_active, sort_link))
 
+        # raise Exception(context['paginator'].page(context['page_obj'].next_page_number()).object_list)
         if context['page_obj'].has_next():
+            # context['page_obj_next'] = context['paginator'].page(context['page_obj'].next_page_number()).object_list
             context['page_obj_next'] = context['paginator'].page(context['page_obj'].next_page_number())
             context['page_num_next'] = context['page_obj'].next_page_number()
 
-        self.kwargs['page_obj_next'] = context['page_obj']
+        # self.kwargs['page_obj_next'] = context['page_obj']
         return context
 
     def get_products(self, **kwargs):
