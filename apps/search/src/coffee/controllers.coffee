@@ -13,22 +13,22 @@ app.config ['$httpProvider', ($httpProvider) ->
 
 app.controller 'Search', ['$http', '$scope', '$window', '$document', '$location', ($http, $scope, $window, $document, $location) ->
 
-  myVar = document.getElementById("myVar").value
-
-#  $http.get($location.absUrl(), {'search_string': $scope.search_string}).success (data) ->
-#      console.log(data)
-#      console.log(myVar)
-#      console.log($location.absUrl())
-#  .error ->
-#      console.error('An error occurred during submission')
+  goods = document.getElementById("goods").value
 
   $scope.submit = ->
-    $http.post($location.absUrl(), {'search_string': $scope.search_string, 'page_obj_next': $scope.page_obj_next}).success (data) ->
+    $http.post($location.absUrl(), {'search_string': $scope.search_string, 'more_goods': goods}).success (data) ->
       $scope.search_string = data.search_string
-      $scope.more_goods = data.more_goods
-      $scope.page_obj_next = myVar
-      console.log(data)
+      $scope.more_goods = goods
+#      $scope.page_obj_next = goods
+      console.log($scope.more_goods)
+#      console.log(goods)
     .error ->
       console.error('An error occurred during submission')
 
+#    $http.get($location.absUrl(), {'search_string': $scope.search_string, 'more_goods': goods}).success (data) ->
+#      console.log(data)
+#      console.log(goods)
+#      console.log($location.absUrl())
+#    .error ->
+#      console.error('An error occurred during submission')
 ]

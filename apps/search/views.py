@@ -13,6 +13,9 @@ from apps.catalogue.models import Feature
 from django.http import HttpResponse
 from django.db.models import Count
 from django.db.models import Q
+from django.template.loader import render_to_string
+from django.shortcuts import render
+from django.shortcuts import render_to_response
 
 Product = get_model('catalogue', 'product')
 
@@ -26,12 +29,19 @@ class FacetedSearchView(views.JSONResponseMixin, views.AjaxResponseMixin, CoreFa
     paginate_by = OSCAR_PRODUCTS_PER_PAGE
 
     def post(self, request, *args, **kwargs):
-        # if request.is_ajax() and request.GET.get('q', False):
-        #     return self.get_ajax(request)
+        # if self.request.is_ajax() and self.request.GET.get('q'):
+        #     data = json.loads(self.request.body)
+        #     self.kwargs['more_goods'] = data.get('more_goods', '')
+        #     self.kwargs['search_string'] = data.get('search_string', '')
+        #     self.products = self.get_products()
+        #     return render(request, self.template_name, {"more_goods": self.kwargs.get('more_goods', 'empty')})
+            # self.get_ajax(request)
+
         self.kwargs['search_string'] = ''
         if self.request.body:
             data = json.loads(self.request.body)
             self.kwargs['search_string'] = data.get('search_string', '')
+            # self.kwargs['more_goods'] = data.get('more_goods', '')
         self.products = self.get_products()
 
     def post_ajax(self, request, *args, **kwargs):
@@ -41,7 +51,10 @@ class FacetedSearchView(views.JSONResponseMixin, views.AjaxResponseMixin, CoreFa
     def get_ajax(self, request, *args, **kwargs):
         self.kwargs['search_string'] = self.request.GET.get('q')
         self.products = self.get_products()
-        # response_data = {'dataa': 'response_data'}
+        # response_data = {'more_goods': ''}
+        # if self.kwargs.get('more_goods', ''):
+        #     response_data['more_goods'] = self.kwargs['more_goods']
+        return render(request, self.template_name, {"more_goods": self.kwargs.get('more_goods', 'empty')})
         # return HttpResponse(json.dumps(response_data), content_type="application/json")
 
     def get_context_data_json(self, **kwargs):
@@ -57,11 +70,12 @@ class FacetedSearchView(views.JSONResponseMixin, views.AjaxResponseMixin, CoreFa
                                       'price_descending': '-stockrecords__price_excl_tax'}
 
         self.kwargs['sorting_type'] = dict_new_sorting_types.get(self.request.GET.get('sorting_type'), '-views_count')
-        # self.kwargs['page'] = self.request.GET.get('page')
         return super(FacetedSearchView, self).get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super(FacetedSearchView, self).get_context_data(**kwargs)
+        # print (self.kwargs.get('more_goods', 'empty'))
+
         context['query'] = self.kwargs['search_string']
 
         queryset_filters = Feature.objects.filter(filter_products__in=self.products_without_filters).distinct().prefetch_related('filter_products')
@@ -89,7 +103,6 @@ class FacetedSearchView(views.JSONResponseMixin, views.AjaxResponseMixin, CoreFa
             # context['page_obj_next'] = context['paginator'].page(context['page_obj'].next_page_number())
             context['page_num_next'] = context['page_obj'].next_page_number()
 
-        # self.kwargs['page_obj_next'] = context['page_obj']
         return context
 
     def get_products(self, **kwargs):

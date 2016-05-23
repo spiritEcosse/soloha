@@ -84,7 +84,20 @@
                         {% include "catalogue/partials/product.html" %}
                     </div>
                 {% endfor %}
-                <input type="hidden" id="myVar" name="variable" value="{{ page_obj_next }}">
+                <input type="hidden" id="goods" name="variable" value="{{ page_obj_next }}">
+                {#ToDo taras: show more goods when corresponding button clicked #}
+                {{ more_goods }}
+                {#                {% if more_goods %}#}
+{#                    {{ more_goods }}#}
+{#                {% endif %}#}
+{#                {% if more_goods %}#}
+{#                    {% for product in more_goods %}#}
+{#                        <div class="col-sm-6 col-md-6">#}
+{#                            {% include "catalogue/partials/product.html" %}#}
+{#                        </div>#}
+{#                    {% endfor %}#}
+{#                {% endif %}#}
+
 {#                {% verbatim %}#}
 {#                <div class="col-sm-6 col-md-6" ng-repeat="product in page_obj_next track by $index">#}
 {#                <ng-include src="catalogue/partials/product.html"></ng-include>#}
@@ -99,11 +112,8 @@
 {#                {% endif %}#}
                 <div class="clearfix"></div>
                 <div name="more_products" class="col-xs-6 col-xs-offset-8 wrapper" action=".">
-{#                    {% csrf_token %}#}
+                    {% csrf_token %}
                     <a href="#" class="more_products" ng-click="submit()"> {#  onclick="location.href='/test/'" #}
-                        {% verbatim %}
-                            {{ search_string }}
-                        {% endverbatim %}
                         ПОКАЗАТЬ ЕЩЕ
                     </a>
                 </div>
