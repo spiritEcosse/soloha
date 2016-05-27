@@ -262,17 +262,32 @@
   ]);
 
   app.controller('Search', [
-    '$http', '$scope', '$window', '$document', '$location', function($http, $scope, $window, $document, $location) {
-      var goods;
-      goods = document.getElementById("goods").value;
+    '$http', '$scope', '$window', '$document', '$location', '$routeParams', function($http, $scope, $window, $document, $location, $routeParams) {
+      $http.post($location.absUrl()).success(function(data) {
+        $scope.products = data.products;
+        console.log($scope.products);
+        return $scope.page_number = data.page_number;
+      }).error(function() {
+        return console.error('An error occurred during submission');
+      });
       return $scope.submit = function() {
         return $http.post($location.absUrl(), {
           'search_string': $scope.search_string,
           'more_goods': goods
         }).success(function(data) {
-          $scope.search_string = data.search_string;
-          $scope.more_goods = goods;
-          return console.log($scope.more_goods);
+          var href, id, image, items, title;
+          id = angular.element(document).find('id');
+          href = angular.element(document).find('href');
+          title = angular.element(document).find('title');
+          image = angular.element(document).find('image');
+          items = angular.element(document).find('row items');
+          items.attr('ng-repeat', 'product in products');
+          id.innerHTML = 'data.product.id';
+          href.innerHTML = 'data.product.href';
+          title.innerHTML = 'data.product.title';
+          image.innerHTML = 'data.product.image';
+          console.log($scope.products);
+          return console.log($scope.page_number);
         }).error(function() {
           return console.error('An error occurred during submission');
         });

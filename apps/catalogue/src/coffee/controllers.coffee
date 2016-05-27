@@ -129,4 +129,8 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
     $scope.product.price = product_versions[selected_attributes.toString()]
     console.log(product_versions)
     console.log(selected_attributes.toString())
+
 ]
+
+
+

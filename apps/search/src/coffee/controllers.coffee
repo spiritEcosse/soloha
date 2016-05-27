@@ -11,24 +11,30 @@ app.config ['$httpProvider', ($httpProvider) ->
   $httpProvider.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest'
 ]
 
-app.controller 'Search', ['$http', '$scope', '$window', '$document', '$location', ($http, $scope, $window, $document, $location) ->
+app.controller 'Search', ['$http', '$scope', '$window', '$document', '$location', '$routeParams', ($http, $scope, $window, $document, $location, $routeParams) ->
 
-  goods = document.getElementById("goods").value
+  $http.post($location.absUrl()).success (data) ->
+#    console.log($scope.search_string)
+    $scope.products = data.products
+    console.log($scope.products)
+    $scope.page_number = data.page_number
+  .error ->
+    console.error('An error occurred during submission')
 
   $scope.submit = ->
     $http.post($location.absUrl(), {'search_string': $scope.search_string, 'more_goods': goods}).success (data) ->
-      $scope.search_string = data.search_string
-      $scope.more_goods = goods
-#      $scope.page_obj_next = goods
-      console.log($scope.more_goods)
-#      console.log(goods)
+      id = angular.element(document).find('id')
+      href = angular.element(document).find('href')
+      title = angular.element(document).find('title')
+      image = angular.element(document).find('image')
+      items = angular.element(document).find('row items')
+      items.attr('ng-repeat', 'product in products')
+      id.innerHTML='data.product.id'
+      href.innerHTML='data.product.href'
+      title.innerHTML='data.product.title'
+      image.innerHTML='data.product.image'
+      console.log($scope.products)
+      console.log($scope.page_number)
     .error ->
       console.error('An error occurred during submission')
-
-#    $http.get($location.absUrl(), {'search_string': $scope.search_string, 'more_goods': goods}).success (data) ->
-#      console.log(data)
-#      console.log(goods)
-#      console.log($location.absUrl())
-#    .error ->
-#      console.error('An error occurred during submission')
 ]

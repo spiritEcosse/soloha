@@ -86,7 +86,7 @@
                 {% endfor %}
                 <input type="hidden" id="goods" name="variable" value="{{ page_obj_next }}">
                 {#ToDo taras: show more goods when corresponding button clicked #}
-                {{ more_goods }}
+
                 {#                {% if more_goods %}#}
 {#                    {{ more_goods }}#}
 {#                {% endif %}#}
@@ -98,11 +98,9 @@
 {#                    {% endfor %}#}
 {#                {% endif %}#}
 
-{#                {% verbatim %}#}
-{#                <div class="col-sm-6 col-md-6" ng-repeat="product in page_obj_next track by $index">#}
+{#                <div class="col-sm-6 col-md-6" ng-repeat="product in products">#}
 {#                <ng-include src="catalogue/partials/product.html"></ng-include>#}
 {#                </div>#}
-{#                {% endverbatim %}#}
 {#                {% if page_obj_next %}#}
 {#                    {% for product in page_obj_next %}#}
 {#                        <div class="col-sm-6 col-md-6">#}

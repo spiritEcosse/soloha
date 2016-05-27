@@ -9,20 +9,20 @@
         <div class="caption">
             <div class="title">
                 {% block product_title %}
-                    <a href="{{ product.get_absolute_url }}" title="{{ product.get_title }}">{{ product.get_title|truncatewords:7 }}</a>
+                    <a id="href" href="{{ product.get_absolute_url }}" id="title" title="{{ product.get_title }}">{{ product.get_title|truncatewords:7 }}</a>
                 {% endblock %}
             </div>
             {% block product_image %}
                 <div class="image_container">
                     {% with image=product.primary_image %}
                         {% thumbnail image 220x165 crop as thumb %}
-                        <a class="image" href="{{ product.get_absolute_url }}">
+                        <a id="image" class="image" href="{{ product.get_absolute_url }}">
                             <img src="{{ thumb.url }}" alt="{{ product.get_title }}" title="{{ product.get_title }}">
                         </a>
                     {% endwith %}
                 </div>
             {% endblock %}
-            <div class="model">Артикул {{ product.id }}</div>
+            <div id="id" class="model">Артикул {{ product.id }}</div>
             <div class="price">
                 {% block product_price %}
                     <div class="product_price">
@@ -39,7 +39,7 @@
         </div>
         <div class="mask">
             <div class="title">
-                <a href="{{ product.get_absolute_url }}">{{ product.get_title|truncatewords:7 }}</a>
+                <a id="href" href="{{ product.get_absolute_url }}">{{ product.get_title|truncatewords:7 }}</a>
             </div>
             <div class="filters">
                 <div class="rows">
