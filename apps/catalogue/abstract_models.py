@@ -453,6 +453,19 @@ class CustomAbstractProduct(models.Model):
         return self.reviews.filter(
             status=self.reviews.model.APPROVED).count()
 
+    def get_data(self, names_fields):
+        """
+        get values by name field
+        :param names_fields: name fields in this object
+        :return: dict
+        Example
+            {'pk': 1, title: 'Product'}
+        """
+        data = {}
+        for name_field in names_fields:
+            data[name_field] = getattr(self, name_field)
+        return data
+
     def get_values(self):
         values = dict()
         values['title'] = strip_entities(self.title)
@@ -501,6 +514,19 @@ class AbstractFeature(MPTTModel):
 
     def get_absolute_url(self):
         return self.slug
+
+    def get_values(self, names_fields):
+        """
+        get values by name field
+        :param names_fields: name fields in this object
+        :return: dict
+        Example
+            {'pk': 1, title: 'Feature'}
+        """
+        data = {}
+        for name_field in names_fields:
+            data[name_field] = getattr(self, name_field)
+        return data
 
 
 @python_2_unicode_compatible

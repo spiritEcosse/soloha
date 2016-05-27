@@ -158,14 +158,36 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
         start_option = [{'id': 0, 'title': NOT_SELECTED}]
 
         for attr in self.get_attributes():
-            values = start_option + [{'id': value.pk, 'title': value.title} for value in attr.values]
-            context['attributes'].append({'pk': attr.pk, 'title': attr.title, 'values': values})
-
-        self.get_product_attribute_values()
+            values = start_option + [{'id': value.id, 'title': value.title} for value in attr.values]
+            context['attributes'].append({'id': attr.id, 'title': attr.title, 'values': values})
 
         context['options'] = [{prod_option.option.pk: prod_option.price_retail} for prod_option in ProductOptions.objects.filter(product=self.object)]
         self.get_price(context)
         context['not_selected'] = NOT_SELECTED
+        context['variant_attributes'] = {}
+
+        def get_values_in_group(value):
+            data = value.get_values(('id', 'title'))
+            data.update({'group': 'in_group'})
+            return data
+
+        def get_values_out_group(value):
+            data = value.get_values(('id', 'title'))
+            data.update({'group': 'out_group'})
+            return data
+
+        for attribute in self.get_product_attribute_values():
+            attributes = []
+
+            for attr in self.get_attributes_for_attribute(attribute):
+                attributes.append({
+                    'id': attr.id,
+                    'title': attr.title,
+                    'in_group': start_option + map(get_values_in_group, attr.values_in_group),
+                    'values': start_option + map(get_values_in_group, attr.values_in_group) + map(get_values_out_group, attr.values_out_group)
+                })
+
+            context['variant_attributes'][attribute.pk] = attributes
 
         product_versions_attributes = {}
         product_versions = self.product_versions_queryset().first()
@@ -181,23 +203,25 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
         return ProductVersion.objects.filter(product=self.object).prefetch_related('attributes').order_by('price_retail')
 
     def get_product_attribute_values(self):
-        only = ['title', 'pk']
+        only = ['pk']
         return Feature.objects.only(*only).filter(level=1, product_versions__product=self.object).distinct().order_by()
 
     def get_attributes_for_attribute(self, attribute):
         only = ['title', 'pk']
+        values_in_group = Feature.objects.only(*only).filter(
+            level=1, product_versions__product=self.object, product_versions__attributes=attribute
+        )
+
         return Feature.objects.only(*only).filter(
             children__product_versions__product=self.object, level=0
         ).prefetch_related(
-            Prefetch('children', queryset=Feature.objects.only(*only).filter(
-                level=1, product_versions__product=self.object, product_versions__attributes=attribute
-            ).annotate(
+            Prefetch('children', queryset=values_in_group.annotate(
                 price=Min('product_versions__price_retail')
             ).order_by('price', 'title', 'pk'), to_attr='values_in_group'),
             Prefetch('children', queryset=Feature.objects.only(*only).filter(
                 level=1, product_versions__product=self.object
             ).exclude(
-                version_attributes__attribute=attribute
+                version_attributes__attribute__in=values_in_group.order_by().distinct()
             ).annotate(
                 price=Min('product_versions__price_retail')
             ).order_by('price', 'title', 'pk'), to_attr='values_out_group')

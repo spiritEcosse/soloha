@@ -19,40 +19,58 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
   selected_attributes = []
   attributes = []
   product_versions = []
+  clone_data = null
 
   $http.post($location.absUrl()).success (data) ->
+    clone_data = data
     if data.price
       $scope.product.price = data.price
     else
       $scope.product.product_not_availability = data.product_not_availability
     product_versions = data.product_versions
 
-    console.log($scope.product.price)
-
     angular.forEach data.attributes, (attr) ->
-      attributes.push(attr.pk)
-      $scope.product.values[attr.pk] = attr.values
-      $scope.product.attributes[attr.pk] = $scope.product.values[attr.pk][0]
+      attributes.push(attr.id)
+      $scope.product.values[attr.id] = attr.values
+      $scope.product.attributes[attr.id] = $scope.product.values[attr.id][0]
 
-      if data.product_version_attributes[attr.pk]
-        $scope.product.attributes[attr.pk] = data.product_version_attributes[attr.pk]
+      if data.product_version_attributes[attr.id]
+        $scope.product.attributes[attr.id] = data.product_version_attributes[attr.id]
 
-      console.log($scope.product.values[attr.pk][0])
-      el = angular.element(document).find('#attribute-' + attr.pk)
-      el.attr('ng-model', 'product.attributes[' + attr.pk + ']')
-      el.attr('ng-options', 'value.title group by value.group for value in product.values[' + attr.pk + '] track by value.id')
-      el.attr('ng-change', 'update_price()')
+      el = angular.element(document).find('#attribute-' + attr.id)
+      el.attr('ng-model', 'product.attributes[' + attr.id + ']')
+      el.attr('ng-options', 'value.title group by value.group for value in product.values[' + attr.id + '] track by value.id')
+      el.attr('ng-change', 'update_price(' + attr.id + ')')
       $compile(el)($scope)
   .error ->
     console.error('An error occurred during submission')
 
-  $scope.update_price = () ->
+  $scope.update_price = (attr_id) ->
     selected_attributes = []
     angular.forEach attributes, (key) ->
-      console.log($scope.product.attributes[key].id)
-
       if $scope.product.attributes[key].id != 0
         selected_attributes.push($scope.product.attributes[key].id)
-    #Todo igor: if selected_attributes is empty - message select - attribute for display price
-    $scope.product.price = product_versions[selected_attributes.toString()]
+#    Todo igor: if selected_attributes is empty - message select - attribute for display price
+
+    if selected_attributes.toString() in product_versions
+      $scope.product.price = product_versions[selected_attributes.toString()]
+    else
+      angular.forEach clone_data.variant_attributes[$scope.product.attributes[attr_id].id], (attr) ->
+        $scope.product.values[attr.id] = attr.values
+
+        if $scope.product.values[attr.id]
+          $scope.product.attributes[attr.id] = $scope.product.values[attr.id][0]
+
+        if attr.in_group[1]
+          $scope.product.attributes[attr.id] = attr.in_group[1]
+
+      selected_attributes = []
+      angular.forEach attributes, (key) ->
+        if $scope.product.attributes[key].id != 0
+          selected_attributes.push($scope.product.attributes[key].id)
+
+      console.log(selected_attributes.toString())
+      console.log(product_versions)
+      if selected_attributes.toString() in product_versions
+        $scope.product.price = product_versions[selected_attributes.toString()]
 ]

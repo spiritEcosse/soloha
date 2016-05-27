@@ -238,7 +238,7 @@ class TestCatalog(LiveServerTestCase):
         :return:
         """
         test_catalogue.create_product_bulk()
-        product = factories.create_product(slug='product-attributes', title='Product attributes', price=D(random.randint(1, 10000)))
+        product = factories.create_product(slug='product-attributes', title='Product attributes', price=5)
         test_catalogue.create_dynamic_attributes(product)
         attributes = list(self.get_product_attributes(product=product))
 
@@ -647,6 +647,42 @@ class TestCatalog(LiveServerTestCase):
         context = dict()
         context['products'] = [product.get_values() for product in products]
         self.assertJSONEqual(json.dumps(context), response.content)
+
+    def test_feature_get_values(self):
+        """
+        test get_values from model Feature
+        :return:
+        """
+        feature = Feature.objects.create(title='Feature 1')
+        real_data = feature.get_values(('pk', ))
+        expected = {'pk': feature.pk}
+        self.assertDictEqual(expected, real_data)
+
+        real_data = feature.get_values(('pk', 'title', 'slug'))
+        expected = {'pk': feature.pk, 'title': feature.title, 'slug': feature.slug}
+        self.assertDictEqual(expected, real_data)
+
+        real_data = feature.get_values(())
+        expected = {}
+        self.assertDictEqual(expected, real_data)
+
+    def test_get_values_by_name_field(self):
+        """
+        test get_data from model Product
+        :return:
+        """
+        product = factories.create_product(title='Product_1')
+        real_data = product.get_data(['pk'])
+        expected = {'pk': product.pk}
+        self.assertDictEqual(expected, real_data)
+
+        real_data = product.get_data(['pk', 'title', 'slug'])
+        expected = {'pk': product.pk, 'title': product.title, 'slug': product.slug}
+        self.assertDictEqual(expected, real_data)
+
+        real_data = product.get_data([])
+        expected = {}
+        self.assertDictEqual(expected, real_data)
 
     def test_page_category_sorting_buttons(self):
         test_catalogue.create_product_bulk()
