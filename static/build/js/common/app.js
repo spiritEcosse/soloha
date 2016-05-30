@@ -35,7 +35,7 @@
 
   app.controller('Product', [
     '$http', '$scope', '$window', '$document', '$location', '$compile', function($http, $scope, $window, $document, $location, $compile) {
-      var attributes, clone_data, product_versions, selected_attributes;
+      var attributes, auto_change, clone_data, product_versions, selected_attributes;
       $scope.product = [];
       $scope.product.values = [];
       $scope.product.attributes = [];
@@ -43,6 +43,7 @@
       attributes = [];
       product_versions = [];
       clone_data = null;
+      auto_change = false;
       $http.post($location.absUrl()).success(function(data) {
         clone_data = data;
         if (data.price) {
@@ -63,41 +64,59 @@
           el.attr('ng-model', 'product.attributes[' + attr.id + ']');
           el.attr('ng-options', 'value.title group by value.group for value in product.values[' + attr.id + '] track by value.id');
           el.attr('ng-change', 'update_price(' + attr.id + ')');
+          el.attr('md-on-open', 'enable_select(' + attr.id + ')');
+          el.attr('attr-dis', '1');
           return $compile(el)($scope);
         });
       }).error(function() {
         return console.error('An error occurred during submission');
       });
+      $scope.enable_select = function(attr_id) {
+        var el;
+        el = angular.element(document).find('#attribute-' + attr_id);
+        el.attr('attr-dis', '1');
+        return $compile(el)($scope);
+      };
       return $scope.update_price = function(attr_id) {
-        var _ref, _ref1;
-        selected_attributes = [];
-        angular.forEach(attributes, function(key) {
-          if ($scope.product.attributes[key].id !== 0) {
-            return selected_attributes.push($scope.product.attributes[key].id);
-          }
-        });
-        if (_ref = selected_attributes.toString(), __indexOf.call(product_versions, _ref) >= 0) {
-          return $scope.product.price = product_versions[selected_attributes.toString()];
-        } else {
-          angular.forEach(clone_data.variant_attributes[$scope.product.attributes[attr_id].id], function(attr) {
-            $scope.product.values[attr.id] = attr.values;
-            if ($scope.product.values[attr.id]) {
-              $scope.product.attributes[attr.id] = $scope.product.values[attr.id][0];
-            }
-            if (attr.in_group[1]) {
-              return $scope.product.attributes[attr.id] = attr.in_group[1];
-            }
-          });
+        var el, _ref, _ref1;
+        el = angular.element(document).find('#attribute-' + attr_id);
+        if (el.attr('attr-dis') !== '0') {
           selected_attributes = [];
           angular.forEach(attributes, function(key) {
             if ($scope.product.attributes[key].id !== 0) {
               return selected_attributes.push($scope.product.attributes[key].id);
             }
           });
-          console.log(selected_attributes.toString());
-          console.log(product_versions);
-          if (_ref1 = selected_attributes.toString(), __indexOf.call(product_versions, _ref1) >= 0) {
+          if (_ref = selected_attributes.toString(), __indexOf.call(product_versions, _ref) >= 0) {
             return $scope.product.price = product_versions[selected_attributes.toString()];
+          } else {
+            angular.forEach(clone_data.variant_attributes[$scope.product.attributes[attr_id].id], function(attr) {
+              console.log(attr.id);
+              el = angular.element(document).find('#attribute-' + attr.id);
+              el.attr('attr-dis', '0');
+              $compile(el)($scope);
+              $scope.product.values[attr.id] = attr.values;
+              if ($scope.product.values[attr.id]) {
+                $scope.product.attributes[attr.id] = $scope.product.values[attr.id][0];
+              }
+              if (attr.in_group[1]) {
+                return $scope.product.attributes[attr.id] = attr.in_group[1];
+              }
+            });
+            el = angular.element(document).find('#attribute-' + attr_id);
+            el.attr('attr-dis', '1');
+            $compile(el)($scope);
+            selected_attributes = [];
+            angular.forEach(attributes, function(key) {
+              if ($scope.product.attributes[key].id !== 0) {
+                return selected_attributes.push($scope.product.attributes[key].id);
+              }
+            });
+            console.log(selected_attributes);
+            if (_ref1 = selected_attributes.toString(), __indexOf.call(product_versions, _ref1) >= 0) {
+              $scope.product.price = product_versions[selected_attributes.toString()];
+              return console.log($scope.product.price);
+            }
           }
         }
       };

@@ -22,10 +22,10 @@ CACHE_MIDDLEWARE_SECONDS = 24 * 60 * 60
 CACHE_MIDDLEWARE_KEY_PREFIX = 'soloha_'
 
 MIDDLEWARE_CLASSES = (
-    """START for production"""
+    # """START for production"""
     # 'django.middleware.cache.UpdateCacheMiddleware',
     # 'django.middleware.cache.FetchFromCacheMiddleware',
-    """END for production"""
+    # """END for production"""
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.gzip.GZipMiddleware',

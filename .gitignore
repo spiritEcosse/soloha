@@ -8,7 +8,7 @@ local.py
 **/node_modules/
 **/bower_components/
 /static_root/*
-!/static_root/emptyq
+!/static_root/empty
 .env
 fabfile.py
 db.sqlite3
