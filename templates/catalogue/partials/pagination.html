@@ -21,16 +21,13 @@
                     {% for sorting_url, text, is_active, link in sort_types %}
                         {% if is_active %}
 {#                            <li class="active"><a href="?page={{ page_num }}&{{ link }}">{{ page_num }}</a></li>#}
-                            <li class="active"><a>{{ page_num }}</a></li>
-{#                             this is for more_goods button#}
-{#                            {% if page_num_next %}#}
-{#                                <li class="active"><a href="?page={{ page_num_next }}&{{ link }}">{{ page_num_next }}</a></li>#}
-{#                            {% endif %}#}
+                            <li ng-repeat="page_number in page_numbers" class="active"><a ng-bind="page_number">{{ page_number }}</a></li>
                         {% endif %}
                     {% endfor %}
                 {% elif page_num == None %}
                     <li><a>...</a></li>
                 {% else %}
+
                     {% for sorting_url, text, is_active, link in sort_types %}
                         {% if is_active %}
 {#                            this is for more_goods button#}

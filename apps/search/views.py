@@ -33,21 +33,15 @@ class FacetedSearchView(views.JSONResponseMixin, views.AjaxResponseMixin, CoreFa
             self.kwargs['search_string'] = self.request.GET.get('q')
             self.kwargs['sorting_type'] = '-views_count'
             self.products_on_page = self.get_queryset()
-            # raise Exception(self.products_on_page[0].get_values())
             self.paginator = self.get_paginator(self.products_on_page, OSCAR_PRODUCTS_PER_PAGE)
             self.page_number = request.GET.get('page', '1')
+            if self.request.body:
+                data = json.loads(self.request.body)
+                self.page_number = data.get('page')
+
+            self.products_current_page = self.paginator.page(self.page_number).object_list
             self.paginated_products = self.paginator.page(str(int(self.page_number)+1)).object_list
 
-            # raise Exception(prod)
-        #     data = json.loads(self.request.body)
-        #     self.kwargs['more_goods'] = data.get('more_goods', '')
-        #     self.kwargs['search_string'] = data.get('search_string', '')
-        #     self.products = self.get_products()
-        #     # print self.kwargs['more_goods']
-        # #     return render(request, self.template_name, {"more_goods": self.kwargs.get('more_goods', 'empty')})
-        #     self.get_ajax(request)
-        # self.kwargs['search_string'] = ''
-        #
         if self.request.body:
             data = json.loads(self.request.body)
             self.kwargs['search_string'] = data.get('search_string', '')
@@ -71,9 +65,8 @@ class FacetedSearchView(views.JSONResponseMixin, views.AjaxResponseMixin, CoreFa
         context = dict()
         context['searched_products'] = self.products
         context['search_string'] = self.kwargs['search_string']
-        context['products'] = []
-        for product in self.paginated_products:
-            context['products'].append(product.get_values())
+        context['products'] = self.get_product_values(self.products_current_page)
+        context['products_next_page'] = self.get_product_values(self.paginated_products)
         context['page_number'] = self.page_number
         return context
 
@@ -109,12 +102,6 @@ class FacetedSearchView(views.JSONResponseMixin, views.AjaxResponseMixin, CoreFa
             sorting_url = '{}?q={}&sorting_type={}'.format(self.request.path, context['query'], link)
             sort_link = 'q={}&sorting_type={}'.format(context['query'], link)
             context['sort_types'].append((sorting_url, text, is_active, sort_link))
-
-        # raise Exception(context['paginator'].page(context['page_obj'].next_page_number()).object_list)
-        if context['page_obj'].has_next():
-            context['page_obj_next'] = context['paginator'].page(context['page_obj'].next_page_number()).object_list
-            # context['page_obj_next'] = context['paginator'].page(context['page_obj'].next_page_number())
-            context['page_num_next'] = context['page_obj'].next_page_number()
 
         return context
 
@@ -157,5 +144,13 @@ class FacetedSearchView(views.JSONResponseMixin, views.AjaxResponseMixin, CoreFa
             Prefetch('categories__parent__parent')
         ).distinct().order_by(self.kwargs['sorting_type'])
 
+    def get_product_values(self, products):
+        values = []
+        for product in products:
+            product_values = product.get_values()
+            product_values['id'] = product.id
+            values.append(product_values)
+
+        return values
 
 
