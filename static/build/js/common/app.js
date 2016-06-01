@@ -18,8 +18,7 @@
   'use strict';
 
   /* Controllers */
-  var app, app_name,
-    __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
+  var app, app_name;
 
   app_name = 'soloha';
 
@@ -64,58 +63,49 @@
           el.attr('ng-model', 'product.attributes[' + attr.id + ']');
           el.attr('ng-options', 'value.title group by value.group for value in product.values[' + attr.id + '] track by value.id');
           el.attr('ng-change', 'update_price(' + attr.id + ')');
-          el.attr('md-on-open', 'enable_select(' + attr.id + ')');
           el.attr('attr-dis', '1');
           return $compile(el)($scope);
         });
       }).error(function() {
         return console.error('An error occurred during submission');
       });
-      $scope.enable_select = function(attr_id) {
+      return $scope.update_price = function(attr_id) {
         var el;
         el = angular.element(document).find('#attribute-' + attr_id);
-        el.attr('attr-dis', '1');
-        return $compile(el)($scope);
-      };
-      return $scope.update_price = function(attr_id) {
-        var el, _ref, _ref1;
-        el = angular.element(document).find('#attribute-' + attr_id);
-        if (el.attr('attr-dis') !== '0') {
+        if (el.attr('attr-dis') === '1') {
           selected_attributes = [];
           angular.forEach(attributes, function(key) {
             if ($scope.product.attributes[key].id !== 0) {
               return selected_attributes.push($scope.product.attributes[key].id);
             }
           });
-          if (_ref = selected_attributes.toString(), __indexOf.call(product_versions, _ref) >= 0) {
+          if (product_versions[selected_attributes.toString()]) {
             return $scope.product.price = product_versions[selected_attributes.toString()];
           } else {
             angular.forEach(clone_data.variant_attributes[$scope.product.attributes[attr_id].id], function(attr) {
-              console.log(attr.id);
               el = angular.element(document).find('#attribute-' + attr.id);
               el.attr('attr-dis', '0');
               $compile(el)($scope);
               $scope.product.values[attr.id] = attr.values;
-              if ($scope.product.values[attr.id]) {
-                $scope.product.attributes[attr.id] = $scope.product.values[attr.id][0];
-              }
               if (attr.in_group[1]) {
                 return $scope.product.attributes[attr.id] = attr.in_group[1];
+              } else if ($scope.product.values[attr.id]) {
+                return $scope.product.attributes[attr.id] = $scope.product.values[attr.id][0];
               }
             });
-            el = angular.element(document).find('#attribute-' + attr_id);
-            el.attr('attr-dis', '1');
-            $compile(el)($scope);
+            angular.forEach(attributes, function(key) {
+              el = angular.element(document).find('#attribute-' + key);
+              el.attr('attr-dis', '1');
+              return $compile(el)($scope);
+            });
             selected_attributes = [];
             angular.forEach(attributes, function(key) {
               if ($scope.product.attributes[key].id !== 0) {
                 return selected_attributes.push($scope.product.attributes[key].id);
               }
             });
-            console.log(selected_attributes);
-            if (_ref1 = selected_attributes.toString(), __indexOf.call(product_versions, _ref1) >= 0) {
-              $scope.product.price = product_versions[selected_attributes.toString()];
-              return console.log($scope.product.price);
+            if (product_versions[selected_attributes.toString()]) {
+              return $scope.product.price = product_versions[selected_attributes.toString()];
             }
           }
         }

@@ -260,18 +260,17 @@ class TestCatalog(LiveServerTestCase):
         price_11_21_31 = self.checkout_price_by_selected_attribute(attribute=feature_11, attributes=attributes, product_versions=product_versions)
         self.assertEqual(str(D('2100.00')), price_11_21_31)
 
-        self.checkout_price_by_selected_attribute(attribute=feature_21, attributes=attributes, product_versions=product_versions)
+        self.checkout_price_by_selected_attribute(attribute=feature_21, attributes=attributes, product_versions=product_versions, earlier_price=price_11_21_31)
         self.assertEqual(str(D('2100.00')), price_11_21_31)
 
-        self.checkout_price_by_selected_attribute(attribute=feature_31, attributes=attributes, product_versions=product_versions)
+        self.checkout_price_by_selected_attribute(attribute=feature_31, attributes=attributes, product_versions=product_versions, earlier_price=price_11_21_31)
         self.assertEqual(str(D('2100.00')), price_11_21_31)
 
         price_11_21_32_41 = self.checkout_price_by_selected_attribute(attribute=feature_32, attributes=attributes, product_versions=product_versions)
         self.assertEqual(str(D('4310.10')), price_11_21_32_41)
 
-        self.checkout_price_by_selected_attribute(attribute=feature_41, attributes=attributes, product_versions=product_versions)
+        self.checkout_price_by_selected_attribute(attribute=feature_41, attributes=attributes, product_versions=product_versions, earlier_price=price_11_21_32_41)
         self.assertEqual(str(D('4310.10')), price_11_21_32_41)
-
 
         # selectable_attributes = [feature_11, feature_21, feature_33]
         # price_11_21_33 = self.checkout_price_by_selected_attribute(attribute=attribute, attributes=attributes, product_versions=product_versions)

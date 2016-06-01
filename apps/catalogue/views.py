@@ -168,12 +168,12 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
 
         def get_values_in_group(value):
             data = value.get_values(('id', 'title'))
-            data.update({'group': 'in_group'})
+            data.update({'group': str(_('in_group'))})
             return data
 
         def get_values_out_group(value):
             data = value.get_values(('id', 'title'))
-            data.update({'group': 'out_group'})
+            data.update({'group': str(_('out_group'))})
             return data
 
         for attribute in self.get_product_attribute_values():
