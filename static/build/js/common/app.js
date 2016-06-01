@@ -273,7 +273,7 @@
         clear.remove();
         $scope.products = data.products;
         $scope.page_number = data.page_number;
-        return $scope.page_numbers.push(parseInt($scope.page_number));
+        return $scope.page_range = data.page_range;
       }).error(function() {
         return console.error('An error occurred during submission');
       });
@@ -282,10 +282,13 @@
           'search_string': $scope.search_string,
           'page': $scope.page_number
         }).success(function(data) {
+          var clear;
+          clear = angular.element('.clear_pagination');
+          clear.remove();
           $scope.products = $scope.products.concat(data.products_next_page);
           $scope.page_number = parseInt($scope.page_number) + 1;
-          $scope.page_numbers.push($scope.page_number);
-          return console.log($scope.page_numbers);
+          $scope.pages = data.pages;
+          return console.log($scope.pages);
         }).error(function() {
           return console.error('An error occurred during submission');
         });

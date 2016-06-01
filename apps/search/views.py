@@ -34,11 +34,15 @@ class FacetedSearchView(views.JSONResponseMixin, views.AjaxResponseMixin, CoreFa
             self.kwargs['sorting_type'] = '-views_count'
             self.products_on_page = self.get_queryset()
             self.paginator = self.get_paginator(self.products_on_page, OSCAR_PRODUCTS_PER_PAGE)
+            # raise Exception(self.paginator.page(5).object_list)
             self.page_number = request.GET.get('page', '1')
             if self.request.body:
                 data = json.loads(self.request.body)
                 self.page_number = data.get('page')
+            self.kwargs['url'] = self.request.path
 
+            # self.paginator.page_range.remove(int(self.page_number))
+            # self.page_range = [page for page in self.paginator.page_range if page!=int(self.page_number)]
             self.products_current_page = self.paginator.page(self.page_number).object_list
             self.paginated_products = self.paginator.page(str(int(self.page_number)+1)).object_list
 
@@ -68,6 +72,11 @@ class FacetedSearchView(views.JSONResponseMixin, views.AjaxResponseMixin, CoreFa
         context['products'] = self.get_product_values(self.products_current_page)
         context['products_next_page'] = self.get_product_values(self.paginated_products)
         context['page_number'] = self.page_number
+        # context['page_range'] = dict()
+        # for page in self.paginator.page_range:
+        #     context['page_range']['page'] = page
+        #     context['page_range']['active'] = False
+        context['pages'] = self.get_page_link(self.paginator.page_range)
         return context
 
     def get(self, request, *args, **kwargs):
@@ -76,12 +85,11 @@ class FacetedSearchView(views.JSONResponseMixin, views.AjaxResponseMixin, CoreFa
                                       'price_descending': '-stockrecords__price_excl_tax'}
 
         self.kwargs['sorting_type'] = dict_new_sorting_types.get(self.request.GET.get('sorting_type'), '-views_count')
+        self.kwargs['url'] = self.request.path
         return super(FacetedSearchView, self).get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super(FacetedSearchView, self).get_context_data(**kwargs)
-        # print (self.kwargs.get('more_goods', 'empty'))
-
         context['query'] = self.kwargs['search_string']
 
         queryset_filters = Feature.objects.filter(filter_products__in=self.products_without_filters).distinct().prefetch_related('filter_products')
@@ -95,6 +103,10 @@ class FacetedSearchView(views.JSONResponseMixin, views.AjaxResponseMixin, CoreFa
                       ('-stockrecords__price_excl_tax', _('By price descending'), 'price_descending'),
                       ('stockrecords__price_excl_tax', _('By price ascending'), 'price_ascending')]
         context['sort_types'] = []
+        context['pages'] = self.get_page_link(context['paginator'].page_range)
+        for page in context['pages']:
+            if page['page_number'] == context['page_obj'].number:
+                page['active'] = 'True'
         for type, text, link in sort_types:
             is_active = False
             if self.kwargs.get('sorting_type', '') == type:
@@ -153,4 +165,17 @@ class FacetedSearchView(views.JSONResponseMixin, views.AjaxResponseMixin, CoreFa
 
         return values
 
+    def get_page_link(self, page_numbers, **kwargs):
+        pages = []
+        for page in page_numbers:
+            pages_dict = dict()
+            pages_dict['page_number'] = page
+            pages_dict['link'] = "{}?page={}&q={}&sorting_type={}".format(
+                                                                    self.kwargs['url'],
+                                                                    page,
+                                                                    self.kwargs['search_string'],
+                                                                    self.kwargs.get('sorting_type'))
+            pages_dict['active'] = 'False'
+            pages.append(pages_dict)
 
+        return pages

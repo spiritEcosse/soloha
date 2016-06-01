@@ -16,30 +16,37 @@
                         <span aria-hidden="true">&laquo;</span></a>
                     </li>
             {% endif %}
-            {% for page_num in page_obj|ellipses_page_range %}
-                {% if page_num == page_obj.number%}
-                    {% for sorting_url, text, is_active, link in sort_types %}
-                        {% if is_active %}
-{#                            <li class="active"><a href="?page={{ page_num }}&{{ link }}">{{ page_num }}</a></li>#}
-                            <li ng-repeat="page_number in page_numbers" class="active"><a ng-bind="page_number">{{ page_number }}</a></li>
-                        {% endif %}
-                    {% endfor %}
-                {% elif page_num == None %}
-                    <li><a>...</a></li>
+{#            {% for page_num in page_obj|ellipses_page_range|slice:":2" %}#}
+            {% for page in pages %}
+                {% if page.active == 'True'%}
+                <li class="active" ng-repeat="page in pages"><a ng-bind="page.page_number">{{ page.page_number }}</a></li>
                 {% else %}
-
-                    {% for sorting_url, text, is_active, link in sort_types %}
-                        {% if is_active %}
-{#                            this is for more_goods button#}
-{#                            {% if page_num != page_num_next %}#}
-                                <li><a href="?page={{ page_num }}&{{ link }}">{{ page_num }}</a></li>
-{#                            {% endif %}#}
-                        {% endif %}
-                    {% endfor %}
+                <li class="clear_pagination"><a href={{ page.link }}>{{ page.page_number }}</a></li>
                 {% endif %}
             {% endfor %}
-            {% if page_obj.has_next %}
-                <li class="next">
+
+{#                {% for page_num in page_obj|ellipses_page_range%}#}
+{#                {% if page_num == page_obj.number%}#}
+{#                    {% for sorting_url, text, is_active, link in sort_types %}#}
+{#                        {% if is_active %}#}
+{#                            <li class="active"><a>{{ page_num }}</a></li>#}
+{#                            <li ng-repeat="page_number in page_numbers" class="active"><a ng-bind="page_number">{{ page_number }}</a></li>#}
+{#                        {% endif %}#}
+{#                    {% endfor %}#}
+{#                {% elif page_num == None %}#}
+{#                    <li><a>...</a></li>#}
+{#                {% else%}#}
+{#                    <li class="cl"><a href="?page={{ page_num }}&{{ link }}">{{ page_num }}</a></li>#}
+{#                            {% verbatim %}#}
+{#                            <li ng-repeat="page_number in page_range">#}
+{#                                <a ng-bind="page_number" ng-href="{{ link }}?page={{ page_number }}&q={{ search_string }}&sorting_type={{ sorting_type }}">#}
+{#                                    {{ page_number }}</a>#}
+{#                            </li>#}
+{#                            {% endverbatim %}#}
+{#                {% endif %}#}
+{#            {% endfor %}#}
+                {% if page_obj.has_next %}
+                    <li class="next">
                     {% for sorting_url, text, is_active, link in sort_types %}
                         {% if is_active %}
                             <a href="?page={{ page_obj.next_page_number }}&{{ link }}" aria-label="Next">
