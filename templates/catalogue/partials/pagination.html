@@ -19,7 +19,7 @@
 {#            {% for page_num in page_obj|ellipses_page_range|slice:":2" %}#}
             {% for page in pages %}
                 {% if page.active == 'True'%}
-                <li class="active" ng-repeat="page in pages"><a ng-bind="page.page_number">{{ page.page_number }}</a></li>
+                <li ng-class="{'active': page.active == 'True'}" ng-repeat="page in pages"><a {% verbatim %} ng-href="{{ page.link }}" {% endverbatim %} ng-bind="page.page_number">{{ page.page_number }} </a></li>
                 {% else %}
                 <li class="clear_pagination"><a href={{ page.link }}>{{ page.page_number }}</a></li>
                 {% endif %}

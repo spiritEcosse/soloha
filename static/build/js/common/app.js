@@ -272,22 +272,35 @@
         clear = angular.element('.clear');
         clear.remove();
         $scope.products = data.products;
+        $scope.initial_page_number = data.page_number;
         $scope.page_number = data.page_number;
-        return $scope.page_range = data.page_range;
+        $scope.num_pages = data.num_pages;
+        $scope.pages = [data.pages[parseInt($scope.initial_page_number) - 1]];
+        $scope.pages[0].active = "True";
+        $scope.pages[0].link = "";
+        return $scope.sorting_type = data.sorting_type;
       }).error(function() {
         return console.error('An error occurred during submission');
       });
       return $scope.submit = function() {
         return $http.post($location.absUrl(), {
           'search_string': $scope.search_string,
-          'page': $scope.page_number
+          'page': $scope.page_number,
+          'sorting_type': $scope.sorting_type
         }).success(function(data) {
-          var clear;
+          var clear, page_active, _i, _ref, _ref1;
           clear = angular.element('.clear_pagination');
           clear.remove();
+          $scope.pages = data.pages;
+          for (page_active = _i = _ref = parseInt($scope.initial_page_number) - 1, _ref1 = parseInt($scope.page_number); _ref <= _ref1 ? _i <= _ref1 : _i >= _ref1; page_active = _ref <= _ref1 ? ++_i : --_i) {
+            $scope.pages[page_active].active = "True";
+            $scope.pages[page_active].link = "";
+          }
           $scope.products = $scope.products.concat(data.products_next_page);
           $scope.page_number = parseInt($scope.page_number) + 1;
-          $scope.pages = data.pages;
+          if ($scope.page_number === parseInt($scope.num_pages)) {
+            $scope.hide = true;
+          }
           return console.log($scope.pages);
         }).error(function() {
           return console.error('An error occurred during submission');
