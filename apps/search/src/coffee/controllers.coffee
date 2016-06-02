@@ -24,6 +24,7 @@ app.controller 'Search', ['$http', '$scope', '$window', '$document', '$location'
     $scope.initial_page_number = data.page_number
     $scope.page_number = data.page_number
     $scope.num_pages = data.num_pages
+    $scope.search_string = data.search_string
     $scope.pages = [data.pages[parseInt($scope.initial_page_number)-1]]
     $scope.pages[0].active = "True"
     $scope.pages[0].link = ""
