@@ -44,7 +44,10 @@ class FacetedSearchView(views.JSONResponseMixin, views.AjaxResponseMixin, CoreFa
                 self.page_number = data.get('page')
             self.kwargs['url'] = self.request.path
             self.products_current_page = self.paginator.page(self.page_number).object_list
-            self.paginated_products = self.paginator.page(str(int(self.page_number)+1)).object_list
+            if (int(self.page_number)) != self.paginator.num_pages:
+                self.paginated_products = self.paginator.page(str(int(self.page_number)+1)).object_list
+            else:
+                self.paginated_products = self.paginator.page(str(int(self.page_number))).object_list
 
         if self.request.body:
             data = json.loads(self.request.body)

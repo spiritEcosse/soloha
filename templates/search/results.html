@@ -96,9 +96,11 @@
                 <div class="clearfix"></div>
                 <div name="more_products" class="col-xs-6 col-xs-offset-8 wrapper" action=".">
                     {% csrf_token %}
+                    {% if page_obj.number != paginator.num_pages %}
                     <a href="#" class="more_products" ng-click="submit()" ng-hide="hide == true"> {#  onclick="location.href='/test/'" #}
                         ПОКАЗАТЬ ЕЩЕ
                     </a>
+                        {% endif %}
                 </div>
                 <div>
                     {% include "catalogue/partials/pagination.html" %}
