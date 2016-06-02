@@ -248,6 +248,7 @@ class TestCatalog(LiveServerTestCase):
         start_price = self.firefox.find_element_by_css_selector(self.css_selector_product_price).text
         context = self.get_product_price(product=product)
         self.assertEqual(start_price, str(context['price']))
+        self.assertEqual(str(D('2100.10')), start_price)
 
         feature_11 = Feature.objects.get(title='Feature 11')
         feature_21 = Feature.objects.get(title='Feature 21')
@@ -257,60 +258,40 @@ class TestCatalog(LiveServerTestCase):
         feature_33 = Feature.objects.get(title='Feature 33')
         feature_41 = Feature.objects.get(title='Feature 41')
 
-        price_11_21_31 = self.checkout_price_by_selected_attribute(attribute=feature_11, attributes=attributes, product_versions=product_versions)
-        self.assertEqual(str(D('2100.00')), price_11_21_31)
+        price_11_22_32 = self.checkout_price_by_selected_attribute(attribute=feature_32, attributes=attributes,
+                                                                   product_versions=product_versions)
+        self.assertEqual(str(D('2500.10')), price_11_22_32)
 
-        self.checkout_price_by_selected_attribute(attribute=feature_21, attributes=attributes, product_versions=product_versions, earlier_price=price_11_21_31)
-        self.assertEqual(str(D('2100.00')), price_11_21_31)
+        price_11_22_33 = self.checkout_price_by_selected_attribute(attribute=feature_33, attributes=attributes,
+                                                                   product_versions=product_versions)
+        self.assertEqual(str(D('2700.00')), price_11_22_33)
 
-        self.checkout_price_by_selected_attribute(attribute=feature_31, attributes=attributes, product_versions=product_versions, earlier_price=price_11_21_31)
-        self.assertEqual(str(D('2100.00')), price_11_21_31)
+        price_11_21_33 = self.checkout_price_by_selected_attribute(attribute=feature_21, attributes=attributes,
+                                                                   product_versions=product_versions)
+        self.assertEqual(str(D('2300.00')), price_11_21_33)
 
-        price_11_21_32_41 = self.checkout_price_by_selected_attribute(attribute=feature_32, attributes=attributes, product_versions=product_versions)
+        price_11_21_32_41 = self.checkout_price_by_selected_attribute(attribute=feature_41, attributes=attributes,
+                                                                      product_versions=product_versions)
         self.assertEqual(str(D('4310.10')), price_11_21_32_41)
 
-        self.checkout_price_by_selected_attribute(attribute=feature_41, attributes=attributes, product_versions=product_versions, earlier_price=price_11_21_32_41)
-        self.assertEqual(str(D('4310.10')), price_11_21_32_41)
+        price_11_21_31 = self.checkout_price_by_selected_attribute(attribute=feature_31, attributes=attributes,
+                                                                   product_versions=product_versions)
+        self.assertEqual(str(D('2100.00')), price_11_21_31)
 
-        # selectable_attributes = [feature_11, feature_21, feature_33]
-        # price_11_21_33 = self.checkout_price_by_selected_attribute(attribute=attribute, attributes=attributes, product_versions=product_versions)
-        # self.assertEqual(str(D('2300.00')), price_11_21_33)
-        #
-        # selectable_attributes = [feature_11, feature_22, feature_31]
-        # price_11_22_31 = self.checkout_price_by_selected_attribute(attribute=attribute, attributes=attributes, product_versions=product_versions)
-        # self.assertEqual(str(D('2400.00')), price_11_22_31)
-        #
-        # selectable_attributes = [feature_11, feature_22, feature_32]
-        # price_11_22_32 = self.checkout_price_by_selected_attribute(attribute=attribute, attributes=attributes, product_versions=product_versions)
-        # self.assertEqual(str(D('2500.00')), price_11_22_32)
-        #
-        # selectable_attributes = [feature_11, feature_22, feature_33]
-        # price_11_22_33 = self.checkout_price_by_selected_attribute(attribute=attribute, attributes=attributes, product_versions=product_versions)
-        # self.assertEqual(str(D('2700.00')), price_11_22_33)
-        #
-        # selectable_attributes = [feature_11, feature_21, feature_31]
-        # self.checkout_price_by_selected_attribute(attribute=attribute, attributes=attributes, product_versions=product_versions)
-        # self.assertEqual(str(D('2100.00')), price_11_21_31)
-        #
-        # selectable_attributes = [feature_11, feature_21, feature_32]
-        # self.checkout_price_by_selected_attribute(attribute=attribute, attributes=attributes, product_versions=product_versions)
-        # self.assertEqual(str(D('2200.00')), price_11_21_32_41)
-        #
-        # selectable_attributes = [feature_11, feature_21, feature_33]
-        # self.checkout_price_by_selected_attribute(attribute=attribute, attributes=attributes, product_versions=product_versions)
-        # self.assertEqual(str(D('2300.00')), price_11_21_33)
-        #
-        # selectable_attributes = [feature_11, feature_22, feature_31]
-        # self.checkout_price_by_selected_attribute(attribute=attribute, attributes=attributes, product_versions=product_versions)
-        # self.assertEqual(str(D('2400.00')), price_11_22_31)
-        #
-        # selectable_attributes = [feature_11, feature_22, feature_32]
-        # self.checkout_price_by_selected_attribute(attribute=attribute, attributes=attributes, product_versions=product_versions)
-        # self.assertEqual(str(D('2500.00')), price_11_22_32)
-        #
-        # selectable_attributes = [feature_11, feature_22, feature_33]
-        # self.checkout_price_by_selected_attribute(attribute=attribute, attributes=attributes, product_versions=product_versions)
-        # self.assertEqual(str(D('2700.00')), price_11_22_33)
+        price_11_22_31 = self.checkout_price_by_selected_attribute(attribute=feature_22, attributes=attributes,
+                                                                   product_versions=product_versions)
+        self.assertEqual(str(D('2400.00')), price_11_22_31)
+
+        self.checkout_price_by_selected_attribute(attribute=feature_21, attributes=attributes,
+                                                  product_versions=product_versions,
+                                                  earlier_price=price_11_21_31)
+
+        self.assertEqual(str(D('2100.00')), price_11_21_31)
+
+        self.checkout_price_by_selected_attribute(attribute=feature_32, attributes=attributes,
+                                                  product_versions=product_versions,
+                                                  earlier_price=price_11_21_32_41)
+        self.assertEqual(str(D('4310.00')), price_11_21_32_41)
 
     def test_page_product_attributes_selenium(self):
         """

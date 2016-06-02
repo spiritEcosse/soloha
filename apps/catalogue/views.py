@@ -301,7 +301,7 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
         if filter_attr_val_args is not None:
             default_filter_attr_val_args.update(filter_attr_val_args)
 
-        return Feature.objects.only(*only).filter(
+        attributes = Feature.objects.only(*only).filter(
             children__product_versions__product=self.object, level=0
         ).prefetch_related(
             Prefetch('children', queryset=Feature.objects.only(*only).filter(**default_filter_attr_val_args).annotate(
@@ -310,6 +310,25 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
         ).annotate(
             price=Min('children__product_versions__price_retail'), count_child=Count('children', distinct=True)
         ).order_by('product_features__sort', 'price', '-count_child', 'title', 'pk')
+
+        for attribute in attributes:
+            attribute_values = []
+            product_version = ProductVersion.objects.get(attributes__in=[attribute])
+            price = product_version.price_retail
+
+            version_attributes = product_version.version_attributes.filter(
+                attribute__parent__children__product_versions__product=self.object, attribute__level=1,
+                attribute__parent__level=0
+            ).annotate(
+                price=Min('version__price_retail'),
+                count_child=Count('attribute__parent__children', distinct=True)
+            ).order_by('attribute__parent__product_features__sort', 'price', '-count_child', 'attribute__parent__title',
+                       'attribute__parent__pk')
+            for version_attribute in version_attributes:
+                attribute_values.append(str(version_attribute.attribute.pk))
+                if version_attribute.plus:
+                    price += version_attribute.price_retail
+            product_versions[','.join(attribute_values)] = str(price)
 
     def get_options(self):
         return Feature.objects.filter(Q(level=0), Q(product_options__product=self.object) | Q(children__product_options__product=self.object)).distinct()
