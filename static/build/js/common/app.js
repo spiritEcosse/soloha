@@ -279,7 +279,8 @@
         $scope.pages = [data.pages[parseInt($scope.initial_page_number) - 1]];
         $scope.pages[0].active = "True";
         $scope.pages[0].link = "";
-        return $scope.sorting_type = data.sorting_type;
+        $scope.sorting_type = data.sorting_type;
+        return console.log($scope.pages);
       }).error(function() {
         return console.error('An error occurred during submission');
       });
@@ -300,9 +301,8 @@
           $scope.products = $scope.products.concat(data.products_next_page);
           $scope.page_number = parseInt($scope.page_number) + 1;
           if ($scope.page_number === parseInt($scope.num_pages)) {
-            $scope.hide = true;
+            return $scope.hide = true;
           }
-          return console.log($scope.pages);
         }).error(function() {
           return console.error('An error occurred during submission');
         });

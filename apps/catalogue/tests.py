@@ -759,7 +759,7 @@ class TestCatalog(TestCase, LiveServerTestCase):
     def test_product_search(self):
         test_catalogue.create_product_bulk()
 
-        # Searching one product
+        # Searching products starting from Product 1
         dict_values = {'search_string': 'Product 1', 'page': 1}
         self.assertions_product_search(dict_values=dict_values)
 
@@ -770,7 +770,7 @@ class TestCatalog(TestCase, LiveServerTestCase):
         dict_values = {'search_string': 'Product', 'page': 2}
         self.assertions_product_search(dict_values=dict_values)
 
-        dict_values = {'search_string': ''}
+        dict_values = {'search_string': '', 'page': 1}
         self.assertions_product_search(dict_values=dict_values)
 
         dict_values = {'search_string': '1', 'page': 1}
@@ -842,23 +842,21 @@ class TestCatalog(TestCase, LiveServerTestCase):
         self.assertEqual(p.page_range, response.context['paginator'].page_range)
         self.assertEqual(list(filters), list(response.context['filters']))
 
-        # response = self.client.post('http://localhost:8000/search/?q=product/',
-        #                             json.dumps(dict_values),
-        #                             content_type='application/json',
-        #                             HTTP_X_REQUESTED_WITH='XMLHttpRequest')
-        #
-        # context = dict()
-        # context['num_pages'] = p.num_pages
-        # context['search_string'] = dict_values['search_string']
+        response = self.client.post('http://localhost:8000/search/?q={}/'.format(dict_values.get('search_string', '')),
+                                    json.dumps(dict_values),
+                                    content_type='application/json',
+                                    HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+
+        context = dict()
         # context['page_number'] = dict_values.get('page', 1)
-        # context['sorting_type'] = dict_values.get('sorting_type', '-views_count')
-        # sqs = self.get_search_queryset(dict_values=dict_values)[:5]
-        # context['searched_products'] = [{'id': obj.id,
-        #                       'title': obj.title,
-        #                       'main_image': obj.object.get_values()['image'],
-        #                       'href': obj.object.get_absolute_url(),
-        #                       'price': obj.object.get_values()['price']} for obj in sqs]
-        # self.assertJSONEqual(json.dumps(context), response.content)
+        sqs = self.get_search_queryset(dict_values=dict_values)
+        context['searched_products'] = [{'id': int(obj.pk),
+                              'title': obj.title,
+                              'image': obj.object.get_values()['image'],
+                              'absolute_url': obj.object.get_absolute_url(),
+                              'price': obj.object.get_values()['price']} for obj in sqs][OSCAR_PRODUCTS_PER_PAGE*(int(dict_values['page'])-1):OSCAR_PRODUCTS_PER_PAGE*(int(dict_values['page']))]
+        content = json.loads(response.content)
+        self.assertListEqual(context['searched_products'], content['products'])
 
     @staticmethod
     def get_search_queryset(dict_values={}):
@@ -1081,8 +1079,6 @@ class TestCatalog(TestCase, LiveServerTestCase):
         form_data = {'confirmation_key': 1, 'email': 'wrq@gmail', 'comment': 'My comment'}
         form_errors = {'email': [u'Enter a valid email address.']}
         self.assertions_form_contacts(form_data=form_data, form_errors=form_errors)
-        # form = FeedbackForm(data=form_data)
-        # self.assertTrue(form.errors)
 
     def assertions_form_contacts(self, form_data={}, form_errors={}):
         form = FeedbackForm(data=form_data)
@@ -1140,7 +1136,7 @@ class TestCatalog(TestCase, LiveServerTestCase):
         self.firefox.get(initial_url)
         time.sleep(10)
         more_goods_button = self.firefox.find_element_by_css_selector(".more_products")
-        time.sleep(10)
+        # time.sleep(10)
         more_goods_button.click()
         time.sleep(10)
         self.assertEqual(self.firefox.current_url, initial_url)
@@ -1164,14 +1160,28 @@ class TestCatalog(TestCase, LiveServerTestCase):
         time.sleep(10)
         self.assertNotEqual(self.firefox.current_url, initial_url)
 
-        # ToDo: fix this part of test
         more_goods_button = self.firefox.find_element_by_css_selector(".more_products")
-        time.sleep(10)
+        # time.sleep(10)
         more_goods_button.click()
         time.sleep(10)
         self.assertIn('Product 49', self.firefox.page_source)
-        self.assertIn('Product 72', self.firefox.page_source)
-        self.assertNotIn('Product 73', self.firefox.page_source)
+        self.assertIn('Product 96', self.firefox.page_source)
+        self.assertNotIn('Product 97', self.firefox.page_source)
+        self.assertIn(u'ПОКАЗАТЬ ЕЩЕ', self.firefox.page_source)
+
+        more_goods_button = self.firefox.find_element_by_css_selector(".more_products")
+        # time.sleep(10)
+        more_goods_button.click()
+        time.sleep(10)
+        self.assertIn('Product 118', self.firefox.page_source)
+        self.assertIn('ng-hide="hide == true"', self.firefox.page_source)
+
+        self.firefox.get(initial_url+"&page=5")
+        time.sleep(10)
+        self.assertNotIn(u'ПОКАЗАТЬ ЕЩЕ', self.firefox.page_source)
+
+
+
 
 
 

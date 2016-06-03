@@ -167,6 +167,10 @@ class FacetedSearchView(views.JSONResponseMixin, views.AjaxResponseMixin, CoreFa
         dict_old_sorting_types = {'-views_count': 'popularity', 'stockrecords__price_excl_tax': 'price_ascending',
                                   '-stockrecords__price_excl_tax': 'price_descending'}
 
+        # this replacement needed, to fix problem with spaces in url
+        if self.kwargs['search_string']:
+            self.kwargs['search_string'] = self.kwargs['search_string'].replace(' ', '+')
+
         for page in page_numbers:
             pages_dict = dict()
             pages_dict['page_number'] = page
