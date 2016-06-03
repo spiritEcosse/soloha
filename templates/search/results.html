@@ -80,7 +80,6 @@
         <div class="row items">
             {% if page_obj %}
                 {% for product in page_obj %}
-                    {#                    <div class="col-sm-6 col-md-6" {% if forloop.first %} id="product" {% else %} class="clear" {% endif %}>#}
                     {% if forloop.first %}
                         <div class="col-sm-6 col-md-6" id="product">
                             {% include "catalogue/partials/product.html" %}

@@ -47,22 +47,57 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
     paginate_by = OSCAR_PRODUCTS_PER_PAGE
 
     def post(self, request, *args, **kwargs):
-        data = json.loads(self.request.body)
-        # self.kwargs['category_slug'] = data.get('category_slug')
+        if self.request.body:
+            data = json.loads(self.request.body)
+            # self.kwargs['category_slug'] = data.get('category_slug')
 
-        self.kwargs['sorting_type'] = data.get('sorting_type', *Product._meta.ordering)
+            self.kwargs['sorting_type'] = data.get('sorting_type', *Product._meta.ordering)
 
-        self.kwargs['filters'] = data.get('filters', '')
-        self.object = self.get_category()
-        self.object_list = self.get_queryset()
+            self.kwargs['filters'] = data.get('filters', '')
+            self.object = self.get_category()
+            self.object_list = self.get_queryset()
+
+        if self.request.is_ajax():
+            self.kwargs['sorting_type'] = self.request.GET.get('sorting_type', 'popularity')
+            self.page_number = request.GET.get('page', '1')
+            if self.request.body:
+                data = json.loads(self.request.body)
+                self.page_number = data.get('page')
+            self.kwargs['url'] = self.request.path
+        # all this for more goods
+        # self.kwargs['url'] = self.request.path
 
     def post_ajax(self, request, *args, **kwargs):
         super(ProductCategoryView, self).post_ajax(request, *args, **kwargs)
+        if self.request.is_ajax():
+            return self.render_json_response(self.get_context_data_more_goods_json())
         return self.render_json_response(self.get_context_data_json())
 
     def get_context_data_json(self, **kwargs):
         context = dict()
         context['products'] = [product.get_values() for product in self.object_list]
+        return context
+
+    def get_context_data_more_goods_json(self, **kwargs):
+        context = dict()
+        dict_new_sorting_types = {'popularity': '-views_count', 'price_ascending': 'stockrecords__price_excl_tax',
+                                  'price_descending': '-stockrecords__price_excl_tax'}
+        self.kwargs['sorting_type'] = dict_new_sorting_types.get(self.kwargs.get('sorting_type', 'popularity'))
+        self.object = self.get_category()
+        # self.object_list = self.get_queryset()
+        self.products_on_page = self.get_queryset()
+        self.paginator = self.get_paginator(self.products_on_page, OSCAR_PRODUCTS_PER_PAGE)
+        self.products_current_page = self.paginator.page(self.page_number).object_list
+        self.paginated_products = []
+        if (int(self.page_number)) != self.paginator.num_pages:
+            self.paginated_products = self.paginator.page(str(int(self.page_number) + 1)).object_list
+
+        context['products'] = self.get_product_values(self.products_current_page)
+        context['products_next_page'] = self.get_product_values(self.paginated_products)
+        context['page_number'] = self.page_number
+        context['num_pages'] = self.paginator.num_pages
+        context['pages'] = self.get_page_link(self.paginator.page_range)
+        context['sorting_type'] = self.kwargs.get('sorting_type')
         return context
 
     def get(self, request, *args, **kwargs):
@@ -131,6 +166,12 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
             Prefetch('children', queryset=queryset_filters.annotate(num_prod=Count('filter_products')),
                      to_attr='children_in_products'),).distinct()
         context['filter_slug'] = self.kwargs.get('filter_slug', '')
+        # this for more goods
+        self.kwargs['url'] = self.request.path
+        context['pages'] = self.get_page_link(context['paginator'].page_range)
+        for page in context['pages']:
+            if page['page_number'] == context['page_obj'].number:
+                page['active'] = 'True'
         context['sort_types'] = []
         sort_types = [('-views_count', _('By popularity'), 'popularity'),
                       ('-stockrecords__price_excl_tax', _('By price descending'), 'price_descending'),
@@ -144,6 +185,34 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
             context['sort_types'].append((sorting_url, text, is_active, sort_link))
         return context
 
+    def get_page_link(self, page_numbers, **kwargs):
+        pages = []
+
+        dict_old_sorting_types = {'-views_count': 'popularity', 'stockrecords__price_excl_tax': 'price_ascending',
+                                  '-stockrecords__price_excl_tax': 'price_descending'}
+
+        for page in page_numbers:
+            pages_dict = dict()
+            pages_dict['page_number'] = page
+            pages_dict['link'] = "{}?page={}&sorting_type={}".format(
+                                                                    self.kwargs['url'],
+                                                                    page,
+                                                                    dict_old_sorting_types.get(self.kwargs.get('sorting_type'), 'popularity'))
+            pages_dict['active'] = 'False'
+            pages.append(pages_dict)
+
+        return pages
+
+    def get_product_values(self, products):
+        values = []
+
+        for product in products:
+            product_values = product.get_values()
+            product_values['id'] = product.id
+            values.append(product_values)
+
+        return values
+
 
 class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CoreProductDetailView):
     def post(self, request, *args, **kwargs):
@@ -152,7 +221,7 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
             data = json.loads(self.request.body)
             self.kwargs['option_id'] = data.get('option_id')
             self.kwargs['parent'] = data.get('parent', None)
-            self.kwargs['list_options'] = data.get('list_options', 'test')
+            self.kwargs['list_options'] = data.get('list_options', '')
         else:
             self.kwargs['option_id'] = None
             self.kwargs['parent'] = None

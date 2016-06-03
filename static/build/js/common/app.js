@@ -113,7 +113,6 @@
             delete $scope.list_options[$scope.option_id];
             return angular.element(document.getElementById('options-0')).append($compile('<span id="' + $scope.option_id + '"> <select class="form-control" ng-model="option_model[' + $scope.option_id + ']" ng-change="change_price(option_id)" ng-options="option for option in options_children[' + $scope.option_id + ']" ></select> </span>')($scope));
           } else {
-            console.log("new");
             delete $scope.list_options[$scope.option_id];
             return angular.element(document.getElementById('options-0')).append($compile('<div id="model[' + $scope.option_id + ']"> <select class="form-control" ng-model="option_model[' + $scope.option_id + ']" ng-change="change_price(option_id)" ng-options="option for option in list_options" ></select> </div>')($scope));
           }
@@ -170,6 +169,54 @@
         $scope.product.price = product_versions[selected_attributes.toString()];
         console.log(product_versions);
         return console.log(selected_attributes.toString());
+      };
+    }
+  ]);
+
+  app.controller('More_goods', [
+    '$http', '$scope', '$window', '$document', '$location', '$compile', function($http, $scope, $window, $document, $location, $compile) {
+      $http.post($location.absUrl()).success(function(data) {
+        var clear, items;
+        items = angular.element(document).find('#product');
+        items.attr('ng-repeat', 'product in products');
+        $compile(items)($scope);
+        clear = angular.element('.clear');
+        clear.remove();
+        $scope.products = data.products;
+        $scope.initial_page_number = data.page_number;
+        $scope.page_number = data.page_number;
+        $scope.num_pages = data.num_pages;
+        $scope.search_string = data.search_string;
+        $scope.pages = [data.pages[parseInt($scope.initial_page_number) - 1]];
+        $scope.pages[0].active = "True";
+        $scope.pages[0].link = "";
+        $scope.sorting_type = data.sorting_type;
+        return console.log($scope.pages);
+      }).error(function() {
+        return console.error('An error occurred during submission');
+      });
+      return $scope.submit = function() {
+        return $http.post($location.absUrl(), {
+          'search_string': $scope.search_string,
+          'page': $scope.page_number,
+          'sorting_type': $scope.sorting_type
+        }).success(function(data) {
+          var clear, page_active, _i, _ref, _ref1;
+          clear = angular.element('.clear_pagination');
+          clear.remove();
+          $scope.pages = data.pages;
+          for (page_active = _i = _ref = parseInt($scope.initial_page_number) - 1, _ref1 = parseInt($scope.page_number); _ref <= _ref1 ? _i <= _ref1 : _i >= _ref1; page_active = _ref <= _ref1 ? ++_i : --_i) {
+            $scope.pages[page_active].active = "True";
+            $scope.pages[page_active].link = "";
+          }
+          $scope.products = $scope.products.concat(data.products_next_page);
+          $scope.page_number = parseInt($scope.page_number) + 1;
+          if ($scope.page_number === parseInt($scope.num_pages)) {
+            return $scope.hide = true;
+          }
+        }).error(function() {
+          return console.error('An error occurred during submission');
+        });
       };
     }
   ]);
@@ -263,7 +310,6 @@
 
   app.controller('Search', [
     '$http', '$scope', '$window', '$document', '$location', '$routeParams', '$compile', function($http, $scope, $window, $document, $location, $routeParams, $compile) {
-      $scope.page_numbers = [];
       $http.post($location.absUrl()).success(function(data) {
         var clear, items;
         items = angular.element(document).find('#product');

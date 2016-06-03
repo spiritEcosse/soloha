@@ -406,35 +406,35 @@ class TestCatalog(TestCase, LiveServerTestCase):
         """
         test_catalogue.create_product_bulk()
         # without products in this category has no descendants in the categories at the same time this very category and its children is not goods
-        dict_values = {'num_queries': 10}
+        dict_values = {'page': 1, 'num_queries': 10}
         category = Category.objects.get(name='Category-2')
         self.assertions_category(category=category, dict_values=dict_values)
 
         # with products in this child category are not the descendants of the categories at the same time, this category has itself in goods
         # Todo: why 24 queries ?
-        dict_values = {'num_queries': 24}
+        dict_values = {'page': 1, 'num_queries': 24}
         category = Category.objects.get(name='Category-321')
         self.assertions_category(category=category, dict_values=dict_values)
 
         # with products in this category has category of descendants with itself, this category is not in goods, but its descendants have in the goods
-        dict_values = {'num_queries': 20}
+        dict_values = {'page': 1, 'num_queries': 20}
         category = Category.objects.get(name='Category-1')
         self.assertions_category(category=category, dict_values=dict_values)
 
         # with products with this main category has no descendants of categories at the same time, this category has itself in goods
-        dict_values = {'num_queries': 18}
+        dict_values = {'page': 1, 'num_queries': 18}
         category = Category.objects.get(name='Category-4')
         self.assertions_category(category=category, dict_values=dict_values)
 
         # with products in this category is that the main categories of the children with this very category and its descendants have in the goods
-        dict_values = {'num_queries': 18}
+        dict_values = {'page': 1, 'num_queries': 18}
         category = Category.objects.get(name='Category-3')
         self.assertions_category(category=category, dict_values=dict_values)
 
     def test_page_category_paginator(self):
         test_catalogue.create_product_bulk()
 
-        dict_values = {'num_queries': 20}
+        dict_values = {'page': 1, 'num_queries': 20}
         category = Category.objects.get(name='Category-12')
         self.assertions_category(category=category, dict_values=dict_values)
         dict_values = {'page': 1, 'num_queries': 20}
@@ -561,8 +561,13 @@ class TestCatalog(TestCase, LiveServerTestCase):
                                     content_type='application/json',
                                     HTTP_X_REQUESTED_WITH='XMLHttpRequest')
         context = dict()
-        context['products'] = [product.get_values() for product in products]
-        self.assertJSONEqual(json.dumps(context), response.content)
+        context['products'] = []
+        for product in products[:OSCAR_PRODUCTS_PER_PAGE]:
+            product_values = product.get_values()
+            product_values['id'] = product.id
+            context['products'].append(product_values)
+        content = json.loads(response.content)
+        self.assertEqual(context['products'], content['products'])
 
     def test_page_category_sorting_buttons(self):
         test_catalogue.create_product_bulk()
@@ -1136,7 +1141,6 @@ class TestCatalog(TestCase, LiveServerTestCase):
         self.firefox.get(initial_url)
         time.sleep(10)
         more_goods_button = self.firefox.find_element_by_css_selector(".more_products")
-        # time.sleep(10)
         more_goods_button.click()
         time.sleep(10)
         self.assertEqual(self.firefox.current_url, initial_url)
@@ -1161,7 +1165,6 @@ class TestCatalog(TestCase, LiveServerTestCase):
         self.assertNotEqual(self.firefox.current_url, initial_url)
 
         more_goods_button = self.firefox.find_element_by_css_selector(".more_products")
-        # time.sleep(10)
         more_goods_button.click()
         time.sleep(10)
         self.assertIn('Product 49', self.firefox.page_source)
@@ -1170,7 +1173,6 @@ class TestCatalog(TestCase, LiveServerTestCase):
         self.assertIn(u'ПОКАЗАТЬ ЕЩЕ', self.firefox.page_source)
 
         more_goods_button = self.firefox.find_element_by_css_selector(".more_products")
-        # time.sleep(10)
         more_goods_button.click()
         time.sleep(10)
         self.assertIn('Product 118', self.firefox.page_source)

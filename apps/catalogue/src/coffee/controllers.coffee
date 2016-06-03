@@ -20,8 +20,6 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
   attributes = []
   product_versions = []
 
-#  $scope.new_price = 1
-
   $http.post($location.absUrl()).success (data) ->
     $scope.options = data.options
     $scope.options_children = data.options_children
@@ -55,7 +53,6 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
       $scope.options_children[$scope.option_id] = data.options_children
 
       if Object.keys($scope.options_children[$scope.option_id]).length != 0
-#        console.log(data.options_children)
         delete $scope.list_options[$scope.option_id]
 
         angular.element(document.getElementById('options-0')).append $compile('<span id="' + $scope.option_id + '">
@@ -63,7 +60,6 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
                 ng-change="change_price(option_id)" ng-options="option for option in options_children[' + $scope.option_id + ']" ></select>
                 </span>')($scope)
       else
-        console.log("new")
         delete $scope.list_options[$scope.option_id]
         #           $scope.current_model = $scope.model[$scope.option_id]
         angular.element(document.getElementById('options-0')).append $compile('<div id="model[' + $scope.option_id + ']">
@@ -132,5 +128,38 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
 
 ]
 
+app.controller 'More_goods', ['$http', '$scope', '$window', '$document', '$location', '$compile', ($http, $scope, $window, $document, $location, $compile) ->
+  $http.post($location.absUrl()).success (data) ->
+    items = angular.element(document).find('#product')
+    items.attr('ng-repeat', 'product in products')
+    $compile(items)($scope)
+    clear = angular.element('.clear')
+    clear.remove()
+    $scope.products = data.products
+    $scope.initial_page_number = data.page_number
+    $scope.page_number = data.page_number
+    $scope.num_pages = data.num_pages
+    $scope.search_string = data.search_string
+    $scope.pages = [data.pages[parseInt($scope.initial_page_number)-1]]
+    $scope.pages[0].active = "True"
+    $scope.pages[0].link = ""
+    $scope.sorting_type = data.sorting_type
+    console.log($scope.pages)
+  .error ->
+    console.error('An error occurred during submission')
 
-
+  $scope.submit = ->
+    $http.post($location.absUrl(), {'search_string': $scope.search_string, 'page': $scope.page_number, 'sorting_type': $scope.sorting_type}).success (data) ->
+      clear = angular.element('.clear_pagination')
+      clear.remove()
+      $scope.pages = data.pages
+      for page_active in [parseInt($scope.initial_page_number)-1..parseInt($scope.page_number)]
+        $scope.pages[page_active].active = "True"
+        $scope.pages[page_active].link = ""
+      $scope.products = $scope.products.concat data.products_next_page
+      $scope.page_number = parseInt($scope.page_number)+1
+      if $scope.page_number == parseInt($scope.num_pages)
+        $scope.hide=true
+    .error ->
+      console.error('An error occurred during submission')
+]

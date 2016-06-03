@@ -12,8 +12,6 @@ app.config ['$httpProvider', ($httpProvider) ->
 ]
 
 app.controller 'Search', ['$http', '$scope', '$window', '$document', '$location', '$routeParams', '$compile', ($http, $scope, $window, $document, $location, $routeParams, $compile) ->
-  $scope.page_numbers = []
-
   $http.post($location.absUrl()).success (data) ->
     items = angular.element(document).find('#product')
     items.attr('ng-repeat', 'product in products')
