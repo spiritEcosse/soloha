@@ -67,8 +67,8 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
           $compile(el)($scope)
           $scope.product.values[attr.id] = attr.values
 
-          if attr.in_group[1]
-            $scope.product.attributes[attr.id] = attr.in_group[1]
+          if attr.in_group[0]
+            $scope.product.attributes[attr.id] = attr.in_group[0]
           else if $scope.product.values[attr.id]
             $scope.product.attributes[attr.id] = $scope.product.values[attr.id][0]
 
@@ -84,4 +84,7 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
 
         if product_versions[selected_attributes.toString()]
           $scope.product.price = product_versions[selected_attributes.toString()]
+        console.log(product_versions[selected_attributes.toString()])
+        console.log($scope.product.price)
+        console.log(product_versions)
 ]

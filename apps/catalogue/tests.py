@@ -248,7 +248,7 @@ class TestCatalog(LiveServerTestCase):
         start_price = self.firefox.find_element_by_css_selector(self.css_selector_product_price).text
         context = self.get_product_price(product=product)
         self.assertEqual(start_price, str(context['price']))
-        self.assertEqual(str(D('2100.10')), start_price)
+        self.assertEqual(str(D('2100.00')), start_price)
 
         feature_11 = Feature.objects.get(title='Feature 11')
         feature_21 = Feature.objects.get(title='Feature 21')

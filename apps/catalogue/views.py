@@ -180,11 +180,13 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
             attributes = []
 
             for attr in self.get_attributes_for_attribute(attribute):
+                values_in_group = start_option + map(get_values_in_group, attr.values_in_group)
+
                 attributes.append({
                     'id': attr.id,
                     'title': attr.title,
-                    'in_group': start_option + map(get_values_in_group, attr.values_in_group),
-                    'values': start_option + map(get_values_in_group, attr.values_in_group) + map(get_values_out_group, attr.values_out_group)
+                    'in_group': values_in_group,
+                    'values': values_in_group + map(get_values_out_group, attr.values_out_group),
                 })
 
             context['variant_attributes'][attribute.pk] = attributes
@@ -206,13 +208,37 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
         only = ['pk']
         return Feature.objects.only(*only).filter(level=1, product_versions__product=self.object).distinct().order_by()
 
+    def set_attributes_final_price(self, value):
+        attributes = list()
+
+        for prod_ver in ProductVersion.objects.filter(attributes__in=[value], product=self.object):
+            price = prod_ver.price_retail
+
+            for attr_ver in prod_ver.version_attributes.all():
+                if attr_ver.plus and attr_ver.price_retail is not None:
+                    price += attr_ver.price_retail
+
+            for ver_attr in prod_ver.version_attributes.all():
+                if ver_attr.attribute not in attributes:
+                    attributes.append(ver_attr.attribute)
+                else:
+                    index = attributes.index(ver_attr.attribute)
+                    ver_attr.attribute = attributes[index]
+
+                if not hasattr(ver_attr.attribute, 'final_price'):
+                    setattr(ver_attr.attribute, 'final_price', [])
+
+                ver_attr.attribute.final_price.append(price)
+
+        return attributes
+
     def get_attributes_for_attribute(self, attribute):
         only = ['title', 'pk']
         values_in_group = Feature.objects.only(*only).filter(
             level=1, product_versions__product=self.object, product_versions__attributes=attribute
         )
 
-        return Feature.objects.only(*only).filter(
+        attributes = Feature.objects.only(*only).filter(
             children__product_versions__product=self.object, level=0
         ).prefetch_related(
             Prefetch('children', queryset=values_in_group.annotate(
@@ -229,6 +255,19 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
             price=Min('children__product_versions__price_retail'), count_child=Count('children', distinct=True)
         ).order_by('product_features__sort', 'price', '-count_child', 'title', 'pk')
 
+        attributes_sort_by_price = []
+
+        for attr in attributes:
+            for attr_source in self.set_attributes_final_price(attribute):
+                if attr_source in attr.values_in_group:
+                    index = attr.values_in_group.index(attr_source)
+                    attr.values_in_group[index] = attr_source
+
+            attr.values_in_group = sorted(attr.values_in_group, key=lambda value: min(value.final_price))
+            attributes_sort_by_price.append(attr)
+
+        return attributes_sort_by_price
+
     def get_product_versions(self):
         product_versions = dict()
 
@@ -244,7 +283,7 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
             ).order_by('attribute__parent__product_features__sort', 'price', '-count_child', 'attribute__parent__title', 'attribute__parent__pk')
             for version_attribute in version_attributes:
                 attribute_values.append(str(version_attribute.attribute.pk))
-                if version_attribute.plus:
+                if version_attribute.plus and version_attribute.price_retail is not None:
                     price += version_attribute.price_retail
             product_versions[','.join(attribute_values)] = str(price)
         return product_versions
@@ -311,24 +350,7 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
             price=Min('children__product_versions__price_retail'), count_child=Count('children', distinct=True)
         ).order_by('product_features__sort', 'price', '-count_child', 'title', 'pk')
 
-        for attribute in attributes:
-            attribute_values = []
-            product_version = ProductVersion.objects.get(attributes__in=[attribute])
-            price = product_version.price_retail
-
-            version_attributes = product_version.version_attributes.filter(
-                attribute__parent__children__product_versions__product=self.object, attribute__level=1,
-                attribute__parent__level=0
-            ).annotate(
-                price=Min('version__price_retail'),
-                count_child=Count('attribute__parent__children', distinct=True)
-            ).order_by('attribute__parent__product_features__sort', 'price', '-count_child', 'attribute__parent__title',
-                       'attribute__parent__pk')
-            for version_attribute in version_attributes:
-                attribute_values.append(str(version_attribute.attribute.pk))
-                if version_attribute.plus:
-                    price += version_attribute.price_retail
-            product_versions[','.join(attribute_values)] = str(price)
+        return attributes
 
     def get_options(self):
         return Feature.objects.filter(Q(level=0), Q(product_options__product=self.object) | Q(children__product_options__product=self.object)).distinct()

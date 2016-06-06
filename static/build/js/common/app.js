@@ -87,8 +87,8 @@
               el.attr('attr-dis', '0');
               $compile(el)($scope);
               $scope.product.values[attr.id] = attr.values;
-              if (attr.in_group[1]) {
-                return $scope.product.attributes[attr.id] = attr.in_group[1];
+              if (attr.in_group[0]) {
+                return $scope.product.attributes[attr.id] = attr.in_group[0];
               } else if ($scope.product.values[attr.id]) {
                 return $scope.product.attributes[attr.id] = $scope.product.values[attr.id][0];
               }
@@ -105,8 +105,11 @@
               }
             });
             if (product_versions[selected_attributes.toString()]) {
-              return $scope.product.price = product_versions[selected_attributes.toString()];
+              $scope.product.price = product_versions[selected_attributes.toString()];
             }
+            console.log(product_versions[selected_attributes.toString()]);
+            console.log($scope.product.price);
+            return console.log(product_versions);
           }
         }
       };
