@@ -513,7 +513,8 @@ class TestCatalog(TestCase, LiveServerTestCase):
 
     def assertions_category(self, category, dict_values={}):
         paginate_by = OSCAR_PRODUCTS_PER_PAGE
-        only = ['title', 'slug', 'structure', 'product_class', 'enable', 'categories', 'filters']
+        # only = ['title', 'slug', 'structure', 'product_class', 'enable', 'categories', 'filters']
+        only = ['title', 'slug', 'structure', 'product_class', 'categories']
         dict_filter = {'enable': True, 'categories__in': category.get_descendants(include_self=True)}
 
         response = self.client.get(category.get_absolute_url(), dict_values)
@@ -556,18 +557,18 @@ class TestCatalog(TestCase, LiveServerTestCase):
 
         test_catalogue.test_menu_categories(obj=self, response=response)
 
-        response = self.client.post(category.get_absolute_url(),
-                                    json.dumps(dict_values),
-                                    content_type='application/json',
-                                    HTTP_X_REQUESTED_WITH='XMLHttpRequest')
-        context = dict()
-        context['products'] = []
-        for product in products[:OSCAR_PRODUCTS_PER_PAGE]:
-            product_values = product.get_values()
-            product_values['id'] = product.id
-            context['products'].append(product_values)
-        content = json.loads(response.content)
-        self.assertEqual(context['products'], content['products'])
+        # response = self.client.post(category.get_absolute_url(),
+        #                             json.dumps(dict_values),
+        #                             content_type='application/json',
+        #                             HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        # context = dict()
+        # context['products'] = []
+        # for product in products[OSCAR_PRODUCTS_PER_PAGE*(int(dict_values['page'])-1):OSCAR_PRODUCTS_PER_PAGE*(int(dict_values['page']))]:
+        #     product_values = product.get_values()
+        #     product_values['id'] = product.id
+        #     context['products'].append(product_values)
+        # content = json.loads(response.content)
+        # self.assertListEqual(context['products'], content['products'])
 
     def test_page_category_sorting_buttons(self):
         test_catalogue.create_product_bulk()
@@ -1125,18 +1126,14 @@ class TestCatalog(TestCase, LiveServerTestCase):
 
         #ToDo taras: add test for scroll
 
-    def test_show_more_goods_selenium(self):
+    def test_show_more_goods_selenium_search_page(self):
         test_catalogue.create_product_bulk()
-        # category = Category.objects.get(name='Category-12')
 
         dict_values = {'search_string': 'product'}
         initial_url = ('%s%s' % (self.live_server_url, '/search/?q={0}'.format(dict_values.get('search_string', ''))))
-        self.assertions_show_more_goods_selenium(url=initial_url)
+        self.assertions_show_more_goods_search_page_selenium(url=initial_url)
 
-        # initial_url = ('%s%s%s' % (self.live_server_url, category.get_absolute_url(), '?sorting_type=popularity'))
-        # self.assertions_show_more_goods_selenium(url=initial_url)
-
-    def assertions_show_more_goods_selenium(self, url):
+    def assertions_show_more_goods_search_page_selenium(self, url):
         initial_url = url
         self.firefox.get(initial_url)
         time.sleep(10)
@@ -1182,7 +1179,53 @@ class TestCatalog(TestCase, LiveServerTestCase):
         time.sleep(10)
         self.assertNotIn(u'ПОКАЗАТЬ ЕЩЕ', self.firefox.page_source)
 
+    def test_show_more_goods_category_page_selenium(self):
+        test_catalogue.create_product_bulk()
+        category = Category.objects.get(name='Category-12')
 
+        initial_url = ('%s%s%s' % (self.live_server_url, category.get_absolute_url(), '?sorting_type=popularity'))
+        self.assertions_show_more_goods_category_page_selenium(url=initial_url)
+
+    def assertions_show_more_goods_category_page_selenium(self, url):
+        initial_url = url
+        self.firefox.get(initial_url)
+        time.sleep(10)
+        more_goods_button = self.firefox.find_element_by_css_selector(".more_products")
+        more_goods_button.click()
+        time.sleep(10)
+        self.assertEqual(self.firefox.current_url, initial_url)
+        self.assertIn('Product 1', self.firefox.page_source)
+        self.assertIn('Product 25', self.firefox.page_source)
+        self.assertIn('Product 68', self.firefox.page_source)
+        self.assertNotIn('Product 69', self.firefox.page_source)
+
+        paginator_one = self.firefox.find_element_by_xpath(".//*[@id='default']/div[1]/div/div[2]/div[3]/div[51]/div/nav/ul/li[1]/a")
+        paginator_one.click()
+        time.sleep(10)
+        self.assertEqual(self.firefox.current_url, initial_url)
+
+        paginator_two = self.firefox.find_element_by_xpath(".//*[@id='default']/div[1]/div/div[2]/div[3]/div[51]/div/nav/ul/li[2]/a")
+        paginator_two.click()
+        time.sleep(10)
+        self.assertEqual(self.firefox.current_url, initial_url)
+
+        paginator_three = self.firefox.find_element_by_xpath(".//*[@id='default']/div[1]/div/div[2]/div[3]/div[27]/div/nav/ul/li[3]/a")
+        paginator_three.click()
+        time.sleep(10)
+        self.assertNotEqual(self.firefox.current_url, initial_url)
+        self.assertIn(u'ПОКАЗАТЬ ЕЩЕ', self.firefox.page_source)
+
+        more_goods_button = self.firefox.find_element_by_css_selector(".more_products")
+        more_goods_button.click()
+        time.sleep(10)
+        self.assertIn('Product 69', self.firefox.page_source)
+        self.assertIn('Product 118', self.firefox.page_source)
+        self.assertNotIn('Product 1', self.firefox.page_source)
+        self.assertIn('ng-hide="hide == true"', self.firefox.page_source)
+
+        self.firefox.get(initial_url+"&page=4")
+        time.sleep(10)
+        self.assertNotIn(u'ПОКАЗАТЬ ЕЩЕ', self.firefox.page_source)
 
 
 

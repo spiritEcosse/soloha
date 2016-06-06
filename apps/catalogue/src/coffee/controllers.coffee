@@ -144,7 +144,7 @@ app.controller 'More_goods', ['$http', '$scope', '$window', '$document', '$locat
     $scope.pages[0].active = "True"
     $scope.pages[0].link = ""
     $scope.sorting_type = data.sorting_type
-    console.log($scope.pages)
+    console.log($scope.products)
   .error ->
     console.error('An error occurred during submission')
 

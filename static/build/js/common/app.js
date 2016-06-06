@@ -191,7 +191,7 @@
         $scope.pages[0].active = "True";
         $scope.pages[0].link = "";
         $scope.sorting_type = data.sorting_type;
-        return console.log($scope.pages);
+        return console.log($scope.products);
       }).error(function() {
         return console.error('An error occurred during submission');
       });

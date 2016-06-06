@@ -47,16 +47,6 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
     paginate_by = OSCAR_PRODUCTS_PER_PAGE
 
     def post(self, request, *args, **kwargs):
-        if self.request.body:
-            data = json.loads(self.request.body)
-            # self.kwargs['category_slug'] = data.get('category_slug')
-
-            self.kwargs['sorting_type'] = data.get('sorting_type', *Product._meta.ordering)
-
-            self.kwargs['filters'] = data.get('filters', '')
-            self.object = self.get_category()
-            self.object_list = self.get_queryset()
-
         if self.request.is_ajax():
             self.kwargs['sorting_type'] = self.request.GET.get('sorting_type', 'popularity')
             self.page_number = request.GET.get('page', '1')
@@ -64,28 +54,20 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
                 data = json.loads(self.request.body)
                 self.page_number = data.get('page')
             self.kwargs['url'] = self.request.path
-        # all this for more goods
-        # self.kwargs['url'] = self.request.path
 
     def post_ajax(self, request, *args, **kwargs):
         super(ProductCategoryView, self).post_ajax(request, *args, **kwargs)
         if self.request.is_ajax():
             return self.render_json_response(self.get_context_data_more_goods_json())
-        return self.render_json_response(self.get_context_data_json())
-
-    def get_context_data_json(self, **kwargs):
-        context = dict()
-        context['products'] = [product.get_values() for product in self.object_list]
-        return context
 
     def get_context_data_more_goods_json(self, **kwargs):
         context = dict()
         dict_new_sorting_types = {'popularity': '-views_count', 'price_ascending': 'stockrecords__price_excl_tax',
                                   'price_descending': '-stockrecords__price_excl_tax'}
-        self.kwargs['sorting_type'] = dict_new_sorting_types.get(self.kwargs.get('sorting_type', 'popularity'))
+        self.kwargs['sorting_type'] = dict_new_sorting_types.get(self.kwargs.get('sorting_type', '-views_count'))
         self.object = self.get_category()
-        # self.object_list = self.get_queryset()
         self.products_on_page = self.get_queryset()
+
         self.paginator = self.get_paginator(self.products_on_page, OSCAR_PRODUCTS_PER_PAGE)
         self.products_current_page = self.paginator.page(self.page_number).object_list
         self.paginated_products = []
@@ -150,12 +132,13 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
             dict_filter['filters__slug__in'] = self.kwargs.get('filter_slug').split('/')
 
         queryset = super(ProductCategoryView, self).get_queryset()
-        return queryset.only(*only).filter(**dict_filter).distinct().select_related('product_class').prefetch_related(
+        queryset = queryset.only(*only).filter(**dict_filter).distinct().select_related('product_class').prefetch_related(
             Prefetch('images'),
             Prefetch('product_class__options'),
             Prefetch('stockrecords'),
             Prefetch('categories__parent__parent')
         ).distinct().order_by(self.kwargs['sorting_type'])
+        return queryset
 
     def get_context_data(self, **kwargs):
         # Category.objects.filter(pk=self.object.pk).update(popular=F('popular') + 1)
@@ -205,7 +188,6 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
 
     def get_product_values(self, products):
         values = []
-
         for product in products:
             product_values = product.get_values()
             product_values['id'] = product.id
