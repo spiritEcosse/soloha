@@ -99,6 +99,7 @@ class Test(object):
         feature_31 = Feature.objects.get(title='Feature 31')
         feature_32 = Feature.objects.get(title='Feature 32')
         feature_33 = Feature.objects.get(title='Feature 33')
+
         product_version_1, created = ProductVersion.objects.get_or_create(product=product, price_retail=D('10.10'), cost_price=D('8'))
 
         ProductFeature.objects.get_or_create(product=product, feature=feature_1, sort=3)
@@ -108,6 +109,7 @@ class Test(object):
         VersionAttribute.objects.get_or_create(version=product_version_1, attribute=feature_11)
         VersionAttribute.objects.get_or_create(version=product_version_1, attribute=feature_21)
         VersionAttribute.objects.get_or_create(version=product_version_1, attribute=feature_31)
+
         product_version_2, created = ProductVersion.objects.get_or_create(product=product, price_retail=D('110.10'), cost_price=D('100'))
 
         VersionAttribute.objects.get_or_create(version=product_version_2, attribute=feature_11)

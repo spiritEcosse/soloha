@@ -19,7 +19,6 @@ from oscar.core.loading import get_model
 from oscar.test import factories
 from selenium import webdriver
 from selenium.webdriver.support.select import Select
-
 from apps.catalogue.views import ProductCategoryView, ProductDetailView
 from python_test.factories import catalogue
 from soloha import settings
@@ -149,11 +148,17 @@ class TestCatalog(LiveServerTestCase):
             ).annotate(
                 price=Min('version__price_retail'),
                 count_child=Count('attribute__parent__children', distinct=True)
-            ).order_by('attribute__parent__product_features__sort', 'price', '-count_child', 'attribute__parent__title', 'attribute__parent__pk')
+            ).order_by('price', '-count_child', 'attribute__parent__title', 'attribute__parent__pk')
+
             for version_attribute in version_attributes:
-                attribute_values.append(str(version_attribute.attribute.pk))
+                attribute_values.append(version_attribute.attribute)
                 if version_attribute.plus:
                     price += version_attribute.price_retail
+            attribute_values = sorted(attribute_values,
+                                      key=lambda attr: attr.product_features.filter(
+                                          product=product).first().sort
+                                      if attr.product_features.filter(product=product).first() else 0)
+            attribute_values = [str(val.pk) for val in attribute_values]
             product_versions[','.join(attribute_values)] = str(price)
         return product_versions
 
@@ -178,7 +183,7 @@ class TestCatalog(LiveServerTestCase):
 
     def get_product_attributes(self, product):
         only = ['title', 'pk']
-        return Feature.objects.only(*only).filter(
+        attributes = Feature.objects.only(*only).filter(
             children__product_versions__product=product, level=0
         ).prefetch_related(
             Prefetch('children', queryset=Feature.objects.only(*only).filter(
@@ -187,7 +192,12 @@ class TestCatalog(LiveServerTestCase):
                 price=Min('product_versions__price_retail')
             ).order_by('price', 'title', 'pk'), to_attr='values')
         ).annotate(price=Min('children__product_versions__price_retail'), count_child=Count('children', distinct=True)).\
-            order_by('product_features__sort', 'price', '-count_child', 'title', 'pk')
+            order_by('price', '-count_child', 'title', 'pk')
+
+        attributes = sorted(attributes,
+                            key=lambda attr: attr.product_features.filter(product=product).first().sort
+                            if attr.product_features.filter(product=product).first() else 0)
+        return attributes
 
     def test_get_price_product_selenium(self):
         """
@@ -290,8 +300,8 @@ class TestCatalog(LiveServerTestCase):
 
         self.checkout_price_by_selected_attribute(attribute=feature_32, attributes=attributes,
                                                   product_versions=product_versions,
-                                                  earlier_price=price_11_21_32_41)
-        self.assertEqual(str(D('4310.00')), price_11_21_32_41)
+                                                  earlier_price=price_11_22_32)
+        self.assertEqual(str(D('2500.00')), price_11_22_32)
 
     def test_page_product_attributes_selenium(self):
         """
@@ -348,7 +358,7 @@ class TestCatalog(LiveServerTestCase):
         index_attr_val = expect_attribute.values.index(attribute)
         attr_val = expect_attribute.values[index_attr_val]
         Select(attribute_1_values).select_by_visible_text(attr_val.title)
-        time.sleep(2)
+        self.firefox.find_element_by_css_selector('#update_price').click()
 
         selected_values = []
         for num in xrange(1, len(attributes) + 1):

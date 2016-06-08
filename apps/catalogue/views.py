@@ -231,18 +231,22 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
             ).order_by('price', 'title', 'pk'), to_attr='values_out_group')
         ).annotate(
             price=Min('children__product_versions__price_retail'), count_child=Count('children', distinct=True)
-        ).order_by('product_features__sort', 'price', '-count_child', 'title', 'pk')
+        ).order_by('price', '-count_child', 'title', 'pk')
 
-        first = ProductVersion.objects.annotate(
+        first = ProductVersion.objects.filter(product=self.object).annotate(
             price_common=Sum('version_attributes__price_retail') + F('price_retail')
         ).filter(attributes=attribute).order_by('price_common').first()
+
+        attributes = sorted(attributes,
+                            key=lambda attr: attr.product_features.filter(product=self.object).first().sort
+                            if attr.product_features.filter(product=self.object).first() else 0)
 
         for attr in attributes:
             for val in attr.values_in_group:
                 val.prices = []
                 val.visible = val in first.attributes.all()
 
-                for prod_ver in val.product_versions.filter(attributes=val).filter(attributes=attribute):
+                for prod_ver in val.product_versions.filter(attributes=val, product=self.object).filter(attributes=attribute):
                     price = ProductVersion.objects.filter(pk=prod_ver.pk).aggregate(
                         common=Sum('version_attributes__price_retail'))
                     price['common'] += prod_ver.price_retail
@@ -263,11 +267,16 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
             ).annotate(
                 price=Min('version__price_retail'),
                 count_child=Count('attribute__parent__children', distinct=True)
-            ).order_by('attribute__parent__product_features__sort', 'price', '-count_child', 'attribute__parent__title', 'attribute__parent__pk')
+            ).order_by('price', '-count_child', 'attribute__parent__title', 'attribute__parent__pk')
             for version_attribute in version_attributes:
-                attribute_values.append(str(version_attribute.attribute.pk))
+                attribute_values.append(version_attribute.attribute)
                 if version_attribute.plus and version_attribute.price_retail is not None:
                     price += version_attribute.price_retail
+            attribute_values = sorted(attribute_values,
+                                      key=lambda attr: attr.product_features.filter(
+                                          product=self.object).first().sort
+                                      if attr.product_features.filter(product=self.object).first() else 0)
+            attribute_values = [str(val.pk) for val in attribute_values]
             product_versions[','.join(attribute_values)] = str(price)
         return product_versions
 
@@ -331,8 +340,11 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
             ).order_by('price', 'title', 'pk'), to_attr='values')
         ).annotate(
             price=Min('children__product_versions__price_retail'), count_child=Count('children', distinct=True)
-        ).order_by('product_features__sort', 'price', '-count_child', 'title', 'pk')
+        ).order_by('price', '-count_child', 'title', 'pk')
 
+        attributes = sorted(attributes,
+                            key=lambda attr: attr.product_features.filter(product=self.object).first().sort
+                            if attr.product_features.filter(product=self.object).first() else 0)
         return attributes
 
     def get_options(self):
