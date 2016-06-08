@@ -11,7 +11,6 @@ app.config ['$httpProvider', ($httpProvider) ->
   $httpProvider.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest'
 ]
 
-
 app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location', '$compile', ($http, $scope, $window, $document, $location, $compile) ->
   $scope.product = []
   $scope.product.values = []
@@ -20,8 +19,8 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
   attributes = []
   product_versions = []
   clone_data = null
-  auto_change = false
 
+  
   $http.post($location.absUrl()).success (data) ->
     clone_data = data
     if data.price
@@ -67,8 +66,8 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
           $compile(el)($scope)
           $scope.product.values[attr.id] = attr.values
 
-          if attr.in_group[0]
-            $scope.product.attributes[attr.id] = attr.in_group[0]
+          if attr.in_group[1] and attr.in_group[1].first_visible
+            $scope.product.attributes[attr.id] = attr.in_group[1]
           else if $scope.product.values[attr.id]
             $scope.product.attributes[attr.id] = $scope.product.values[attr.id][0]
 
@@ -84,7 +83,13 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
 
         if product_versions[selected_attributes.toString()]
           $scope.product.price = product_versions[selected_attributes.toString()]
-        console.log(product_versions[selected_attributes.toString()])
-        console.log($scope.product.price)
-        console.log(product_versions)
+        else
+          $scope.product.price = clone_data.price
+
+          angular.forEach clone_data.attributes, (attr) ->
+            $scope.product.values[attr.id] = attr.values
+            $scope.product.attributes[attr.id] = $scope.product.values[attr.id][0]
+
+            if clone_data.product_version_attributes[attr.id]
+              $scope.product.attributes[attr.id] = clone_data.product_version_attributes[attr.id]
 ]

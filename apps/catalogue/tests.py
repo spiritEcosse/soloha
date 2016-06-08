@@ -260,7 +260,7 @@ class TestCatalog(LiveServerTestCase):
 
         price_11_22_32 = self.checkout_price_by_selected_attribute(attribute=feature_32, attributes=attributes,
                                                                    product_versions=product_versions)
-        self.assertEqual(str(D('2500.10')), price_11_22_32)
+        self.assertEqual(str(D('2500.00')), price_11_22_32)
 
         price_11_22_33 = self.checkout_price_by_selected_attribute(attribute=feature_33, attributes=attributes,
                                                                    product_versions=product_versions)
@@ -348,6 +348,7 @@ class TestCatalog(LiveServerTestCase):
         index_attr_val = expect_attribute.values.index(attribute)
         attr_val = expect_attribute.values[index_attr_val]
         Select(attribute_1_values).select_by_visible_text(attr_val.title)
+        time.sleep(2)
 
         selected_values = []
         for num in xrange(1, len(attributes) + 1):
@@ -356,9 +357,7 @@ class TestCatalog(LiveServerTestCase):
                 selected_values.append(int(selector.first_selected_option.get_attribute('value')))
 
         expected_price = product_versions.get(','.join(map(str, selected_values)))
-        time.sleep(1)
         price = self.firefox.find_element_by_css_selector(self.css_selector_product_price).text
-        time.sleep(1)
         self.assertEqual(price, str(expected_price))
 
         if earlier_price is not None:

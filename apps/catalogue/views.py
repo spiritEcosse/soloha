@@ -25,7 +25,7 @@ from djangular.views.crud import NgCRUDView
 from oscar.core.loading import get_class
 from django.db.models import Q
 from soloha import settings
-from django.db.models import Min
+from django.db.models import Min, Sum
 
 Product = get_model('catalogue', 'product')
 Category = get_model('catalogue', 'category')
@@ -168,7 +168,7 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
 
         def get_values_in_group(value):
             data = value.get_values(('id', 'title'))
-            data.update({'group': str(_('in_group'))})
+            data.update({'group': str(_('in_group')), 'first_visible': value.visible})
             return data
 
         def get_values_out_group(value):
@@ -208,30 +208,6 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
         only = ['pk']
         return Feature.objects.only(*only).filter(level=1, product_versions__product=self.object).distinct().order_by()
 
-    def set_attributes_final_price(self, value):
-        attributes = list()
-
-        for prod_ver in ProductVersion.objects.filter(attributes__in=[value], product=self.object):
-            price = prod_ver.price_retail
-
-            for attr_ver in prod_ver.version_attributes.all():
-                if attr_ver.plus and attr_ver.price_retail is not None:
-                    price += attr_ver.price_retail
-
-            for ver_attr in prod_ver.version_attributes.all():
-                if ver_attr.attribute not in attributes:
-                    attributes.append(ver_attr.attribute)
-                else:
-                    index = attributes.index(ver_attr.attribute)
-                    ver_attr.attribute = attributes[index]
-
-                if not hasattr(ver_attr.attribute, 'final_price'):
-                    setattr(ver_attr.attribute, 'final_price', [])
-
-                ver_attr.attribute.final_price.append(price)
-
-        return attributes
-
     def get_attributes_for_attribute(self, attribute):
         only = ['title', 'pk']
         values_in_group = Feature.objects.only(*only).filter(
@@ -240,6 +216,8 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
 
         attributes = Feature.objects.only(*only).filter(
             children__product_versions__product=self.object, level=0
+        ).exclude(
+            pk=attribute.parent.pk
         ).prefetch_related(
             Prefetch('children', queryset=values_in_group.annotate(
                 price=Min('product_versions__price_retail')
@@ -255,18 +233,23 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
             price=Min('children__product_versions__price_retail'), count_child=Count('children', distinct=True)
         ).order_by('product_features__sort', 'price', '-count_child', 'title', 'pk')
 
-        attributes_sort_by_price = []
+        first = ProductVersion.objects.annotate(
+            price_common=Sum('version_attributes__price_retail') + F('price_retail')
+        ).filter(attributes=attribute).order_by('price_common').first()
 
         for attr in attributes:
-            for attr_source in self.set_attributes_final_price(attribute):
-                if attr_source in attr.values_in_group:
-                    index = attr.values_in_group.index(attr_source)
-                    attr.values_in_group[index] = attr_source
+            for val in attr.values_in_group:
+                val.prices = []
+                val.visible = val in first.attributes.all()
 
-            attr.values_in_group = sorted(attr.values_in_group, key=lambda value: min(value.final_price))
-            attributes_sort_by_price.append(attr)
+                for prod_ver in val.product_versions.filter(attributes=val).filter(attributes=attribute):
+                    price = ProductVersion.objects.filter(pk=prod_ver.pk).aggregate(
+                        common=Sum('version_attributes__price_retail'))
+                    price['common'] += prod_ver.price_retail
+                    val.prices.append(price['common'])
+            attr.values_in_group = sorted(attr.values_in_group, key=lambda val: min(val.prices))
 
-        return attributes_sort_by_price
+        return attributes
 
     def get_product_versions(self):
         product_versions = dict()

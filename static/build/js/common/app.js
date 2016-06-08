@@ -34,7 +34,7 @@
 
   app.controller('Product', [
     '$http', '$scope', '$window', '$document', '$location', '$compile', function($http, $scope, $window, $document, $location, $compile) {
-      var attributes, auto_change, clone_data, product_versions, selected_attributes;
+      var attributes, clone_data, product_versions, selected_attributes;
       $scope.product = [];
       $scope.product.values = [];
       $scope.product.attributes = [];
@@ -42,7 +42,6 @@
       attributes = [];
       product_versions = [];
       clone_data = null;
-      auto_change = false;
       $http.post($location.absUrl()).success(function(data) {
         clone_data = data;
         if (data.price) {
@@ -87,8 +86,8 @@
               el.attr('attr-dis', '0');
               $compile(el)($scope);
               $scope.product.values[attr.id] = attr.values;
-              if (attr.in_group[0]) {
-                return $scope.product.attributes[attr.id] = attr.in_group[0];
+              if (attr.in_group[1] && attr.in_group[1].first_visible) {
+                return $scope.product.attributes[attr.id] = attr.in_group[1];
               } else if ($scope.product.values[attr.id]) {
                 return $scope.product.attributes[attr.id] = $scope.product.values[attr.id][0];
               }
@@ -105,11 +104,17 @@
               }
             });
             if (product_versions[selected_attributes.toString()]) {
-              $scope.product.price = product_versions[selected_attributes.toString()];
+              return $scope.product.price = product_versions[selected_attributes.toString()];
+            } else {
+              $scope.product.price = clone_data.price;
+              return angular.forEach(clone_data.attributes, function(attr) {
+                $scope.product.values[attr.id] = attr.values;
+                $scope.product.attributes[attr.id] = $scope.product.values[attr.id][0];
+                if (clone_data.product_version_attributes[attr.id]) {
+                  return $scope.product.attributes[attr.id] = clone_data.product_version_attributes[attr.id];
+                }
+              });
             }
-            console.log(product_versions[selected_attributes.toString()]);
-            console.log($scope.product.price);
-            return console.log(product_versions);
           }
         }
       };
