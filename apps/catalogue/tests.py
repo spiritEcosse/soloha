@@ -557,6 +557,7 @@ class TestCatalog(TestCase, LiveServerTestCase):
 
         test_catalogue.test_menu_categories(obj=self, response=response)
 
+        # ToDo taras: post request don't work with sorting.
         # response = self.client.post(category.get_absolute_url(),
         #                             json.dumps(dict_values),
         #                             content_type='application/json',
@@ -1183,7 +1184,7 @@ class TestCatalog(TestCase, LiveServerTestCase):
         test_catalogue.create_product_bulk()
         category = Category.objects.get(name='Category-12')
 
-        initial_url = ('%s%s%s' % (self.live_server_url, category.get_absolute_url(), '?sorting_type=popularity'))
+        initial_url = ('%s%s%s' % (self.live_server_url, category.get_absolute_url(), '?sorting_type=price_ascending'))
         self.assertions_show_more_goods_category_page_selenium(url=initial_url)
 
     def assertions_show_more_goods_category_page_selenium(self, url):
@@ -1209,7 +1210,7 @@ class TestCatalog(TestCase, LiveServerTestCase):
         time.sleep(10)
         self.assertEqual(self.firefox.current_url, initial_url)
 
-        paginator_three = self.firefox.find_element_by_xpath(".//*[@id='default']/div[1]/div/div[2]/div[3]/div[27]/div/nav/ul/li[3]/a")
+        paginator_three = self.firefox.find_element_by_xpath(".//*[@id='default']/div[1]/div/div[2]/div[3]/div[51]/div/nav/ul/li[3]/a")
         paginator_three.click()
         time.sleep(10)
         self.assertNotEqual(self.firefox.current_url, initial_url)
@@ -1220,12 +1221,16 @@ class TestCatalog(TestCase, LiveServerTestCase):
         time.sleep(10)
         self.assertIn('Product 69', self.firefox.page_source)
         self.assertIn('Product 118', self.firefox.page_source)
-        self.assertNotIn('Product 1', self.firefox.page_source)
+        self.assertNotIn('Product 68', self.firefox.page_source)
         self.assertIn('ng-hide="hide == true"', self.firefox.page_source)
 
         self.firefox.get(initial_url+"&page=4")
         time.sleep(10)
         self.assertNotIn(u'ПОКАЗАТЬ ЕЩЕ', self.firefox.page_source)
+
+
+
+
 
 
 

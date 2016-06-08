@@ -129,6 +129,9 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
 ]
 
 app.controller 'More_goods', ['$http', '$scope', '$window', '$document', '$location', '$compile', ($http, $scope, $window, $document, $location, $compile) ->
+#  paramValue = $location.search().sorting_type
+#  console.log(paramValue)
+
   $http.post($location.absUrl()).success (data) ->
     items = angular.element(document).find('#product')
     items.attr('ng-repeat', 'product in products')
@@ -144,12 +147,12 @@ app.controller 'More_goods', ['$http', '$scope', '$window', '$document', '$locat
     $scope.pages[0].active = "True"
     $scope.pages[0].link = ""
     $scope.sorting_type = data.sorting_type
-    console.log($scope.products)
+    console.log(data)
   .error ->
     console.error('An error occurred during submission')
 
   $scope.submit = ->
-    $http.post($location.absUrl(), {'search_string': $scope.search_string, 'page': $scope.page_number, 'sorting_type': $scope.sorting_type}).success (data) ->
+    $http.post($location.absUrl(), {'page': $scope.page_number, 'sorting_type': $scope.sorting_type}).success (data) ->
       clear = angular.element('.clear_pagination')
       clear.remove()
       $scope.pages = data.pages

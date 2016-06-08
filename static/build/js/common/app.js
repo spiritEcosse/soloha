@@ -191,13 +191,12 @@
         $scope.pages[0].active = "True";
         $scope.pages[0].link = "";
         $scope.sorting_type = data.sorting_type;
-        return console.log($scope.products);
+        return console.log(data);
       }).error(function() {
         return console.error('An error occurred during submission');
       });
       return $scope.submit = function() {
         return $http.post($location.absUrl(), {
-          'search_string': $scope.search_string,
           'page': $scope.page_number,
           'sorting_type': $scope.sorting_type
         }).success(function(data) {
