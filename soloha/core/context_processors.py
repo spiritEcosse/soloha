@@ -15,6 +15,6 @@ def context_data(request):
         'work_time': queryset.work_time,
         'address': queryset.address,
         'phone_number': queryset.phone_number,
-        'email': queryset.email
+        'email': queryset.email,
     }
 

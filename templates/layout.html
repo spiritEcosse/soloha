@@ -4,6 +4,7 @@
 {% load promotion_tags %}
 {% load thumbnail %}
 {% load i18n %}
+{% load flatpages %}
 
 {% block extrascripts %}
     <script src="{% static 'build/js/common/app.js' %}"></script>
@@ -308,14 +309,18 @@
                     </div>
                     <div class="col-xs-24 col-sm-6 column">
                         <div class="title line-bottom">Информация</div>
+                        {% get_flatpages as flatpages %}
                         <ul class="list-group">
-                            <li class="list-group-item"><a href="#">Гарантии</a></li>
-                            <li class="list-group-item"><a href="#">О нас</a></li>
-                            <li class="list-group-item"><a href="#">Контакты</a></li>
-                            <li class="list-group-item"><a href="#">Доставка и оплата</a></li>
-                            <li class="list-group-item"><a href="#">Мобильный офис</a></li>
-                            <li class="list-group-item"><a href="#">Кредит</a></li>
-                            <li class="list-group-item"><a href="#">Механизмы трансформации</a></li>
+                            {% for page in flatpages %}
+                                <li><a href="{{ page.get_absolute_url }}">{{ page.title }}</a></li>
+                            {% endfor %}
+                            {#                            <li class="list-group-item"><a href="#">Гарантии</a></li>#}
+                            {#                            <li class="list-group-item"><a href="#">О нас</a></li>#}
+                            {#                            <li class="list-group-item"><a href="#">Контакты</a></li>#}
+                            {#                            <li class="list-group-item"><a href="#">Доставка и оплата</a></li>#}
+                            {#                            <li class="list-group-item"><a href="#">Мобильный офис</a></li>#}
+                            {#                            <li class="list-group-item"><a href="#">Кредит</a></li>#}
+{#                            <li class="list-group-item"><a href="#">Механизмы трансформации</a></li>#}
                         </ul>
                         <div class="col-xs-24 special line-top"><a href="#">Акции</a>/<a href="#">Распродажи</a></div>
                     </div>

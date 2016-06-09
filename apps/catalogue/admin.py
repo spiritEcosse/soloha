@@ -7,6 +7,8 @@ from django.forms import Textarea
 from django import forms
 from django.contrib.admin import widgets
 from django.contrib.sites.models import Site
+from django.contrib.flatpages.admin import FlatPageAdmin
+from django.contrib.flatpages.models import FlatPage
 
 
 Feature = get_model('catalogue', 'Feature')
@@ -21,6 +23,7 @@ ProductClass = get_model('catalogue', 'ProductClass')
 ProductImage = get_model('catalogue', 'ProductImage')
 ProductRecommendation = get_model('catalogue', 'ProductRecommendation')
 SiteInfo = get_model('sites', 'SiteInfo')
+InfoPage = get_model('flatpages', 'InfoPage')
 
 
 class FeatureAdmin(tree_editor.TreeEditor):
@@ -130,3 +133,6 @@ admin.site.register(Feature, FeatureAdmin)
 admin.site.register(SiteInfo)
 
 admin.site.unregister(Site)
+admin.site.unregister(FlatPage)
+
+admin.site.register(InfoPage)
