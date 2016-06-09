@@ -128,11 +128,28 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
 
 ]
 
-app.controller 'More_goods', ['$http', '$scope', '$window', '$document', '$location', '$compile', ($http, $scope, $window, $document, $location, $compile) ->
-#  paramValue = $location.search().sorting_type
-#  console.log(paramValue)
+app.controller 'More_goods', ['$http', '$scope', '$window', '$document', '$location', '$compile', '$routeParams', ($http, $scope, $window, $document, $location, $compile, $routeParams) ->
+  getParameterByName = (name, url) ->
+    if !url
+      url = window.location.href
+    name = name.replace(/[\[\]]/g, '\\$&')
+    regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)')
+    results = regex.exec(url)
+    if !results
+      return null
+    if !results[2]
+      return ''
+    decodeURIComponent results[2].replace(/\+/g, ' ')
 
-  $http.post($location.absUrl()).success (data) ->
+  $scope.sorting_type = '-views_count'
+  if getParameterByName('sorting_type')
+    $scope.sorting_type = getParameterByName('sorting_type')
+  $scope.page_number = '1'
+  if getParameterByName('page')
+    $scope.page_number = getParameterByName('page')
+  console.log($scope.page_number)
+
+  $http.post($location.absUrl(), {'page': $scope.page_number, 'sorting_type': $scope.sorting_type}).success (data) ->
     items = angular.element(document).find('#product')
     items.attr('ng-repeat', 'product in products')
     $compile(items)($scope)
@@ -140,9 +157,8 @@ app.controller 'More_goods', ['$http', '$scope', '$window', '$document', '$locat
     clear.remove()
     $scope.products = data.products
     $scope.initial_page_number = data.page_number
-    $scope.page_number = data.page_number
+#    $scope.page_number = data.page_number
     $scope.num_pages = data.num_pages
-    $scope.search_string = data.search_string
     $scope.pages = [data.pages[parseInt($scope.initial_page_number)-1]]
     $scope.pages[0].active = "True"
     $scope.pages[0].link = ""

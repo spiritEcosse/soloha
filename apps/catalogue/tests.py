@@ -557,19 +557,18 @@ class TestCatalog(TestCase, LiveServerTestCase):
 
         test_catalogue.test_menu_categories(obj=self, response=response)
 
-        # ToDo taras: post request don't work with sorting.
-        # response = self.client.post(category.get_absolute_url(),
-        #                             json.dumps(dict_values),
-        #                             content_type='application/json',
-        #                             HTTP_X_REQUESTED_WITH='XMLHttpRequest')
-        # context = dict()
-        # context['products'] = []
-        # for product in products[OSCAR_PRODUCTS_PER_PAGE*(int(dict_values['page'])-1):OSCAR_PRODUCTS_PER_PAGE*(int(dict_values['page']))]:
-        #     product_values = product.get_values()
-        #     product_values['id'] = product.id
-        #     context['products'].append(product_values)
-        # content = json.loads(response.content)
-        # self.assertListEqual(context['products'], content['products'])
+        response = self.client.post(category.get_absolute_url(),
+                                    json.dumps(dict_values),
+                                    content_type='application/json',
+                                    HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        context = dict()
+        context['products'] = []
+        for product in products[OSCAR_PRODUCTS_PER_PAGE*(int(dict_values['page'])-1):OSCAR_PRODUCTS_PER_PAGE*(int(dict_values['page']))]:
+            product_values = product.get_values()
+            product_values['id'] = product.id
+            context['products'].append(product_values)
+        content = json.loads(response.content)
+        self.assertListEqual(context['products'], content['products'])
 
     def test_page_category_sorting_buttons(self):
         test_catalogue.create_product_bulk()

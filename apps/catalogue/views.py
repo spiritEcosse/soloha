@@ -48,10 +48,10 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
 
     def post(self, request, *args, **kwargs):
         if self.request.is_ajax():
-            # self.page_number = request.GET.get('page', '1')
             if self.request.body:
                 data = json.loads(self.request.body)
                 self.page_number = data.get('page')
+                self.kwargs['sorting_type'] = data.get('sorting_type')
             self.kwargs['url'] = self.request.path
 
     def post_ajax(self, request, *args, **kwargs):
@@ -61,11 +61,6 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
 
     def get_context_data_more_goods_json(self, **kwargs):
         context = dict()
-        self.page_number = self.request.GET.get('page', '1')
-        self.kwargs['sorting_type'] = self.request.GET.get('sorting_type', 'popularity')
-        dict_new_sorting_types = {'popularity': '-views_count', 'price_ascending': 'stockrecords__price_excl_tax',
-                                  'price_descending': '-stockrecords__price_excl_tax'}
-        self.kwargs['sorting_type'] = dict_new_sorting_types.get(self.kwargs.get('sorting_type'), '-views_count')
         self.object = self.get_category()
         self.products_on_page = self.get_queryset()
 
@@ -80,7 +75,7 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
         context['page_number'] = self.page_number
         context['num_pages'] = self.paginator.num_pages
         context['pages'] = self.get_page_link(self.paginator.page_range)
-        context['sorting_type'] = self.kwargs.get('sorting_type')
+        context['sorting_type'] = self.kwargs['sorting_type']
         return context
 
     def get(self, request, *args, **kwargs):
@@ -127,6 +122,11 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
     def get_queryset(self):
         dict_filter = {'enable': True, 'categories__in': self.object.get_descendants(include_self=True)}
         only = ['title', 'slug', 'structure', 'product_class', 'categories']
+
+        dict_new_sorting_types = {'popularity': '-views_count', 'price_ascending': 'stockrecords__price_excl_tax',
+                              'price_descending': '-stockrecords__price_excl_tax'}
+        self.kwargs['sorting_type'] = dict_new_sorting_types.get(self.kwargs.get('sorting_type'), self.kwargs.get('sorting_type', '-views_count'))
+
         self.products_without_filters = Product.objects.only('id').filter(**dict_filter).distinct().order_by(self.kwargs.get('sorting_type'))
 
         if self.kwargs.get('filter_slug'):

@@ -17,7 +17,7 @@
   app = angular.module(app_name, ['ngResource', 'ngRoute', 'ng.django.forms', 'ui.bootstrap', 'ngAnimate', 'duScroll']);
 
   app.config([
-    '$httpProvider', function($httpProvider) {
+    '$httpProvider', '$routeProvider', function($httpProvider) {
       $httpProvider.defaults.xsrfCookieName = 'csrftoken';
       $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
       return $httpProvider.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
@@ -25,7 +25,7 @@
   ]);
 
   app.controller('Header', [
-    '$http', '$scope', '$location', '$window', '$document', '$log', '$cacheFactory', '$route', function($http, $scope, $location, $window, $document, $log, $cacheFactory, $route) {
+    '$http', '$scope', '$location', '$window', '$document', '$log', '$cacheFactory', function($http, $scope, $location, $window, $document, $log, $cacheFactory) {
       return $scope.update_products = function() {
         return $http.post('/search/', {
           'search_string': $scope.search
@@ -174,8 +174,37 @@
   ]);
 
   app.controller('More_goods', [
-    '$http', '$scope', '$window', '$document', '$location', '$compile', function($http, $scope, $window, $document, $location, $compile) {
-      $http.post($location.absUrl()).success(function(data) {
+    '$http', '$scope', '$window', '$document', '$location', '$compile', '$routeParams', function($http, $scope, $window, $document, $location, $compile, $routeParams) {
+      var getParameterByName;
+      getParameterByName = function(name, url) {
+        var regex, results;
+        if (!url) {
+          url = window.location.href;
+        }
+        name = name.replace(/[\[\]]/g, '\\$&');
+        regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)');
+        results = regex.exec(url);
+        if (!results) {
+          return null;
+        }
+        if (!results[2]) {
+          return '';
+        }
+        return decodeURIComponent(results[2].replace(/\+/g, ' '));
+      };
+      $scope.sorting_type = '-views_count';
+      if (getParameterByName('sorting_type')) {
+        $scope.sorting_type = getParameterByName('sorting_type');
+      }
+      $scope.page_number = '1';
+      if (getParameterByName('page')) {
+        $scope.page_number = getParameterByName('page');
+      }
+      console.log($scope.page_number);
+      $http.post($location.absUrl(), {
+        'page': $scope.page_number,
+        'sorting_type': $scope.sorting_type
+      }).success(function(data) {
         var clear, items;
         items = angular.element(document).find('#product');
         items.attr('ng-repeat', 'product in products');
@@ -184,9 +213,7 @@
         clear.remove();
         $scope.products = data.products;
         $scope.initial_page_number = data.page_number;
-        $scope.page_number = data.page_number;
         $scope.num_pages = data.num_pages;
-        $scope.search_string = data.search_string;
         $scope.pages = [data.pages[parseInt($scope.initial_page_number) - 1]];
         $scope.pages[0].active = "True";
         $scope.pages[0].link = "";
