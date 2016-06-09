@@ -63,7 +63,6 @@
 {% endblock left-bar %}
 
 {% block content %}
-    <form method="get" action="." class="form-horizontal">
         <div class="row sort">
             <div class="col-xs-16">
                 <span class="text">Сортировать:</span>
@@ -81,26 +80,26 @@
         <div class="row items">
             {% if page_obj %}
                 {% for product in page_obj %}
-                    <div class="col-sm-6 col-md-6">
+                    {% if forloop.first %}
+                        <div class="col-sm-6 col-md-6" id="product">
+                            {% include "catalogue/partials/product.html" %}
+                        </div>
+                    {% else %}
+                        <span class="clear">
+                    <div class="col-sm-6 col-md-6" id="product">
                         {% include "catalogue/partials/product.html" %}
                     </div>
+                    </span>
+                    {% endif %}
                 {% endfor %}
-{#                {% if page_obj_next %}#}
-{#                    {% for product in page_obj_next %}#}
-{#                        <div class="col-sm-6 col-md-6">#}
-{#                            {% include "catalogue/partials/product.html" %}#}
-{#                        </div>#}
-{#                    {% endfor %}#}
-{#                {% endif %}#}
                 <div class="clearfix"></div>
                 <div name="more_products" class="col-xs-6 col-xs-offset-8 wrapper" action=".">
                     {% csrf_token %}
-                    <a href="#" class="more_products" ng-click="submit()"> {#  onclick="location.href='/test/'" #}
-                        {% verbatim %}
-                        {{ search_string }}
-                        {% endverbatim %}
+                    {% if page_obj.number != paginator.num_pages %}
+                    <a href="#" class="more_products" ng-click="submit()" ng-hide="hide == true"> {#  onclick="location.href='/test/'" #}
                         ПОКАЗАТЬ ЕЩЕ
                     </a>
+                        {% endif %}
                 </div>
                 <div>
                     {% include "catalogue/partials/pagination.html" %}
@@ -109,9 +108,6 @@
                 <div class="nonefound col-xs-24">{% trans "No products found." %}</div>
             {% endif %}
         </div>
-
-    </form>
-
 {% endblock %}
 
 

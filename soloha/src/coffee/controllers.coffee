@@ -6,13 +6,13 @@ app_name = 'soloha'
 #app = angular.module app_name
 app = angular.module app_name, ['ngResource', 'ngRoute', 'ng.django.forms', 'ui.bootstrap', 'ngAnimate', 'duScroll']
 
-app.config ['$httpProvider', ($httpProvider) ->
+app.config ['$httpProvider', '$routeProvider', ($httpProvider) ->
   $httpProvider.defaults.xsrfCookieName = 'csrftoken'
   $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken'
   $httpProvider.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest'
 ]
 
-app.controller 'Header', ['$http', '$scope', '$location', '$window', '$document', '$log', '$cacheFactory', '$route', ($http, $scope, $location, $window, $document, $log, $cacheFactory, $route) ->
+app.controller 'Header', ['$http', '$scope', '$location', '$window', '$document', '$log', '$cacheFactory', ($http, $scope, $location, $window, $document, $log, $cacheFactory) ->
   $scope.update_products = () ->
     $http.post('/search/', {'search_string': $scope.search}).success (data) ->
       $scope.search_string = data.search_string

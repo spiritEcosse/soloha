@@ -7,7 +7,8 @@
 {% load staticfiles %}
 {% load i18n %}
 
-{% block ngController %}ng-controller="" {% endblock ngController %}
+{#{% block ngController %}ng-controller="" {% endblock ngController %}#}
+{% block ngController%}ng-controller="More_goods"{% endblock ngController %}
 
 {% load filters_concatenation %}
 
@@ -123,16 +124,30 @@
     <div class="row items">
         {% if page_obj %}
             {% for product in page_obj %}
-                <div class="col-sm-6 col-md-6">
-                    {% include "catalogue/partials/product.html" %}
-                </div>
+                {% if forloop.first %}
+                    <div class="col-sm-6 col-md-6" id="product">
+                        {% include "catalogue/partials/product.html" %}
+                    </div>
+                {% else %}
+                    <span class="clear">
+                    <div class="col-sm-6 col-md-6" id="product">
+                        {% include "catalogue/partials/product.html" %}
+                    </div>
+                    </span>
+                {% endif %}
+{#                <div class="col-sm-6 col-md-6">#}
+{#                    {% include "catalogue/partials/product.html" %}#}
+{#                </div>#}
             {% endfor %}
             <div class="clearfix"></div>
-            <div class="col-xs-6 col-xs-offset-8 wrapper">
-                <a href="#" class="more_products">
-                    ПОКАЗАТЬ ЕЩЕ
-                </a>
-            </div>
+                <div name="more_products" class="col-xs-6 col-xs-offset-8 wrapper" action=".">
+                    {% csrf_token %}
+                    {% if page_obj.number != paginator.num_pages %}
+                    <a href="#" class="more_products" ng-click="submit()" ng-hide="hide == true"> {#  onclick="location.href='/test/'" #}
+                        ПОКАЗАТЬ ЕЩЕ
+                    </a>
+                        {% endif %}
+                </div>
             <div>
                 {% include "catalogue/partials/pagination.html" %}
             </div>

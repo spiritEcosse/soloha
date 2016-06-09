@@ -13,6 +13,8 @@ from apps.catalogue.models import Feature
 from django.http import HttpResponse
 from django.db.models import Count
 from django.db.models import Q
+from django.shortcuts import render
+from django.forms.models import model_to_dict
 
 Product = get_model('catalogue', 'product')
 
@@ -26,27 +28,49 @@ class FacetedSearchView(views.JSONResponseMixin, views.AjaxResponseMixin, CoreFa
     paginate_by = OSCAR_PRODUCTS_PER_PAGE
 
     def post(self, request, *args, **kwargs):
-        # if request.is_ajax() and request.GET.get('q', False):
-        #     return self.get_ajax(request)
-        self.kwargs['search_string'] = ''
+        if self.request.is_ajax() and self.request.GET.get('q'):
+            self.kwargs['search_string'] = self.request.GET.get('q')
+            self.kwargs['sorting_type'] = self.request.GET.get('sorting_type', 'popularity')
+            self.page_number = request.GET.get('page', '1')
+            if self.request.body:
+                data = json.loads(self.request.body)
+                self.page_number = data.get('page')
+            self.kwargs['url'] = self.request.path
+
         if self.request.body:
             data = json.loads(self.request.body)
             self.kwargs['search_string'] = data.get('search_string', '')
-        self.products = self.get_products()
 
     def post_ajax(self, request, *args, **kwargs):
         super(FacetedSearchView, self).post_ajax(request, *args, **kwargs)
-        return self.render_json_response(self.get_context_data_json())
-
-    def get_ajax(self, request, *args, **kwargs):
-        self.kwargs['search_string'] = self.request.GET.get('q')
-        self.products = self.get_products()
-        self.kwargs['data_to_context'] = 'data_context'
-        # return HttpResponse(json.dumps(response_data), content_type="application/json")
+        if self.request.is_ajax() and self.request.GET.get('q'):
+            return self.render_json_response(self.get_context_data_json())
+        return self.render_json_response(self.get_context_data_live_search_json())
 
     def get_context_data_json(self, **kwargs):
         context = dict()
-        context['searched_products'] = self.products
+        dict_new_sorting_types = {'popularity': '-views_count', 'price_ascending': 'stockrecords__price_excl_tax',
+                                  'price_descending': '-stockrecords__price_excl_tax'}
+        self.kwargs['sorting_type'] = dict_new_sorting_types.get(self.kwargs.get('sorting_type', 'popularity'))
+        self.products_on_page = self.get_queryset()
+        self.paginator = self.get_paginator(self.products_on_page, OSCAR_PRODUCTS_PER_PAGE)
+        self.products_current_page = self.paginator.page(self.page_number).object_list
+        self.paginated_products = []
+        if (int(self.page_number)) != self.paginator.num_pages:
+            self.paginated_products = self.paginator.page(str(int(self.page_number) + 1)).object_list
+
+        context['search_string'] = self.kwargs['search_string']
+        context['products'] = self.get_product_values(self.products_current_page)
+        context['products_next_page'] = self.get_product_values(self.paginated_products)
+        context['page_number'] = self.page_number
+        context['num_pages'] = self.paginator.num_pages
+        context['pages'] = self.get_page_link(self.paginator.page_range)
+        context['sorting_type'] = self.kwargs.get('sorting_type')
+        return context
+
+    def get_context_data_live_search_json(self, **kwargs):
+        context = dict()
+        context['searched_products'] = self.get_products()
         context['search_string'] = self.kwargs['search_string']
         return context
 
@@ -56,6 +80,7 @@ class FacetedSearchView(views.JSONResponseMixin, views.AjaxResponseMixin, CoreFa
                                       'price_descending': '-stockrecords__price_excl_tax'}
 
         self.kwargs['sorting_type'] = dict_new_sorting_types.get(self.request.GET.get('sorting_type'), '-views_count')
+        self.kwargs['url'] = self.request.path
         return super(FacetedSearchView, self).get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -73,6 +98,10 @@ class FacetedSearchView(views.JSONResponseMixin, views.AjaxResponseMixin, CoreFa
                       ('-stockrecords__price_excl_tax', _('By price descending'), 'price_descending'),
                       ('stockrecords__price_excl_tax', _('By price ascending'), 'price_ascending')]
         context['sort_types'] = []
+        context['pages'] = self.get_page_link(context['paginator'].page_range)
+        for page in context['pages']:
+            if page['page_number'] == context['page_obj'].number:
+                page['active'] = 'True'
         for type, text, link in sort_types:
             is_active = False
             if self.kwargs.get('sorting_type', '') == type:
@@ -80,9 +109,6 @@ class FacetedSearchView(views.JSONResponseMixin, views.AjaxResponseMixin, CoreFa
             sorting_url = '{}?q={}&sorting_type={}'.format(self.request.path, context['query'], link)
             sort_link = 'q={}&sorting_type={}'.format(context['query'], link)
             context['sort_types'].append((sorting_url, text, is_active, sort_link))
-
-        if context['page_obj'].has_next():
-            context['page_obj_next'] = context['paginator'].page(context['page_obj'].next_page_number())
 
         return context
 
@@ -125,5 +151,35 @@ class FacetedSearchView(views.JSONResponseMixin, views.AjaxResponseMixin, CoreFa
             Prefetch('categories__parent__parent')
         ).distinct().order_by(self.kwargs['sorting_type'])
 
+    def get_product_values(self, products):
+        values = []
 
+        for product in products:
+            product_values = product.get_values()
+            product_values['id'] = product.id
+            values.append(product_values)
 
+        return values
+
+    def get_page_link(self, page_numbers, **kwargs):
+        pages = []
+
+        dict_old_sorting_types = {'-views_count': 'popularity', 'stockrecords__price_excl_tax': 'price_ascending',
+                                  '-stockrecords__price_excl_tax': 'price_descending'}
+
+        # this replacement needed, to fix problem with spaces in url
+        if self.kwargs['search_string']:
+            self.kwargs['search_string'] = self.kwargs['search_string'].replace(' ', '+')
+
+        for page in page_numbers:
+            pages_dict = dict()
+            pages_dict['page_number'] = page
+            pages_dict['link'] = "{}?page={}&q={}&sorting_type={}".format(
+                                                                    self.kwargs['url'],
+                                                                    page,
+                                                                    self.kwargs['search_string'],
+                                                                    dict_old_sorting_types.get(self.kwargs.get('sorting_type'), 'popularity'))
+            pages_dict['active'] = 'False'
+            pages.append(pages_dict)
+
+        return pages

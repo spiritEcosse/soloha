@@ -17,7 +17,7 @@
   app = angular.module(app_name, ['ngResource', 'ngRoute', 'ng.django.forms', 'ui.bootstrap', 'ngAnimate', 'duScroll']);
 
   app.config([
-    '$httpProvider', function($httpProvider) {
+    '$httpProvider', '$routeProvider', function($httpProvider) {
       $httpProvider.defaults.xsrfCookieName = 'csrftoken';
       $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
       return $httpProvider.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
@@ -25,7 +25,7 @@
   ]);
 
   app.controller('Header', [
-    '$http', '$scope', '$location', '$window', '$document', '$log', '$cacheFactory', '$route', function($http, $scope, $location, $window, $document, $log, $cacheFactory, $route) {
+    '$http', '$scope', '$location', '$window', '$document', '$log', '$cacheFactory', function($http, $scope, $location, $window, $document, $log, $cacheFactory) {
       return $scope.update_products = function() {
         return $http.post('/search/', {
           'search_string': $scope.search
@@ -115,7 +115,6 @@
             delete $scope.list_options[$scope.option_id];
             return angular.element(document.getElementById('options-0')).append($compile('<span id="' + $scope.option_id + '"> <select class="form-control" ng-model="option_model[' + $scope.option_id + ']" ng-change="change_price(option_id)" ng-options="option for option in options_children[' + $scope.option_id + ']" ></select> </span>')($scope));
           } else {
-            console.log("new");
             delete $scope.list_options[$scope.option_id];
             return angular.element(document.getElementById('options-0')).append($compile('<div id="model[' + $scope.option_id + ']"> <select class="form-control" ng-model="option_model[' + $scope.option_id + ']" ng-change="change_price(option_id)" ng-options="option for option in list_options" ></select> </div>')($scope));
           }
@@ -211,8 +210,86 @@
               }
             });
           }
-          return console.log('choose the option with the lowest price');
+          console.log('choose the option with the lowest price');
+          selected_attributes.push($scope.product.attributes[key].id);
         }
+        $scope.product.price = product_versions[selected_attributes.toString()];
+        console.log(product_versions);
+        return console.log(selected_attributes.toString());
+      };
+    }
+  ]);
+
+  app.controller('More_goods', [
+    '$http', '$scope', '$window', '$document', '$location', '$compile', '$routeParams', function($http, $scope, $window, $document, $location, $compile, $routeParams) {
+      var getParameterByName;
+      getParameterByName = function(name, url) {
+        var regex, results;
+        if (!url) {
+          url = window.location.href;
+        }
+        name = name.replace(/[\[\]]/g, '\\$&');
+        regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)');
+        results = regex.exec(url);
+        if (!results) {
+          return null;
+        }
+        if (!results[2]) {
+          return '';
+        }
+        return decodeURIComponent(results[2].replace(/\+/g, ' '));
+      };
+      $scope.sorting_type = '-views_count';
+      if (getParameterByName('sorting_type')) {
+        $scope.sorting_type = getParameterByName('sorting_type');
+      }
+      $scope.page_number = '1';
+      if (getParameterByName('page')) {
+        $scope.page_number = getParameterByName('page');
+      }
+      console.log($scope.page_number);
+      $http.post($location.absUrl(), {
+        'page': $scope.page_number,
+        'sorting_type': $scope.sorting_type
+      }).success(function(data) {
+        var clear, items;
+        items = angular.element(document).find('#product');
+        items.attr('ng-repeat', 'product in products');
+        $compile(items)($scope);
+        clear = angular.element('.clear');
+        clear.remove();
+        $scope.products = data.products;
+        $scope.initial_page_number = data.page_number;
+        $scope.num_pages = data.num_pages;
+        $scope.pages = [data.pages[parseInt($scope.initial_page_number) - 1]];
+        $scope.pages[0].active = "True";
+        $scope.pages[0].link = "";
+        $scope.sorting_type = data.sorting_type;
+        return console.log(data);
+      }).error(function() {
+        return console.error('An error occurred during submission');
+      });
+      return $scope.submit = function() {
+        return $http.post($location.absUrl(), {
+          'page': $scope.page_number,
+          'sorting_type': $scope.sorting_type
+        }).success(function(data) {
+          var clear, page_active, _i, _ref, _ref1;
+          clear = angular.element('.clear_pagination');
+          clear.remove();
+          $scope.pages = data.pages;
+          for (page_active = _i = _ref = parseInt($scope.initial_page_number) - 1, _ref1 = parseInt($scope.page_number); _ref <= _ref1 ? _i <= _ref1 : _i >= _ref1; page_active = _ref <= _ref1 ? ++_i : --_i) {
+            $scope.pages[page_active].active = "True";
+            $scope.pages[page_active].link = "";
+          }
+          $scope.products = $scope.products.concat(data.products_next_page);
+          $scope.page_number = parseInt($scope.page_number) + 1;
+          if ($scope.page_number === parseInt($scope.num_pages)) {
+            return $scope.hide = true;
+          }
+        }).error(function() {
+          return console.error('An error occurred during submission');
+        });
       };
     }
   ]);
@@ -305,14 +382,46 @@
   ]);
 
   app.controller('Search', [
-    '$http', '$scope', '$window', '$document', '$location', function($http, $scope, $window, $document, $location) {
+    '$http', '$scope', '$window', '$document', '$location', '$routeParams', '$compile', function($http, $scope, $window, $document, $location, $routeParams, $compile) {
+      $http.post($location.absUrl()).success(function(data) {
+        var clear, items;
+        items = angular.element(document).find('#product');
+        items.attr('ng-repeat', 'product in products');
+        $compile(items)($scope);
+        clear = angular.element('.clear');
+        clear.remove();
+        $scope.products = data.products;
+        $scope.initial_page_number = data.page_number;
+        $scope.page_number = data.page_number;
+        $scope.num_pages = data.num_pages;
+        $scope.search_string = data.search_string;
+        $scope.pages = [data.pages[parseInt($scope.initial_page_number) - 1]];
+        $scope.pages[0].active = "True";
+        $scope.pages[0].link = "";
+        $scope.sorting_type = data.sorting_type;
+        return console.log($scope.pages);
+      }).error(function() {
+        return console.error('An error occurred during submission');
+      });
       return $scope.submit = function() {
         return $http.post($location.absUrl(), {
-          'search_string': $scope.search_string
+          'search_string': $scope.search_string,
+          'page': $scope.page_number,
+          'sorting_type': $scope.sorting_type
         }).success(function(data) {
-          $scope.search_string = data.search_string;
-          console.log(data);
-          return console.log($location.absUrl());
+          var clear, page_active, _i, _ref, _ref1;
+          clear = angular.element('.clear_pagination');
+          clear.remove();
+          $scope.pages = data.pages;
+          for (page_active = _i = _ref = parseInt($scope.initial_page_number) - 1, _ref1 = parseInt($scope.page_number); _ref <= _ref1 ? _i <= _ref1 : _i >= _ref1; page_active = _ref <= _ref1 ? ++_i : --_i) {
+            $scope.pages[page_active].active = "True";
+            $scope.pages[page_active].link = "";
+          }
+          $scope.products = $scope.products.concat(data.products_next_page);
+          $scope.page_number = parseInt($scope.page_number) + 1;
+          if ($scope.page_number === parseInt($scope.num_pages)) {
+            return $scope.hide = true;
+          }
         }).error(function() {
           return console.error('An error occurred during submission');
         });

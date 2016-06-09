@@ -22,8 +22,6 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
   prefix = 'attribute-'
   selector_el = '.dropdown-menu.inner'
 
-#  $scope.new_price = 1
-
   $http.post($location.absUrl()).success (data) ->
     $scope.options = data.options
     $scope.options_children = data.options_children
@@ -57,7 +55,6 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
       $scope.options_children[$scope.option_id] = data.options_children
 
       if Object.keys($scope.options_children[$scope.option_id]).length != 0
-#        console.log(data.options_children)
         delete $scope.list_options[$scope.option_id]
 
         angular.element(document.getElementById('options-0')).append $compile('<span id="' + $scope.option_id + '">
@@ -65,7 +62,6 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
                 ng-change="change_price(option_id)" ng-options="option for option in options_children[' + $scope.option_id + ']" ></select>
                 </span>')($scope)
       else
-        console.log("new")
         delete $scope.list_options[$scope.option_id]
         #           $scope.current_model = $scope.model[$scope.option_id]
         angular.element(document.getElementById('options-0')).append $compile('<div id="model[' + $scope.option_id + ']">
@@ -173,4 +169,64 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
           if clone_data.product_version_attributes[attr.id]
             $scope.product.attributes[attr.id] = clone_data.product_version_attributes[attr.id]
       console.log('choose the option with the lowest price')
+      selected_attributes.push($scope.product.attributes[key].id)
+    $scope.product.price = product_versions[selected_attributes.toString()]
+    console.log(product_versions)
+    console.log(selected_attributes.toString())
+
+]
+
+app.controller 'More_goods', ['$http', '$scope', '$window', '$document', '$location', '$compile', '$routeParams', ($http, $scope, $window, $document, $location, $compile, $routeParams) ->
+  getParameterByName = (name, url) ->
+    if !url
+      url = window.location.href
+    name = name.replace(/[\[\]]/g, '\\$&')
+    regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)')
+    results = regex.exec(url)
+    if !results
+      return null
+    if !results[2]
+      return ''
+    decodeURIComponent results[2].replace(/\+/g, ' ')
+
+  $scope.sorting_type = '-views_count'
+  if getParameterByName('sorting_type')
+    $scope.sorting_type = getParameterByName('sorting_type')
+  $scope.page_number = '1'
+  if getParameterByName('page')
+    $scope.page_number = getParameterByName('page')
+  console.log($scope.page_number)
+
+  $http.post($location.absUrl(), {'page': $scope.page_number, 'sorting_type': $scope.sorting_type}).success (data) ->
+    items = angular.element(document).find('#product')
+    items.attr('ng-repeat', 'product in products')
+    $compile(items)($scope)
+    clear = angular.element('.clear')
+    clear.remove()
+    $scope.products = data.products
+    $scope.initial_page_number = data.page_number
+#    $scope.page_number = data.page_number
+    $scope.num_pages = data.num_pages
+    $scope.pages = [data.pages[parseInt($scope.initial_page_number)-1]]
+    $scope.pages[0].active = "True"
+    $scope.pages[0].link = ""
+    $scope.sorting_type = data.sorting_type
+    console.log(data)
+  .error ->
+    console.error('An error occurred during submission')
+
+  $scope.submit = ->
+    $http.post($location.absUrl(), {'page': $scope.page_number, 'sorting_type': $scope.sorting_type}).success (data) ->
+      clear = angular.element('.clear_pagination')
+      clear.remove()
+      $scope.pages = data.pages
+      for page_active in [parseInt($scope.initial_page_number)-1..parseInt($scope.page_number)]
+        $scope.pages[page_active].active = "True"
+        $scope.pages[page_active].link = ""
+      $scope.products = $scope.products.concat data.products_next_page
+      $scope.page_number = parseInt($scope.page_number)+1
+      if $scope.page_number == parseInt($scope.num_pages)
+        $scope.hide=true
+    .error ->
+      console.error('An error occurred during submission')
 ]
