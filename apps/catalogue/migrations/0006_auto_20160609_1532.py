@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('catalogue', '0007_auto_20160421_1606'),
+        ('catalogue', '0005_auto_20160510_1516'),
     ]
 
     operations = [
@@ -19,8 +19,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='versionattribute',
             name='cost_price',
-            field=models.DecimalField(default=0, verbose_name='Cost Price', max_digits=12, decimal_places=2),
-            preserve_default=False,
+            field=models.DecimalField(null=True, verbose_name='Cost Price', max_digits=12, decimal_places=2, blank=True),
         ),
         migrations.AddField(
             model_name='versionattribute',
@@ -30,7 +29,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='versionattribute',
             name='price_retail',
-            field=models.DecimalField(default=0, verbose_name='Price (retail)', max_digits=12, decimal_places=2),
-            preserve_default=False,
+            field=models.DecimalField(default=0, verbose_name='Price (retail)', max_digits=12, decimal_places=2, blank=True),
         ),
     ]
