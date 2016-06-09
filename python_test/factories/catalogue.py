@@ -128,6 +128,7 @@ class Test(object):
         feature_31 = Feature.objects.get(title='Feature 31')
         feature_32 = Feature.objects.get(title='Feature 32')
         feature_33 = Feature.objects.get(title='Feature 33')
+
         product_version_1, created = ProductVersion.objects.get_or_create(product=product, price_retail=D('10.10'), cost_price=D('8'))
 
         ProductFeature.objects.get_or_create(product=product, feature=feature_1, sort=3)
@@ -137,6 +138,7 @@ class Test(object):
         VersionAttribute.objects.get_or_create(version=product_version_1, attribute=feature_11)
         VersionAttribute.objects.get_or_create(version=product_version_1, attribute=feature_21)
         VersionAttribute.objects.get_or_create(version=product_version_1, attribute=feature_31)
+
         product_version_2, created = ProductVersion.objects.get_or_create(product=product, price_retail=D('110.10'), cost_price=D('100'))
 
         VersionAttribute.objects.get_or_create(version=product_version_2, attribute=feature_11)
@@ -149,6 +151,42 @@ class Test(object):
         VersionAttribute.objects.get_or_create(version=product_version_3, attribute=feature_21)
         VersionAttribute.objects.get_or_create(version=product_version_3, attribute=feature_33)
 
+    def create_attribute_option(self, product):
+        self.create_feature()
+        feature_1 = Feature.objects.get(title='Feature 1')
+        feature_2 = Feature.objects.get(title='Feature 2')
+        feature_3 = Feature.objects.get(title='Feature 3')
+
+        feature_11 = Feature.objects.get(title='Feature 11')
+        feature_21 = Feature.objects.get(title='Feature 21')
+        feature_31 = Feature.objects.get(title='Feature 31')
+        feature_32 = Feature.objects.get(title='Feature 32')
+        feature_33 = Feature.objects.get(title='Feature 33')
+        feature_41 = Feature.objects.get(title='Feature 41')
+        cost_price = D('10.10')
+        product_version_1, created = ProductVersion.objects.get_or_create(product=product, price_retail=cost_price + 100, cost_price=cost_price)
+
+        ProductFeature.objects.get_or_create(product=product, feature=feature_1, sort=3)
+        ProductFeature.objects.get_or_create(product=product, feature=feature_2, sort=1)
+        ProductFeature.objects.get_or_create(product=product, feature=feature_3, sort=2)
+
+        VersionAttribute.objects.get_or_create(version=product_version_1, attribute=feature_11)
+        VersionAttribute.objects.get_or_create(version=product_version_1, attribute=feature_21)
+        VersionAttribute.objects.get_or_create(version=product_version_1, attribute=feature_31)
+
+        cost_price = D('110.10')
+        product_version_2, created = ProductVersion.objects.get_or_create(product=product, price_retail=cost_price + 100, cost_price=cost_price)
+        VersionAttribute.objects.get_or_create(version=product_version_2, attribute=feature_11)
+        VersionAttribute.objects.get_or_create(version=product_version_2, attribute=feature_21)
+        VersionAttribute.objects.get_or_create(version=product_version_2, attribute=feature_32)
+
+        cost_price = D('1.10')
+        product_version_3, created = ProductVersion.objects.get_or_create(product=product, price_retail=cost_price + 10, cost_price=cost_price)
+        VersionAttribute.objects.get_or_create(version=product_version_3, attribute=feature_11)
+        VersionAttribute.objects.get_or_create(version=product_version_3, attribute=feature_21)
+        VersionAttribute.objects.get_or_create(version=product_version_3, attribute=feature_33)
+        VersionAttribute.objects.get_or_create(version=product_version_3, attribute=feature_41, plus=True, price_retail=cost_price + 100, cost_price=cost_price)
+
     def create_dynamic_attributes(self, product):
         self.create_feature()
         feature_11 = Feature.objects.get(title='Feature 11')
@@ -157,41 +195,43 @@ class Test(object):
         feature_31 = Feature.objects.get(title='Feature 31')
         feature_32 = Feature.objects.get(title='Feature 32')
         feature_33 = Feature.objects.get(title='Feature 33')
+        feature_41 = Feature.objects.get(title='Feature 41')
 
-        price_retail = D(random.randint(1, 10000))
+        price_retail = D(2000)
         product_version_1, created = ProductVersion.objects.get_or_create(product=product, price_retail=price_retail + 100, cost_price=price_retail)
 
         VersionAttribute.objects.get_or_create(version=product_version_1, attribute=feature_11)
         VersionAttribute.objects.get_or_create(version=product_version_1, attribute=feature_21)
         VersionAttribute.objects.get_or_create(version=product_version_1, attribute=feature_31)
 
-        price_retail = D(random.randint(1, 10000))
-        product_version_2, created = ProductVersion.objects.get_or_create(product=product, price_retail=price_retail + 100, cost_price=price_retail)
+        cost_price = D(2100)
+        product_version_2, created = ProductVersion.objects.get_or_create(product=product, price_retail=cost_price + 100, cost_price=cost_price)
 
         VersionAttribute.objects.get_or_create(version=product_version_2, attribute=feature_11)
         VersionAttribute.objects.get_or_create(version=product_version_2, attribute=feature_21)
         VersionAttribute.objects.get_or_create(version=product_version_2, attribute=feature_32)
+        VersionAttribute.objects.get_or_create(version=product_version_2, attribute=feature_41, plus=True, price_retail=cost_price + D('10.10'), cost_price=cost_price)
 
-        price_retail = D(random.randint(1, 10000))
+        price_retail = D(2200)
         product_version_3, created = ProductVersion.objects.get_or_create(product=product, price_retail=price_retail + 100, cost_price=price_retail)
 
         VersionAttribute.objects.get_or_create(version=product_version_3, attribute=feature_11)
         VersionAttribute.objects.get_or_create(version=product_version_3, attribute=feature_21)
         VersionAttribute.objects.get_or_create(version=product_version_3, attribute=feature_33)
 
-        price_retail = D(random.randint(1, 10000))
+        price_retail = D(2300)
         product_version_4, created = ProductVersion.objects.get_or_create(product=product, price_retail=price_retail + 100, cost_price=price_retail)
         VersionAttribute.objects.get_or_create(version=product_version_4, attribute=feature_11)
         VersionAttribute.objects.get_or_create(version=product_version_4, attribute=feature_22)
         VersionAttribute.objects.get_or_create(version=product_version_4, attribute=feature_31)
-        price_retail = D(random.randint(1, 10000))
+        price_retail = D(2400)
         product_version_5, created = ProductVersion.objects.get_or_create(product=product, price_retail=price_retail + 100, cost_price=price_retail)
 
         VersionAttribute.objects.get_or_create(version=product_version_5, attribute=feature_11)
         VersionAttribute.objects.get_or_create(version=product_version_5, attribute=feature_22)
         VersionAttribute.objects.get_or_create(version=product_version_5, attribute=feature_32)
 
-        price_retail = D(random.randint(1, 10000))
+        price_retail = D(2600)
         product_version_6, created = ProductVersion.objects.get_or_create(product=product, price_retail=price_retail + 100, cost_price=price_retail)
 
         VersionAttribute.objects.get_or_create(version=product_version_6, attribute=feature_11)

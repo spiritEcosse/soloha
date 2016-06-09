@@ -29,7 +29,7 @@ from django.db.models import Q
 from haystack.query import SearchQuerySet
 from apps.contacts.views import FeedbackForm
 from apps.catalogue.models import SiteInfo
-
+from apps.catalogue.views import NOT_SELECTED
 
 Product = get_model('catalogue', 'product')
 ProductClass = get_model('catalogue', 'ProductClass')
@@ -44,7 +44,7 @@ test_catalogue = catalogue.Test()
 STATUS_CODE_200 = 200
 
 
-class TestCatalog(TestCase, LiveServerTestCase):
+class TestCatalog(LiveServerTestCase):
     css_selector_product_price = 'div#section3 .price .wrapper-number .number'
     css_selector_attribute = '.options .panel-default:nth-child({})'
 
@@ -57,7 +57,9 @@ class TestCatalog(TestCase, LiveServerTestCase):
 
     def tearDown(self):
         # Call tearDown to close the web browser
+        time.sleep(2)
         self.firefox.quit()
+        time.sleep(2)
         super(TestCatalog, self).tearDown()
 
     def test_page_product(self):
@@ -110,23 +112,60 @@ class TestCatalog(TestCase, LiveServerTestCase):
             else:
                 context['price'] = str(_('Product is not available.'))
         else:
-            context['price'] = first_prod_version.price_retail
+            price = first_prod_version.price_retail
+            for attribute in first_prod_version.version_attributes.all():
+                if attribute.plus:
+                    price += attribute.price_retail
+            context['price'] = price
             context['currency'] = settings.OSCAR_DEFAULT_CURRENCY
         return context
 
+    def get_attributes_for_attribute(self, product, attribute):
+        only = ['title', 'pk']
+        return Feature.objects.only(*only).filter(
+            children__product_versions__product=product, level=0
+        ).prefetch_related(
+            Prefetch('children', queryset=Feature.objects.only(*only).filter(
+                level=1, product_versions__product=product, product_versions__attributes=attribute
+            ).annotate(
+                price=Min('product_versions__price_retail')
+            ).order_by('price', 'title', 'pk'), to_attr='values_in_group'),
+            Prefetch('children', queryset=Feature.objects.only(*only).filter(
+                level=1, product_versions__product=product
+            ).exclude(
+                version_attributes__attribute=attribute
+            ).annotate(
+                price=Min('product_versions__price_retail')
+            ).order_by('price', 'title', 'pk'), to_attr='values_out_group')
+        ).annotate(
+            price=Min('children__product_versions__price_retail'), count_child=Count('children', distinct=True)
+        ).order_by('product_features__sort', 'price', '-count_child', 'title', 'pk')
+
     def get_dict_product_version_price(self, product):
-        dict_product_version_price = dict()
+        product_versions = dict()
 
         for product_version in self.get_product_version(product=product):
-            attribute_values = [str(attr.pk) for attr in product_version.attributes.filter(
-                parent__children__product_versions__product=product, level=1, parent__level=0
+            attribute_values = []
+            price = product_version.price_retail
+            version_attributes = product_version.version_attributes.filter(
+                attribute__parent__children__product_versions__product=product, attribute__level=1,
+                attribute__parent__level=0
             ).annotate(
-                price=Min('product_versions__price_retail'),
-                count_child=Count('parent__children', distinct=True)
-            ).order_by('parent__product_features__sort', 'price', '-count_child', 'parent__title', 'parent__pk')]
-            dict_product_version_price[','.join(attribute_values)] = str(product_version.price_retail)
+                price=Min('version__price_retail'),
+                count_child=Count('attribute__parent__children', distinct=True)
+            ).order_by('price', '-count_child', 'attribute__parent__title', 'attribute__parent__pk')
 
-        return dict_product_version_price
+            for version_attribute in version_attributes:
+                attribute_values.append(version_attribute.attribute)
+                if version_attribute.plus:
+                    price += version_attribute.price_retail
+            attribute_values = sorted(attribute_values,
+                                      key=lambda attr: attr.product_features.filter(
+                                          product=product).first().sort
+                                      if attr.product_features.filter(product=product).first() else 0)
+            attribute_values = [str(val.pk) for val in attribute_values]
+            product_versions[','.join(attribute_values)] = str(price)
+        return product_versions
 
     def test_product_post(self):
         test_catalogue.create_product_bulk()
@@ -140,16 +179,18 @@ class TestCatalog(TestCase, LiveServerTestCase):
         expected_context = dict()
         expected_context['product_versions'] = self.get_dict_product_version_price(product=product)
         expected_context['attributes'] = []
+        start_option = [{'id': 0, 'title': NOT_SELECTED}]
+
         for attr in self.get_product_attributes(product=product):
-            values = [{'id': value.pk, 'title': value.title} for value in attr.values]
-            expected_context['attributes'].append({'pk': attr.pk, 'title': attr.title, 'values': values})
+            values = start_option + [{'id': value.id, 'title': value.title} for value in attr.values]
+            expected_context['attributes'].append({'id': attr.id, 'title': attr.title, 'values': values})
 
         self.assertDictEqual(context['product_versions'], expected_context['product_versions'])
         self.assertListEqual(context['attributes'], expected_context['attributes'])
 
     def get_product_attributes(self, product):
         only = ['title', 'pk']
-        return Feature.objects.only(*only).filter(
+        attributes = Feature.objects.only(*only).filter(
             children__product_versions__product=product, level=0
         ).prefetch_related(
             Prefetch('children', queryset=Feature.objects.only(*only).filter(
@@ -158,7 +199,12 @@ class TestCatalog(TestCase, LiveServerTestCase):
                 price=Min('product_versions__price_retail')
             ).order_by('price', 'title', 'pk'), to_attr='values')
         ).annotate(price=Min('children__product_versions__price_retail'), count_child=Count('children', distinct=True)).\
-            order_by('product_features__sort', 'price', '-count_child', 'title', 'pk')
+            order_by('price', '-count_child', 'title', 'pk')
+
+        attributes = sorted(attributes,
+                            key=lambda attr: attr.product_features.filter(product=product).first().sort
+                            if attr.product_features.filter(product=product).first() else 0)
+        return attributes
 
     def test_get_price_product_selenium(self):
         """
@@ -171,13 +217,11 @@ class TestCatalog(TestCase, LiveServerTestCase):
         product = factories.create_product(slug='product-{}'.format(num), title='Product {}'.format(num), price=D('12.12'),
                                            product_class=product_class_with_track_stock)
 
-        test_catalogue.create_attributes(product)
-        test_catalogue.create_options(product, product)
-
         self.firefox.get('%s%s' % (self.live_server_url, product.get_absolute_url()))
         price = self.firefox.find_element_by_css_selector(self.css_selector_product_price).text
         context = self.get_product_price(product=product)
         self.assertEqual(price, str(context['price']))
+        self.assertEqual(price, str(_('Product is not available.')))
 
         product_class_without_track_stock, created = ProductClass.objects.get_or_create(name='Product class where track_stock is False', track_stock=False)
         num = 2
@@ -189,25 +233,39 @@ class TestCatalog(TestCase, LiveServerTestCase):
         self.firefox.get('%s%s' % (self.live_server_url, product.get_absolute_url()))
         time.sleep(1)
         price = self.firefox.find_element_by_css_selector(self.css_selector_product_price).text
-        time.sleep(1)
         context = self.get_product_price(product=product)
         self.assertEqual(price, str(context['price']))
+        self.assertEqual(price, str(D('1.10')))
 
-    def test_page_product_attribute_dynamic_attributes(self):
+        product_class_without_track_stock, created = ProductClass.objects.get_or_create(name='Product class where track_stock is False', track_stock=False)
+        num = 3
+        product = factories.create_product(slug='product-{}'.format(num), title='Product {}'.format(num), price=D('15.13'),
+                                           product_class=product_class_without_track_stock)
+        test_catalogue.create_attribute_option(product=product)
+        self.firefox.get('%s%s' % (self.live_server_url, product.get_absolute_url()))
+        time.sleep(2)
+        price = self.firefox.find_element_by_css_selector(self.css_selector_product_price).text
+        context = self.get_product_price(product=product)
+        self.assertEqual(price, str(context['price']))
+        self.assertEqual(price, str(D('112.20')))
+
+    def test_page_product_attributes_selenium(self):
         """
         test page product with attributes by selenium
         :return:
         """
         test_catalogue.create_product_bulk()
-        product = factories.create_product(slug='product-attributes', title='Product attributes', price=D(random.randint(1, 10000)))
+        product = factories.create_product(slug='product-attributes', title='Product attributes', price=5)
         test_catalogue.create_dynamic_attributes(product)
         attributes = list(self.get_product_attributes(product=product))
+
         product_versions = self.get_dict_product_version_price(product=product)
         self.firefox.get('%s%s' % (self.live_server_url, product.get_absolute_url()))
 
         start_price = self.firefox.find_element_by_css_selector(self.css_selector_product_price).text
         context = self.get_product_price(product=product)
         self.assertEqual(start_price, str(context['price']))
+        self.assertEqual(str(D('2100.00')), start_price)
 
         feature_11 = Feature.objects.get(title='Feature 11')
         feature_21 = Feature.objects.get(title='Feature 21')
@@ -215,63 +273,42 @@ class TestCatalog(TestCase, LiveServerTestCase):
         feature_31 = Feature.objects.get(title='Feature 31')
         feature_32 = Feature.objects.get(title='Feature 32')
         feature_33 = Feature.objects.get(title='Feature 33')
+        feature_41 = Feature.objects.get(title='Feature 41')
 
-        price_33 = self.checkout_price_by_selected_attribute(attribute=feature_33, attributes=attributes, product_versions=product_versions)
-        price_32 = self.checkout_price_by_selected_attribute(attribute=feature_32, attributes=attributes, product_versions=product_versions)
-        price_31 = self.checkout_price_by_selected_attribute(attribute=feature_31, attributes=attributes, product_versions=product_versions)
-        price_11 = self.checkout_price_by_selected_attribute(attribute=feature_11, attributes=attributes, product_versions=product_versions)
-        price_21 = self.checkout_price_by_selected_attribute(attribute=feature_21, attributes=attributes, product_versions=product_versions)
-        price_22 = self.checkout_price_by_selected_attribute(attribute=feature_22, attributes=attributes, product_versions=product_versions)
+        price_11_22_32 = self.checkout_price_by_selected_attribute(attribute=feature_32, attributes=attributes,
+                                                                   product_versions=product_versions)
+        self.assertEqual(str(D('2500.00')), price_11_22_32)
 
-        self.checkout_price_by_selected_attribute(attribute=feature_33, attributes=attributes, product_versions=product_versions, earlier_price=price_33)
-        self.checkout_price_by_selected_attribute(attribute=feature_32, attributes=attributes, product_versions=product_versions, earlier_price=price_32)
-        self.checkout_price_by_selected_attribute(attribute=feature_31, attributes=attributes, product_versions=product_versions, earlier_price=price_31)
-        self.checkout_price_by_selected_attribute(attribute=feature_11, attributes=attributes, product_versions=product_versions, earlier_price=price_11)
-        self.checkout_price_by_selected_attribute(attribute=feature_21, attributes=attributes, product_versions=product_versions, earlier_price=price_21)
-        self.checkout_price_by_selected_attribute(attribute=feature_22, attributes=attributes, product_versions=product_versions, earlier_price=price_22)
+        price_11_22_33 = self.checkout_price_by_selected_attribute(attribute=feature_33, attributes=attributes,
+                                                                   product_versions=product_versions)
+        self.assertEqual(str(D('2700.00')), price_11_22_33)
 
-    def test_page_product_attributes_selenium(self):
-        """
-        test page product with ordered attributes by selenium
-        :return:
-        """
-        test_catalogue.create_product_bulk()
-        product = Product.objects.get(slug='product-1')
-        attributes = self.get_product_attributes(product=product)
+        price_11_21_33 = self.checkout_price_by_selected_attribute(attribute=feature_21, attributes=attributes,
+                                                                   product_versions=product_versions)
+        self.assertEqual(str(D('2300.00')), price_11_21_33)
 
-        product_versions = self.get_dict_product_version_price(product=product)
-        self.firefox.get('%s%s' % (self.live_server_url, product.get_absolute_url()))
+        price_11_21_32_41 = self.checkout_price_by_selected_attribute(attribute=feature_41, attributes=attributes,
+                                                                      product_versions=product_versions)
+        self.assertEqual(str(D('4310.10')), price_11_21_32_41)
 
-        start_price = self.firefox.find_element_by_css_selector(self.css_selector_product_price).text
-        context = self.get_product_price(product=product)
-        self.assertEqual(start_price, str(context['price']))
+        price_11_21_31 = self.checkout_price_by_selected_attribute(attribute=feature_31, attributes=attributes,
+                                                                   product_versions=product_versions)
+        self.assertEqual(str(D('2100.00')), price_11_21_31)
 
-        attributes_real = []
-        for position in xrange(1, len(attributes) + 1):
-            attribute = self.firefox.find_element_by_css_selector(self.css_selector_attribute.format(position))
-            attributes_real.append(attribute.find_element_by_css_selector('.name').text)
+        price_11_22_31 = self.checkout_price_by_selected_attribute(attribute=feature_22, attributes=attributes,
+                                                                   product_versions=product_versions)
+        self.assertEqual(str(D('2400.00')), price_11_22_31)
 
-        self.assertListEqual(attributes_real, [attribute.title for attribute in attributes])
+        self.checkout_price_by_selected_attribute(attribute=feature_21, attributes=attributes,
+                                                  product_versions=product_versions,
+                                                  earlier_price=price_11_21_31)
 
-        list_price = product_versions.values()
-        self.assertEqual(start_price in list_price, True)
+        self.assertEqual(str(D('2100.00')), price_11_21_31)
 
-        attributes = list(attributes)
-        attribute_33 = Feature.objects.get(title='Feature 33')
-        attribute_32 = Feature.objects.get(title='Feature 32')
-        attribute_31 = Feature.objects.get(title='Feature 31')
-        self.checkout_price_by_selected_attribute(attribute=attribute_33, attributes=attributes, product_versions=product_versions, earlier_price=start_price)
-        price_32 = self.checkout_price_by_selected_attribute(attribute=attribute_32, attributes=attributes, product_versions=product_versions)
-        price_31 = self.checkout_price_by_selected_attribute(attribute=attribute_31, attributes=attributes, product_versions=product_versions)
-        price_33 = self.checkout_price_by_selected_attribute(attribute=attribute_33, attributes=attributes, product_versions=product_versions)
-        self.checkout_price_by_selected_attribute(attribute=attribute_31, attributes=attributes, product_versions=product_versions, earlier_price=price_31)
-        self.checkout_price_by_selected_attribute(attribute=attribute_32, attributes=attributes, product_versions=product_versions, earlier_price=price_32)
-        self.checkout_price_by_selected_attribute(attribute=attribute_33, attributes=attributes, product_versions=product_versions, earlier_price=start_price)
-
-        self.firefox.get('%s%s' % (self.live_server_url, product.get_absolute_url()))
-        self.checkout_price_by_selected_attribute(attribute=attribute_32, attributes=attributes, product_versions=product_versions, earlier_price=price_32)
-        self.checkout_price_by_selected_attribute(attribute=attribute_31, attributes=attributes, product_versions=product_versions, earlier_price=price_31)
-        self.checkout_price_by_selected_attribute(attribute=attribute_33, attributes=attributes, product_versions=product_versions, earlier_price=price_33)
+        self.checkout_price_by_selected_attribute(attribute=feature_32, attributes=attributes,
+                                                  product_versions=product_versions,
+                                                  earlier_price=price_11_22_32)
+        self.assertEqual(str(D('2500.00')), price_11_22_32)
 
     def checkout_price_by_selected_attribute(self, attribute, attributes, product_versions, earlier_price=None):
         index_attr = attributes.index(attribute.parent)
@@ -280,21 +317,21 @@ class TestCatalog(TestCase, LiveServerTestCase):
         self.assertEqual(attribute_1.find_element_by_css_selector('.name').text, expect_attribute.title)
 
         attribute_1_values = attribute_1.find_element_by_css_selector('select')
-        self.assertListEqual(attribute_1_values.text.split('\n'), [value.title for value in expect_attribute.values])
+        # self.assertListEqual(attribute_1_values.text.split('\n'), [NOT_SELECTED] + [value.title for value in expect_attribute.values])
 
         index_attr_val = expect_attribute.values.index(attribute)
         attr_val = expect_attribute.values[index_attr_val]
         Select(attribute_1_values).select_by_visible_text(attr_val.title)
+        self.firefox.find_element_by_css_selector('#update_price').click()
 
         selected_values = []
         for num in xrange(1, len(attributes) + 1):
             selector = Select(self.firefox.find_element_by_css_selector('%s select' % self.css_selector_attribute.format(num)))
-            selected_values.append(int(selector.first_selected_option.get_attribute('value')))
+            if int(selector.first_selected_option.get_attribute('value')):
+                selected_values.append(int(selector.first_selected_option.get_attribute('value')))
 
         expected_price = product_versions.get(','.join(map(str, selected_values)))
-        time.sleep(1)
         price = self.firefox.find_element_by_css_selector(self.css_selector_product_price).text
-        time.sleep(1)
         self.assertEqual(price, str(expected_price))
 
         if earlier_price is not None:
@@ -308,7 +345,7 @@ class TestCatalog(TestCase, LiveServerTestCase):
         response = self.client.get(product.get_absolute_url())
 
         attributes = self.get_product_attributes(product=product)
-        self.assertEqual(str(attributes.query), str(response.context['attributes'].query))
+        self.assertListEqual(attributes, response.context['attributes'])
         self.assertEqual(response.status_code, STATUS_CODE_200)
         self.assertEqual(response.resolver_match.func.__name__, ProductDetailView.as_view().__name__)
         self.assertTemplateUsed(response, 'catalogue/detail.html')
@@ -564,6 +601,42 @@ class TestCatalog(TestCase, LiveServerTestCase):
         context['products'] = [product.get_values() for product in products]
         self.assertJSONEqual(json.dumps(context), response.content)
 
+    def test_feature_get_values(self):
+        """
+        test get_values from model Feature
+        :return:
+        """
+        feature = Feature.objects.create(title='Feature 1')
+        real_data = feature.get_values(('pk', ))
+        expected = {'pk': feature.pk}
+        self.assertDictEqual(expected, real_data)
+
+        real_data = feature.get_values(('pk', 'title', 'slug'))
+        expected = {'pk': feature.pk, 'title': feature.title, 'slug': feature.slug}
+        self.assertDictEqual(expected, real_data)
+
+        real_data = feature.get_values(())
+        expected = {}
+        self.assertDictEqual(expected, real_data)
+
+    def test_get_values_by_name_field(self):
+        """
+        test get_data from model Product
+        :return:
+        """
+        product = factories.create_product(title='Product_1')
+        real_data = product.get_data(['pk'])
+        expected = {'pk': product.pk}
+        self.assertDictEqual(expected, real_data)
+
+        real_data = product.get_data(['pk', 'title', 'slug'])
+        expected = {'pk': product.pk, 'title': product.title, 'slug': product.slug}
+        self.assertDictEqual(expected, real_data)
+
+        real_data = product.get_data([])
+        expected = {}
+        self.assertDictEqual(expected, real_data)
+
     def test_page_category_sorting_buttons(self):
         test_catalogue.create_product_bulk()
         category = Category.objects.get(name='Category-12')
@@ -734,9 +807,8 @@ class TestCatalog(TestCase, LiveServerTestCase):
     #         '%s%s' % (self.live_server_url,  product1.get_absolute_url())
     #     )
     #
-    #     # price_without_options = self.firefox.find_element_by_xpath(".//*[@id='section3']/div/div[1]/div/div[2]/div[1]/span").text
-    #     price_without_options = self.firefox.find_element_by_xpath(".//*[@id='section3']/div[1]/div[1]/div/div[2]/div[1]/span").text
-    #     time.sleep(10)
+    #     # TODO check when we will have price
+    #     price_without_options = self.firefox.find_element_by_xpath(".//*[@id='section3']/div/div[1]/div/div[2]/div[1]/span").text
     #     if len(price_without_options) == 0:
     #         raise Exception("price can't be empty")
     #     self.assertIn("Product 1", self.firefox.title)
@@ -1120,13 +1192,3 @@ class TestCatalog(TestCase, LiveServerTestCase):
         self.assertFalse(submit_btn.is_enabled())
 
         #ToDo taras: add test for scroll
-
-
-
-
-
-
-
-
-
-
