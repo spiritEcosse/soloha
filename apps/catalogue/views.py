@@ -216,8 +216,6 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
 
         attributes = Feature.objects.only(*only).filter(
             children__product_versions__product=self.object, level=0
-        ).exclude(
-            pk=attribute.parent.pk
         ).prefetch_related(
             Prefetch('children', queryset=values_in_group.annotate(
                 price=Min('product_versions__price_retail')

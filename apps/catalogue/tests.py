@@ -174,9 +174,11 @@ class TestCatalog(LiveServerTestCase):
         expected_context = dict()
         expected_context['product_versions'] = self.get_dict_product_version_price(product=product)
         expected_context['attributes'] = []
+        start_option = [{'id': 0, 'title': NOT_SELECTED}]
+
         for attr in self.get_product_attributes(product=product):
-            values = [{'id': value.pk, 'title': value.title} for value in attr.values]
-            expected_context['attributes'].append({'pk': attr.pk, 'title': attr.title, 'values': values})
+            values = start_option + [{'id': value.id, 'title': value.title} for value in attr.values]
+            expected_context['attributes'].append({'id': attr.id, 'title': attr.title, 'values': values})
 
         self.assertDictEqual(context['product_versions'], expected_context['product_versions'])
         self.assertListEqual(context['attributes'], expected_context['attributes'])
@@ -236,13 +238,13 @@ class TestCatalog(LiveServerTestCase):
                                            product_class=product_class_without_track_stock)
         test_catalogue.create_attribute_option(product=product)
         self.firefox.get('%s%s' % (self.live_server_url, product.get_absolute_url()))
-        time.sleep(1)
+        time.sleep(2)
         price = self.firefox.find_element_by_css_selector(self.css_selector_product_price).text
         context = self.get_product_price(product=product)
         self.assertEqual(price, str(context['price']))
         self.assertEqual(price, str(D('112.20')))
 
-    def test_page_product_attribute_dynamic_attributes(self):
+    def test_page_product_attributes_selenium(self):
         """
         test page product with attributes by selenium
         :return:
@@ -303,49 +305,6 @@ class TestCatalog(LiveServerTestCase):
                                                   earlier_price=price_11_22_32)
         self.assertEqual(str(D('2500.00')), price_11_22_32)
 
-    def test_page_product_attributes_selenium(self):
-        """
-        test page product with ordered attributes by selenium
-        :return:
-        """
-        test_catalogue.create_product_bulk()
-        product = Product.objects.get(slug='product-1')
-        attributes = self.get_product_attributes(product=product)
-
-        product_versions = self.get_dict_product_version_price(product=product)
-        self.firefox.get('%s%s' % (self.live_server_url, product.get_absolute_url()))
-
-        start_price = self.firefox.find_element_by_css_selector(self.css_selector_product_price).text
-        context = self.get_product_price(product=product)
-        self.assertEqual(start_price, str(context['price']))
-
-        attributes_real = []
-        for position in xrange(1, len(attributes) + 1):
-            attribute = self.firefox.find_element_by_css_selector(self.css_selector_attribute.format(position))
-            attributes_real.append(attribute.find_element_by_css_selector('.name').text)
-
-        self.assertListEqual(attributes_real, [attribute.title for attribute in attributes])
-
-        list_price = product_versions.values()
-        self.assertEqual(start_price in list_price, True)
-
-        attributes = list(attributes)
-        attribute_33 = Feature.objects.get(title='Feature 33')
-        attribute_32 = Feature.objects.get(title='Feature 32')
-        attribute_31 = Feature.objects.get(title='Feature 31')
-        self.checkout_price_by_selected_attribute(attribute=attribute_33, attributes=attributes, product_versions=product_versions, earlier_price=start_price)
-        price_32 = self.checkout_price_by_selected_attribute(attribute=attribute_32, attributes=attributes, product_versions=product_versions)
-        price_31 = self.checkout_price_by_selected_attribute(attribute=attribute_31, attributes=attributes, product_versions=product_versions)
-        price_33 = self.checkout_price_by_selected_attribute(attribute=attribute_33, attributes=attributes, product_versions=product_versions)
-        self.checkout_price_by_selected_attribute(attribute=attribute_31, attributes=attributes, product_versions=product_versions, earlier_price=price_31)
-        self.checkout_price_by_selected_attribute(attribute=attribute_32, attributes=attributes, product_versions=product_versions, earlier_price=price_32)
-        self.checkout_price_by_selected_attribute(attribute=attribute_33, attributes=attributes, product_versions=product_versions, earlier_price=start_price)
-
-        self.firefox.get('%s%s' % (self.live_server_url, product.get_absolute_url()))
-        self.checkout_price_by_selected_attribute(attribute=attribute_32, attributes=attributes, product_versions=product_versions, earlier_price=price_32)
-        self.checkout_price_by_selected_attribute(attribute=attribute_31, attributes=attributes, product_versions=product_versions, earlier_price=price_31)
-        self.checkout_price_by_selected_attribute(attribute=attribute_33, attributes=attributes, product_versions=product_versions, earlier_price=price_33)
-
     def checkout_price_by_selected_attribute(self, attribute, attributes, product_versions, earlier_price=None):
         index_attr = attributes.index(attribute.parent)
         expect_attribute = attributes[index_attr]
@@ -381,7 +340,7 @@ class TestCatalog(LiveServerTestCase):
         response = self.client.get(product.get_absolute_url())
 
         attributes = self.get_product_attributes(product=product)
-        self.assertEqual(str(attributes.query), str(response.context['attributes'].query))
+        self.assertListEqual(attributes, response.context['attributes'])
         self.assertEqual(response.status_code, STATUS_CODE_200)
         self.assertEqual(response.resolver_match.func.__name__, ProductDetailView.as_view().__name__)
         self.assertTemplateUsed(response, 'catalogue/detail.html')
@@ -810,39 +769,39 @@ class TestCatalog(LiveServerTestCase):
         self.assertEqual(len(options), len(response.context['options']))
         self.assertListEqual(list(options), list(response.context['options']))
 
-    def test_product_options_selenium(self):
-        """
-        product options selenium test
-        """
-        test_catalogue.create_product_bulk()
-
-        product1 = Product.objects.get(pk=1)
-        product2 = Product.objects.get(pk=2)
-
-        test_catalogue.create_options(product1, product2)
-
-        self.firefox.get(
-            '%s%s' % (self.live_server_url,  product1.get_absolute_url())
-        )
-
-        # TODO check when we will have price
-        price_without_options = self.firefox.find_element_by_xpath(".//*[@id='section3']/div/div[1]/div/div[2]/div[1]/span").text
-        if len(price_without_options) == 0:
-            raise Exception("price can't be empty")
-        self.assertIn("Product 1", self.firefox.title)
-
-        options_db = [option.title for option in Feature.objects.filter(Q(level=0), Q(product_options__product=product1) | Q(children__product_options__product=product1)).distinct()]
-        options_on_page = self.firefox.find_element_by_xpath(".//*[@id='options']/div[2]/div/div/label/select").text.split('\n')[1:]
-        self.assertListEqual(options_db, options_on_page)
-
-        option1 = self.firefox.find_element_by_xpath(".//*[@id='options']/div[2]/div/div/label/select/option[4]")
-        option1.click()
-
-        # TODO check when price will depend on selected option
-        price_option1 = self.firefox.find_element_by_xpath(".//*[@id='section3']/div/div[1]/div/div[2]/div[1]/span").text
-        # if price_without_options == price_option1:
-        #     self.assertNotEqual(price_without_options, price_option1)
-
-        # parent = Feature.objects.get(title=options_db[0])
-        # options_db_level1 = [option.title for option in Feature.objects.filter(level=1, parent=parent.pk)]
-        # options_on_page_level1 = self.firefox.find_element_by_xpath(".//*[@id='options']/div[2]/div[2]/div[2]/div/label/select/option[2]").text
+    # def test_product_options_selenium(self):
+    #     """
+    #     product options selenium test
+    #     """
+    #     test_catalogue.create_product_bulk()
+    #
+    #     product1 = Product.objects.get(pk=1)
+    #     product2 = Product.objects.get(pk=2)
+    #
+    #     test_catalogue.create_options(product1, product2)
+    #
+    #     self.firefox.get(
+    #         '%s%s' % (self.live_server_url,  product1.get_absolute_url())
+    #     )
+    #
+    #     # TODO check when we will have price
+    #     price_without_options = self.firefox.find_element_by_xpath(".//*[@id='section3']/div/div[1]/div/div[2]/div[1]/span").text
+    #     if len(price_without_options) == 0:
+    #         raise Exception("price can't be empty")
+    #     self.assertIn("Product 1", self.firefox.title)
+    #
+    #     options_db = [option.title for option in Feature.objects.filter(Q(level=0), Q(product_options__product=product1) | Q(children__product_options__product=product1)).distinct()]
+    #     options_on_page = self.firefox.find_element_by_xpath(".//*[@id='options']/div[2]/div/div/label/select").text.split('\n')[1:]
+    #     self.assertListEqual(options_db, options_on_page)
+    #
+    #     option1 = self.firefox.find_element_by_xpath(".//*[@id='options']/div[2]/div/div/label/select/option[4]")
+    #     option1.click()
+    #
+    #     # TODO check when price will depend on selected option
+    #     price_option1 = self.firefox.find_element_by_xpath(".//*[@id='section3']/div/div[1]/div/div[2]/div[1]/span").text
+    #     # if price_without_options == price_option1:
+    #     #     self.assertNotEqual(price_without_options, price_option1)
+    #
+    #     # parent = Feature.objects.get(title=options_db[0])
+    #     # options_db_level1 = [option.title for option in Feature.objects.filter(level=1, parent=parent.pk)]
+    #     # options_on_page_level1 = self.firefox.find_element_by_xpath(".//*[@id='options']/div[2]/div[2]/div[2]/div/label/select/option[2]").text

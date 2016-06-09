@@ -15,12 +15,12 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
   $scope.product = []
   $scope.product.values = []
   $scope.product.attributes = []
-  selected_attributes = []
   attributes = []
-  product_versions = []
   clone_data = null
   $scope.last_select_attr = null
-  
+  prefix = 'attribute-'
+  selector_el = '.dropdown-menu.inner'
+
   $http.post($location.absUrl()).success (data) ->
     clone_data = data
     if data.price
@@ -36,27 +36,41 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
       if data.product_version_attributes[attr.id]
         $scope.product.attributes[attr.id] = data.product_version_attributes[attr.id]
 
-      el = angular.element(document).find('#attribute-' + attr.id)
+      element = angular.element(document).find("[data-id='" + prefix + attr.id + "']")
+      element.parent().find(selector_el + ' li:not(:first)').remove()
+
+      el = angular.element(document).find('#' + prefix + attr.id)
       el.attr('ng-model', 'product.attributes[' + attr.id + ']')
       el.attr('ng-options', 'value.title group by value.group for value in product.values[' + attr.id + '] track by value.id')
       el.attr('ng-change', 'last_select_attr=' + attr.id)
       $compile(el)($scope)
+      el = element.find('.filter-option')
+      el.attr('ng-bind', 'product.attributes[' + attr.id + '].title')
+      $compile(el)($scope)
+      el = element.parent().find(selector_el + ' li:first')
+      el.attr('ng-repeat', 'val in product.values[' + attr.id + ']')
+      el.attr('data-original-index', "{{$index}}")
+      el.find('a .text').attr('ng-bind', "val.title")
+      $compile(el)($scope)
   .error ->
     console.error('An error occurred during submission')
 
-  $scope.update_price = () ->
+  set_price = () ->
     selected_attributes = []
+
     angular.forEach attributes, (key) ->
       if $scope.product.attributes[key].id != 0
         selected_attributes.push($scope.product.attributes[key].id)
-    #    Todo igor: if selected_attributes is empty - message select - attribute for display price
+      #    Todo igor: if selected_attributes is empty - message select - attribute for display price
 
-#    console.log(clone_data.product_versions)
-#    console.log(selected_attributes)
+    exist_selected_attr = clone_data.product_versions[selected_attributes.toString()]
 
-    if clone_data.product_versions[selected_attributes.toString()]
+    if exist_selected_attr
       $scope.product.price = clone_data.product_versions[selected_attributes.toString()]
-    else
+    return exist_selected_attr
+
+  $scope.update_price = () ->
+    if not set_price()
       angular.forEach clone_data.variant_attributes[$scope.product.attributes[$scope.last_select_attr].id], (attr) ->
         $scope.product.values[attr.id] = attr.values
 
@@ -65,23 +79,14 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
         else if $scope.product.values[attr.id]
           $scope.product.attributes[attr.id] = $scope.product.values[attr.id][0]
 
-        console.log($scope.product.attributes[attr.id])
+      if not set_price()
+        $scope.product.price = clone_data.price
 
-      selected_attributes = []
-      angular.forEach attributes, (key) ->
-        if $scope.product.attributes[key].id != 0
-          selected_attributes.push($scope.product.attributes[key].id)
+        angular.forEach clone_data.attributes, (attr) ->
+          $scope.product.values[attr.id] = attr.values
+          $scope.product.attributes[attr.id] = $scope.product.values[attr.id][0]
 
-      if clone_data.product_versions[selected_attributes.toString()]
-        $scope.product.price = clone_data.product_versions[selected_attributes.toString()]
-#      else
-#        $scope.product.price = clone_data.price
-#
-#        angular.forEach clone_data.attributes, (attr) ->
-#          $scope.product.values[attr.id] = attr.values
-#          $scope.product.attributes[attr.id] = $scope.product.values[attr.id][0]
-#
-#          if clone_data.product_version_attributes[attr.id]
-#            $scope.product.attributes[attr.id] = clone_data.product_version_attributes[attr.id]
+          if clone_data.product_version_attributes[attr.id]
+            $scope.product.attributes[attr.id] = clone_data.product_version_attributes[attr.id]
       console.log('choose the option with the lowest price')
 ]
