@@ -303,3 +303,12 @@ LOGGING = {
     },
 }
 
+TEST_INDEX = {
+    'default': {
+        'ENGINE': 'haystack.backends.solr_backend.SolrEngine',
+        'URL': 'http://127.0.0.1:8983/',
+        'TIMEOUT': 60 * 10,
+        'INDEX_NAME': 'test_index',
+    },
+}
+

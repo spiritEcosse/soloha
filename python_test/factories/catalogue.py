@@ -264,8 +264,8 @@ class Test(object):
         selector = Selector()
         strategy = selector.strategy()
 
-        Feature.objects.create(title=u'длина', slug='dlina')
-        Feature.objects.create(title=u'ширина', slug='shirina')
+        Feature.objects.get_or_create(title=u'длина', slug='dlina')
+        Feature.objects.get_or_create(title=u'ширина', slug='shirina')
         parent_dlina = Feature.objects.get(title=u'длина')
         parent_shirina = Feature.objects.get(title=u'ширина')
         for num in xrange(1000, 1400, 100):
