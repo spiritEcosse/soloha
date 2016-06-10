@@ -4,7 +4,6 @@
 {% load promotion_tags %}
 {% load thumbnail %}
 {% load i18n %}
-{% load flatpages %}
 
 {% block extrascripts %}
     <script src="{% static 'build/js/common/app.js' %}"></script>
@@ -309,9 +308,8 @@
                     </div>
                     <div class="col-xs-24 col-sm-6 column">
                         <div class="title line-bottom">Информация</div>
-                        {% get_flatpages as flatpages %}
                         <ul class="list-group">
-                            {% for page in flatpages %}
+                            {% for page in info_pages %}
                                 <li><a href="{{ page.get_absolute_url }}">{{ page.title }}</a></li>
                             {% endfor %}
                             {#                            <li class="list-group-item"><a href="#">Гарантии</a></li>#}
@@ -327,7 +325,7 @@
                     <div class="col-xs-24 col-sm-6 column">
                         <div class="title line-bottom">Служба поддержка</div>
                         <ul class="list-group">
-                            <li class="list-group-item"><a href="#">Связаться с нами</a></li>
+                            <li class="list-group-item"><a href="{{ contacts }}">Связаться с нами</a></li>
                             <li class="list-group-item"><a href="#">Возврат товара</a></li>
                             <li class="list-group-item"><a href="#">Карта сайта</a></li>
                         </ul>

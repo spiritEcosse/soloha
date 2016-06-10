@@ -52,7 +52,7 @@ class TestCatalog(TestCase, LiveServerTestCase):
         self.client = Client()
         self.firefox = webdriver.Firefox()
         self.firefox.maximize_window()
-        test_catalogue.create_site_info()
+        # test_catalogue.create_site_info()
         super(TestCatalog, self).setUp()
 
     def tearDown(self):
@@ -912,20 +912,20 @@ class TestCatalog(TestCase, LiveServerTestCase):
         list_elements_sqs = [product.title for product in sqs_search[:5]]
         first_product = sqs_search[0].title
 
-        input_field = self.firefox.find_element_by_xpath(".//*[@id='default']/div[1]/header/div[2]/div[2]/div/input")
+        input_field = self.firefox.find_element_by_css_selector(".form-control")
         input_field.send_keys(dict_values['search_string'])
         time.sleep(10)
 
-        popup_first_element = self.firefox.find_element_by_xpath(
-            ".//*[@id='default']/div[1]/header/div[2]/div[2]/div/div/div/div[1]/a/div[2]/div[1]").text
+        popup_first_element = self.firefox.find_element_by_css_selector(
+            ".search .dropdown-menu .item:nth-child(1) .title").text
         self.assertEqual(search_menu.is_displayed(), True)
         self.assertNotEqual(len(popup_first_element), 0)
         self.assertEqual(popup_first_element, first_product)
 
         list_elements_on_page = []
         for i in xrange(1, 6):
-            list_elements_on_page.append(self.firefox.find_element_by_xpath(
-                ".//*[@id='default']/div[1]/header/div[2]/div[2]/div/div/div/div[{}]/a/div[2]/div[1]".format(i)).text)
+            list_elements_on_page.append(self.firefox.find_element_by_css_selector(
+                ".search .dropdown-menu .item:nth-child({}) .title".format(i)).text)
         self.assertListEqual(list_elements_on_page, list_elements_sqs)
 
         input_field.clear()
@@ -1052,15 +1052,15 @@ class TestCatalog(TestCase, LiveServerTestCase):
     def assertions_filter_checkbox_selenium(self, url):
         initial_url = url
         self.firefox.get(initial_url)
-        checkbox_unchecked = self.firefox.find_element_by_xpath(
-            ".//*[@id='default']/div[1]/div/div[1]/div/div/div[2]/div[1]/div[2]/ul/li[1]/label/a/input")
+        checkbox_unchecked = self.firefox.find_element_by_css_selector(
+            ".filter .items .values .list-group-item input")
         self.assertEqual(checkbox_unchecked.is_selected(), False)
         checkbox_unchecked.click()
         time.sleep(10)
         self.assertNotEqual(self.firefox.current_url, initial_url)
 
-        checkbox_checked = self.firefox.find_element_by_xpath(
-            ".//*[@id='default']/div[1]/div/div[1]/div/div/div[2]/div[1]/div[2]/ul/li[1]/label/a/input")
+        checkbox_checked = self.firefox.find_element_by_css_selector(
+            ".filter .items .values .list-group-item input")
         self.assertEqual(checkbox_checked.is_selected(), True)
         checkbox_checked.click()
         time.sleep(10)
@@ -1117,8 +1117,8 @@ class TestCatalog(TestCase, LiveServerTestCase):
         input_phone.send_keys(dict_values['phone'])
         time.sleep(10)
 
-        email_error = self.firefox.find_element_by_xpath(".//*[@id='default']/div[1]/div/div/div/div[2]/div/div/div[1]/form/div[4]/ul[1]/li[2]").text
-        phone_error = self.firefox.find_element_by_xpath(".//*[@id='default']/div[1]/div/div/div/div[2]/div/div/div[1]/form/div[3]/ul[1]/li[1]").text
+        email_error = self.firefox.find_element_by_css_selector(".has-feedback:nth-child(5) .invalid:nth-child(2)").text
+        phone_error = self.firefox.find_element_by_css_selector(".has-feedback:nth-child(4) .invalid").text
         errors = {'email': 'Enter a valid email address.', 'phone': 'Enter a valid phone number'}
         self.assertEqual(email_error, errors['email'])
         self.assertEqual(phone_error, errors['phone'])
@@ -1146,17 +1146,17 @@ class TestCatalog(TestCase, LiveServerTestCase):
         self.assertIn('Product 48', self.firefox.page_source)
         self.assertNotIn('Product 49', self.firefox.page_source)
 
-        paginator_one = self.firefox.find_element_by_xpath(".//*[@id='default']/div[1]/div/div[2]/div[2]/div[51]/div/nav/ul/li[1]/a")
+        paginator_one = self.firefox.find_element_by_css_selector(".pagination li:nth-child(1)")
         paginator_one.click()
         time.sleep(10)
         self.assertEqual(self.firefox.current_url, initial_url)
 
-        paginator_two = self.firefox.find_element_by_xpath(".//*[@id='default']/div[1]/div/div[2]/div[2]/div[51]/div/nav/ul/li[2]/a")
+        paginator_two = self.firefox.find_element_by_css_selector(".pagination li:nth-child(2)")
         paginator_two.click()
         time.sleep(10)
         self.assertEqual(self.firefox.current_url, initial_url)
 
-        paginator_three = self.firefox.find_element_by_xpath(".//*[@id='default']/div[1]/div/div[2]/div[2]/div[51]/div/nav/ul/li[3]/a")
+        paginator_three = self.firefox.find_element_by_css_selector(".pagination li:nth-child(3)")
         paginator_three.click()
         time.sleep(10)
         self.assertNotEqual(self.firefox.current_url, initial_url)
@@ -1199,17 +1199,17 @@ class TestCatalog(TestCase, LiveServerTestCase):
         self.assertIn('Product 68', self.firefox.page_source)
         self.assertNotIn('Product 69', self.firefox.page_source)
 
-        paginator_one = self.firefox.find_element_by_xpath(".//*[@id='default']/div[1]/div/div[2]/div[3]/div[51]/div/nav/ul/li[1]/a")
+        paginator_one = self.firefox.find_element_by_css_selector(".pagination li:nth-child(1)")
         paginator_one.click()
         time.sleep(10)
         self.assertEqual(self.firefox.current_url, initial_url)
 
-        paginator_two = self.firefox.find_element_by_xpath(".//*[@id='default']/div[1]/div/div[2]/div[3]/div[51]/div/nav/ul/li[2]/a")
+        paginator_two = self.firefox.find_element_by_css_selector(".pagination li:nth-child(2)")
         paginator_two.click()
         time.sleep(10)
         self.assertEqual(self.firefox.current_url, initial_url)
 
-        paginator_three = self.firefox.find_element_by_xpath(".//*[@id='default']/div[1]/div/div[2]/div[3]/div[51]/div/nav/ul/li[3]/a")
+        paginator_three = self.firefox.find_element_by_css_selector(".pagination li:nth-child(3)")
         paginator_three.click()
         time.sleep(10)
         self.assertNotEqual(self.firefox.current_url, initial_url)
@@ -1226,7 +1226,6 @@ class TestCatalog(TestCase, LiveServerTestCase):
         self.firefox.get(initial_url+"&page=4")
         time.sleep(10)
         self.assertNotIn(u'ПОКАЗАТЬ ЕЩЕ', self.firefox.page_source)
-
 
 
 

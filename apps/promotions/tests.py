@@ -9,6 +9,8 @@ from oscar.core.loading import get_model
 from oscar.apps.catalogue.categories import create_from_breadcrumbs
 from python_test.factories import catalogue
 from apps.promotions.views import HomeView
+from apps.catalogue.models import SiteInfo
+
 
 Category = get_model('catalogue', 'category')
 Product = get_model('catalogue', 'product')
@@ -21,7 +23,7 @@ test_catalogue = catalogue.Test()
 class TestHomePage(TestCase):
     def setUp(self):
         self.client = Client()
-        test_catalogue.create_site_info()
+        # test_catalogue.create_site_info()
 
     def test_home_view(self):
         """
@@ -80,6 +82,24 @@ class TestHomePage(TestCase):
         self.assertListEqual(products_order, products_expected)
 
         test_catalogue.test_menu_categories(obj=self, response=response)
+
+    def test_site_info(self):
+        response = self.client.get(reverse('promotions:home'))
+        self.assertEqual(response.status_code, 200)
+
+        test_catalogue.create_site_info()
+        response = self.client.get(reverse('promotions:home'))
+        context = dict()
+        queryset = SiteInfo.objects.get(domain='example.com')
+        context['work_time'] = queryset.work_time
+        context['address'] = queryset.address
+        context['phone_number'] = queryset.phone_number
+        context['email'] = queryset.email
+        self.assertEqual(context['work_time'], response.context['work_time'])
+        self.assertEqual(context['address'], response.context['address'])
+        self.assertEqual(context['phone_number'], response.context['phone_number'])
+        self.assertEqual(context['email'], response.context['email'])
+
 
     # def test_categories_menu(self):
     #     """
