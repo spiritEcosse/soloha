@@ -459,6 +459,19 @@ class CustomAbstractProduct(models.Model):
         return self.reviews.filter(
             status=self.reviews.model.APPROVED).count()
 
+    def get_data(self, names_fields):
+        """
+        get values by name field
+        :param names_fields: name fields in this object
+        :return: dict
+        Example
+            {'pk': 1, title: 'Product'}
+        """
+        data = {}
+        for name_field in names_fields:
+            data[name_field] = getattr(self, name_field)
+        return data
+
     def get_values(self):
         values = dict()
         values['title'] = strip_entities(self.title)
@@ -507,6 +520,19 @@ class AbstractFeature(MPTTModel):
 
     def get_absolute_url(self):
         return self.slug
+
+    def get_values(self, names_fields):
+        """
+        get values by name field
+        :param names_fields: name fields in this object
+        :return: dict
+        Example
+            {'pk': 1, title: 'Feature'}
+        """
+        data = {}
+        for name_field in names_fields:
+            data[name_field] = getattr(self, name_field)
+        return data
 
 
 @python_2_unicode_compatible
@@ -790,6 +816,7 @@ class AbstractProductVersion(models.Model):
     product = models.ForeignKey('catalogue.Product', related_name='versions', on_delete=models.DO_NOTHING)
     price_retail = models.DecimalField(_("Price (retail)"), decimal_places=2, max_digits=12)
     cost_price = models.DecimalField(_("Cost Price"), decimal_places=2, max_digits=12)
+    plus = models.BooleanField(verbose_name=_('Plus on price'), default=False) #Todo igor delete this field
 
     class Meta:
         abstract = True
@@ -810,6 +837,9 @@ class AbstractVersionAttribute(models.Model):
                                 related_name='version_attributes')
     attribute = models.ForeignKey('catalogue.Feature', verbose_name=_('Attribute'),
                                   related_name='version_attributes')
+    price_retail = models.DecimalField(_("Price (retail)"), decimal_places=2, max_digits=12, blank=True, default=0)
+    cost_price = models.DecimalField(_("Cost Price"), decimal_places=2, max_digits=12, blank=True, null=True)
+    plus = models.BooleanField(verbose_name=_('Plus on price'), default=False)
 
     class Meta:
         abstract = True

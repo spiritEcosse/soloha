@@ -100,3 +100,4 @@ def local_act():
         local("git push bit")
         local("git push origin")
 
+# sudo apt-get install libjpeg-dev

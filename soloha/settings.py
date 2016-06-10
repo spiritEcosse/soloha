@@ -250,7 +250,6 @@ HAYSTACK_CONNECTIONS = {
     'default': {
         'ENGINE': 'haystack.backends.solr_backend.SolrEngine',
         'URL': 'http://127.0.0.1:8983/solr/',
-        # 'URL': 'http://localhost:9001/solr/default'
     },
 }
 
@@ -301,6 +300,15 @@ LOGGING = {
             'handlers': ['console'],
             'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
         },
+    },
+}
+
+TEST_INDEX = {
+    'default': {
+        'ENGINE': 'haystack.backends.solr_backend.SolrEngine',
+        'URL': 'http://127.0.0.1:8983/',
+        'TIMEOUT': 60 * 10,
+        'INDEX_NAME': 'test_index',
     },
 }
 

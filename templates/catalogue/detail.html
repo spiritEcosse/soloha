@@ -9,7 +9,7 @@
 {% load i18n %}
 {% load purchase_info_tags %}
 {% load thumbnail %}
-
+{% load product %}
 {% block ngController %}ng-controller="Product" {% endblock ngController %}
 
 {% block title %}
@@ -168,6 +168,8 @@
                             </div>
                         </div>
                     </div>
+                    <button id="update_price" class="btn btn-default" ng-click="update_price()">{% trans "Get price" %}</button>
+
                     <div class="col-xs-24 col-sm-24 col-md-14 options">
                         <span class="relation">*Цена зависит от выбранных параметров:</span>
                         <div class="list_attr">
@@ -179,10 +181,19 @@
                                                 {{ attribute.title }}
                                             </div>
                                             <div class="col-xs-11 pull-right values">
-                                                <select id="attribute-{{ attribute.pk }}" class="form-control input-md">
-                                                    {% for value in attribute.values %}
-                                                        <option value="{{ value.pk }}">{{ value.title }}</option>
-                                                    {% endfor %}
+                                                <select data-live-search="true" id="attribute-{{ attribute.pk }}" class="selectpicker" data-width="100%">
+                                                    {#                                                    <optgroup label="{% trans 'Группа 1' %}">#}
+                                                    {#                                                        <option value="volvo">Volvo</option>#}
+                                                    {#                                                        <option value="saab">Saab</option>#}
+                                                    {#                                                    </optgroup>#}
+                                                    <option value="0">{{ not_selected }}</option>
+                                                    {% with select='selected' %}
+                                                        {% for value in attribute.values %}
+                                                            <option {% if value.pk in product_version_attributes %}{{ select }}{% endif %}
+                                                                    value="{{ value.pk }}">{{ value.title }}
+                                                            </option>
+                                                        {% endfor %}
+                                                    {% endwith %}
                                                 </select>
                                             </div>
                                         </div>
