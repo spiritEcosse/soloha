@@ -4,13 +4,15 @@
 <article class="review">
     <header>
         <h3 class="star-rating {{ review.score|as_stars }}">
-            <span>
-                <i class="icon-star"></i>
-                <i class="icon-star"></i>
-                <i class="icon-star"></i>
-                <i class="icon-star"></i>
-                <i class="icon-star"></i>
-            </span>
+          <span class="glyphicon glyphicon-star"></span>
+{#            ToDo taras: why here stars not like I add above?#}
+{#            <span>#}
+{#                <i class="icon-star"></i>#}
+{#                <i class="icon-star"></i>#}
+{#                <i class="icon-star"></i>#}
+{#                <i class="icon-star"></i>#}
+{#                <i class="icon-star"></i>#}
+{#            </span>#}
             <a href="{{ review.get_absolute_url }}">{{ review.title }}</a>
         </h3>
     </header>
