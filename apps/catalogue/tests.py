@@ -996,7 +996,7 @@ class TestCatalog(LiveServerTestCase):
 
         input_field = self.firefox.find_element_by_css_selector(".form-control")
         input_field.send_keys(dict_values['search_string'])
-        time.sleep(10)
+        time.sleep(2)
 
         popup_first_element = self.firefox.find_element_by_css_selector(
             ".search .dropdown-menu .item:nth-child(1) .title").text
@@ -1014,11 +1014,11 @@ class TestCatalog(LiveServerTestCase):
         self.assertEqual(search_menu.is_displayed(), False)
 
         input_field.send_keys('product')
-        time.sleep(10)
+        time.sleep(2)
         self.assertEqual(search_menu.is_displayed(), True)
 
         input_field.send_keys('tt')
-        time.sleep(10)
+        time.sleep(2)
         self.assertEqual(search_menu.is_displayed(), False)
 
     def test_search_page_sorting_buttons(self):
@@ -1139,14 +1139,14 @@ class TestCatalog(LiveServerTestCase):
             ".filter .items .values .list-group-item input")
         self.assertEqual(checkbox_unchecked.is_selected(), False)
         checkbox_unchecked.click()
-        time.sleep(10)
+        time.sleep(2)
         self.assertNotEqual(self.firefox.current_url, initial_url)
 
         checkbox_checked = self.firefox.find_element_by_css_selector(
             ".filter .items .values .list-group-item input")
         self.assertEqual(checkbox_checked.is_selected(), True)
         checkbox_checked.click()
-        time.sleep(10)
+        time.sleep(2)
         self.assertEqual(self.firefox.current_url, initial_url)
 
     def test_form_contacts(self):
@@ -1184,11 +1184,11 @@ class TestCatalog(LiveServerTestCase):
         input_comment = self.firefox.find_element_by_xpath(".//*[@id='id_comment']")
         input_email.send_keys(dict_values['email'])
         input_comment.send_keys(dict_values['comment'])
-        time.sleep(10)
+        time.sleep(2)
         self.assertTrue(submit_btn.is_enabled())
 
         submit_btn.click()
-        time.sleep(10)
+        time.sleep(2)
         alert_message = self.firefox.find_element_by_xpath(".// *[ @ id = 'alerts'] / alert").text
         self.assertEqual(alert_message, 'Your message sent!')
 
@@ -1198,7 +1198,7 @@ class TestCatalog(LiveServerTestCase):
         input_phone = self.firefox.find_element_by_xpath(".//*[@id='id_phone']")
         input_email.send_keys(dict_values['email'])
         input_phone.send_keys(dict_values['phone'])
-        time.sleep(10)
+        time.sleep(2)
 
         email_error = self.firefox.find_element_by_css_selector(".has-feedback:nth-child(5) .invalid:nth-child(2)").text
         phone_error = self.firefox.find_element_by_css_selector(".has-feedback:nth-child(4) .invalid").text
@@ -1218,34 +1218,34 @@ class TestCatalog(LiveServerTestCase):
     def assertions_show_more_goods_search_page_selenium(self, url):
         initial_url = url
         self.firefox.get(initial_url)
-        time.sleep(10)
+        time.sleep(3)
         more_goods_button = self.firefox.find_element_by_css_selector(".more_products")
         more_goods_button.click()
-        time.sleep(10)
+        time.sleep(2)
         self.assertEqual(self.firefox.current_url, initial_url)
         self.assertIn('Product 1', self.firefox.page_source)
         self.assertIn('Product 25', self.firefox.page_source)
         self.assertIn('Product 48', self.firefox.page_source)
         self.assertNotIn('Product 49', self.firefox.page_source)
 
-        paginator_one = self.firefox.find_element_by_css_selector(".pagination li:nth-child(1)")
+        paginator_one = self.firefox.find_element_by_css_selector(".pagination li:nth-child(1) a")
         paginator_one.click()
-        time.sleep(10)
+        time.sleep(2)
         self.assertEqual(self.firefox.current_url, initial_url)
 
-        paginator_two = self.firefox.find_element_by_css_selector(".pagination li:nth-child(2)")
+        paginator_two = self.firefox.find_element_by_css_selector(".pagination li:nth-child(2) a")
         paginator_two.click()
-        time.sleep(10)
+        time.sleep(2)
         self.assertEqual(self.firefox.current_url, initial_url)
 
-        paginator_three = self.firefox.find_element_by_css_selector(".pagination li:nth-child(3)")
+        paginator_three = self.firefox.find_element_by_css_selector(".pagination li:nth-child(3) a")
         paginator_three.click()
-        time.sleep(10)
+        time.sleep(2)
         self.assertNotEqual(self.firefox.current_url, initial_url)
 
         more_goods_button = self.firefox.find_element_by_css_selector(".more_products")
         more_goods_button.click()
-        time.sleep(10)
+        time.sleep(4)
         self.assertIn('Product 49', self.firefox.page_source)
         self.assertIn('Product 96', self.firefox.page_source)
         self.assertNotIn('Product 97', self.firefox.page_source)
@@ -1253,12 +1253,12 @@ class TestCatalog(LiveServerTestCase):
 
         more_goods_button = self.firefox.find_element_by_css_selector(".more_products")
         more_goods_button.click()
-        time.sleep(10)
+        time.sleep(2)
         self.assertIn('Product 118', self.firefox.page_source)
         self.assertIn('ng-hide="hide == true"', self.firefox.page_source)
 
         self.firefox.get(initial_url+"&page=5")
-        time.sleep(10)
+        time.sleep(2)
         self.assertNotIn(u'ПОКАЗАТЬ ЕЩЕ', self.firefox.page_source)
 
     def test_show_more_goods_category_page_selenium(self):
@@ -1271,40 +1271,40 @@ class TestCatalog(LiveServerTestCase):
     def assertions_show_more_goods_category_page_selenium(self, url):
         initial_url = url
         self.firefox.get(initial_url)
-        time.sleep(10)
+        time.sleep(3)
         more_goods_button = self.firefox.find_element_by_css_selector(".more_products")
         more_goods_button.click()
-        time.sleep(10)
+        time.sleep(2)
         self.assertEqual(self.firefox.current_url, initial_url)
         self.assertIn('Product 1', self.firefox.page_source)
         self.assertIn('Product 25', self.firefox.page_source)
         self.assertIn('Product 68', self.firefox.page_source)
         self.assertNotIn('Product 69', self.firefox.page_source)
 
-        paginator_one = self.firefox.find_element_by_css_selector(".pagination li:nth-child(1)")
+        paginator_one = self.firefox.find_element_by_css_selector(".pagination li:nth-child(1) a")
         paginator_one.click()
-        time.sleep(10)
+        time.sleep(2)
         self.assertEqual(self.firefox.current_url, initial_url)
 
-        paginator_two = self.firefox.find_element_by_css_selector(".pagination li:nth-child(2)")
+        paginator_two = self.firefox.find_element_by_css_selector(".pagination li:nth-child(2) a")
         paginator_two.click()
-        time.sleep(10)
+        time.sleep(2)
         self.assertEqual(self.firefox.current_url, initial_url)
 
-        paginator_three = self.firefox.find_element_by_css_selector(".pagination li:nth-child(3)")
+        paginator_three = self.firefox.find_element_by_css_selector(".pagination li:nth-child(3) a")
         paginator_three.click()
-        time.sleep(10)
+        time.sleep(2)
         self.assertNotEqual(self.firefox.current_url, initial_url)
         self.assertIn(u'ПОКАЗАТЬ ЕЩЕ', self.firefox.page_source)
 
         more_goods_button = self.firefox.find_element_by_css_selector(".more_products")
         more_goods_button.click()
-        time.sleep(10)
+        time.sleep(2)
         self.assertIn('Product 69', self.firefox.page_source)
         self.assertIn('Product 118', self.firefox.page_source)
         self.assertNotIn('Product 68', self.firefox.page_source)
         self.assertIn('ng-hide="hide == true"', self.firefox.page_source)
 
         self.firefox.get(initial_url+"&page=4")
-        time.sleep(10)
+        time.sleep(2)
         self.assertNotIn(u'ПОКАЗАТЬ ЕЩЕ', self.firefox.page_source)
