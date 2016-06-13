@@ -269,8 +269,8 @@ class Test(object):
         parent_dlina = Feature.objects.get(title=u'длина')
         parent_shirina = Feature.objects.get(title=u'ширина')
         for num in xrange(1000, 1400, 100):
-            Feature.objects.create(title=u'длина_{}'.format(num), slug='dlina_{}'.format(num), parent=parent_dlina)
-            Feature.objects.create(title=u'ширина_{}'.format(num), slug='shirina_{}'.format(num), parent=parent_shirina)
+            Feature.objects.get_or_create(title=u'длина_{}'.format(num), slug='dlina_{}'.format(num), parent=parent_dlina)
+            Feature.objects.get_or_create(title=u'ширина_{}'.format(num), slug='shirina_{}'.format(num), parent=parent_shirina)
 
         for num in xrange(1, 10):
             product = factories.create_product(slug='product-{}'.format(num), title='Product {}'.format(num), price=num)

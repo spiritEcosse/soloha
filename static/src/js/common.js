@@ -3,7 +3,7 @@
  */
 
 $(document).ready(function() {
-    $('.dropdown-menu').click(function(event){
+    $('.stop-propagation').click(function(event){
         event.stopPropagation();
     });
 
@@ -11,9 +11,4 @@ $(document).ready(function() {
         e.preventDefault();
         $(this).tab('show')
     })
-
-    $('.selectpicker').selectpicker({
-        style: 'btn-info',
-        size: 4
-    });
 });

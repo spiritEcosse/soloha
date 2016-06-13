@@ -35,8 +35,6 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
 
 
   $scope.change_price = (option_id) ->
-#    if $scope.option_model
-    console.log(option_id)
     if Object.keys($scope.options_children).length != 0 # && Object.keys($scope.options_children[$scope.option_id]).length != 0
       $scope.option_id = Object.keys($scope.options_children[$scope.option_id]).filter((key) ->
         $scope.options_children[$scope.option_id][key] == $scope.option_model[$scope.option_id]
@@ -71,7 +69,6 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
     .error ->
       console.error('An error occurred during submission')
 
-
       angular.element(document.getElementById('options-0')).remove(ng-model="option_model[' + $scope.option_id + ']")
 
       angular.forEach data.attributes, (attr) ->
@@ -99,38 +96,35 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
       angular.element(document.getElementById('options-0')).append $compile('<select class="form-control" ng-model="option_model[' + $scope.option_id + ']"
                                                 ng-change="change_price()" ng-options="option for option in options_children[' + $scope.option_id + ']" ></select>')($scope)
 
-
-
   $http.post($location.absUrl()).success (data) ->
     clone_data = data
+
     if data.price
       $scope.product.price = data.price
+      el = angular.element('#product_price')
+      el.attr('ng-bind', 'product.price')
     else
       $scope.product.product_not_availability = data.product_not_availability
+      el = angular.element('#product_not_availability')
+      el.attr('ng-bind', 'product.product_not_availability')
+    $compile(el)($scope)
 
     angular.forEach data.attributes, (attr) ->
-      attributes.push(attr.id)
-      $scope.product.values[attr.id] = attr.values
-      $scope.product.attributes[attr.id] = $scope.product.values[attr.id][0]
+      attributes.push(attr.pk)
+      $scope.product.values[attr.pk] = attr.values
+      $scope.product.attributes[attr.pk] = $scope.product.values[attr.pk][0]
 
-      if data.product_version_attributes[attr.id]
-        $scope.product.attributes[attr.id] = data.product_version_attributes[attr.id]
+      if data.product_version_attributes[attr.pk]
+        $scope.product.attributes[attr.pk] = data.product_version_attributes[attr.pk]
 
-      element = angular.element(document).find("[data-id='" + prefix + attr.id + "']")
+      element = angular.element(document).find("[data-id='" + prefix + attr.pk + "']")
       element.parent().find(selector_el + ' li:not(:first)').remove()
 
-      el = angular.element(document).find('#' + prefix + attr.id)
-      el.attr('ng-model', 'product.attributes[' + attr.id + ']')
-      el.attr('ng-options', 'value.title group by value.group for value in product.values[' + attr.id + '] track by value.id')
-      el.attr('ng-change', 'last_select_attr=' + attr.id)
-      $compile(el)($scope)
-      el = element.find('.filter-option')
-      el.attr('ng-bind', 'product.attributes[' + attr.id + '].title')
-      $compile(el)($scope)
-      el = element.parent().find(selector_el + ' li:first')
-      el.attr('ng-repeat', 'val in product.values[' + attr.id + ']')
-      el.attr('data-original-index', "{{$index}}")
-      el.find('a .text').attr('ng-bind', "val.title")
+      el = angular.element(document).find('#' + prefix + attr.pk)
+      el.find('button .title').attr('ng-bind', 'product.attributes[' + attr.pk + '].title')
+      el.find('.dropdown-menu li.list:not(:first)').remove()
+      el.find('.dropdown-menu li.list a').attr('ng-click', 'update_price($index, "' + attr.pk + '")').html("{{value.title}}")
+      el.find('.dropdown-menu li.list').attr('ng-repeat', 'value in product.values[' + attr.pk + '] | filter:query.attr[' + attr.pk + ']')
       $compile(el)($scope)
   .error ->
     console.error('An error occurred during submission')
@@ -139,41 +133,43 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
     selected_attributes = []
 
     angular.forEach attributes, (key) ->
-      if $scope.product.attributes[key].id != 0
-        selected_attributes.push($scope.product.attributes[key].id)
+      if $scope.product.attributes[key].pk != 0
+        selected_attributes.push($scope.product.attributes[key].pk)
       #    Todo igor: if selected_attributes is empty - message select - attribute for display price
 
     exist_selected_attr = clone_data.product_versions[selected_attributes.toString()]
 
     if exist_selected_attr
-      $scope.product.price = clone_data.product_versions[selected_attributes.toString()]
+      $scope.product.price = exist_selected_attr
     return exist_selected_attr
 
-  $scope.update_price = () ->
+  $scope.update_price = (index, attr_pk) ->
+    if $scope.product.values[attr_pk][index]
+      $scope.product.attributes[attr_pk] = $scope.product.values[attr_pk][index]
+
     if not set_price()
-      angular.forEach clone_data.variant_attributes[$scope.product.attributes[$scope.last_select_attr].id], (attr) ->
-        $scope.product.values[attr.id] = attr.values
+      angular.forEach clone_data.variant_attributes[$scope.product.attributes[attr_pk].pk], (attr) ->
+        $scope.product.values[attr.pk] = attr.values
 
         if attr.in_group[1] and attr.in_group[1].first_visible
-          $scope.product.attributes[attr.id] = attr.in_group[1]
-        else if $scope.product.values[attr.id]
-          $scope.product.attributes[attr.id] = $scope.product.values[attr.id][0]
+          $scope.product.attributes[attr.pk] = attr.in_group[1]
+        else if $scope.product.values[attr.pk]
+          $scope.product.attributes[attr.pk] = $scope.product.values[attr.pk][0]
 
       if not set_price()
         $scope.product.price = clone_data.price
+        selected_attributes = []
 
         angular.forEach clone_data.attributes, (attr) ->
-          $scope.product.values[attr.id] = attr.values
-          $scope.product.attributes[attr.id] = $scope.product.values[attr.id][0]
+          $scope.product.values[attr.pk] = attr.values
+          $scope.product.attributes[attr.pk] = $scope.product.values[attr.pk][0]
 
-          if clone_data.product_version_attributes[attr.id]
-            $scope.product.attributes[attr.id] = clone_data.product_version_attributes[attr.id]
-      console.log('choose the option with the lowest price')
-      selected_attributes.push($scope.product.attributes[key].id)
-    $scope.product.price = product_versions[selected_attributes.toString()]
-    console.log(product_versions)
-    console.log(selected_attributes.toString())
+          if clone_data.product_version_attributes[attr.pk]
+            $scope.product.attributes[attr.pk] = clone_data.product_version_attributes[attr.pk]
 
+          if $scope.product.attributes[attr.pk].pk != 0
+            selected_attributes.push($scope.product.attributes[attr.pk].pk)
+        $scope.product.price = clone_data.product_versions[selected_attributes.toString()]
 ]
 
 app.controller 'More_goods', ['$http', '$scope', '$window', '$document', '$location', '$compile', '$routeParams', ($http, $scope, $window, $document, $location, $compile, $routeParams) ->
@@ -229,4 +225,7 @@ app.controller 'More_goods', ['$http', '$scope', '$window', '$document', '$locat
         $scope.hide=true
     .error ->
       console.error('An error occurred during submission')
+
+  $scope.click_test_option = ->
+    console.log('hello')
 ]

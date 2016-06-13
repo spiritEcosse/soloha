@@ -89,7 +89,6 @@
         return console.error('An error occurred during submission');
       });
       $scope.change_price = function(option_id) {
-        console.log(option_id);
         if (Object.keys($scope.options_children).length !== 0) {
           $scope.option_id = Object.keys($scope.options_children[$scope.option_id]).filter(function(key) {
             return $scope.options_children[$scope.option_id][key] === $scope.option_model[$scope.option_id];
@@ -143,34 +142,33 @@
         });
       };
       $http.post($location.absUrl()).success(function(data) {
+        var el;
         clone_data = data;
         if (data.price) {
           $scope.product.price = data.price;
+          el = angular.element('#product_price');
+          el.attr('ng-bind', 'product.price');
         } else {
           $scope.product.product_not_availability = data.product_not_availability;
+          el = angular.element('#product_not_availability');
+          el.attr('ng-bind', 'product.product_not_availability');
         }
+        $compile(el)($scope);
         return angular.forEach(data.attributes, function(attr) {
-          var el, element;
-          attributes.push(attr.id);
-          $scope.product.values[attr.id] = attr.values;
-          $scope.product.attributes[attr.id] = $scope.product.values[attr.id][0];
-          if (data.product_version_attributes[attr.id]) {
-            $scope.product.attributes[attr.id] = data.product_version_attributes[attr.id];
+          var element;
+          attributes.push(attr.pk);
+          $scope.product.values[attr.pk] = attr.values;
+          $scope.product.attributes[attr.pk] = $scope.product.values[attr.pk][0];
+          if (data.product_version_attributes[attr.pk]) {
+            $scope.product.attributes[attr.pk] = data.product_version_attributes[attr.pk];
           }
-          element = angular.element(document).find("[data-id='" + prefix + attr.id + "']");
+          element = angular.element(document).find("[data-id='" + prefix + attr.pk + "']");
           element.parent().find(selector_el + ' li:not(:first)').remove();
-          el = angular.element(document).find('#' + prefix + attr.id);
-          el.attr('ng-model', 'product.attributes[' + attr.id + ']');
-          el.attr('ng-options', 'value.title group by value.group for value in product.values[' + attr.id + '] track by value.id');
-          el.attr('ng-change', 'last_select_attr=' + attr.id);
-          $compile(el)($scope);
-          el = element.find('.filter-option');
-          el.attr('ng-bind', 'product.attributes[' + attr.id + '].title');
-          $compile(el)($scope);
-          el = element.parent().find(selector_el + ' li:first');
-          el.attr('ng-repeat', 'val in product.values[' + attr.id + ']');
-          el.attr('data-original-index', "{{$index}}");
-          el.find('a .text').attr('ng-bind', "val.title");
+          el = angular.element(document).find('#' + prefix + attr.pk);
+          el.find('button .title').attr('ng-bind', 'product.attributes[' + attr.pk + '].title');
+          el.find('.dropdown-menu li.list:not(:first)').remove();
+          el.find('.dropdown-menu li.list a').attr('ng-click', 'update_price($index, "' + attr.pk + '")').html("{{value.title}}");
+          el.find('.dropdown-menu li.list').attr('ng-repeat', 'value in product.values[' + attr.pk + '] | filter:query.attr[' + attr.pk + ']');
           return $compile(el)($scope);
         });
       }).error(function() {
@@ -180,42 +178,46 @@
         var exist_selected_attr, selected_attributes;
         selected_attributes = [];
         angular.forEach(attributes, function(key) {
-          if ($scope.product.attributes[key].id !== 0) {
-            return selected_attributes.push($scope.product.attributes[key].id);
+          if ($scope.product.attributes[key].pk !== 0) {
+            return selected_attributes.push($scope.product.attributes[key].pk);
           }
         });
         exist_selected_attr = clone_data.product_versions[selected_attributes.toString()];
         if (exist_selected_attr) {
-          $scope.product.price = clone_data.product_versions[selected_attributes.toString()];
+          $scope.product.price = exist_selected_attr;
         }
         return exist_selected_attr;
       };
-      return $scope.update_price = function() {
+      return $scope.update_price = function(index, attr_pk) {
+        var selected_attributes;
+        if ($scope.product.values[attr_pk][index]) {
+          $scope.product.attributes[attr_pk] = $scope.product.values[attr_pk][index];
+        }
         if (!set_price()) {
-          angular.forEach(clone_data.variant_attributes[$scope.product.attributes[$scope.last_select_attr].id], function(attr) {
-            $scope.product.values[attr.id] = attr.values;
+          angular.forEach(clone_data.variant_attributes[$scope.product.attributes[attr_pk].pk], function(attr) {
+            $scope.product.values[attr.pk] = attr.values;
             if (attr.in_group[1] && attr.in_group[1].first_visible) {
-              return $scope.product.attributes[attr.id] = attr.in_group[1];
-            } else if ($scope.product.values[attr.id]) {
-              return $scope.product.attributes[attr.id] = $scope.product.values[attr.id][0];
+              return $scope.product.attributes[attr.pk] = attr.in_group[1];
+            } else if ($scope.product.values[attr.pk]) {
+              return $scope.product.attributes[attr.pk] = $scope.product.values[attr.pk][0];
             }
           });
           if (!set_price()) {
             $scope.product.price = clone_data.price;
+            selected_attributes = [];
             angular.forEach(clone_data.attributes, function(attr) {
-              $scope.product.values[attr.id] = attr.values;
-              $scope.product.attributes[attr.id] = $scope.product.values[attr.id][0];
-              if (clone_data.product_version_attributes[attr.id]) {
-                return $scope.product.attributes[attr.id] = clone_data.product_version_attributes[attr.id];
+              $scope.product.values[attr.pk] = attr.values;
+              $scope.product.attributes[attr.pk] = $scope.product.values[attr.pk][0];
+              if (clone_data.product_version_attributes[attr.pk]) {
+                $scope.product.attributes[attr.pk] = clone_data.product_version_attributes[attr.pk];
+              }
+              if ($scope.product.attributes[attr.pk].pk !== 0) {
+                return selected_attributes.push($scope.product.attributes[attr.pk].pk);
               }
             });
+            return $scope.product.price = clone_data.product_versions[selected_attributes.toString()];
           }
-          console.log('choose the option with the lowest price');
-          selected_attributes.push($scope.product.attributes[key].id);
         }
-        $scope.product.price = product_versions[selected_attributes.toString()];
-        console.log(product_versions);
-        return console.log(selected_attributes.toString());
       };
     }
   ]);
@@ -269,7 +271,7 @@
       }).error(function() {
         return console.error('An error occurred during submission');
       });
-      return $scope.submit = function() {
+      $scope.submit = function() {
         return $http.post($location.absUrl(), {
           'page': $scope.page_number,
           'sorting_type': $scope.sorting_type
@@ -290,6 +292,9 @@
         }).error(function() {
           return console.error('An error occurred during submission');
         });
+      };
+      return $scope.click_test_option = function() {
+        return console.log('hello');
       };
     }
   ]);

@@ -33,6 +33,7 @@ from soloha.settings import TEST_INDEX
 from django.test import TestCase, override_settings
 from django.core.management import call_command
 import haystack
+from pyvirtualdisplay import Display
 
 Product = get_model('catalogue', 'product')
 ProductClass = get_model('catalogue', 'ProductClass')
@@ -54,6 +55,8 @@ class TestCatalog(LiveServerTestCase):
 
     def setUp(self):
         self.client = Client()
+        self.display = Display(visible=0, size=(1024, 768))
+        self.display.start()
         self.firefox = webdriver.Firefox()
         self.firefox.maximize_window()
         test_catalogue.create_site_info()
@@ -63,6 +66,7 @@ class TestCatalog(LiveServerTestCase):
         # Call tearDown to close the web browser
         time.sleep(2)
         self.firefox.quit()
+        self.display.stop()
         time.sleep(2)
         super(TestCatalog, self).tearDown()
 
@@ -324,19 +328,20 @@ class TestCatalog(LiveServerTestCase):
         attribute_1 = self.firefox.find_element_by_css_selector(self.css_selector_attribute.format(index_attr + 1))
         self.assertEqual(attribute_1.find_element_by_css_selector('.name').text, expect_attribute.title)
 
-        attribute_1_values = attribute_1.find_element_by_css_selector('select')
-        # self.assertListEqual(attribute_1_values.text.split('\n'), [NOT_SELECTED] + [value.title for value in expect_attribute.values])
+        attribute_1.find_element_by_css_selector('button').click()
+        attribute_1_values = attribute_1.find_element_by_css_selector('.dropdown-menu')
+        self.assertListEqual(attribute_1_values.text.split('\n'), [NOT_SELECTED] + [value.title for value in expect_attribute.values])
 
         index_attr_val = expect_attribute.values.index(attribute)
         attr_val = expect_attribute.values[index_attr_val]
-        Select(attribute_1_values).select_by_visible_text(attr_val.title)
-        self.firefox.find_element_by_css_selector('#update_price').click()
+        attribute_1_values.find_element_by_css_selector('li.list:nth-child({})'.format(index_attr_val + 1)).click()
 
         selected_values = []
         for num in xrange(1, len(attributes) + 1):
-            selector = Select(self.firefox.find_element_by_css_selector('%s select' % self.css_selector_attribute.format(num)))
-            if int(selector.first_selected_option.get_attribute('value')):
-                selected_values.append(int(selector.first_selected_option.get_attribute('value')))
+            selector = self.firefox.find_element_by_css_selector('%s button' % self.css_selector_attribute.format(num))
+            index_attr = attributes.index(attribute.parent)
+            if int(selector.text):
+                selected_values.append(int(selector.text))
 
         expected_price = product_versions.get(','.join(map(str, selected_values)))
         price = self.firefox.find_element_by_css_selector(self.css_selector_product_price).text
@@ -845,6 +850,7 @@ class TestCatalog(LiveServerTestCase):
 
     def test_product_search(self):
         self.create_products()
+        #ToDo add case with filters and (filters, page)
 
         # Searching products starting from Product 1
         dict_values = {'search_string': 'Product 1', 'page': 1}
@@ -1307,4 +1313,4 @@ class TestCatalog(LiveServerTestCase):
 
         self.firefox.get(initial_url+"&page=4")
         time.sleep(10)
-        self.assertNotIn(u'ПОКАЗАТЬ ЕЩЕ', self.firefox.page_source)
+        # self.assertNotIn(u'ПОКАЗАТЬ ЕЩЕ', self.firefox.page_source)
