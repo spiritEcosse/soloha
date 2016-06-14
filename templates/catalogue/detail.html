@@ -315,63 +315,19 @@
                                 {% else %}
                                     <ol class="list-unstyled review-list">
                                         {% for review in reviews|slice:":3" %}
-                                            <div class="date pull-left">
-                                                <time>{{ review.date_created }}</time>
+                                            <div class="col-xs-24 head">
+                                                <li>
+                                                    {% include 'catalogue/partials/review.html' %}
+                                                </li>
                                             </div>
-                                            <li>
-                                                {% include 'catalogue/partials/review.html' %}
-                                            </li>
                                         {% endfor %}
                                     </ol>
                                 {% endif %}
                             </section>
                         {% endblock product_review %}
                     {% endiffeature %}
-
-                    <div class="col-xs-24 head">
-                        <div class="name pull-left">Валерий</div>
-                        <p class="star-rating Four pull-left">
-                            <span class="glyphicon glyphicon-star"></span>
-                            <span class="glyphicon glyphicon-star"></span>
-                            <span class="glyphicon glyphicon-star"></span>
-                            <span class="glyphicon glyphicon-star"></span>
-                        </p>
-                        <div class="date pull-left">
-                            <time>04.01.2016</time>
-                        </div>
-                        <div class="clearfix"></div>
-                        <div class="full-text">
-                            <span class="text">Комментарий:</span>
-                            <p>
-                                Очень довольны покупкой и работой компании. В ходе приёма заявки уделили
-                                должное внимание все рассказали, показали. Сроки по изготовлению выдерживают.
-                            </p>
-                            <a href="#" class="answer pull-right">Ответить</a>
-                        </div>
-                    </div>
-                    <div class="col-xs-24 head">
-                        <div class="name pull-left">Валерий</div>
-                        <p class="star-rating Four pull-left">
-                            <span class="glyphicon glyphicon-star"></span>
-                            <span class="glyphicon glyphicon-star"></span>
-                            <span class="glyphicon glyphicon-star"></span>
-                            <span class="glyphicon glyphicon-star"></span>
-                        </p>
-                        <div class="date pull-left">
-                            <time>04.01.2016</time>
-                        </div>
-                        <div class="clearfix"></div>
-                        <div class="full-text">
-                            <span class="text">Комментарий:</span>
-                            <p>
-                                Очень довольны покупкой и работой компании. В ходе приёма заявки уделили
-                                должное внимание все рассказали, показали. Сроки по изготовлению выдерживают.
-                            </p>
-                            <a href="#" class="answer pull-right">Ответить</a>
-                        </div>
-                    </div>
                     <div class="col-xs-24">
-                        <a class="pull-right more" href="#">Посмотреть все отзывы >> </a>
+                        <a class="pull-right more" href="{% url 'catalogue:reviews-list' product_slug=product.slug product_pk=product.id %}">Посмотреть все отзывы >> </a>
                     </div>
                 </div>
             </div>
