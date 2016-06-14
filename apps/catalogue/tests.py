@@ -5,8 +5,7 @@ import random
 from decimal import Decimal as D
 from django.core.paginator import Paginator
 from django.db import IntegrityError
-from django.db.models import Count
-from django.db.models import Min
+from django.db.models import Min, Sum, Count
 from django.db.models import Q
 from django.db.models.query import Prefetch
 from django.test import Client
@@ -24,7 +23,7 @@ from templatetags.filters_concatenation import concatenate
 import time
 from selenium import webdriver
 from django.test import LiveServerTestCase
-from django.db.models import Q
+from django.db.models import Q, F
 from haystack.query import SearchQuerySet
 from apps.contacts.views import FeedbackForm
 from apps.catalogue.models import SiteInfo
@@ -52,11 +51,12 @@ STATUS_CODE_200 = 200
 class TestCatalog(LiveServerTestCase):
     css_selector_product_price = 'div#section3 .price .wrapper-number .number'
     css_selector_attribute = '.options .panel-default:nth-child({})'
+    start_option = [{'pk': 0, 'title': NOT_SELECTED}]
 
     def setUp(self):
         self.client = Client()
-        self.display = Display(visible=0, size=(1024, 768))
-        self.display.start()
+        # self.display = Display(visible=0, size=(1024, 768))
+        # self.display.start()
         self.firefox = webdriver.Firefox()
         self.firefox.maximize_window()
         test_catalogue.create_site_info()
@@ -66,7 +66,7 @@ class TestCatalog(LiveServerTestCase):
         # Call tearDown to close the web browser
         time.sleep(2)
         self.firefox.quit()
-        self.display.stop()
+        # self.display.stop()
         time.sleep(2)
         super(TestCatalog, self).tearDown()
 
@@ -133,25 +133,53 @@ class TestCatalog(LiveServerTestCase):
         return context
 
     def get_attributes_for_attribute(self, product, attribute):
-        only = ['title', 'pk']
-        return Feature.objects.only(*only).filter(
+        only = ['pk', 'title']
+
+        values_in_group = Feature.objects.only(*only).filter(
+            level=1, product_versions__product=product, product_versions__attributes=attribute
+        )
+
+        attributes = Feature.objects.only(*only).filter(
             children__product_versions__product=product, level=0
         ).prefetch_related(
-            Prefetch('children', queryset=Feature.objects.only(*only).filter(
-                level=1, product_versions__product=product, product_versions__attributes=attribute
-            ).annotate(
+            Prefetch('children', queryset=values_in_group.annotate(
                 price=Min('product_versions__price_retail')
             ).order_by('price', 'title', 'pk'), to_attr='values_in_group'),
             Prefetch('children', queryset=Feature.objects.only(*only).filter(
                 level=1, product_versions__product=product
             ).exclude(
-                version_attributes__attribute=attribute
+                version_attributes__attribute__in=values_in_group.order_by().distinct()
             ).annotate(
                 price=Min('product_versions__price_retail')
             ).order_by('price', 'title', 'pk'), to_attr='values_out_group')
         ).annotate(
             price=Min('children__product_versions__price_retail'), count_child=Count('children', distinct=True)
-        ).order_by('product_features__sort', 'price', '-count_child', 'title', 'pk')
+        ).order_by('price', '-count_child', 'title', 'pk')
+
+        first = ProductVersion.objects.filter(product=product).annotate(
+            price_common=Sum('version_attributes__price_retail') + F('price_retail')
+        ).filter(attributes=attribute).order_by('price_common').first()
+
+        attributes = sorted(attributes,
+                            key=lambda attr: attr.product_features.filter(product=product).first().sort
+                            if attr.product_features.filter(product=product).first() else 0)
+
+        for attr in attributes:
+            for val in attr.values_in_group:
+                val.prices = []
+                val.visible = val in first.attributes.all()
+
+                for prod_ver in val.product_versions.filter(attributes=val, product=product).filter(attributes=attribute):
+                    price = ProductVersion.objects.filter(pk=prod_ver.pk).aggregate(
+                        common=Sum('version_attributes__price_retail'))
+                    price['common'] += prod_ver.price_retail
+                    val.prices.append(price['common'])
+            attr.values_in_group = sorted(attr.values_in_group, key=lambda val: min(val.prices))
+
+        for attr in attributes:
+            attr.values = list(attr.values_in_group) + list(attr.values_out_group)
+
+        return attributes
 
     def get_dict_product_version_price(self, product):
         product_versions = dict()
@@ -182,23 +210,49 @@ class TestCatalog(LiveServerTestCase):
     def test_product_post(self):
         self.create_products()
         product = Product.objects.get(slug='product-1')
-        product_2 = Product.objects.get(slug='product-2')
-        test_catalogue.create_options(product, product_2)
+        self.assert_product_post(product=product)
 
-        response = self.client.post(product.get_absolute_url(), content_type='application/json', HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        product = factories.create_product(slug='product-attributes', title='Product attributes', price=5)
+        test_catalogue.create_dynamic_attributes(product)
+        self.assert_product_post(product=product)
+
+    def get_product_attribute_values(self, product):
+        only = ['pk']
+        return Feature.objects.only(*only).filter(level=1, product_versions__product=product).distinct()
+
+    def assert_product_post(self, product):
+        response = self.client.post(product.get_absolute_url(), content_type='application/json',
+                                    HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+
         context = json.loads(response.content)
 
         expected_context = dict()
         expected_context['product_versions'] = self.get_dict_product_version_price(product=product)
         expected_context['attributes'] = []
-        start_option = [{'id': 0, 'title': NOT_SELECTED}]
+        expected_context['variant_attributes'] = {}
 
         for attr in self.get_product_attributes(product=product):
-            values = start_option + [{'id': value.id, 'title': value.title} for value in attr.values]
-            expected_context['attributes'].append({'id': attr.id, 'title': attr.title, 'values': values})
+            attr.values = self.start_option + map(lambda val: val.get_values(('pk', 'title')), attr.values)
+            expected_context['attributes'].append(attr.get_values(('pk', 'title', 'values')))
+
+        for attribute in self.get_product_attribute_values(product):
+            attributes = []
+
+            for attr in self.get_attributes_for_attribute(product, attribute):
+                values_in_group = self.start_option + map(lambda val: val.get_values(('pk', 'title', 'visible')), attr.values_in_group)
+
+                attributes.append({
+                    'pk': attr.pk,
+                    'title': attr.title,
+                    'in_group': values_in_group,
+                    'values': values_in_group + map(lambda val: val.get_values(('pk', 'title')), attr.values_out_group),
+                })
+
+                expected_context['variant_attributes'][attribute.pk] = attributes
 
         self.assertDictEqual(context['product_versions'], expected_context['product_versions'])
         self.assertListEqual(context['attributes'], expected_context['attributes'])
+        self.assertDictEqual(expected_context['variant_attributes'], context['variant_attributes'])
 
     def get_product_attributes(self, product):
         only = ['title', 'pk']
@@ -287,37 +341,52 @@ class TestCatalog(LiveServerTestCase):
         feature_33 = Feature.objects.get(title='Feature 33')
         feature_41 = Feature.objects.get(title='Feature 41')
 
-        price_11_22_32 = self.checkout_price_by_selected_attribute(attribute=feature_32, attributes=attributes,
+        attribute = feature_32
+        price_11_22_32 = self.checkout_price_by_selected_attribute(attribute=attribute, attributes=attributes,
                                                                    product_versions=product_versions)
         self.assertEqual(str(D('2500.00')), price_11_22_32)
 
-        price_11_22_33 = self.checkout_price_by_selected_attribute(attribute=feature_33, attributes=attributes,
+        attributes = list(self.get_attributes_for_attribute(product, attribute))
+        attribute = feature_33
+        price_11_22_33 = self.checkout_price_by_selected_attribute(attribute=attribute, attributes=attributes,
                                                                    product_versions=product_versions)
         self.assertEqual(str(D('2700.00')), price_11_22_33)
 
-        price_11_21_33 = self.checkout_price_by_selected_attribute(attribute=feature_21, attributes=attributes,
+        attributes = list(self.get_attributes_for_attribute(product, attribute))
+        attribute = feature_21
+        price_11_21_33 = self.checkout_price_by_selected_attribute(attribute=attribute, attributes=attributes,
                                                                    product_versions=product_versions)
         self.assertEqual(str(D('2300.00')), price_11_21_33)
 
-        price_11_21_32_41 = self.checkout_price_by_selected_attribute(attribute=feature_41, attributes=attributes,
+        attributes = list(self.get_attributes_for_attribute(product, attribute))
+        attribute = feature_41
+        price_11_21_32_41 = self.checkout_price_by_selected_attribute(attribute=attribute, attributes=attributes,
                                                                       product_versions=product_versions)
         self.assertEqual(str(D('4310.10')), price_11_21_32_41)
 
-        price_11_21_31 = self.checkout_price_by_selected_attribute(attribute=feature_31, attributes=attributes,
+        attributes = list(self.get_attributes_for_attribute(product, attribute))
+        attribute = feature_31
+        price_11_21_31 = self.checkout_price_by_selected_attribute(attribute=attribute, attributes=attributes,
                                                                    product_versions=product_versions)
         self.assertEqual(str(D('2100.00')), price_11_21_31)
 
-        price_11_22_31 = self.checkout_price_by_selected_attribute(attribute=feature_22, attributes=attributes,
+        attributes = list(self.get_attributes_for_attribute(product, attribute))
+        attribute = feature_22
+        price_11_22_31 = self.checkout_price_by_selected_attribute(attribute=attribute, attributes=attributes,
                                                                    product_versions=product_versions)
         self.assertEqual(str(D('2400.00')), price_11_22_31)
 
-        self.checkout_price_by_selected_attribute(attribute=feature_21, attributes=attributes,
+        attributes = list(self.get_attributes_for_attribute(product, attribute))
+        attribute = feature_21
+        self.checkout_price_by_selected_attribute(attribute=attribute, attributes=attributes,
                                                   product_versions=product_versions,
                                                   earlier_price=price_11_21_31)
 
         self.assertEqual(str(D('2100.00')), price_11_21_31)
 
-        self.checkout_price_by_selected_attribute(attribute=feature_32, attributes=attributes,
+        attributes = list(self.get_attributes_for_attribute(product, attribute))
+        attribute = feature_32
+        self.checkout_price_by_selected_attribute(attribute=attribute, attributes=attributes,
                                                   product_versions=product_versions,
                                                   earlier_price=price_11_22_32)
         self.assertEqual(str(D('2500.00')), price_11_22_32)
@@ -327,22 +396,33 @@ class TestCatalog(LiveServerTestCase):
         expect_attribute = attributes[index_attr]
         attribute_1 = self.firefox.find_element_by_css_selector(self.css_selector_attribute.format(index_attr + 1))
         self.assertEqual(attribute_1.find_element_by_css_selector('.name').text, expect_attribute.title)
+        print 'name - {}'.format(expect_attribute.title)
 
-        attribute_1.find_element_by_css_selector('button').click()
         attribute_1_values = attribute_1.find_element_by_css_selector('.dropdown-menu')
-        self.assertListEqual(attribute_1_values.text.split('\n'), [NOT_SELECTED] + [value.title for value in expect_attribute.values])
+        # self.assertListEqual(attribute_1_values.text.split('\n'), [NOT_SELECTED] + [value.title for value in expect_attribute.values])
 
         index_attr_val = expect_attribute.values.index(attribute)
-        attr_val = expect_attribute.values[index_attr_val]
-        attribute_1_values.find_element_by_css_selector('li.list:nth-child({})'.format(index_attr_val + 1)).click()
+        attribute_1.find_element_by_css_selector('button').click()
+
+        self.assertEqual(attribute_1_values.is_displayed(), True)
+
+        time.sleep(2)
+        print expect_attribute.values
+        print 'li.list:nth-child({})'.format(index_attr_val + 3)
+        attribute_1_values.find_element_by_css_selector('li.list:nth-child({})'.format(index_attr_val + 3)).click()
+        time.sleep(2)
 
         selected_values = []
         for num in xrange(1, len(attributes) + 1):
-            selector = self.firefox.find_element_by_css_selector('%s button' % self.css_selector_attribute.format(num))
-            index_attr = attributes.index(attribute.parent)
-            if int(selector.text):
-                selected_values.append(int(selector.text))
+            selected = int(self.firefox.find_element_by_css_selector(
+                '%s button .attr-pk' % self.css_selector_attribute.format(num)
+            ).get_attribute('innerHTML'))
 
+            if selected != 0:
+                selected_values.append(selected)
+
+        print selected_values
+        print product_versions
         expected_price = product_versions.get(','.join(map(str, selected_values)))
         price = self.firefox.find_element_by_css_selector(self.css_selector_product_price).text
         self.assertEqual(price, str(expected_price))
@@ -350,6 +430,7 @@ class TestCatalog(LiveServerTestCase):
         if earlier_price is not None:
             self.assertEqual(price, earlier_price)
 
+        attribute_1.find_element_by_css_selector('button').click()
         return price
 
     def test_get_product_attributes(self):

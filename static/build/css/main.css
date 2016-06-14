@@ -8638,6 +8638,9 @@ header .bottom .navbar .nav > li .yamm-content .image .btn-menu {
   top: 50%;
   transform: translateY(-50%);
 }
+.main .product .common .panel .panel-heading .option .values .attr-pk {
+  display: none;
+}
 .main .product .common .panel .panel-heading .option .name,
 .main .product .common .panel .panel-heading .option .values {
   color: #6f6f6f;

@@ -166,6 +166,7 @@
           element.parent().find(selector_el + ' li:not(:first)').remove();
           el = angular.element(document).find('#' + prefix + attr.pk);
           el.find('button .title').attr('ng-bind', 'product.attributes[' + attr.pk + '].title');
+          el.find('button .attr-pk').attr('ng-bind', 'product.attributes[' + attr.pk + '].pk');
           el.find('.dropdown-menu li.list:not(:first)').remove();
           el.find('.dropdown-menu li.list a').attr('ng-click', 'update_price($index, "' + attr.pk + '")').html("{{value.title}}");
           el.find('.dropdown-menu li.list').attr('ng-repeat', 'value in product.values[' + attr.pk + '] | filter:query.attr[' + attr.pk + ']');
@@ -196,7 +197,7 @@
         if (!set_price()) {
           angular.forEach(clone_data.variant_attributes[$scope.product.attributes[attr_pk].pk], function(attr) {
             $scope.product.values[attr.pk] = attr.values;
-            if (attr.in_group[1] && attr.in_group[1].first_visible) {
+            if (attr.in_group[1] && attr.in_group[1].visible) {
               return $scope.product.attributes[attr.pk] = attr.in_group[1];
             } else if ($scope.product.values[attr.pk]) {
               return $scope.product.attributes[attr.pk] = $scope.product.values[attr.pk][0];

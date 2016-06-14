@@ -232,27 +232,17 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
         context['not_selected'] = NOT_SELECTED
         context['variant_attributes'] = {}
 
-        def get_values_in_group(value):
-            data = value.get_values(('pk', 'title'))
-            data.update({'group': str(_('in_group')), 'first_visible': value.visible})
-            return data
-
-        def get_values_out_group(value):
-            data = value.get_values(('pk', 'title'))
-            data.update({'group': str(_('out_group'))})
-            return data
-
         for attribute in self.get_product_attribute_values():
             attributes = []
 
             for attr in self.get_attributes_for_attribute(attribute):
-                values_in_group = self.start_option + map(get_values_in_group, attr.values_in_group)
+                values_in_group = self.start_option + map(lambda val: val.get_values(('pk', 'title', 'visible')), attr.values_in_group)
 
                 attributes.append({
                     'pk': attr.pk,
                     'title': attr.title,
                     'in_group': values_in_group,
-                    'values': values_in_group + map(get_values_out_group, attr.values_out_group),
+                    'values': values_in_group + map(lambda val: val.get_values(('pk', 'title')), attr.values_out_group),
                 })
 
             context['variant_attributes'][attribute.pk] = attributes
@@ -272,7 +262,7 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
 
     def get_product_attribute_values(self):
         only = ['pk']
-        return Feature.objects.only(*only).filter(level=1, product_versions__product=self.object).distinct().order_by()
+        return Feature.objects.only(*only).filter(level=1, product_versions__product=self.object).distinct()
 
     def get_attributes_for_attribute(self, attribute):
         values_in_group = Feature.objects.only(*self.only).filter(
