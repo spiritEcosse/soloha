@@ -21,6 +21,7 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
   $scope.last_select_attr = null
   prefix = 'attribute-'
   selector_el = '.dropdown-menu.inner'
+  $scope.isOpen = []
 
   $http.post($location.absUrl()).success (data) ->
     $scope.options = data.options
@@ -120,15 +121,25 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
       element = angular.element(document).find("[data-id='" + prefix + attr.pk + "']")
       element.parent().find(selector_el + ' li:not(:first)').remove()
 
-      el = angular.element(document).find('#' + prefix + attr.pk)
-      el.find('button .title').attr('ng-bind', 'product.attributes[' + attr.pk + '].title')
-      el.find('button .attr-pk').attr('ng-bind', 'product.attributes[' + attr.pk + '].pk')
-      el.find('.dropdown-menu li.list:not(:first)').remove()
-      el.find('.dropdown-menu li.list a').attr('ng-click', 'update_price($index, "' + attr.pk + '")').html("{{value.title}}")
-      el.find('.dropdown-menu li.list').attr('ng-repeat', 'value in product.values[' + attr.pk + '] | filter:query.attr[' + attr.pk + ']')
-      $compile(el)($scope)
+      dropdown = angular.element(document).find('#' + prefix + attr.pk)
+      dropdown.attr('ng-click', "click(" + attr.pk + ")")
+      dropdown.find('button .title').attr('ng-bind', 'product.attributes[' + attr.pk + '].title')
+      dropdown.find('button .attr-pk').attr('ng-bind', 'product.attributes[' + attr.pk + '].pk')
+      dropdown.find('.dropdown-menu input').attr('ng-model', "query_attr[" + attr.pk + "]")
+      dropdown.find('.dropdown-menu li.list:not(:first)').remove()
+      li = dropdown.find('.dropdown-menu li.list')
+      $scope.isOpen[attr.pk] = false
+      li.find('a').attr('ng-click', 'update_price($index, "' + attr.pk + '")').html("{{value.title}}")
+      li.attr('ng-repeat', 'value in product.values[' + attr.pk + '] | filter:query_attr[' + attr.pk + ']')
+      li.attr('ng-class', '{"selected active": value.pk == product.attributes[' + attr.pk + '].pk}')
+      $compile(dropdown)($scope)
+      $compile(li)($scope)
   .error ->
     console.error('An error occurred during submission')
+
+    $scope.click = (attr_id) ->
+      $scope.isOpen[attr_id] = true
+  #    angular.element(document).find('#' + prefix + attr_id + ' .dropdown-menu input').focus()
 
   set_price = () ->
     selected_attributes = []
@@ -136,7 +147,7 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
     angular.forEach attributes, (key) ->
       if $scope.product.attributes[key].pk != 0
         selected_attributes.push($scope.product.attributes[key].pk)
-      #    Todo igor: if selected_attributes is empty - message select - attribute for display price
+    #    Todo igor: if selected_attributes is empty - message select - attribute for display price
 
     exist_selected_attr = clone_data.product_versions[selected_attributes.toString()]
 
@@ -147,6 +158,9 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
   $scope.update_price = (index, attr_pk) ->
     if $scope.product.values[attr_pk][index]
       $scope.product.attributes[attr_pk] = $scope.product.values[attr_pk][index]
+
+    angular.forEach clone_data.variant_attributes[$scope.product.attributes[attr_pk].pk], (attr) ->
+      $scope.product.values[attr.pk] = attr.values
 
     if not set_price()
       angular.forEach clone_data.variant_attributes[$scope.product.attributes[attr_pk].pk], (attr) ->
@@ -172,6 +186,21 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
             selected_attributes.push($scope.product.attributes[attr.pk].pk)
         $scope.product.price = clone_data.product_versions[selected_attributes.toString()]
 ]
+
+app.directive 'focusMe', ($timeout, $parse) ->
+  { link: (scope, element, attrs) ->
+    model = $parse(attrs.focusMe)
+    scope.$watch model, (value) ->
+      if value == true
+        $timeout ->
+          element[0].focus()
+          return
+      return
+    element.bind 'blur', ->
+      scope.$apply model.assign(scope, false)
+      return
+    return
+  }
 
 app.controller 'More_goods', ['$http', '$scope', '$window', '$document', '$location', '$compile', '$routeParams', ($http, $scope, $window, $document, $location, $compile, $routeParams) ->
   getParameterByName = (name, url) ->
@@ -202,7 +231,7 @@ app.controller 'More_goods', ['$http', '$scope', '$window', '$document', '$locat
     clear.remove()
     $scope.products = data.products
     $scope.initial_page_number = data.page_number
-#    $scope.page_number = data.page_number
+    #    $scope.page_number = data.page_number
     $scope.num_pages = data.num_pages
     $scope.pages = [data.pages[parseInt($scope.initial_page_number)-1]]
     $scope.pages[0].active = "True"

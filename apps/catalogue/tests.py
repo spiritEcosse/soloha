@@ -55,8 +55,8 @@ class TestCatalog(LiveServerTestCase):
 
     def setUp(self):
         self.client = Client()
-        # self.display = Display(visible=0, size=(1024, 768))
-        # self.display.start()
+        self.display = Display(visible=0, size=(1024, 768))
+        self.display.start()
         self.firefox = webdriver.Firefox()
         self.firefox.maximize_window()
         test_catalogue.create_site_info()
@@ -66,7 +66,7 @@ class TestCatalog(LiveServerTestCase):
         # Call tearDown to close the web browser
         time.sleep(2)
         self.firefox.quit()
-        # self.display.stop()
+        self.display.stop()
         time.sleep(2)
         super(TestCatalog, self).tearDown()
 
@@ -169,15 +169,14 @@ class TestCatalog(LiveServerTestCase):
                 val.prices = []
                 val.visible = val in first.attributes.all()
 
-                for prod_ver in val.product_versions.filter(attributes=val, product=product).filter(attributes=attribute):
+                for prod_ver in val.product_versions.filter(attributes=val, product=product).filter(
+                        attributes=attribute):
                     price = ProductVersion.objects.filter(pk=prod_ver.pk).aggregate(
                         common=Sum('version_attributes__price_retail'))
                     price['common'] += prod_ver.price_retail
                     val.prices.append(price['common'])
             attr.values_in_group = sorted(attr.values_in_group, key=lambda val: min(val.prices))
-
-        for attr in attributes:
-            attr.values = list(attr.values_in_group) + list(attr.values_out_group)
+            attr.values = attr.values_in_group + list(attr.values_out_group)
 
         return attributes
 
@@ -248,7 +247,7 @@ class TestCatalog(LiveServerTestCase):
                     'values': values_in_group + map(lambda val: val.get_values(('pk', 'title')), attr.values_out_group),
                 })
 
-                expected_context['variant_attributes'][attribute.pk] = attributes
+            expected_context['variant_attributes'][attribute.pk] = attributes
 
         self.assertDictEqual(context['product_versions'], expected_context['product_versions'])
         self.assertListEqual(context['attributes'], expected_context['attributes'])
@@ -397,18 +396,18 @@ class TestCatalog(LiveServerTestCase):
         attribute_1 = self.firefox.find_element_by_css_selector(self.css_selector_attribute.format(index_attr + 1))
         self.assertEqual(attribute_1.find_element_by_css_selector('.name').text, expect_attribute.title)
         print 'name - {}'.format(expect_attribute.title)
+        print expect_attribute.values
 
+        attribute_1.find_element_by_css_selector('button').click()
         attribute_1_values = attribute_1.find_element_by_css_selector('.dropdown-menu')
-        # self.assertListEqual(attribute_1_values.text.split('\n'), [NOT_SELECTED] + [value.title for value in expect_attribute.values])
+        self.assertEqual(attribute_1_values.is_displayed(), True)
+        self.assertListEqual(attribute_1_values.text.split('\n'), [NOT_SELECTED] + [value.title for value in expect_attribute.values])
 
         index_attr_val = expect_attribute.values.index(attribute)
-        attribute_1.find_element_by_css_selector('button').click()
-
-        self.assertEqual(attribute_1_values.is_displayed(), True)
+        print 'li.list:nth-child({})'.format(index_attr_val + 3)
 
         time.sleep(2)
-        print expect_attribute.values
-        print 'li.list:nth-child({})'.format(index_attr_val + 3)
+        self.assertEqual(attribute_1_values.is_displayed(), True)
         attribute_1_values.find_element_by_css_selector('li.list:nth-child({})'.format(index_attr_val + 3)).click()
         time.sleep(2)
 
@@ -421,8 +420,6 @@ class TestCatalog(LiveServerTestCase):
             if selected != 0:
                 selected_values.append(selected)
 
-        print selected_values
-        print product_versions
         expected_price = product_versions.get(','.join(map(str, selected_values)))
         price = self.firefox.find_element_by_css_selector(self.css_selector_product_price).text
         self.assertEqual(price, str(expected_price))

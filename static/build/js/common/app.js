@@ -76,6 +76,7 @@
       $scope.last_select_attr = null;
       prefix = 'attribute-';
       selector_el = '.dropdown-menu.inner';
+      $scope.isOpen = [];
       $http.post($location.absUrl()).success(function(data) {
         $scope.options = data.options;
         $scope.options_children = data.options_children;
@@ -155,7 +156,7 @@
         }
         $compile(el)($scope);
         return angular.forEach(data.attributes, function(attr) {
-          var element;
+          var dropdown, element, li;
           attributes.push(attr.pk);
           $scope.product.values[attr.pk] = attr.values;
           $scope.product.attributes[attr.pk] = $scope.product.values[attr.pk][0];
@@ -164,16 +165,25 @@
           }
           element = angular.element(document).find("[data-id='" + prefix + attr.pk + "']");
           element.parent().find(selector_el + ' li:not(:first)').remove();
-          el = angular.element(document).find('#' + prefix + attr.pk);
-          el.find('button .title').attr('ng-bind', 'product.attributes[' + attr.pk + '].title');
-          el.find('button .attr-pk').attr('ng-bind', 'product.attributes[' + attr.pk + '].pk');
-          el.find('.dropdown-menu li.list:not(:first)').remove();
-          el.find('.dropdown-menu li.list a').attr('ng-click', 'update_price($index, "' + attr.pk + '")').html("{{value.title}}");
-          el.find('.dropdown-menu li.list').attr('ng-repeat', 'value in product.values[' + attr.pk + '] | filter:query.attr[' + attr.pk + ']');
-          return $compile(el)($scope);
+          dropdown = angular.element(document).find('#' + prefix + attr.pk);
+          dropdown.attr('ng-click', "click(" + attr.pk + ")");
+          dropdown.find('button .title').attr('ng-bind', 'product.attributes[' + attr.pk + '].title');
+          dropdown.find('button .attr-pk').attr('ng-bind', 'product.attributes[' + attr.pk + '].pk');
+          dropdown.find('.dropdown-menu input').attr('ng-model', "query_attr[" + attr.pk + "]");
+          dropdown.find('.dropdown-menu li.list:not(:first)').remove();
+          li = dropdown.find('.dropdown-menu li.list');
+          $scope.isOpen[attr.pk] = false;
+          li.find('a').attr('ng-click', 'update_price($index, "' + attr.pk + '")').html("{{value.title}}");
+          li.attr('ng-repeat', 'value in product.values[' + attr.pk + '] | filter:query_attr[' + attr.pk + ']');
+          li.attr('ng-class', '{"selected active": value.pk == product.attributes[' + attr.pk + '].pk}');
+          $compile(dropdown)($scope);
+          return $compile(li)($scope);
         });
       }).error(function() {
-        return console.error('An error occurred during submission');
+        console.error('An error occurred during submission');
+        return $scope.click = function(attr_id) {
+          return $scope.isOpen[attr_id] = true;
+        };
       });
       set_price = function() {
         var exist_selected_attr, selected_attributes;
@@ -194,6 +204,9 @@
         if ($scope.product.values[attr_pk][index]) {
           $scope.product.attributes[attr_pk] = $scope.product.values[attr_pk][index];
         }
+        angular.forEach(clone_data.variant_attributes[$scope.product.attributes[attr_pk].pk], function(attr) {
+          return $scope.product.values[attr.pk] = attr.values;
+        });
         if (!set_price()) {
           angular.forEach(clone_data.variant_attributes[$scope.product.attributes[attr_pk].pk], function(attr) {
             $scope.product.values[attr.pk] = attr.values;
@@ -222,6 +235,25 @@
       };
     }
   ]);
+
+  app.directive('focusMe', function($timeout, $parse) {
+    return {
+      link: function(scope, element, attrs) {
+        var model;
+        model = $parse(attrs.focusMe);
+        scope.$watch(model, function(value) {
+          if (value === true) {
+            $timeout(function() {
+              element[0].focus();
+            });
+          }
+        });
+        element.bind('blur', function() {
+          scope.$apply(model.assign(scope, false));
+        });
+      }
+    };
+  });
 
   app.controller('More_goods', [
     '$http', '$scope', '$window', '$document', '$location', '$compile', '$routeParams', function($http, $scope, $window, $document, $location, $compile, $routeParams) {

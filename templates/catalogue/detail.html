@@ -196,13 +196,15 @@
                                                         </button>
                                                         <ul role="menu" class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownAttrVal{{ attribute.pk }}">
                                                             <li role="presentation">
-                                                                <div class="input-group input-group-sm search-control">
-                                                                    <input type="text" class="form-control" placeholder="{% trans "Query" %}" ng-model="query.attr[{{ attribute.pk }}]"/>
-                                                                </div>
+                                                                <form class="navbar-form navbar-left" role="search">
+                                                                    <div class="form-group">
+                                                                        <input type="text" focus-me="isOpen['{{ attribute.pk }}']" class="form-control" placeholder="{% trans "Search" %}">
+                                                                    </div>
+                                                                </form>
                                                             </li>
                                                             <li role="presentation" class="list"><a>{{ not_selected }}</a></li>
                                                             {% for value in attribute.values %}
-                                                                <li role="presentation" class="list"><a>{{ value.title }}</a></li>
+                                                                <li role="presentation" class="list"><a href="#">{{ value.title }}</a></li>
                                                             {% endfor %}
                                                         </ul>
                                                     </div>
