@@ -3,10 +3,16 @@ from django.views.generic.list import MultipleObjectMixin
 from django.conf.urls import url
 from oscar.core.loading import get_class
 
+calculate_price = get_class('catalogue.views', 'ProductCalculatePrice')
+
 
 class CatalogueApplication(CoreCatalogueApplication):
-
     def get_urls(self):
-        return super(CatalogueApplication, self).get_urls()
+        urlpatterns = super(CatalogueApplication, self).get_urls()
+        urlpatterns += [
+            url(r'^calculate/price/(?P<pk>[\d]+)$', calculate_price.as_view(),
+                name='calculate_price'),
+        ]
+        return urlpatterns
 
 application = CatalogueApplication()

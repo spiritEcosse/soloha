@@ -66,7 +66,7 @@
   ]);
 
   app.controller('Product', [
-    '$http', '$scope', '$window', '$document', '$location', '$compile', function($http, $scope, $window, $document, $location, $compile) {
+    '$http', '$scope', '$window', '$document', '$location', '$compile', '$filter', function($http, $scope, $window, $document, $location, $compile, $filter) {
       var attributes, clone_data, prefix, selector_el, set_price;
       $scope.product = [];
       $scope.product.values = [];
@@ -77,6 +77,8 @@
       prefix = 'attribute-';
       selector_el = '.dropdown-menu.inner';
       $scope.isOpen = [];
+      $scope.product.custom_values = [];
+      $scope.product.dict_attributes = [];
       $http.post($location.absUrl()).success(function(data) {
         $scope.options = data.options;
         $scope.options_children = data.options_children;
@@ -156,9 +158,10 @@
         }
         $compile(el)($scope);
         return angular.forEach(data.attributes, function(attr) {
-          var dropdown, element, li;
+          var custom_li, dropdown, dropdown_menu, element, input, li;
           attributes.push(attr.pk);
           $scope.product.values[attr.pk] = attr.values;
+          $scope.product.dict_attributes[attr.pk] = attr;
           $scope.product.attributes[attr.pk] = $scope.product.values[attr.pk][0];
           if (data.product_version_attributes[attr.pk]) {
             $scope.product.attributes[attr.pk] = data.product_version_attributes[attr.pk];
@@ -166,25 +169,62 @@
           element = angular.element(document).find("[data-id='" + prefix + attr.pk + "']");
           element.parent().find(selector_el + ' li:not(:first)').remove();
           dropdown = angular.element(document).find('#' + prefix + attr.pk);
-          dropdown.attr('ng-click', "click(" + attr.pk + ")");
+          dropdown.attr('ng-click', "click_dropdown(" + attr.pk + ")");
           dropdown.find('button .title').attr('ng-bind', 'product.attributes[' + attr.pk + '].title');
           dropdown.find('button .attr-pk').attr('ng-bind', 'product.attributes[' + attr.pk + '].pk');
-          dropdown.find('.dropdown-menu input').attr('ng-model', "query_attr[" + attr.pk + "]");
-          dropdown.find('.dropdown-menu li.list:not(:first)').remove();
-          li = dropdown.find('.dropdown-menu li.list');
+          dropdown_menu = dropdown.find('.dropdown-menu');
+          input = dropdown_menu.find('input');
+          input.attr('ng-model', "query_attr[" + attr.pk + "]");
+          input.attr('ng-change', "search(" + attr.pk + ")");
+          dropdown_menu.find('li.list:not(:first)').remove();
+          li = dropdown_menu.find('li.list');
           $scope.isOpen[attr.pk] = false;
           li.find('a').attr('ng-click', 'update_price($index, "' + attr.pk + '")').html("{{value.title}}");
           li.attr('ng-repeat', 'value in product.values[' + attr.pk + '] | filter:query_attr[' + attr.pk + ']');
           li.attr('ng-class', '{"selected active": value.pk == product.attributes[' + attr.pk + '].pk}');
+          custom_li = dropdown_menu.find('li.custom');
+          $scope.product.custom_values[attr.pk] = null;
+          custom_li.attr('ng-class', '{"selected active": product.custom_values[' + attr.pk + '].pk == product.attributes[' + attr.pk + '].pk}');
+          custom_li.find('a').attr('ng-click', 'update_price_with_custom_val(' + attr.pk + ')').html('{{product.custom_values[' + attr.pk + '].title}}');
+          dropdown_menu.find('.divider').attr('ng-show', 'product.custom_values[' + attr.pk + '].pk');
           $compile(dropdown)($scope);
-          return $compile(li)($scope);
+          $compile(input)($scope);
+          $compile(li)($scope);
+          return $compile(custom_li)($scope);
         });
       }).error(function() {
-        console.error('An error occurred during submission');
-        return $scope.click = function(attr_id) {
-          return $scope.isOpen[attr_id] = true;
-        };
+        return console.error('An error occurred during submission');
       });
+      $scope.update_price_with_custom_val = function(attr_pk) {
+        var selected_attributes;
+        $scope.product.attributes[attr_pk] = $scope.product.custom_values[attr_pk];
+        selected_attributes = [];
+        angular.forEach(clone_data.attributes, function(attr) {
+          if ($scope.product.attributes[attr.pk].pk !== 0 && $scope.product.dict_attributes[attr.pk].non_standard === true) {
+            return selected_attributes.push($scope.product.attributes[attr.pk].title);
+          }
+        });
+        if (selected_attributes.length > 0) {
+          return $http.post('/catalogue/calculate/price/' + clone_data.product.pk, {
+            'selected_attributes': selected_attributes
+          }).success(function(data) {
+            return console.log(data);
+          }).error(function() {
+            return console.error('An error occurred during submission');
+          });
+        }
+      };
+      $scope.search = function(attr_id) {
+        if (!$filter('filter')($scope.product.values[attr_id], $scope.query_attr[attr_id]).length) {
+          return $scope.product.custom_values[attr_id] = {
+            'pk': -1,
+            'title': $scope.query_attr[attr_id]
+          };
+        }
+      };
+      $scope.click_dropdown = function(attr_id) {
+        return $scope.isOpen[attr_id] = true;
+      };
       set_price = function() {
         var exist_selected_attr, selected_attributes;
         selected_attributes = [];

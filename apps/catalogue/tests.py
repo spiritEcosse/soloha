@@ -126,7 +126,7 @@ class TestCatalog(LiveServerTestCase):
         else:
             price = first_prod_version.price_retail
             for attribute in first_prod_version.version_attributes.all():
-                if attribute.plus:
+                if attribute.price_retail is not None:
                     price += attribute.price_retail
             context['price'] = price
             context['currency'] = settings.OSCAR_DEFAULT_CURRENCY
@@ -196,7 +196,7 @@ class TestCatalog(LiveServerTestCase):
 
             for version_attribute in version_attributes:
                 attribute_values.append(version_attribute.attribute)
-                if version_attribute.plus:
+                if version_attribute.price_retail is not None:
                     price += version_attribute.price_retail
             attribute_values = sorted(attribute_values,
                                       key=lambda attr: attr.product_features.filter(

@@ -27,18 +27,21 @@ from oscar.core.loading import get_class
 from django.db.models import Q
 from soloha import settings
 from django.db.models import Min, Sum
-
+import operator
+import functools
 from haystack.query import SearchQuerySet
 from haystack.inputs import AutoQuery
 from django.template import defaultfilters
 from django.http import HttpResponse
+import logging
+logger = logging.getLogger(__name__)
 
 Product = get_model('catalogue', 'product')
 Category = get_model('catalogue', 'category')
 ProductVersion = get_model('catalogue', 'ProductVersion')
 Feature = get_model('catalogue', 'Feature')
 ProductOptions = get_model('catalogue', 'ProductOptions')
-
+ProductFeature = get_model('catalogue', 'ProductFeature')
 NOT_SELECTED = str(_('Not selected'))
 
 
@@ -220,12 +223,17 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
 
     def get_context_data_json(self, **kwargs):
         context = dict()
+        context['product'] = {'pk': self.object.pk}
         context['product_versions'] = self.get_product_versions()
         context['attributes'] = []
 
         for attr in self.get_attributes():
             values = self.start_option + [{'pk': value.pk, 'title': value.title} for value in attr.values]
-            context['attributes'].append({'pk': attr.pk, 'title': attr.title, 'values': values})
+            context['attributes'].append({'pk': attr.pk,
+                                          'title': attr.title,
+                                          'values': values,
+                                          'non_standard': attr.features_by_product[0].non_standard if attr.features_by_product else False
+                                          })
 
         context['options'] = [{prod_option.option.pk: prod_option.price_retail} for prod_option in ProductOptions.objects.filter(product=self.object)]
         self.get_price(context)
@@ -323,7 +331,7 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
             ).order_by('price', '-count_child', 'attribute__parent__title', 'attribute__parent__pk')
             for version_attribute in version_attributes:
                 attribute_values.append(version_attribute.attribute)
-                if version_attribute.plus and version_attribute.price_retail is not None:
+                if version_attribute.price_retail is not None:
                     price += version_attribute.price_retail
             attribute_values = sorted(attribute_values,
                                       key=lambda attr: attr.product_features.filter(
@@ -366,7 +374,7 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
         else:
             price = first_prod_version.price_retail
             for attribute in first_prod_version.version_attributes.all():
-                if attribute.plus:
+                if attribute.price_retail is not None:
                     price += attribute.price_retail
             context['price'] = price
             context['currency'] = settings.OSCAR_DEFAULT_CURRENCY
@@ -384,7 +392,9 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
         ).prefetch_related(
             Prefetch('children', queryset=Feature.objects.only(*only).filter(**default_filter_attr_val_args).annotate(
                 price=Min('product_versions__price_retail')
-            ).order_by('price', 'title', 'pk'), to_attr='values')
+            ).order_by('price', 'title', 'pk'), to_attr='values'),
+            Prefetch('product_features', queryset=ProductFeature.objects.filter(product=self.object),
+                     to_attr='features_by_product')
         ).annotate(
             price=Min('children__product_versions__price_retail'), count_child=Count('children', distinct=True)
         ).order_by('price', '-count_child', 'title', 'pk')
@@ -397,3 +407,23 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
     def get_options(self):
         return Feature.objects.filter(Q(level=0), Q(product_options__product=self.object) | Q(children__product_options__product=self.object)).distinct()
 
+
+class ProductCalculatePrice(views.JSONRequestResponseMixin, views.AjaxResponseMixin, SingleObjectMixin, View):
+    model = Product
+    mm = 1000
+
+    def post(self, *args, **kwargs):
+        self.object = self.get_object()
+
+    def post_ajax(self, request, *args, **kwargs):
+        super(ProductCalculatePrice, self).post_ajax(request, *args, **kwargs)
+        return self.render_json_response(self.get_context_data_json())
+
+    def get_context_data_json(self, **kwargs):
+        context = dict()
+        data = json.loads(self.request.body)
+        selected_attributes = map(int, data['selected_attributes'])
+        selected_attributes = map(lambda val: val / self.mm, selected_attributes)
+        total_size = functools.reduce(operator.mul, selected_attributes)
+        context['price'] = total_size * self.object.non_standard_price_retail
+        return context

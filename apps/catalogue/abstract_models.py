@@ -65,6 +65,9 @@ class CustomAbstractProduct(models.Model):
     characteristics = models.ManyToManyField('catalogue.Feature', verbose_name='Characteristics', related_name='characteristic_products', blank=True)
     options = models.ManyToManyField('catalogue.Feature', through='ProductOptions', related_name='option_products', verbose_name='Additional options')
 
+    non_standard_price_retail = models.DecimalField(_("Non-standard retail price"), decimal_places=2, max_digits=12, blank=True, null=True)
+    non_standard_cost_price = models.DecimalField(_("Non-standard cost price"), decimal_places=2, max_digits=12, blank=True, null=True)
+
     #: "Kind" of product, e.g. T-Shirt, Book, etc.
     #: None for child products, they inherit their parent's product class
     product_class = models.ForeignKey(
@@ -816,7 +819,6 @@ class AbstractProductVersion(models.Model):
     product = models.ForeignKey('catalogue.Product', related_name='versions', on_delete=models.DO_NOTHING)
     price_retail = models.DecimalField(_("Price (retail)"), decimal_places=2, max_digits=12)
     cost_price = models.DecimalField(_("Cost Price"), decimal_places=2, max_digits=12)
-    plus = models.BooleanField(verbose_name=_('Plus on price'), default=False) #Todo igor delete this field
 
     class Meta:
         abstract = True
@@ -838,8 +840,7 @@ class AbstractVersionAttribute(models.Model):
     attribute = models.ForeignKey('catalogue.Feature', verbose_name=_('Attribute'),
                                   related_name='version_attributes')
     price_retail = models.DecimalField(_("Price (retail)"), decimal_places=2, max_digits=12, blank=True, default=0)
-    cost_price = models.DecimalField(_("Cost Price"), decimal_places=2, max_digits=12, blank=True, null=True)
-    plus = models.BooleanField(verbose_name=_('Plus on price'), default=False)
+    cost_price = models.DecimalField(_("Cost Price"), decimal_places=2, max_digits=12, blank=True, default=0)
 
     class Meta:
         abstract = True
@@ -868,6 +869,7 @@ class AbstractProductFeature(models.Model):
     info = models.CharField(_('Block info'), max_length=255, blank=True)
     product = models.ForeignKey('catalogue.Product', verbose_name=_('Product'), related_name='product_features', on_delete=models.DO_NOTHING)
     feature = models.ForeignKey('catalogue.Feature', verbose_name=_('Feature'), related_name='product_features', on_delete=models.DO_NOTHING)
+    non_standard = models.BooleanField(verbose_name=_('Available non standard size for this feature'), default=False)
 
     class Meta:
         abstract = True
