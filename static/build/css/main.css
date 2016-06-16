@@ -8365,6 +8365,9 @@ header .bottom .navbar .nav > li .yamm-content .image .btn-menu {
 .main .product .wrapper .defer .love {
   background: url("../../image/love-icon.png") top center no-repeat;
 }
+.main .product .wrapper .defer .active .love {
+  color: orange;
+}
 .main .product .wrapper .defer .compare {
   background: url("../../image/compare-icon.png") top center no-repeat;
   margin-left: 10px;

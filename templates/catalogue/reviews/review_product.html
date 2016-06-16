@@ -12,7 +12,7 @@
     </div>
     <div class="col-sm-10">
         <h2><a href="{{ product.get_absolute_url }}">{{ product.get_title }}</a></h2>
-        <span><strong>{% trans "Price:" %}</strong> {{ product.get_values.price }}</span>
+        <span><strong>Price:</strong> {{ product.get_values.price }}</span>
         {% include "catalogue/partials/stock_record.html" %}
         {% include "catalogue/reviews/partials/review_stars.html" %}
     </div>
