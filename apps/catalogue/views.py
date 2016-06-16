@@ -34,6 +34,7 @@ from haystack.inputs import AutoQuery
 from django.template import defaultfilters
 from django.http import HttpResponse
 import logging
+from collections import namedtuple
 logger = logging.getLogger(__name__)
 
 Product = get_model('catalogue', 'product')
@@ -223,17 +224,16 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
 
     def get_context_data_json(self, **kwargs):
         context = dict()
-        context['product'] = {'pk': self.object.pk}
+        context['product'] = {'pk': self.object.pk, 'non_standard_price_retail': self.object.non_standard_price_retail}
         context['product_versions'] = self.get_product_versions()
         context['attributes'] = []
 
         for attr in self.get_attributes():
-            values = self.start_option + [{'pk': value.pk, 'title': value.title} for value in attr.values]
-            context['attributes'].append({'pk': attr.pk,
-                                          'title': attr.title,
-                                          'values': values,
-                                          'non_standard': attr.features_by_product[0].non_standard if attr.features_by_product else False
-                                          })
+            non_standard = attr.features_by_product[0].non_standard if attr.features_by_product else False
+            values = self.start_option + [{'pk': value.pk, 'title': value.title, 'parent': attr.pk} for value in attr.values]
+            context['attributes'].append({'pk': attr.pk, 'title': attr.title, 'values': values,
+                                          'non_standard': non_standard, 'bottom_line': attr.bottom_line,
+                                          'top_line': attr.top_line})
 
         context['options'] = [{prod_option.option.pk: prod_option.price_retail} for prod_option in ProductOptions.objects.filter(product=self.object)]
         self.get_price(context)
@@ -244,13 +244,15 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
             attributes = []
 
             for attr in self.get_attributes_for_attribute(attribute):
-                values_in_group = self.start_option + map(lambda val: val.get_values(('pk', 'title', 'visible')), attr.values_in_group)
+                values_in_group = self.start_option + map(lambda val: val.get_values(('pk', 'title', 'visible'))
+                                                          .update({'parent': attr.pk}), attr.values_in_group)
 
                 attributes.append({
                     'pk': attr.pk,
                     'title': attr.title,
                     'in_group': values_in_group,
-                    'values': values_in_group + map(lambda val: val.get_values(('pk', 'title')), attr.values_out_group),
+                    'values': values_in_group + map(lambda val: val.get_values(('pk', 'title'))
+                                                    .update({'parent': attr.pk}), attr.values_out_group),
                 })
 
             context['variant_attributes'][attribute.pk] = attributes
@@ -260,7 +262,7 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
 
         if product_versions:
             for attr in product_versions.attributes.all():
-                product_versions_attributes[attr.parent.pk] = {'pk': attr.pk, 'title': attr.title}
+                product_versions_attributes[attr.parent.pk] = {'pk': attr.pk, 'title': attr.title, 'parent': attr.parent.pk}
         context['product_version_attributes'] = product_versions_attributes
         return context
 
@@ -381,16 +383,15 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
         return context
 
     def get_attributes(self, filter_attr_val_args=None):
-        only = ['title', 'pk']
         default_filter_attr_val_args = {'level': 1, 'product_versions__product': self.object}
 
         if filter_attr_val_args is not None:
             default_filter_attr_val_args.update(filter_attr_val_args)
 
-        attributes = Feature.objects.only(*only).filter(
+        attributes = Feature.objects.only(*self.only).filter(
             children__product_versions__product=self.object, level=0
         ).prefetch_related(
-            Prefetch('children', queryset=Feature.objects.only(*only).filter(**default_filter_attr_val_args).annotate(
+            Prefetch('children', queryset=Feature.objects.only(*self.only).filter(**default_filter_attr_val_args).annotate(
                 price=Min('product_versions__price_retail')
             ).order_by('price', 'title', 'pk'), to_attr='values'),
             Prefetch('product_features', queryset=ProductFeature.objects.filter(product=self.object),
@@ -421,9 +422,55 @@ class ProductCalculatePrice(views.JSONRequestResponseMixin, views.AjaxResponseMi
 
     def get_context_data_json(self, **kwargs):
         context = dict()
-        data = json.loads(self.request.body)
-        selected_attributes = map(int, data['selected_attributes'])
-        selected_attributes = map(lambda val: val / self.mm, selected_attributes)
-        total_size = functools.reduce(operator.mul, selected_attributes)
-        context['price'] = total_size * self.object.non_standard_price_retail
+
+        if self.object.non_standard_price_retail != 0:
+            data = json.loads(self.request.body)
+            custom_features = []
+            fields_list = ['pk', 'title', 'parent']
+            fields = ' '.join(fields_list)
+            print data['selected_attributes']
+
+            for val in data['selected_attributes']:
+                custom_feature = namedtuple('CustomFeature', fields)
+
+                for field in fields:
+                    setattr(custom_feature, field, val.get(field, False))
+                custom_features.append(custom_feature)
+
+            count_attr = len(Feature.objects.filter(pk__in=[attr.parent['pk'] for attr in custom_features], level=0))
+
+            if count_attr != len(custom_features):
+                error = 'Not all passed the attributes exist in the database'
+                logger.error(error)
+                raise Exception(error)
+
+            real_val = [attr.pk for attr in custom_features if attr.pk != -1]
+            count_expect_val = len(Feature.objects.filter(pk__in=real_val, level=1))
+
+            if len(real_val) != count_expect_val:
+                error = 'Not all passed the values attributes exist in the database'
+                logger.error(error)
+                raise Exception(error)
+
+            for val in custom_features:
+                product_feature = ProductFeature.objects.get(product=self.object, feature__children=val.pk)
+
+                if product_feature.non_standard is False:
+                    error = 'This attribute "{}" is not available for calculate'.format(product_feature.feature)
+                    logger.error(error)
+                    raise Exception(error)
+
+                if val.title < product_feature.feature.bottom_line or val.title > product_feature.feature.top_line:
+                    error = 'Size "{}" not valid. Available size limits: bottom_line - "{}", top_line - "{}"'.\
+                        format(val.title, product_feature.feature.bottom_line, product_feature.feature.top_line)
+                    logger.error(error)
+                    raise Exception(error)
+
+            calculate_features = map(lambda val: round(float(val.title) / self.mm, 2), custom_features)
+            total_size = functools.reduce(operator.mul, [attr.title for attr in calculate_features])
+            context['price'] = total_size * self.object.non_standard_price_retail
+        else:
+            error = 'Price not available for non-standard'
+            logger.error(error)
+            raise Exception(error)
         return context

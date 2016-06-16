@@ -25,18 +25,6 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
     $scope.product.custom_values = []
     $scope.product.dict_attributes = []
 
-    $http.post($location.absUrl()).success (data) ->
-        $scope.options = data.options
-        $scope.options_children = data.options_children
-        $scope.list_options = data.list_options
-        if data.price
-            $scope.new_price = data.price
-        else
-            $scope.product.product_not_availability = data.product_not_availability
-    .error ->
-        console.error('An error occurred during submission')
-
-
     $scope.change_price = (option_id) ->
         if Object.keys($scope.options_children).length != 0 # && Object.keys($scope.options_children[$scope.option_id]).length != 0
             $scope.option_id = Object.keys($scope.options_children[$scope.option_id]).filter((key) ->
@@ -101,6 +89,9 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
 
     $http.post($location.absUrl()).success (data) ->
         clone_data = data
+        $scope.options = data.options
+        $scope.options_children = data.options_children
+        $scope.list_options = data.list_options
 
         if data.price
             $scope.product.price = data.price
@@ -117,6 +108,8 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
             $scope.product.values[attr.pk] = attr.values
             $scope.product.dict_attributes[attr.pk] = attr
             $scope.product.attributes[attr.pk] = $scope.product.values[attr.pk][0]
+            $scope.product.custom_values[attr.pk] = null
+            $scope.isOpen[attr.pk] = false
 
             if data.product_version_attributes[attr.pk]
                 $scope.product.attributes[attr.pk] = data.product_version_attributes[attr.pk]
@@ -134,19 +127,20 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
             input.attr('ng-change', "search(" + attr.pk + ")")
             dropdown_menu.find('li.list:not(:first)').remove()
             li = dropdown_menu.find('li.list')
-            $scope.isOpen[attr.pk] = false
             li.find('a').attr('ng-click', 'update_price($index, "' + attr.pk + '")').html("{{value.title}}")
             li.attr('ng-repeat', 'value in product.values[' + attr.pk + '] | filter:query_attr[' + attr.pk + ']')
             li.attr('ng-class', '{"selected active": value.pk == product.attributes[' + attr.pk + '].pk}')
-            custom_li = dropdown_menu.find('li.custom')
-            $scope.product.custom_values[attr.pk] = null
-            custom_li.attr('ng-class', '{"selected active": product.custom_values[' + attr.pk + '].pk == product.attributes[' + attr.pk + '].pk}')
-            custom_li.find('a').attr('ng-click', 'update_price_with_custom_val(' + attr.pk + ')').html('{{product.custom_values[' + attr.pk + '].title}}')
             dropdown_menu.find('.divider').attr('ng-show', 'product.custom_values[' + attr.pk + '].pk')
+
+            if attr.non_standard is true and clone_data.product.non_standard_price_retail != 0
+                custom_li = dropdown_menu.find('li.custom')
+                custom_li.attr('ng-class', '{"selected active": product.custom_values[' + attr.pk + '].pk == product.attributes[' + attr.pk + '].pk}')
+                custom_li.find('a').attr('ng-click', 'update_price_with_custom_val(' + attr.pk + ')').html('{{product.custom_values[' + attr.pk + '].title}}')
+                $compile(custom_li)($scope)
+
             $compile(dropdown)($scope)
             $compile(input)($scope)
             $compile(li)($scope)
-            $compile(custom_li)($scope)
     .error ->
         console.error('An error occurred during submission')
 
@@ -155,12 +149,16 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
         selected_attributes = []
 
         angular.forEach clone_data.attributes, (attr) ->
-            if $scope.product.attributes[attr.pk].pk != 0 and $scope.product.dict_attributes[attr.pk].non_standard is true
-                selected_attributes.push($scope.product.attributes[attr.pk].title)
+            non_standard = $scope.product.dict_attributes[attr.pk].non_standard
 
-        if selected_attributes.length > 0
+            if $scope.product.attributes[attr.pk].pk != 0 and non_standard is true
+                selected_attributes.push($scope.product.attributes[attr.pk])
+
+        console.log(selected_attributes)
+
+        if selected_attributes.length
             $http.post('/catalogue/calculate/price/' + clone_data.product.pk, {'selected_attributes': selected_attributes}).success (data) ->
-                console.log(data)
+                $scope.product.price = data.price
             .error ->
                 console.error('An error occurred during submission')
 
