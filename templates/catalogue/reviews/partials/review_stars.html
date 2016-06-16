@@ -24,8 +24,10 @@
 {% endif %}
 
 {% if product|is_review_permitted:user %}
+    <p>
     <a id="write_review" href="{% url 'catalogue:reviews-add' product_slug=product.slug product_pk=product.id %}#addreview">
         {% trans "Write a review" %}
     </a>
+    </p>
 {% endif %}
 </p>

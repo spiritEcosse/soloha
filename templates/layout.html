@@ -19,7 +19,7 @@
     {% endif %}
 
     <div class="container page" {% block ngApp %}ng-app="soloha"{% endblock ngApp %}>
-{#    <div class="container page" >#}
+        {#    <div class="container page" >#}
         {# Site logo/title, mini-basket, browse dropdown and searchbox #}
         {% block header %}
             <header ng-controller="Header">
@@ -128,46 +128,46 @@
                                 </div>
                             </div>
                         </nav>
-                            <div class="input-group search">
-                                <input type="text" ng-model="search"  ng-change="update_products()" data-toggle="dropdown" href="#" class="form-control" placeholder="Ищете что-то?">
-                                {% verbatim %}
-                                <div class="input-group-btn">
-                                    <a href="/search/?q={{ search_string }}">
-                                        <button class="btn btn-default dropdown-toggle" type="button" id='search-show'> <!-- data-toggle="dropdown"> -->
-                                            <span class="glyphicon glyphicon-search"></span> Найти
-                                        </button>
-                                    </a>
-                                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="search-show" name="search-menu" ng-model="display" ng-style="{ 'display': display }">
-                                        <div class="item col-xs-24" ng-repeat="product in searched_products">
-                                            <a href="{{ product.href }}">
-                                                <div class="col-xs-4">
-                                                    <img src="{{ product.main_image }}" class="img-responsive" />
+                        <div class="input-group search">
+                            <input type="text" ng-model="search"  ng-change="update_products()" data-toggle="dropdown" href="#" class="form-control" placeholder="Ищете что-то?">
+                            {% verbatim %}
+                            <div class="input-group-btn">
+                                <a href="/search/?q={{ search_string }}">
+                                    <button class="btn btn-default dropdown-toggle" type="button" id='search-show'> <!-- data-toggle="dropdown"> -->
+                                        <span class="glyphicon glyphicon-search"></span> Найти
+                                    </button>
+                                </a>
+                                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="search-show" name="search-menu" ng-model="display" ng-style="{ 'display': display }">
+                                    <div class="item col-xs-24" ng-repeat="product in searched_products">
+                                        <a href="{{ product.href }}">
+                                            <div class="col-xs-4">
+                                                <img src="{{ product.main_image }}" class="img-responsive" />
+                                            </div>
+                                            <div class="col-xs-20">
+                                                <div class="title">
+                                                    {{ product.title }}
                                                 </div>
-                                                <div class="col-xs-20">
-                                                    <div class="title">
-                                                        {{ product.title }}
-                                                    </div>
-                                                    <div class="price">{{ product.price }}</div>
-                                                </div>
-                                                <div class="col-xs-1 icon">
+                                                <div class="price">{{ product.price }}</div>
+                                            </div>
+                                            <div class="col-xs-1 icon">
+                                                <span class="glyphicon glyphicon-chevron-right"></span>
+                                            </div>
+                                        </a>
+                                    </div>
+                                    <div class="item col-xs-24 text-center">
+                                        <a href="/search/?q={{ search_string }}">
+                                            <div class="col-xs-24">
+                                                <div class="title">
+                                                    Все результаты поиска
                                                     <span class="glyphicon glyphicon-chevron-right"></span>
                                                 </div>
-                                            </a>
-                                        </div>
-                                        <div class="item col-xs-24 text-center">
-                                            <a href="/search/?q={{ search_string }}">
-                                                <div class="col-xs-24">
-                                                    <div class="title">
-                                                        Все результаты поиска
-                                                        <span class="glyphicon glyphicon-chevron-right"></span>
-                                                    </div>
-                                                </div>
-                                            </a>
-                                        </div>
+                                            </div>
+                                        </a>
                                     </div>
-                                    {% endverbatim %}
                                 </div>
+                                {% endverbatim %}
                             </div>
+                        </div>
                     </div>
                     <div class="col-xs-4 col-sm-4 call hidden-xs"></div>
                 </div>
@@ -270,79 +270,74 @@
                 <div class="row center">
                     <div class="col-xs-24 col-sm-6 row question">
                         <div class="row">
-                            <div class="title">Есть вопрос?</div>
-                            <div class="row item line-top">
-                                <div class="col-xs-4 row icon">
-                                    <span class="glyphicon glyphicon-time"></span>
+                            {% if work_time or address or phone_number or email%}
+                                <div class="title">Есть вопрос?</div>
+                                <div class="row item line-top">
+                                    <div class="col-xs-4 row icon">
+                                        <span class="glyphicon glyphicon-time"></span>
+                                    </div>
+                                    <div class="col-xs-20 text">
+                                        {{ work_time }}
+                                    </div>
                                 </div>
-                                <div class="col-xs-20 text">
-                                    {{ work_time }}
+                                <div class="row item line-top">
+                                    <div class="col-xs-4 row icon">
+                                        <span class="glyphicon glyphicon-map-marker"></span>
+                                    </div>
+                                    <div class="col-xs-20 text">
+                                        {{ address }}
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="row item line-top">
-                                <div class="col-xs-4 row icon">
-                                    <span class="glyphicon glyphicon-map-marker"></span>
+                                <div class="row item line-top">
+                                    <div class="col-xs-4 row icon">
+                                        <span class="glyphicon glyphicon-phone-alt"></span>
+                                    </div>
+                                    <div class="col-xs-20 text">
+                                        {{ phone_number }} <br/>
+                                    </div>
                                 </div>
-                                <div class="col-xs-20 text">
-                                    {{ address }}
+                                <div class="row item line-top">
+                                    <div class="col-xs-4 row icon">
+                                        <span class="glyphicon glyphicon-envelope"></span>
+                                    </div>
+                                    <div class="col-xs-20 text">{{ email }}</div>
                                 </div>
-                            </div>
-                            <div class="row item line-top">
-                                <div class="col-xs-4 row icon">
-                                    <span class="glyphicon glyphicon-phone-alt"></span>
-                                </div>
-                                <div class="col-xs-20 text">
-{#                                    {% for phone in phone_number %}#}
-                                    {{ phone_number }} <br/>
-{#                                    {% endfor %}#}
-                                </div>
-                            </div>
-                            <div class="row item line-top">
-                                <div class="col-xs-4 row icon">
-                                    <span class="glyphicon glyphicon-envelope"></span>
-                                </div>
-                                <div class="col-xs-20 text">{{ email }}</div>
-                            </div>
+                            {% endif %}
                         </div>
                     </div>
                     <div class="col-xs-24 col-sm-6 column">
-                        <div class="title line-bottom">Информация</div>
-                        <ul class="list-group">
-                            {% for page in info_pages %}
-                                <li><a href="{{ page.get_absolute_url }}">{{ page.title }}</a></li>
-                            {% endfor %}
-                            {#                            <li class="list-group-item"><a href="#">Гарантии</a></li>#}
-                            {#                            <li class="list-group-item"><a href="#">О нас</a></li>#}
-                            {#                            <li class="list-group-item"><a href="#">Контакты</a></li>#}
-                            {#                            <li class="list-group-item"><a href="#">Доставка и оплата</a></li>#}
-                            {#                            <li class="list-group-item"><a href="#">Мобильный офис</a></li>#}
-                            {#                            <li class="list-group-item"><a href="#">Кредит</a></li>#}
-{#                            <li class="list-group-item"><a href="#">Механизмы трансформации</a></li>#}
-                        </ul>
-                        <div class="col-xs-24 special line-top"><a href="#">Акции</a>/<a href="#">Распродажи</a></div>
+                        {% if info_pages %}
+                            <div class="title line-bottom">{% trans "Information" %}</div>
+                            <ul class="list-group">
+                                {% for page in info_pages %}
+                                    <li><a href="{{ page.get_absolute_url }}">{{ page.title }}</a></li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                        <div class="col-xs-24 special line-top"><a href="#">{% trans "Special offers" %}</a>/<a href="#">{% trans "Sales" %}</a></div>
                     </div>
                     <div class="col-xs-24 col-sm-6 column">
-                        <div class="title line-bottom">Служба поддержка</div>
+                        <div class="title line-bottom">{% trans "Support service" %}</div>
                         <ul class="list-group">
-                            <li class="list-group-item"><a href="{{ contacts }}">Связаться с нами</a></li>
-                            <li class="list-group-item"><a href="#">Возврат товара</a></li>
-                            <li class="list-group-item"><a href="#">Карта сайта</a></li>
+                            <li class="list-group-item"><a href="{{ contacts }}">{% trans "Contact us" %}</a></li>
+                            <li class="list-group-item"><a href="#">{% trans "Return purchase " %}</a></li>
+                            <li class="list-group-item"><a href="#">{% trans "Site Map" %}</a></li>
                         </ul>
                     </div>
                     <div class="col-xs-24 col-sm-6 column account">
                         <div class="row">
-                            <div class="title line-bottom">Личный кабинет</div>
+                            <div class="title line-bottom">{% trans "Personal office" %}</div>
                             <ul class="list-group">
-                                <li class="list-group-item"><a href="#">Личный кабинет</a></li>
-                                <li class="list-group-item"><a href="#">История заказов</a></li>
-                                <li class="list-group-item"><a href="#">Заметки (0)</a></li>
+                                <li class="list-group-item"><a href="#">{% trans "Personal office" %}</a></li>
+                                <li class="list-group-item"><a href="#">{% trans "Orders history" %}</a></li>
+                                <li class="list-group-item"><a href="#">{% trans "Notes (0)" %}</a></li>
                             </ul>
                         </div>
                     </div>
                     <div class="col-xs-24 col-sm-12 text-center subscribe">
                         <div class="row">
                             <div class="title line-top">
-                                Подписывайся на скидки!
+                                {% trans "Sign up for discounts!" %}
                             </div>
                             <div class="input-group">
                                 <div class="col-xs-6 element">
@@ -355,18 +350,18 @@
                                     <input type="text" class="form-control" placeholder="город" aria-describedby="basic-addon1">
                                 </div>
                                 <div class="col-xs-6 element">
-                                    <button type="button" class="btn btn-danger btn-block">Подписаться</button>
+                                    <button type="button" class="btn btn-danger btn-block">{% trans "Subscribe" %}</button>
                                 </div>
                             </div>
                             <div class="social">
-                                <div class="title">МЫ В СОЦ. СЕТЯХ. ПРИСОЕДИНЯЙТЕСЬ!</div>
+                                <div class="title">{% trans "WE ARE IN SOCIAL NETWORKS JOIN US!" %}</div>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="row bottom">
                     <div class="col-xs-24 text-center">
-                        Copyright Soloha. Интернет магазин мебели и мебельных тканей. © 2012 - 2016
+                        Copyright Soloha. {% trans "Online shop of furniture and furniture fabrics." %} © 2012 - 2016
                     </div>
                 </div>
             </footer>

@@ -7362,6 +7362,32 @@ button.close {
 .navbar-primary .navbar-toggle .icon-bar {
   background-color: white;
 }
+.star-rating.One .glyphicon-star:first-child {
+  color: #f08825;
+}
+.star-rating.Two .glyphicon-star:first-child,
+.star-rating.Two .glyphicon-star:first-child + .glyphicon-star {
+  color: #f08825;
+}
+.star-rating.Three .glyphicon-star:first-child,
+.star-rating.Three .glyphicon-star:first-child + .glyphicon-star,
+.star-rating.Three .glyphicon-star:first-child + .glyphicon-star + .glyphicon-star {
+  color: #f08825;
+}
+.star-rating.Four .glyphicon-star:first-child,
+.star-rating.Four .glyphicon-star:first-child + .glyphicon-star,
+.star-rating.Four .glyphicon-star:first-child + .glyphicon-star + .glyphicon-star,
+.star-rating.Four .glyphicon-star:first-child + .glyphicon-star + .glyphicon-star + .glyphicon-star {
+  color: #f08825;
+}
+.star-rating.Five .glyphicon-star:first-child,
+.star-rating.Five .glyphicon-star:first-child + .glyphicon-star,
+.star-rating.Five .glyphicon-star:first-child + .glyphicon-star + .glyphicon-star,
+.star-rating.Five .glyphicon-star:first-child + .glyphicon-star + .glyphicon-star + .glyphicon-star,
+.star-rating.Five .glyphicon-star:first-child + .glyphicon-star + .glyphicon-star + .glyphicon-star + .glyphicon-star,
+.star-rating.Five .glyphicon-star:first-child + .glyphicon-star + .glyphicon-star + .glyphicon-star + .glyphicon-star + .glyphicon-star {
+  color: #f08825;
+}
 .line-bottom {
   background: url("../../image/product_line_bottom.png") bottom center repeat-x;
 }
@@ -8293,7 +8319,7 @@ header .bottom .navbar .nav > li .yamm-content .image .btn-menu {
   position: relative;
 }
 .main .product .glyphicon {
-  color: #f08825;
+  color: #cbcbcb;
 }
 .main .product .prevSlide,
 .main .product .nextSlide {

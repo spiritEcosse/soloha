@@ -7,6 +7,8 @@
     {% trans "All reviews" %} | {{ product.title }} | {{ block.super }}
 {% endblock %}
 
+{% block main %}
+    <div class="col-xs-24 content product">
 {% block breadcrumbs %}
     <ul class="breadcrumb">
         <li>
@@ -52,4 +54,6 @@
         {% endif %}
 
     </section>
+{% endblock %}
+    </div>
 {% endblock %}

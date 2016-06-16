@@ -79,31 +79,32 @@
                             {% endiffeature %}
                         </a>
                         {% iffeature "reviews" %}
+                            <br>
                             <p class="star-rating Four pull-left">
                                 {% include "catalogue/reviews/partials/review_stars.html" %}
                             </p>
                         {% endiffeature %}
-                        <div class="social">Поделиться:</div>
+                        <div class="social">{% trans "Share:" %} </div>
                     </div>
                     <div class="defer pull-right">
                         <a class="love" href="#">
-                            Отложить
+                            {% trans "Postpone" %}
                         </a>
                         {#                        {% iffeature "wishlists" %}#}
                         {#                            {% include "catalogue/partials/add_to_wishlist.html" %}#}
                         {#                        {% endiffeature %}#}
-                        <a class="compare" href="#">Сравнить</a>
+                        <a class="compare" href="#">{% trans "compare" %}</a>
                     </div>
                 </div>
                 <div class="row liner" id="nav-fix">
                     <div class="col-xs-22">
                         <ul class="nav nav-tabs nav-stacked">
-                            <li class="active"><a data-toggle="tab" href="#info">Общая информация</a></li>
-                            <li><a data-toggle="tab" href="#options">Выбрать дополнительные опции</a></li>
-                            <li><a data-toggle="tab" href="#characteristics">Характеристики</a></li>
-                            <li><a data-toggle="tab" href="#description">Описание</a></li>
-                            <li><a data-toggle="tab" href="#reviews">Отзывы</a></li>
-                            <li><a data-toggle="tab" href="#delivery">Доставка и оплата</a></li>
+                            <li class="active"><a data-toggle="tab" href="#info">{% trans "general information" %}</a></li>
+                            <li><a data-toggle="tab" href="#options">{% trans "Select additional options" %}</a></li>
+                            <li><a data-toggle="tab" href="#characteristics">{% trans "Characteristics" %}</a></li>
+                            <li><a data-toggle="tab" href="#description">{% trans "Description" %}</a></li>
+                            <li><a data-toggle="tab" href="#reviews">{% trans "Reviews" %}</a></li>
+                            <li><a data-toggle="tab" href="#delivery">{% trans "Shipping and payment" %}</a></li>
                         </ul>
                     </div>
                 </div>
@@ -113,15 +114,14 @@
                     <div class="col-xs-24 col-sm-24 col-md-10 price">
                         <div class="panel panel-default">
                             <div class="panel-heading">
-                                Артикул: {{ product.id }}
-                                <div class="pull-right">Под заказ</div>
+                                {% trans "Vendor code:" %} {{ product.id }}
+                                <div class="pull-right">{% trans "Under the order" %}</div>
                             </div>
                             <div class="panel-body">
                                 {% with class_price="number" %}
                                     {% if price %}
                                         <div class="text-center wrapper-number">
-                                            цена:
-
+                                            {% trans "price:" %}
                                             <span ng-bind="product.price" class="{{ class_price }}">{{ price }}</span>
                                             <span>{{ currency }}</span>
                                             {#                                    {% block product_stock_record %}#}
@@ -131,14 +131,14 @@
                                         <div class="row">
                                             <div class="wrapper-btn-primary col-xs-12">
                                                 <button class="btn btn-block btn-primary">
-                                                    Купить
+                                                    {% trans "Buy" %}
                                                     {#                                            {% block product_basket_form %}#}
                                                     {#                                                {% include "catalogue/partials/add_to_basket_form.html" %}#}
                                                     {#                                            {% endblock %}#}
                                                 </button>
                                             </div>
                                             <div class="wrapper-btn-faster col-xs-12">
-                                                <button class="btn btn-block btn-faster btn-primary">Купить в 1 клик</button>
+                                                <button class="btn btn-block btn-faster btn-primary">{% trans "buy in one click" %}</button>
                                             </div>
                                         </div>
                                     {% else %}
@@ -171,7 +171,7 @@
                     <button id="update_price" class="btn btn-default" ng-click="update_price()">{% trans "Get price" %}</button>
 
                     <div class="col-xs-24 col-sm-24 col-md-14 options">
-                        <span class="relation">*Цена зависит от выбранных параметров:</span>
+                        <span class="relation">{% trans "* The price depends on the selected parameters:" %}</span>
                         <div class="list_attr">
                             {% for attribute in attributes %}
                                 <div class="panel panel-default">
@@ -205,7 +205,7 @@
                     <div class="col-xs-24 tab-content-info">
                         <div class="panel panel-default info" id="options">
                             <div class="panel-heading text-center">
-                                Выбрать дополнительные опции:
+                                {% trans "Select additional options:" %}
                             </div>
                             <div class="panel-body">
                                 <div class="col-xs-24">
@@ -213,133 +213,120 @@
                                         <label class="block" id="options-0">
                                             <select class="form-control" ng-model="option_model[0]"
                                                     ng-change="change_price(option_id)" ng-options="option for option in list_options" ></select>
-                                            {#                                        <select class="form-control input-md" ng-model="model[0]" ng-change="change_price(option_id)">#}
-                                            {#                                            <option>--не выбрано--</option>#}
-                                            {#                                            {% for option in options %}#}
-                                            {#                                                <option value="{{ option.id }}"> {{ option }}</option>#}
-                                            {#                                            {% endfor %}#}
-                                            {#                                        </select>#}
                                         </label>
                                     </div>
-
-                                    {#                                    <select #}
-                                    {#                                        <select class="form-control" ng-if="parent == true" ng-model="children"#}
-                                    {#                                                ng-change="change_price()" ng-options="option for option in options_children" >#}
-                                    {#                                        </select>#}
                                 </div>
                             </div>
                         </div>
                     </div>
-
-        </div>
-        <div class="panel panel-default characteristics" id="characteristics">
-            <div class="panel-heading text-center">
-                Характеристики:
-            </div>
-            <div class="panel-body">
-                <div class="row option">
-                    <div class="col-xs-12">
-                        Артикул:
-                    </div>
-                    <div class="col-xs-12 values">
-                        {{ product.id }}
-                    </div>
                 </div>
-                {% for av in product.attribute_values.all %}
-                    <div class="row option">
-                        <div class="col-xs-12">
-                            {{ av.attribute.name }}
-                        </div>
-                        <div class="col-xs-12 values">
-                            {{ av.value_as_html }}
-                        </div>
+                <div class="panel panel-default characteristics" id="characteristics">
+                    <div class="panel-heading text-center">
+                        {% trans "Characteristics:" %}
                     </div>
-                {% endfor %}
-                {% iffeature "reviews" %}
-                    <div class="row option">
-                        <div class="col-xs-12">
-                            {% trans "Number of reviews" %}
-                        </div>
-                        <div class="col-xs-12 values">
-                            {{ product.num_approved_reviews }}
-                        </div>
-                    </div>
-                {% endiffeature %}
-            </div>
-        </div>
-        {% block product_description %}
-            {% if product.description %}
-                <div class="panel panel-default" id="description">
-                    <div class="panel-heading text-center">{% trans "Product Description" %}</div>
                     <div class="panel-body">
-                        <p>{{ product.description|safe }}</p>
-                    </div>
-                </div>
-            {% endif %}
-        {% endblock %}
-
-        <div class="panel panel-default reviews" id="reviews">
-            <div class="panel-heading text-center">Отзывы:</div>
-            <div class="panel-body">
-                <div class="write">
-                        {% url 'catalogue:reviews-add' product_slug=product.slug product_pk=product.id as add_review_url %}
-                        {% blocktrans %}
-                            <a href="{{ add_review_url }}#addreview">
-                                <span class="glyphicon glyphicon-pencil"></span>
-                                Написать отзыв о товаре
-                            </a>
-                        {% endblocktrans %}
-                </div>
-                <div class="row list">
-                    {% iffeature "reviews" %}
-                        {% block product_review %}
-                            <section>
-                                <div id="reviews" class="sub-header">
-                                    {% if product.num_approved_reviews > 3 %}
-                                        <a href="{% url 'catalogue:reviews-list' product_slug=product.slug product_pk=product.id %}" class="btn pull-right">{% trans "See all reviews" %}</a>
-                                    {% endif %}
-                                    <h2>{% trans "Customer Reviews" %}</h2>
+                        <div class="row option">
+                            <div class="col-xs-12">
+                                {% trans "Vendor code:" %}
+                            </div>
+                            <div class="col-xs-12 values">
+                                {{ product.id }}
+                            </div>
+                        </div>
+                        {% for av in product.attribute_values.all %}
+                            <div class="row option">
+                                <div class="col-xs-12">
+                                    {{ av.attribute.name }}
                                 </div>
+                                <div class="col-xs-12 values">
+                                    {{ av.value_as_html }}
+                                </div>
+                            </div>
+                        {% endfor %}
+                        {% iffeature "reviews" %}
+                            <div class="row option">
+                                <div class="col-xs-12">
+                                    {% trans "Number of reviews" %}
+                                </div>
+                                <div class="col-xs-12 values">
+                                    {{ product.num_approved_reviews }}
+                                </div>
+                            </div>
+                        {% endiffeature %}
+                    </div>
+                </div>
+                {% block product_description %}
+                    {% if product.description %}
+                        <div class="panel panel-default" id="description">
+                            <div class="panel-heading text-center">{% trans "Product Description" %}</div>
+                            <div class="panel-body">
+                                <p>{{ product.description|safe }}</p>
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endblock %}
 
-                                {% if product.num_approved_reviews == 0 %}
-                                    <p>
-                                        {% if product|is_review_permitted:user %}
-                                            {% url 'catalogue:reviews-add' product_slug=product.slug product_pk=product.id as add_review_url %}
-                                            {% blocktrans %}This product does not have any reviews yet -
-                                                <a href="{{ add_review_url }}#addreview">be the first to write one</a>.
-                                            {% endblocktrans %}
+                <div class="panel panel-default reviews" id="reviews">
+                    <div class="panel-heading text-center">{% trans "Reviews:" %}</div>
+                    <div class="panel-body">
+                        <div class="write">
+                            {% url 'catalogue:reviews-add' product_slug=product.slug product_pk=product.id as add_review_url %}
+                            {% blocktrans %}
+                                <a href="{{ add_review_url }}#addreview">
+                                    <span class="glyphicon glyphicon-pencil"></span>
+                                    Write Review
+                                </a>
+                            {% endblocktrans %}
+                        </div>
+                        <div class="row list">
+                            {% iffeature "reviews" %}
+                                {% block product_review %}
+                                    <section>
+                                        <div id="reviews" class="sub-header">
+                                            {% if product.num_approved_reviews > 3 %}
+                                                <a href="{% url 'catalogue:reviews-list' product_slug=product.slug product_pk=product.id %}" class="btn pull-right">{% trans "See all reviews" %}</a>
+                                            {% endif %}
+                                            <h2>{% trans "Customer Reviews" %}</h2>
+                                        </div>
+                                        {% if product.num_approved_reviews == 0 %}
+                                            <p>
+                                                {% if product|is_review_permitted:user %}
+                                                    {% url 'catalogue:reviews-add' product_slug=product.slug product_pk=product.id as add_review_url %}
+                                                    {% blocktrans %}This product does not have any reviews yet -
+                                                        <a href="{{ add_review_url }}#addreview">be the first to write one</a>.
+                                                    {% endblocktrans %}
+                                                {% else %}
+                                                    {% trans "This product does not have any reviews yet" %}.
+                                                {% endif %}
+                                            </p>
                                         {% else %}
-                                            {% trans "This product does not have any reviews yet" %}.
+                                            <ol class="list-unstyled review-list">
+                                                {% for review in reviews|slice:":3" %}
+                                                    <div class="col-xs-24 head">
+                                                        <li>
+                                                            {% include 'catalogue/partials/review.html' %}
+                                                        </li>
+                                                    </div>
+                                                {% endfor %}
+                                            </ol>
                                         {% endif %}
-                                    </p>
-                                {% else %}
-                                    <ol class="list-unstyled review-list">
-                                        {% for review in reviews|slice:":3" %}
-                                            <div class="col-xs-24 head">
-                                                <li>
-                                                    {% include 'catalogue/partials/review.html' %}
-                                                </li>
-                                            </div>
-                                        {% endfor %}
-                                    </ol>
-                                {% endif %}
-                            </section>
-                        {% endblock product_review %}
-                    {% endiffeature %}
-                    <div class="col-xs-24">
-                        <a class="pull-right more" href="{% url 'catalogue:reviews-list' product_slug=product.slug product_pk=product.id %}">Посмотреть все отзывы >> </a>
+                                    </section>
+                                {% endblock product_review %}
+                            {% endiffeature %}
+                            <div class="col-xs-24">
+                                <a class="pull-right more" href="{% url 'catalogue:reviews-list' product_slug=product.slug product_pk=product.id %}">{% trans "View all comments >>" %}</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel panel-default reviews" id="delivery">
+                    <div class="panel-heading text-center">{% trans "Shipping and payment:" %}</div>
+                    <div class="panel-body">
+                        {% trans "Partial information and links to the page with full information" %}
                     </div>
                 </div>
             </div>
         </div>
-        <div class="panel panel-default reviews" id="delivery">
-            <div class="panel-heading text-center">Доставка и оплата:</div>
-            <div class="panel-body">
-                Часть информации и ссылка на страницу с полной информацией
-            </div>
-        </div>
-    </div>
-    </div>
     </div>
     <div class="row">
         {% with recommended_products=product.recommended_products.all|slice:":6" %}
