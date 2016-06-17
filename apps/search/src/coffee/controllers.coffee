@@ -27,7 +27,6 @@ app.controller 'Search', ['$http', '$scope', '$window', '$document', '$location'
     $scope.pages[0].active = "True"
     $scope.pages[0].link = ""
     $scope.sorting_type = data.sorting_type
-    console.log($scope.pages)
   .error ->
     console.error('An error occurred during submission')
 

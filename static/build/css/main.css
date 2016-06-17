@@ -8978,6 +8978,12 @@ header .bottom .navbar .nav > li .yamm-content .image .btn-menu {
   font-size: 22px;
   font-weight: 400;
 }
+.glyphicon-heart:before {
+  font-size: 38px;
+}
+.active .glyphicon-heart:before {
+  color: #f08825;
+}
 footer {
   margin-top: 30px;
 }

@@ -87,9 +87,6 @@
                         <div class="social">{% trans "Share:" %} </div>
                     </div>
                     <div class="defer pull-right">
-{#                        <a class="love" href="#">#}
-{#                            {% trans "Add to wish list" %}#}
-{#                        </a>#}
                         {% iffeature "wishlists" %}
                             {% include "catalogue/partials/add_to_wishlist.html" %}
                         {% endiffeature %}

@@ -38,6 +38,7 @@ Category = get_model('catalogue', 'category')
 ProductVersion = get_model('catalogue', 'ProductVersion')
 Feature = get_model('catalogue', 'Feature')
 ProductOptions = get_model('catalogue', 'ProductOptions')
+WishList = get_model('wishlists', 'WishList')
 
 NOT_SELECTED = str(_('Not selected'))
 
@@ -145,7 +146,6 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
 
     def get_context_data(self, **kwargs):
         # Category.objects.filter(pk=self.object.pk).update(popular=F('popular') + 1)
-
         context = super(ProductCategoryView, self).get_context_data(**kwargs)
         queryset_filters = Feature.objects.filter(filter_products__in=self.products_without_filters).distinct().prefetch_related('filter_products')
         context['filters'] = Feature.objects.filter(level=0, children__in=queryset_filters).prefetch_related(
@@ -262,6 +262,9 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
             for attr in product_versions.attributes.all():
                 product_versions_attributes[attr.parent.pk] = {'id': attr.pk, 'title': attr.title}
         context['product_version_attributes'] = product_versions_attributes
+        context['product_id'] = self.object.id
+        context['wish_list_url'] = self.get_wish_list().get_absolute_url()
+        context['active'] = self.check_active_product_in_wish_list(wish_list=self.get_wish_list(), product_id=self.object.id)
         return context
 
     def product_versions_queryset(self):
@@ -412,3 +415,15 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
     def get_options(self):
         return Feature.objects.filter(Q(level=0), Q(product_options__product=self.object) | Q(children__product_options__product=self.object)).distinct()
 
+    def get_wish_list(self):
+        wish_list = WishList.objects.filter(owner=self.request.user.id).first()
+        return wish_list
+
+    @staticmethod
+    def check_active_product_in_wish_list(wish_list, product_id):
+        product_in_wish_list = 'none'
+        for line in wish_list.lines.all():
+            if product_id == line.product_id:
+                product_in_wish_list = 'active'
+
+        return product_in_wish_list
