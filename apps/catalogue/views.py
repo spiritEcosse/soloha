@@ -35,6 +35,9 @@ from django.template import defaultfilters
 from django.http import HttpResponse
 import logging
 from collections import namedtuple
+from decimal import Decimal as D
+from decimal import ROUND_DOWN
+
 logger = logging.getLogger(__name__)
 
 Product = get_model('catalogue', 'product')
@@ -240,19 +243,22 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
         context['not_selected'] = NOT_SELECTED
         context['variant_attributes'] = {}
 
+        def get_values(val, tuple_values, attr_pk):
+            values = val.get_values(tuple_values)
+            values.update({'parent': attr_pk})
+            return values
+
         for attribute in self.get_product_attribute_values():
             attributes = []
 
             for attr in self.get_attributes_for_attribute(attribute):
-                values_in_group = self.start_option + map(lambda val: val.get_values(('pk', 'title', 'visible'))
-                                                          .update({'parent': attr.pk}), attr.values_in_group)
+                values_in_group = self.start_option + map(lambda val: get_values(val, ('pk', 'title', 'visible'), attr.pk), attr.values_in_group)
 
                 attributes.append({
                     'pk': attr.pk,
                     'title': attr.title,
                     'in_group': values_in_group,
-                    'values': values_in_group + map(lambda val: val.get_values(('pk', 'title'))
-                                                    .update({'parent': attr.pk}), attr.values_out_group),
+                    'values': values_in_group + map(lambda val: get_values(val, ('pk', 'title'), attr.pk), attr.values_out_group)
                 })
 
             context['variant_attributes'][attribute.pk] = attributes
@@ -421,6 +427,7 @@ class ProductCalculatePrice(views.JSONRequestResponseMixin, views.AjaxResponseMi
         return self.render_json_response(self.get_context_data_json())
 
     def get_context_data_json(self, **kwargs):
+        #ToDo All raise Exception override on ValidationError or similar as angular not working after raise Exception
         context = dict()
 
         if self.object.non_standard_price_retail != 0:
@@ -428,16 +435,15 @@ class ProductCalculatePrice(views.JSONRequestResponseMixin, views.AjaxResponseMi
             custom_features = []
             fields_list = ['pk', 'title', 'parent']
             fields = ' '.join(fields_list)
-            print data['selected_attributes']
 
             for val in data['selected_attributes']:
                 custom_feature = namedtuple('CustomFeature', fields)
 
-                for field in fields:
-                    setattr(custom_feature, field, val.get(field, False))
+                for field in fields_list:
+                    setattr(custom_feature, field, int(val.get(field)))
                 custom_features.append(custom_feature)
 
-            count_attr = len(Feature.objects.filter(pk__in=[attr.parent['pk'] for attr in custom_features], level=0))
+            count_attr = len(Feature.objects.filter(pk__in=[attr.parent for attr in custom_features], level=0))
 
             if count_attr != len(custom_features):
                 error = 'Not all passed the attributes exist in the database'
@@ -452,8 +458,8 @@ class ProductCalculatePrice(views.JSONRequestResponseMixin, views.AjaxResponseMi
                 logger.error(error)
                 raise Exception(error)
 
-            for val in custom_features:
-                product_feature = ProductFeature.objects.get(product=self.object, feature__children=val.pk)
+            for val in [val for val in custom_features if val.pk == -1]:
+                product_feature = ProductFeature.objects.get(product=self.object, feature=val.parent)
 
                 if product_feature.non_standard is False:
                     error = 'This attribute "{}" is not available for calculate'.format(product_feature.feature)
@@ -461,14 +467,15 @@ class ProductCalculatePrice(views.JSONRequestResponseMixin, views.AjaxResponseMi
                     raise Exception(error)
 
                 if val.title < product_feature.feature.bottom_line or val.title > product_feature.feature.top_line:
-                    error = 'Size "{}" not valid. Available size limits: bottom_line - "{}", top_line - "{}"'.\
-                        format(val.title, product_feature.feature.bottom_line, product_feature.feature.top_line)
-                    logger.error(error)
+                    error = 'Size "{}" not valid. Attribute - "{}". Available size limits: bottom_line - "{}", top_line - "{}"'.\
+                        format(val.title, product_feature.feature.title, product_feature.feature.bottom_line, product_feature.feature.top_line)
+                    # logger.error(error)
                     raise Exception(error)
 
             calculate_features = map(lambda val: round(float(val.title) / self.mm, 2), custom_features)
-            total_size = functools.reduce(operator.mul, [attr.title for attr in calculate_features])
-            context['price'] = total_size * self.object.non_standard_price_retail
+            total_size = functools.reduce(operator.mul, calculate_features, 1)
+            total_size = D(total_size).quantize(D('.01'), rounding=ROUND_DOWN)
+            context['price'] = D(total_size * self.object.non_standard_price_retail).quantize(D('.01'), rounding=ROUND_DOWN)
         else:
             error = 'Price not available for non-standard'
             logger.error(error)

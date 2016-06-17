@@ -8,7 +8,7 @@ from easy_thumbnails.exceptions import (
 from mptt.models import MPTTModel, TreeForeignKey
 from oscar.apps.catalogue.abstract_models import *  # noqa
 from django.db import IntegrityError
-
+from django.core.exceptions import ValidationError
 
 class EnableManagerProduct(models.Manager):
     def get_queryset(self):
@@ -883,6 +883,30 @@ class AbstractProductFeature(models.Model):
 
     def __str__(self):
         return u'{}, {} - {}'.format(self.pk, self.product.title, self.feature.title)
+
+    def clean(self):
+        if self.non_standard is True:
+            if self.feature.bottom_line is None:
+                raise ValidationError(_('For this feature not specified bottom_line.'))
+
+            if self.feature.top_line is None:
+                raise ValidationError(_('For this feature not specified top_line.'))
+
+            if self.product.non_standard_price_retail == 0:
+                raise ValidationError(_('For this product set non_standard_price_retail to 0.'))
+
+    def save(self, *args, **kwargs):
+        if self.non_standard is True:
+            if self.feature.bottom_line is None:
+                raise Exception('For feature - "{}" not specified bottom_line.'.format(self.feature))
+
+            if self.feature.top_line is None:
+                raise Exception('For feature - "{}" not specified top_line.'.format(self.feature))
+
+            if self.product.non_standard_price_retail == 0:
+                raise Exception('For product - "{}" set non_standard_price_retail to 0.'.format(self.product))
+
+        super(AbstractProductFeature, self).save(*args, **kwargs)
 
 
 @python_2_unicode_compatible

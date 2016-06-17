@@ -166,16 +166,16 @@
           dropdown.find('button .title').attr('ng-bind', 'product.attributes[' + attr.pk + '].title');
           dropdown.find('button .attr-pk').attr('ng-bind', 'product.attributes[' + attr.pk + '].pk');
           dropdown_menu = dropdown.find('.dropdown-menu');
-          input = dropdown_menu.find('input');
-          input.attr('ng-model', "query_attr[" + attr.pk + "]");
-          input.attr('ng-change', "search(" + attr.pk + ")");
           dropdown_menu.find('li.list:not(:first)').remove();
           li = dropdown_menu.find('li.list');
           li.find('a').attr('ng-click', 'update_price($index, "' + attr.pk + '")').html("{{value.title}}");
-          li.attr('ng-repeat', 'value in product.values[' + attr.pk + '] | filter:query_attr[' + attr.pk + ']');
+          li.attr('ng-repeat', 'value in product.values[' + attr.pk + '] | filter:query_attr[' + attr.pk + '] track by value.pk');
           li.attr('ng-class', '{"selected active": value.pk == product.attributes[' + attr.pk + '].pk}');
           dropdown_menu.find('.divider').attr('ng-show', 'product.custom_values[' + attr.pk + '].pk');
+          input = dropdown_menu.find('input');
+          input.attr('ng-model', "query_attr[" + attr.pk + "]");
           if (attr.non_standard === true && clone_data.product.non_standard_price_retail !== 0) {
+            input.attr('ng-change', "search(" + attr.pk + ")");
             custom_li = dropdown_menu.find('li.custom');
             custom_li.attr('ng-class', '{"selected active": product.custom_values[' + attr.pk + '].pk == product.attributes[' + attr.pk + '].pk}');
             custom_li.find('a').attr('ng-click', 'update_price_with_custom_val(' + attr.pk + ')').html('{{product.custom_values[' + attr.pk + '].title}}');
@@ -199,7 +199,6 @@
             return selected_attributes.push($scope.product.attributes[attr.pk]);
           }
         });
-        console.log(selected_attributes);
         if (selected_attributes.length) {
           return $http.post('/catalogue/calculate/price/' + clone_data.product.pk, {
             'selected_attributes': selected_attributes
@@ -214,7 +213,8 @@
         if (!$filter('filter')($scope.product.values[attr_id], $scope.query_attr[attr_id]).length) {
           return $scope.product.custom_values[attr_id] = {
             'pk': -1,
-            'title': $scope.query_attr[attr_id]
+            'title': $scope.query_attr[attr_id],
+            'parent': attr_id
           };
         }
       };
@@ -255,9 +255,9 @@
           if (!set_price()) {
             $scope.product.price = clone_data.price;
             selected_attributes = [];
-            angular.forEach(clone_data.attributes, function(attr) {
+            return angular.forEach(clone_data.attributes, function(attr) {
               $scope.product.values[attr.pk] = attr.values;
-              $scope.product.attributes[attr.pk] = $scope.product.values[attr.pk][0];
+              $scope.product.attributes[attr.pk].pk = $scope.product.values[attr.pk][0];
               if (clone_data.product_version_attributes[attr.pk]) {
                 $scope.product.attributes[attr.pk] = clone_data.product_version_attributes[attr.pk];
               }
@@ -265,7 +265,6 @@
                 return selected_attributes.push($scope.product.attributes[attr.pk].pk);
               }
             });
-            return $scope.product.price = clone_data.product_versions[selected_attributes.toString()];
           }
         }
       };
