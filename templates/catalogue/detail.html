@@ -181,7 +181,7 @@
                                             {% if attribute.values %}
                                                 <div class="col-xs-11 pull-right values">
                                                     <div class="dropdown" id="attribute-{{ attribute.pk }}">
-                                                        <button class="btn btn-default dropdown-toggle btn-block" type="button" id="dropdownAttrVal{{ attribute.pk }}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                                        <button class="btn-white btn dropdown-toggle btn-block" type="button" id="dropdownAttrVal{{ attribute.pk }}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
                                                             <span class="title">
                                                                 {% with attribute.values|first as attr_first %}
                                                                     {% if attr_first in product_version_attributes.attributes.all %}
@@ -198,7 +198,7 @@
                                                             <li role="presentation">
                                                                 <form class="navbar-form navbar-left" role="search">
                                                                     <div class="form-group">
-                                                                        <input type="text" focus-me="isOpen['{{ attribute.pk }}']" class="form-control" placeholder="{% trans "Search" %}">
+                                                                        <input type="text" focus-me="isOpen['{{ attribute.pk }}']" class="form-control stop-propagation" placeholder="{% trans "Search" %}">
                                                                     </div>
                                                                 </form>
                                                             </li>

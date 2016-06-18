@@ -169,6 +169,7 @@
           dropdown_menu.find('li.list:not(:first)').remove();
           li = dropdown_menu.find('li.list');
           li.find('a').attr('ng-click', 'update_price($index, "' + attr.pk + '")').html("{{value.title}}");
+          li.find('a').attr('href', "#");
           li.attr('ng-repeat', 'value in product.values[' + attr.pk + '] | filter:query_attr[' + attr.pk + '] track by value.pk');
           li.attr('ng-class', '{"selected active": value.pk == product.attributes[' + attr.pk + '].pk}');
           dropdown_menu.find('.divider').attr('ng-show', 'product.custom_values[' + attr.pk + '].pk');
@@ -178,6 +179,7 @@
             input.attr('ng-change', "search(" + attr.pk + ")");
             custom_li = dropdown_menu.find('li.custom');
             custom_li.attr('ng-class', '{"selected active": product.custom_values[' + attr.pk + '].pk == product.attributes[' + attr.pk + '].pk}');
+            custom_li.attr('ng-show', 'product.custom_values[' + attr.pk + '].pk');
             custom_li.find('a').attr('ng-click', 'update_price_with_custom_val(' + attr.pk + ')').html('{{product.custom_values[' + attr.pk + '].title}}');
             $compile(custom_li)($scope);
           }
