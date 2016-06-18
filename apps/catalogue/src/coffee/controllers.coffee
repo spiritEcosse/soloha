@@ -124,6 +124,7 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
             dropdown_menu = dropdown.find('.dropdown-menu')
             dropdown_menu.find('li.list:not(:first)').remove()
             li = dropdown_menu.find('li.list')
+            li.attr('data-original-index', '{{$index}}')
             li.find('a').attr('ng-click', 'update_price($index, "' + attr.pk + '")').html("{{value.title}}")
             li.find('a').attr('href', "#")
             li.attr('ng-repeat', 'value in product.values[' + attr.pk + '] | filter:query_attr[' + attr.pk + '] track by value.pk')
@@ -217,17 +218,22 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
 
 app.directive 'focusMe', ($timeout, $parse) ->
     { link: (scope, element, attrs) ->
-        model = $parse(attrs.focusMe)
-        scope.$watch model, (value) ->
-            if value == true
-                $timeout ->
-                    element[0].focus()
-                    return
+        parent = element.parent().parent().parent().parent()
+
+        parent.bind 'show',  ->
+            console.log('sds')
+
+            model = $parse(attrs.focusMe)
+            scope.$watch model, (value) ->
+                if value == true
+                    $timeout ->
+                        element[0].focus()
+                        return
+                return
+            element.bind 'blur', ->
+                scope.$apply model.assign(scope, false)
+                return
             return
-        element.bind 'blur', ->
-            scope.$apply model.assign(scope, false)
-            return
-        return
     }
 
 app.controller 'More_goods', ['$http', '$scope', '$window', '$document', '$location', '$compile', '$routeParams', ($http, $scope, $window, $document, $location, $compile, $routeParams) ->

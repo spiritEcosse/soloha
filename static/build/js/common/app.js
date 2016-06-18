@@ -168,6 +168,7 @@
           dropdown_menu = dropdown.find('.dropdown-menu');
           dropdown_menu.find('li.list:not(:first)').remove();
           li = dropdown_menu.find('li.list');
+          li.attr('data-original-index', '{{$index}}');
           li.find('a').attr('ng-click', 'update_price($index, "' + attr.pk + '")').html("{{value.title}}");
           li.find('a').attr('href', "#");
           li.attr('ng-repeat', 'value in product.values[' + attr.pk + '] | filter:query_attr[' + attr.pk + '] track by value.pk');
@@ -276,17 +277,22 @@
   app.directive('focusMe', function($timeout, $parse) {
     return {
       link: function(scope, element, attrs) {
-        var model;
-        model = $parse(attrs.focusMe);
-        scope.$watch(model, function(value) {
-          if (value === true) {
-            $timeout(function() {
-              element[0].focus();
-            });
-          }
-        });
-        element.bind('blur', function() {
-          scope.$apply(model.assign(scope, false));
+        var parent;
+        parent = element.parent().parent().parent().parent();
+        return parent.bind('show', function() {
+          var model;
+          console.log('sds');
+          model = $parse(attrs.focusMe);
+          scope.$watch(model, function(value) {
+            if (value === true) {
+              $timeout(function() {
+                element[0].focus();
+              });
+            }
+          });
+          element.bind('blur', function() {
+            scope.$apply(model.assign(scope, false));
+          });
         });
       }
     };

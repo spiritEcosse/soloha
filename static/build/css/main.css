@@ -3598,7 +3598,7 @@ select[multiple].input-lg {
 .btn:hover,
 .btn:focus,
 .btn.focus {
-  color: white;
+  color: #333;
   text-decoration: none;
 }
 .btn:active,
@@ -3622,26 +3622,26 @@ fieldset[disabled] a.btn {
   pointer-events: none;
 }
 .btn-default {
-  color: white;
-  background-color: #c2c2c2;
+  color: #333;
+  background-color: #fff;
   border-color: #ccc;
 }
 .btn-default:focus,
 .btn-default.focus {
-  color: white;
-  background-color: #a9a9a9;
+  color: #333;
+  background-color: #e6e6e6;
   border-color: #8c8c8c;
 }
 .btn-default:hover {
-  color: white;
-  background-color: #a9a9a9;
+  color: #333;
+  background-color: #e6e6e6;
   border-color: #adadad;
 }
 .btn-default:active,
 .btn-default.active,
 .open > .dropdown-toggle.btn-default {
-  color: white;
-  background-color: #a9a9a9;
+  color: #333;
+  background-color: #e6e6e6;
   border-color: #adadad;
 }
 .btn-default:active:hover,
@@ -3653,8 +3653,8 @@ fieldset[disabled] a.btn {
 .btn-default:active.focus,
 .btn-default.active.focus,
 .open > .dropdown-toggle.btn-default.focus {
-  color: white;
-  background-color: #979797;
+  color: #333;
+  background-color: #d4d4d4;
   border-color: #8c8c8c;
 }
 .btn-default:active,
@@ -3671,12 +3671,12 @@ fieldset[disabled] .btn-default:focus,
 .btn-default.disabled.focus,
 .btn-default[disabled].focus,
 fieldset[disabled] .btn-default.focus {
-  background-color: #c2c2c2;
+  background-color: #fff;
   border-color: #ccc;
 }
 .btn-default .badge {
-  color: #c2c2c2;
-  background-color: white;
+  color: #fff;
+  background-color: #333;
 }
 .btn-primary {
   color: white;
@@ -8194,6 +8194,16 @@ header .bottom .navbar .nav > li .yamm-content .image .btn-menu {
   overflow-x: hidden;
   padding-top: 14px;
 }
+.main .left-bar .filter .items .values .dropdown-menu.inner {
+  position: static;
+  float: none;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  border-radius: 0;
+  -webkit-box-shadow: none;
+  box-shadow: none;
+}
 .main .left-bar .filter .items .values::-webkit-scrollbar {
   height: 4px;
   width: 12px;
@@ -8649,6 +8659,12 @@ header .bottom .navbar .nav > li .yamm-content .image .btn-menu {
 }
 .main .product .common .panel .panel-heading .option .values .attr-pk {
   display: none;
+}
+.main .product .common .panel .panel-heading .option .values .dropdown {
+  width: 100%;
+}
+.main .product .common .panel .panel-heading .option .values .dropdown .inner {
+  display: block;
 }
 .main .product .common .panel .panel-heading .option .name,
 .main .product .common .panel .panel-heading .option .values {

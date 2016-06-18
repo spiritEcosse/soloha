@@ -180,8 +180,8 @@
                                             </div>
                                             {% if attribute.values %}
                                                 <div class="col-xs-11 pull-right values">
-                                                    <div class="dropdown" id="attribute-{{ attribute.pk }}">
-                                                        <button class="btn-white btn dropdown-toggle btn-block" type="button" id="dropdownAttrVal{{ attribute.pk }}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                                    <div class="dropdown btn-group bootstrap-select" id="attribute-{{ attribute.pk }}">
+                                                        <button class="btn-white btn btn-default dropdown-toggle btn-block" type="button" id="dropdownAttrVal{{ attribute.pk }}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
                                                             <span class="title">
                                                                 {% with attribute.values|first as attr_first %}
                                                                     {% if attr_first in product_version_attributes.attributes.all %}
@@ -194,21 +194,24 @@
                                                             <span class="caret"></span>
                                                             <span class="attr-pk"></span>
                                                         </button>
-                                                        <ul role="menu" class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownAttrVal{{ attribute.pk }}">
-                                                            <li role="presentation">
-                                                                <form class="navbar-form navbar-left" role="search">
-                                                                    <div class="form-group">
-                                                                        <input type="text" focus-me="isOpen['{{ attribute.pk }}']" class="form-control stop-propagation" placeholder="{% trans "Search" %}">
-                                                                    </div>
-                                                                </form>
-                                                            </li>
-                                                            <li role="presentation" class="list"><a>{{ not_selected }}</a></li>
-                                                            {% for value in attribute.values %}
-                                                                <li role="presentation" class="list"><a href="#">{{ value.title }}</a></li>
-                                                            {% endfor %}
-                                                            <li role="separator" class="divider"></li>
-                                                            <li role="presentation" class="custom" ><a href="#"></a></li>
-                                                        </ul>
+                                                        <div class="dropdown-menu dropdown-menu-right">
+                                                            <div class="bs-searchbox"><input type="text" class="form-control" autocomplete="off"></div>
+
+{#                                                            <form class="navbar-form navbar-left" role="search">#}
+{#                                                                <div class="form-group">#}
+{#                                                                    <input type="text" focus-me="isOpen['{{ attribute.pk }}']" class="form-control" placeholder="{% trans "Search" %}">#}
+{#                                                                </div>#}
+{#                                                            </form>#}
+
+                                                            <ul role="menu" class="dropdown-menu inner" aria-labelledby="dropdownAttrVal{{ attribute.pk }}">
+                                                                <li role="presentation" class="list"><a>{{ not_selected }}</a></li>
+                                                                {% for value in attribute.values %}
+                                                                    <li role="presentation" class="list"><a href="#">{{ value.title }}</a></li>
+                                                                {% endfor %}
+                                                                <li role="separator" class="divider"></li>
+                                                                <li role="presentation" class="custom" ><a href="#"></a></li>
+                                                            </ul>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             {% endif %}
@@ -226,6 +229,18 @@
                             <div class="panel-body">
                                 <div class="col-xs-24">
                                     <div class="row option form-inline">
+                                        <div class="btn-group">
+                                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                Action <span class="caret"></span>
+                                            </button>
+                                            <ul class="dropdown-menu">
+                                                <li><a href="#">Action</a></li>
+                                                <li><a href="#">Another action</a></li>
+                                                <li><a href="#">Something else here</a></li>
+                                                <li role="separator" class="divider"></li>
+                                                <li><a href="#">Separated link</a></li>
+                                            </ul>
+                                        </div>
                                         <label class="block" id="options-0">
                                             <select class="form-control" ng-model="option_model[0]"
                                                     ng-change="change_price(option_id)" ng-options="option for option in list_options" ></select>
