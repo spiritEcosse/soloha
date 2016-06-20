@@ -39,7 +39,7 @@
         </div>
         <div class="mask">
             <div class="title">
-                <a ng-attr-href="product.absolute_url" href="{{ product.get_absolute_url }}" ng-bind="product.title">{{ product.get_title|truncatewords:7 }}</a>
+                <a {% verbatim %} ng-attr-href="{{ product.absolute_url }}" {% endverbatim %} href="{{ product.get_absolute_url }}" ng-bind="product.title">{{ product.get_title|truncatewords:7 }}</a>
             </div>
             <div class="filters">
                 <div class="rows">
