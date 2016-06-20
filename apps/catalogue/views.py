@@ -263,7 +263,8 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
                 product_versions_attributes[attr.parent.pk] = {'id': attr.pk, 'title': attr.title}
         context['product_version_attributes'] = product_versions_attributes
         context['product_id'] = self.object.id
-        context['wish_list_url'] = self.get_wish_list().get_absolute_url()
+        if self.get_wish_list():
+            context['wish_list_url'] = self.get_wish_list().get_absolute_url()
         context['active'] = self.check_active_product_in_wish_list(wish_list=self.get_wish_list(), product_id=self.object.id)
         return context
 
@@ -422,8 +423,9 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
     @staticmethod
     def check_active_product_in_wish_list(wish_list, product_id):
         product_in_wish_list = 'none'
-        for line in wish_list.lines.all():
-            if product_id == line.product_id:
-                product_in_wish_list = 'active'
+        if wish_list:
+            for line in wish_list.lines.all():
+                if product_id == line.product_id:
+                    product_in_wish_list = 'active'
 
         return product_in_wish_list

@@ -32,6 +32,7 @@ from apps.catalogue.views import NOT_SELECTED
 from soloha.settings import TEST_INDEX
 from django.test import TestCase, override_settings
 from django.core.management import call_command
+from django.contrib.auth.models import User
 import haystack
 
 Product = get_model('catalogue', 'product')
@@ -42,6 +43,7 @@ VersionAttribute = get_model('catalogue', 'VersionAttribute')
 ProductCategory = get_model('catalogue', 'ProductCategory')
 ProductVersion = get_model('catalogue', 'ProductVersion')
 Feature = get_model('catalogue', 'Feature')
+WishList = get_model('wishlists', 'WishList')
 test_catalogue = catalogue.Test()
 
 STATUS_CODE_200 = 200
@@ -1308,3 +1310,53 @@ class TestCatalog(LiveServerTestCase):
         self.firefox.get(initial_url+"&page=4")
         time.sleep(2)
         self.assertNotIn(u'ПОКАЗАТЬ ЕЩЕ', self.firefox.page_source)
+
+    def test_wish_list(self):
+        self.create_products()
+        product_1 = Product.objects.get(slug='product-1')
+
+        username = 'test'
+        email = 'test@test.com'
+        password = 'test'
+        test_user = User.objects.create_user(username, email, password)
+        login = self.client.login(username=username, password=password)
+        self.assertEqual(login, True)
+
+        WishList.objects.create(owner=test_user)
+        wish_list = self.get_wish_list(owner=test_user)
+        wish_list.add(product_1)
+        wish_list_url = wish_list.get_absolute_url()
+        active = self.check_active_product_in_wish_list(wish_list=wish_list, product_id=product_1.id)
+
+        response = self.client.post(product_1.get_absolute_url(), content_type='application/json', HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        context = json.loads(response.content)
+
+        self.assertEqual(wish_list_url, context['wish_list_url'])
+        self.assertEqual(active, context['active'])
+
+
+    @staticmethod
+    def get_wish_list(owner):
+        wish_list = WishList.objects.filter(owner=owner).first()
+        return wish_list
+
+    @staticmethod
+    def check_active_product_in_wish_list(wish_list, product_id):
+        product_in_wish_list = 'none'
+        if wish_list:
+            for line in wish_list.lines.all():
+                if product_id == line.product_id:
+                    product_in_wish_list = 'active'
+
+        return product_in_wish_list
+
+    def test_wish_list_selenium(self):
+        self.create_products()
+        product_1 = Product.objects.get(slug='product-1')
+        self.firefox.get('%s%s' % (self.live_server_url, product_1.get_absolute_url()))
+        text_wish_list = self.firefox.find_element_by_css_selector(".none .glyphicon-class")
+        self.assertEqual('Add to wish list', text_wish_list)
+
+        text_wish_list = self.firefox.find_element_by_css_selector(".active .glyphicon-class")
+        self.assertEqual('Remove from wish list', text_wish_list)
+
