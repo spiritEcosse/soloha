@@ -12,6 +12,27 @@ app.config ['$httpProvider', ($httpProvider) ->
     $httpProvider.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest'
 ]
 
+app.filter 'search_by_title', ->
+    (list, needle) ->
+        if list and needle
+            return if needle in [val.title for val in list][0] then true else false
+        return null
+
+app.directive 'focusMe', ($timeout, $parse) ->
+    { link: (scope, element, attrs) ->
+        model = $parse(attrs.focusMe)
+        scope.$watch model, (value) ->
+            if value == true
+                $timeout ->
+                    element[0].focus()
+                    return
+            return
+        element.bind 'blur', ->
+            scope.$apply model.assign(scope, false)
+            return
+        return
+    }
+
 app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location', '$compile', '$filter', ($http, $scope, $window, $document, $location, $compile, $filter) ->
     $scope.product = []
     $scope.product.values = []
@@ -140,8 +161,7 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
                 input.attr('min', attr.bottom_line).attr('max', attr.top_line)
                 input.attr('ng-change', "search(" + attr.pk + ")")
                 custom_value_li = dropdown_menu.find('li.query')
-                custom_value_li.attr('ng-if', 'product.custom_value[' + attr.pk + ']')
-                custom_value_li.attr('ng-show', '(product.custom_values[' + attr.pk + '] | filter:{title: product.custom_value[' + attr.pk + '].title}).length == 0')
+                custom_value_li.attr('ng-if', '(product.custom_values[' + attr.pk + '] | search_by_title: product.custom_value[' + attr.pk + '].title) == false')
                 custom_value_li.find('a').attr('ng-click', 'update_price_with_custom_val(' + attr.pk + ')').html('{{product.custom_value[' + attr.pk + '].title}}')
                 $compile(custom_value_li)($scope)
                 custom_values_li = dropdown_menu.find('li.custom')
@@ -174,17 +194,19 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
             $http.post('/catalogue/calculate/price/' + clone_data.product.pk, {'selected_attributes': selected_attributes}).success (data) ->
                 $scope.product.price = data.price
 
-                if $scope.product.custom_value[attr_pk] and not $filter('filter')($scope.product.custom_values[attr_pk], {'title': $scope.product.custom_value[attr_pk].title}).length
+                if $scope.product.custom_value[attr_pk] and not $filter('search_by_title')($scope.product.custom_values[attr_pk], $scope.product.custom_value[attr_pk].title)
                     $scope.product.custom_values[attr_pk].push($scope.product.custom_value[attr_pk])
             .error ->
                 console.error('An error occurred during submission')
 
-    $scope.search = (attr_id) ->
-        custom_value = {'pk': -1, 'title': $scope.query_attr[attr_id], 'parent': attr_id}
-        $scope.product.custom_value[attr_id] = if $scope.query_attr[attr_id] != '' then custom_value else null
+    $scope.search = (attr_pk) ->
+        if $scope.query_attr[attr_pk]? and not $filter('search_by_title')($scope.product.custom_values[attr_pk], $scope.query_attr[attr_pk])
+            $scope.product.custom_value[attr_pk] = {'pk': -1, 'title': $scope.query_attr[attr_pk], 'parent': attr_pk}
+        else
+            $scope.product.custom_value[attr_pk] = null
 
     $scope.click_dropdown = (attr_id) ->
-#Todo bug with focus. If click on button three times, open dropdown without focus on us input.
+        #Todo bug with focus. If click on button three times, open dropdown without focus on us input.
         $scope.isOpen[attr_id] = if $scope.isOpen[attr_id] is false then true else false
 
     set_price = () ->
@@ -231,21 +253,6 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
                     if $scope.product.attributes[attr.pk].pk != 0
                         selected_attributes.push($scope.product.attributes[attr.pk].pk)
 ]
-
-app.directive 'focusMe', ($timeout, $parse) ->
-    { link: (scope, element, attrs) ->
-        model = $parse(attrs.focusMe)
-        scope.$watch model, (value) ->
-            if value == true
-                $timeout ->
-                    element[0].focus()
-                    return
-            return
-        element.bind 'blur', ->
-            scope.$apply model.assign(scope, false)
-            return
-        return
-    }
 
 app.controller 'More_goods', ['$http', '$scope', '$window', '$document', '$location', '$compile', '$routeParams', ($http, $scope, $window, $document, $location, $compile, $routeParams) ->
     getParameterByName = (name, url) ->

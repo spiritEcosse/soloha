@@ -51,7 +51,8 @@
   'use strict';
 
   /* Controllers */
-  var app, app_name;
+  var app, app_name,
+    __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
   app_name = 'soloha';
 
@@ -64,6 +65,49 @@
       return $httpProvider.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
     }
   ]);
+
+  app.filter('search_by_title', function() {
+    return function(list, needle) {
+      var val;
+      if (list && needle) {
+        if (__indexOf.call([
+          (function() {
+            var _i, _len, _results;
+            _results = [];
+            for (_i = 0, _len = list.length; _i < _len; _i++) {
+              val = list[_i];
+              _results.push(val.title);
+            }
+            return _results;
+          })()
+        ][0], needle) >= 0) {
+          return true;
+        } else {
+          return false;
+        }
+      }
+      return null;
+    };
+  });
+
+  app.directive('focusMe', function($timeout, $parse) {
+    return {
+      link: function(scope, element, attrs) {
+        var model;
+        model = $parse(attrs.focusMe);
+        scope.$watch(model, function(value) {
+          if (value === true) {
+            $timeout(function() {
+              element[0].focus();
+            });
+          }
+        });
+        element.bind('blur', function() {
+          scope.$apply(model.assign(scope, false));
+        });
+      }
+    };
+  });
 
   app.controller('Product', [
     '$http', '$scope', '$window', '$document', '$location', '$compile', '$filter', function($http, $scope, $window, $document, $location, $compile, $filter) {
@@ -183,8 +227,7 @@
             input.attr('min', attr.bottom_line).attr('max', attr.top_line);
             input.attr('ng-change', "search(" + attr.pk + ")");
             custom_value_li = dropdown_menu.find('li.query');
-            custom_value_li.attr('ng-if', 'product.custom_value[' + attr.pk + ']');
-            custom_value_li.attr('ng-show', '(product.custom_values[' + attr.pk + '] | filter:{title: product.custom_value[' + attr.pk + '].title}).length == 0');
+            custom_value_li.attr('ng-if', '(product.custom_values[' + attr.pk + '] | search_by_title: product.custom_value[' + attr.pk + '].title) == false');
             custom_value_li.find('a').attr('ng-click', 'update_price_with_custom_val(' + attr.pk + ')').html('{{product.custom_value[' + attr.pk + '].title}}');
             $compile(custom_value_li)($scope);
             custom_values_li = dropdown_menu.find('li.custom');
@@ -223,9 +266,7 @@
             'selected_attributes': selected_attributes
           }).success(function(data) {
             $scope.product.price = data.price;
-            if ($scope.product.custom_value[attr_pk] && !$filter('filter')($scope.product.custom_values[attr_pk], {
-              'title': $scope.product.custom_value[attr_pk].title
-            }).length) {
+            if ($scope.product.custom_value[attr_pk] && !$filter('search_by_title')($scope.product.custom_values[attr_pk], $scope.product.custom_value[attr_pk].title)) {
               return $scope.product.custom_values[attr_pk].push($scope.product.custom_value[attr_pk]);
             }
           }).error(function() {
@@ -233,14 +274,16 @@
           });
         }
       };
-      $scope.search = function(attr_id) {
-        var custom_value;
-        custom_value = {
-          'pk': -1,
-          'title': $scope.query_attr[attr_id],
-          'parent': attr_id
-        };
-        return $scope.product.custom_value[attr_id] = $scope.query_attr[attr_id] !== '' ? custom_value : null;
+      $scope.search = function(attr_pk) {
+        if (($scope.query_attr[attr_pk] != null) && !$filter('search_by_title')($scope.product.custom_values[attr_pk], $scope.query_attr[attr_pk])) {
+          return $scope.product.custom_value[attr_pk] = {
+            'pk': -1,
+            'title': $scope.query_attr[attr_pk],
+            'parent': attr_pk
+          };
+        } else {
+          return $scope.product.custom_value[attr_pk] = null;
+        }
       };
       $scope.click_dropdown = function(attr_id) {
         return $scope.isOpen[attr_id] = $scope.isOpen[attr_id] === false ? true : false;
@@ -294,25 +337,6 @@
       };
     }
   ]);
-
-  app.directive('focusMe', function($timeout, $parse) {
-    return {
-      link: function(scope, element, attrs) {
-        var model;
-        model = $parse(attrs.focusMe);
-        scope.$watch(model, function(value) {
-          if (value === true) {
-            $timeout(function() {
-              element[0].focus();
-            });
-          }
-        });
-        element.bind('blur', function() {
-          scope.$apply(model.assign(scope, false));
-        });
-      }
-    };
-  });
 
   app.controller('More_goods', [
     '$http', '$scope', '$window', '$document', '$location', '$compile', '$routeParams', function($http, $scope, $window, $document, $location, $compile, $routeParams) {
