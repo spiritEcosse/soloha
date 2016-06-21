@@ -1315,6 +1315,7 @@ class TestCatalog(LiveServerTestCase):
         self.create_products()
         product_1 = Product.objects.get(slug='product-1')
 
+        # wish list needs loged in user
         username = 'test'
         email = 'test@test.com'
         password = 'test'
@@ -1334,7 +1335,6 @@ class TestCatalog(LiveServerTestCase):
         self.assertEqual(wish_list_url, context['wish_list_url'])
         self.assertEqual(active, context['active'])
 
-
     @staticmethod
     def get_wish_list(owner):
         wish_list = WishList.objects.filter(owner=owner).first()
@@ -1352,11 +1352,33 @@ class TestCatalog(LiveServerTestCase):
 
     def test_wish_list_selenium(self):
         self.create_products()
-        product_1 = Product.objects.get(slug='product-1')
-        self.firefox.get('%s%s' % (self.live_server_url, product_1.get_absolute_url()))
-        text_wish_list = self.firefox.find_element_by_css_selector(".none .glyphicon-class")
+        product_2 = Product.objects.get(slug='product-2')
+
+        # login user in selenium
+        username = 'test'
+        email = 'test@test.com'
+        password = 'test'
+        User.objects.create_superuser(username, email, password)
+        self.client.login(username=username, password=password)
+        cookie = self.client.cookies['sessionid']
+        self.firefox.get(self.live_server_url + '/admin/')
+        self.firefox.add_cookie({'name': 'sessionid', 'value': cookie.value, 'secure': False, 'path': '/'})
+        self.firefox.refresh()
+        self.firefox.get('%s%s' % (self.live_server_url, product_2.get_absolute_url()))
+
+        text_wish_list = self.firefox.find_element_by_css_selector(".glyphicon-class").text
         self.assertEqual('Add to wish list', text_wish_list)
 
-        text_wish_list = self.firefox.find_element_by_css_selector(".active .glyphicon-class")
+        add_to_wish_list_button = self.firefox.find_element_by_css_selector(".glyphicon.glyphicon-heart")
+        add_to_wish_list_button.click()
+        time.sleep(3)
+
+        text_wish_list = self.firefox.find_element_by_css_selector(".glyphicon-class").text
         self.assertEqual('Remove from wish list', text_wish_list)
 
+    def test_wish_list_selenium_no_login(self):
+        self.create_products()
+        product_2 = Product.objects.get(slug='product-2')
+
+        self.firefox.get('%s%s' % (self.live_server_url, product_2.get_absolute_url()))
+        self.assertIn('Please login to add products to a wish list.', self.firefox.page_source)
