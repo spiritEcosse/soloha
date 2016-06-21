@@ -133,7 +133,7 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
         only = ['title', 'slug', 'structure', 'product_class', 'categories']
 
         dict_new_sorting_types = {'popularity': '-views_count', 'price_ascending': 'stockrecords__price_excl_tax',
-                              'price_descending': '-stockrecords__price_excl_tax'}
+                                  'price_descending': '-stockrecords__price_excl_tax'}
         self.kwargs['sorting_type'] = dict_new_sorting_types.get(self.kwargs.get('sorting_type'), self.kwargs.get('sorting_type', '-views_count'))
 
         self.products_without_filters = Product.objects.only('id').filter(**dict_filter).distinct().order_by(self.kwargs.get('sorting_type'))
@@ -188,9 +188,9 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
             pages_dict = dict()
             pages_dict['page_number'] = page
             pages_dict['link'] = "{}?page={}&sorting_type={}".format(
-                                                                    self.kwargs['url'],
-                                                                    page,
-                                                                    dict_old_sorting_types.get(self.kwargs.get('sorting_type'), 'popularity'))
+                self.kwargs['url'],
+                page,
+                dict_old_sorting_types.get(self.kwargs.get('sorting_type'), 'popularity'))
             pages_dict['active'] = 'False'
             pages.append(pages_dict)
 
@@ -436,46 +436,57 @@ class ProductCalculatePrice(views.JSONRequestResponseMixin, views.AjaxResponseMi
             fields_list = ['pk', 'title', 'parent']
             fields = ' '.join(fields_list)
 
-            for val in data['selected_attributes']:
-                custom_feature = namedtuple('CustomFeature', fields)
+            current_attr = data['current_attr']
+            product_feature = ProductFeature.objects.get(product=self.object, feature=current_attr['parent'])
 
-                for field in fields_list:
-                    setattr(custom_feature, field, int(val.get(field)))
-                custom_features.append(custom_feature)
+            context['error'] = {}
 
-            count_attr = len(Feature.objects.filter(pk__in=[attr.parent for attr in custom_features], level=0))
+            try:
+                current_attr['title'] = int(current_attr['title'])
+            except ValueError:
+                context['error'][current_attr['parent']] = str(_('Please, enter number.'))
+            else:
+                for val in data['selected_attributes']:
+                    custom_feature = namedtuple('CustomFeature', fields)
 
-            if count_attr != len(custom_features):
-                error = 'Not all passed the attributes exist in the database'
-                logger.error(error)
-                raise Exception(error)
+                    for field in fields_list:
+                        setattr(custom_feature, field, int(val.get(field)))
+                    custom_features.append(custom_feature)
 
-            real_val = [attr.pk for attr in custom_features if attr.pk != -1]
-            count_expect_val = len(Feature.objects.filter(pk__in=real_val, level=1))
+                count_attr = len(Feature.objects.filter(pk__in=[attr.parent for attr in custom_features], level=0))
 
-            if len(real_val) != count_expect_val:
-                error = 'Not all passed the values attributes exist in the database'
-                logger.error(error)
-                raise Exception(error)
-
-            for val in [val for val in custom_features if val.pk == -1]:
-                product_feature = ProductFeature.objects.get(product=self.object, feature=val.parent)
-
-                if product_feature.non_standard is False:
-                    error = 'This attribute "{}" is not available for calculate'.format(product_feature.feature)
+                if count_attr != len(custom_features):
+                    error = 'Not all passed the attributes exist in the database'
                     logger.error(error)
                     raise Exception(error)
 
-                if val.title < product_feature.feature.bottom_line or val.title > product_feature.feature.top_line:
-                    error = 'Size "{}" not valid. Attribute - "{}". Available size limits: bottom_line - "{}", top_line - "{}"'.\
-                        format(val.title, product_feature.feature.title, product_feature.feature.bottom_line, product_feature.feature.top_line)
-                    # logger.error(error)
+                real_val = [attr.pk for attr in custom_features if attr.pk != -1]
+                count_expect_val = len(Feature.objects.filter(pk__in=real_val, level=1))
+
+                if len(real_val) != count_expect_val:
+                    error = 'Not all passed the values attributes exist in the database'
+                    logger.error(error)
                     raise Exception(error)
 
-            calculate_features = map(lambda val: round(float(val.title) / self.mm, 2), custom_features)
-            total_size = functools.reduce(operator.mul, calculate_features, 1)
-            total_size = D(total_size).quantize(D('.01'), rounding=ROUND_DOWN)
-            context['price'] = D(total_size * self.object.non_standard_price_retail).quantize(D('.01'), rounding=ROUND_DOWN)
+                for val in [val for val in custom_features if val.pk == -1]:
+                    product_feature = ProductFeature.objects.get(product=self.object, feature=val.parent)
+
+                    if product_feature.non_standard is False:
+                        error = 'This attribute "{}" is not available for calculate'.format(product_feature.feature)
+                        logger.error(error)
+                        raise Exception(error)
+
+                    if val.title < product_feature.feature.bottom_line or val.title > product_feature.feature.top_line:
+                        error = str(_('Available size limits: min - "{}", max - "{}"'.
+                                      format(product_feature.feature.bottom_line, product_feature.feature.top_line)))
+                        context['error'][val.parent] = error
+
+                if not context['error']:
+                    calculate_features = map(lambda val: round(float(val.title) / self.mm, 2), custom_features)
+                    total_size = functools.reduce(operator.mul, calculate_features, 1)
+                    total_size = D(total_size).quantize(D('.01'), rounding=ROUND_DOWN)
+                    context['price'] = D(total_size * self.object.non_standard_price_retail).quantize(D('.01'), rounding=ROUND_DOWN)
+                    context['error'] = None
         else:
             error = 'Price not available for non-standard'
             logger.error(error)

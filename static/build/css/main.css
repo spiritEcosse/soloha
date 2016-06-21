@@ -8646,6 +8646,10 @@ header .bottom .navbar .nav > li .yamm-content .image .btn-menu {
 .main .product .common .panel .panel-heading {
   background-color: #e6e6e6;
 }
+.main .product .common .panel .alert {
+  margin-bottom: 0;
+  padding: 5px;
+}
 .main .product .common .panel .panel-heading {
   padding: 3px 3px;
 }

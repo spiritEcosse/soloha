@@ -18,6 +18,14 @@ app.filter 'search_by_title', ->
             return if needle in [val.title for val in list][0] then true else false
         return null
 
+app.filter 'filter_attribute', ->
+    (list, needle) ->
+        if list and needle? and needle != ''
+            needle = needle.toString()
+            new_list = [val for val in list when val.title.toString().indexOf(needle) > -1]
+            return if new_list.length then new_list else false
+        return list
+
 app.directive 'focusMe', ($timeout, $parse) ->
     { link: (scope, element, attrs) ->
         model = $parse(attrs.focusMe)
@@ -131,7 +139,7 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
             $scope.product.values[attr.pk] = attr.values
             $scope.product.dict_attributes[attr.pk] = attr
             $scope.product.attributes[attr.pk] = $scope.product.values[attr.pk][0]
-            $scope.product.custom_values[attr.pk] = null
+            $scope.product.custom_value[attr.pk] = null
             $scope.isOpen[attr.pk] = false
             $scope.product.custom_values[attr.pk] = []
 
@@ -145,31 +153,33 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
             dropdown.attr('ng-click', "click_dropdown(" + attr.pk + ", $event)")
             dropdown.find('button .title').attr('ng-bind', 'product.attributes[' + attr.pk + '].title')
             dropdown.find('button .attr-pk').attr('ng-bind', 'product.attributes[' + attr.pk + '].pk')
+            dropdown.find('form').attr('name', 'attr_form[' + attr.pk + ']')
             dropdown_menu = dropdown.find('.dropdown-menu')
             dropdown_menu.find('li.list:not(:first)').remove()
             li = dropdown_menu.find('li.list')
             li.attr('data-original-index', '{{$index}}')
             li.find('a').attr('ng-click', 'update_price($index, "' + attr.pk + '")').html("{{value.title}}")
             li.find('a').attr('href', "#")
-            li.attr('ng-repeat', 'value in product.values[' + attr.pk + '] | filter:{title: query_attr[' + attr.pk + ']} track by value.pk')
+            li.attr('ng-repeat', 'value in product.values[' + attr.pk + '] | filter: {title: query_attr[' + attr.pk + ']}')
             li.attr('ng-class', '{"selected active": value.pk == product.attributes[' + attr.pk + '].pk}')
-            dropdown_menu.find('.divider').attr('ng-show', 'product.custom_values[' + attr.pk + '].length || product.custom_value[' + attr.pk + ']')
+            dropdown_menu.find('.divider').attr('ng-if', 'product.custom_values[' + attr.pk + '].length || product.custom_value[' + attr.pk + '] !== null')
             input = dropdown_menu.find('input')
             input.attr('ng-model', "query_attr[" + attr.pk + "]")
+            custom_value_li = dropdown_menu.find('li.query')
+            custom_value_li.attr('ng-if', '(product.custom_values[' + attr.pk + '] | search_by_title: product.custom_value[' + attr.pk + '].title) == false')
+            custom_values_li = dropdown_menu.find('li.custom')
+            custom_values_li.attr('ng-if', 'product.custom_values[' + attr.pk + '].length')
 
             if attr.non_standard is true and clone_data.product.non_standard_price_retail != 0
                 input.attr('min', attr.bottom_line).attr('max', attr.top_line)
                 input.attr('ng-change', "search(" + attr.pk + ")")
-                custom_value_li = dropdown_menu.find('li.query')
-                custom_value_li.attr('ng-if', '(product.custom_values[' + attr.pk + '] | search_by_title: product.custom_value[' + attr.pk + '].title) == false')
                 custom_value_li.find('a').attr('ng-click', 'update_price_with_custom_val(' + attr.pk + ')').html('{{product.custom_value[' + attr.pk + '].title}}')
-                $compile(custom_value_li)($scope)
-                custom_values_li = dropdown_menu.find('li.custom')
-                custom_values_li.attr('ng-repeat', 'value in product.custom_values[' + attr.pk + '] | filter:{title: query_attr[' + attr.pk + ']} track by $index')
+                custom_values_li.attr('ng-repeat', 'value in product.custom_values[' + attr.pk + '] | filter:{title: query_attr[' + attr.pk + ']} | orderBy: "title" track by $index')
                 custom_values_li.attr('ng-class', '{"selected active": value.title == product.attributes[' + attr.pk + '].title}')
                 custom_values_li.find('a').attr('ng-click', 'update_price_with_custom_val(' + attr.pk + ', $index)').html('{{value.title}}')
-                $compile(custom_values_li)($scope)
 
+            $compile(custom_values_li)($scope)
+            $compile(custom_value_li)($scope)
             $compile(dropdown)($scope)
             $compile(input)($scope)
             $compile(li)($scope)
@@ -191,16 +201,20 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
                 selected_attributes.push($scope.product.attributes[attr.pk])
 
         if selected_attributes.length
-            $http.post('/catalogue/calculate/price/' + clone_data.product.pk, {'selected_attributes': selected_attributes}).success (data) ->
-                $scope.product.price = data.price
+            $http.post('/catalogue/calculate/price/' + clone_data.product.pk, {'selected_attributes': selected_attributes, 'current_attr': $scope.product.custom_value[attr_pk]}).success (data) ->
+                if not data.error?
+                    $scope.product.price = data.price
 
-                if $scope.product.custom_value[attr_pk] and not $filter('search_by_title')($scope.product.custom_values[attr_pk], $scope.product.custom_value[attr_pk].title)
-                    $scope.product.custom_values[attr_pk].push($scope.product.custom_value[attr_pk])
+                    if $scope.product.custom_value[attr_pk] and not $filter('search_by_title')($scope.product.custom_values[attr_pk], $scope.product.custom_value[attr_pk].title)
+                        $scope.product.custom_values[attr_pk].push($scope.product.custom_value[attr_pk])
+                else
+                    for key, value of data.error
+                        $scope.product.attributes[key].error = value
             .error ->
                 console.error('An error occurred during submission')
 
     $scope.search = (attr_pk) ->
-        if $scope.query_attr[attr_pk]? and not $filter('search_by_title')($scope.product.custom_values[attr_pk], $scope.query_attr[attr_pk])
+        if $scope.query_attr[attr_pk]? and $scope.query_attr[attr_pk] != '' and not $filter('search_by_title')($scope.product.custom_values[attr_pk], $scope.query_attr[attr_pk])
             $scope.product.custom_value[attr_pk] = {'pk': -1, 'title': $scope.query_attr[attr_pk], 'parent': attr_pk}
         else
             $scope.product.custom_value[attr_pk] = null
@@ -245,7 +259,7 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
 
                 angular.forEach clone_data.attributes, (attr) ->
                     $scope.product.values[attr.pk] = attr.values
-                    $scope.product.attributes[attr.pk].pk = $scope.product.values[attr.pk][0]
+                    $scope.product.attributes[attr.pk] = $scope.product.values[attr.pk][0]
 
                     if clone_data.product_version_attributes[attr.pk]
                         $scope.product.attributes[attr.pk] = clone_data.product_version_attributes[attr.pk]

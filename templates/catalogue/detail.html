@@ -168,96 +168,81 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-xs-24 col-sm-24 col-md-14 options">
-                        <span class="relation">*Цена зависит от выбранных параметров:</span>
-                        <div class="list_attr">
-                            {% for attribute in attributes %}
-                                <div class="panel panel-default">
-                                    <div class="panel-heading">
-                                        <div class="row option">
-                                            <div class="col-xs-15 name">
-                                                {{ attribute.title }}
-                                            </div>
-                                            {% if attribute.values %}
-                                                <div class="col-xs-11 pull-right values">
-                                                    <div class="dropdown btn-group bootstrap-select" id="attribute-{{ attribute.pk }}">
-                                                        <button class="btn-white btn btn-default dropdown-toggle btn-block" type="button" data-toggle="dropdown">
-                                                            <span class="title">
-                                                                {% with attribute.values|first as attr_first %}
-                                                                    {% if attr_first in product_version_attributes.attributes.all %}
-                                                                        {{ attr_first.title }}
-                                                                    {% else %}
-                                                                        {{ not_selected }}
-                                                                    {% endif %}
-                                                                {% endwith %}
-                                                            </span>
-                                                            <span class="caret"></span>
-                                                            <span class="attr-pk"></span>
-                                                        </button>
-                                                        <div class="dropdown-menu open">
-                                                            <div class="bs-searchbox">
-                                                                <input type="text" focus-me="isOpen['{{ attribute.pk }}']" placeholder="{% trans "Search" %}" class="form-control">
-                                                            </div>
+                    {% if attributes %}
+                        <div class="col-xs-24 col-sm-24 col-md-14 options">
+                            <span class="relation">*Цена зависит от выбранных параметров:</span>
+                            <div class="list_attr">
+                                {% for attribute in attributes %}
+                                    <div class="panel panel-default">
+                                        <div class="alert alert-warning" role="alert" ng-cloak=""
+                                             ng-if="product.attributes['{{ attribute.pk }}'].error"
+                                             ng-bind="product.attributes['{{ attribute.pk }}'].error"></div>
+                                        <div class="panel-heading">
+                                            <div class="row option">
+                                                <div class="col-xs-15 name">
+                                                    {{ attribute.title }}
+                                                </div>
+                                                {% if attribute.values %}
+                                                    <div class="col-xs-11 pull-right values">
+                                                        <div class="dropdown btn-group bootstrap-select" id="attribute-{{ attribute.pk }}">
+                                                            <button class="btn-white btn btn-default dropdown-toggle btn-block" type="button" data-toggle="dropdown">
+                                                                <span class="title">
+                                                                    {% with attribute.values|first as attr_first %}
+                                                                        {% if attr_first in product_version_attributes.attributes.all %}
+                                                                            {{ attr_first.title }}
+                                                                        {% else %}
+                                                                            {{ not_selected }}
+                                                                        {% endif %}
+                                                                    {% endwith %}
+                                                                </span>
+                                                                <span class="caret"></span>
+                                                                <span class="attr-pk"></span>
+                                                            </button>
+                                                            <div class="dropdown-menu open">
+                                                                <div class="bs-searchbox">
+                                                                    <form>
+                                                                        <input
+                                                                                type="text"
+                                                                                focus-me="isOpen['{{ attribute.pk }}']"
+                                                                                placeholder="{% trans "Search" %}"
+                                                                                class="form-control">
+                                                                    </form>
+                                                                </div>
 
-                                                            <ul role="menu" class="dropdown-menu inner">
-                                                                <li role="presentation" class="list"><a>{{ not_selected }}</a></li>
-                                                                {% for value in attribute.values %}
-                                                                    <li role="presentation" class="list"><a href="#">{{ value.title }}</a></li>
-                                                                {% endfor %}
-                                                                <li role="separator" class="divider"></li>
-                                                                <li role="presentation" class="query" ><a href="#"></a></li>
-                                                                <li role="presentation" class="custom" ><a href="#"></a></li>
-                                                            </ul>
+                                                                <ul role="menu" class="dropdown-menu inner">
+                                                                    <li role="presentation" class="list"><a>{{ not_selected }}</a></li>
+                                                                    {% for value in attribute.values %}
+                                                                        <li role="presentation" class="list"><a href="#">{{ value.title }}</a></li>
+                                                                    {% endfor %}
+                                                                    <li role="separator" class="divider"></li>
+                                                                    <li role="presentation" class="query" ><a href="#"></a></li>
+                                                                    <li role="presentation" class="custom" ><a href="#"></a></li>
+                                                                </ul>
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                </div>
-                                            {% endif %}
+                                                {% endif %}
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            {% endfor %}
-                        </div>
-                    </div>
-                    <div class="col-xs-24 tab-content-info">
-                        <div class="panel panel-default info" id="options">
-                            <div class="panel-heading text-center">
-                                Выбрать дополнительные опции:
+                                {% endfor %}
                             </div>
-                            <div class="panel-body">
-                                <div class="col-xs-24">
-                                    <div class="row option form-inline">
-                                        <div class="btn-group">
-                                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                Action <span class="caret"></span>
-                                            </button>
-                                            <ul class="dropdown-menu">
-                                                <li><a href="#">Action</a></li>
-                                                <li><a href="#">Another action</a></li>
-                                                <li><a href="#">Something else here</a></li>
-                                                <li role="separator" class="divider"></li>
-                                                <li><a href="#">Separated link</a></li>
-                                            </ul>
-                                        </div>
-                                        <label class="block" id="options-0">
-                                            <select class="form-control" ng-model="option_model[0]"
-                                                    ng-change="change_price(option_id)" ng-options="option for option in list_options" ></select>
-                                            {#                                        <select class="form-control input-md" ng-model="model[0]" ng-change="change_price(option_id)">#}
-                                            {#                                            <option>--не выбрано--</option>#}
-                                            {#                                            {% for option in options %}#}
-                                            {#                                                <option value="{{ option.id }}"> {{ option }}</option>#}
-                                            {#                                            {% endfor %}#}
-                                            {#                                        </select>#}
-                                        </label>
+                        </div>
+                    {% endif %}
+                    {% if options %}
+                        <div class="col-xs-24 tab-content-info">
+                            <div class="panel panel-default info" id="options">
+                                <div class="panel-heading text-center">
+                                    Выбрать дополнительные опции:
+                                </div>
+                                <div class="panel-body">
+                                    <div class="col-xs-24">
+                                        <div class="row option form-inline"></div>
                                     </div>
-
-                                    {#                                    <select #}
-                                    {#                                        <select class="form-control" ng-if="parent == true" ng-model="children"#}
-                                    {#                                                ng-change="change_price()" ng-options="option for option in options_children" >#}
-                                    {#                                        </select>#}
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    {% endif %}
                 </div>
                 <div class="panel panel-default characteristics" id="characteristics">
                     <div class="panel-heading text-center">
