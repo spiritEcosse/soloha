@@ -344,7 +344,7 @@
         }
         return exist_selected_attr;
       };
-      return $scope.update_price = function(index, attr_pk) {
+      $scope.update_price = function(index, attr_pk) {
         var selected_attributes;
         if ($scope.product.values[attr_pk][index]) {
           $scope.product.attributes[attr_pk] = $scope.product.values[attr_pk][index];
@@ -375,6 +375,18 @@
               }
             });
           }
+        }
+      };
+      return $scope.quick_order = function() {
+        console.log($scope.subscribe_data);
+        if ($scope.subscribe_data) {
+          return $http.post('/catalogue/quick/order/' + clone_data.product.pk, $scope.subscribe_data).success(function(out_data) {
+            if (!djangoForm.setErrors($scope.my_form, out_data.errors)) {
+              $window.location.href = out_data.success_url;
+            }
+          }).error(function() {
+            console.error('An error occured during submission');
+          });
         }
       };
     }

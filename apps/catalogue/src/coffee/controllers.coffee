@@ -220,7 +220,7 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
             $scope.product.custom_value[attr_pk] = null
 
     $scope.click_dropdown = (attr_id) ->
-        #Todo bug with focus. If click on button three times, open dropdown without focus on us input.
+#Todo bug with focus. If click on button three times, open dropdown without focus on us input.
         $scope.isOpen[attr_id] = if $scope.isOpen[attr_id] is false then true else false
 
     set_price = () ->
@@ -266,6 +266,18 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
 
                     if $scope.product.attributes[attr.pk].pk != 0
                         selected_attributes.push($scope.product.attributes[attr.pk].pk)
+
+    $scope.quick_order = () ->
+        console.log($scope.subscribe_data)
+
+        if $scope.subscribe_data
+            $http.post('/catalogue/quick/order/' + clone_data.product.pk, $scope.subscribe_data).success((out_data) ->
+                if !djangoForm.setErrors($scope.my_form, out_data.errors)
+                    $window.location.href = out_data.success_url
+                return
+            ).error ->
+                console.error 'An error occured during submission'
+                return
 ]
 
 app.controller 'More_goods', ['$http', '$scope', '$window', '$document', '$location', '$compile', '$routeParams', ($http, $scope, $window, $document, $location, $compile, $routeParams) ->

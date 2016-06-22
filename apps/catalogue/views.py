@@ -37,6 +37,11 @@ import logging
 from collections import namedtuple
 from decimal import Decimal as D
 from decimal import ROUND_DOWN
+from forms import QuickOrderForm
+from django.views.generic.edit import FormMixin
+from django.core.urlresolvers import reverse_lazy
+from django.utils.encoding import force_text
+from django.views.generic.edit import FormView
 
 logger = logging.getLogger(__name__)
 
@@ -206,6 +211,28 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
         return values
 
 
+class QuickOrderView(FormView):
+    form_class = QuickOrderForm
+    success_url = reverse_lazy('form_data_valid')
+
+    def post(self, request, **kwargs):
+        if request.is_ajax():
+            return self.ajax(request)
+        return super(QuickOrderView, self).post(request, **kwargs)
+
+    def ajax(self, request):
+        form = self.form_class(data=json.loads(request.body))
+        response_data = {'errors': form.errors, 'success_url': force_text(self.success_url)}
+
+        if form.is_valid():
+            quick_order = form.save(commit=False)
+            quick_order.user = request.user
+            quick_order.save()
+            print quick_order
+
+        return HttpResponse(json.dumps(response_data), content_type="application/json")
+
+
 class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CoreProductDetailView):
     start_option = [{'pk': 0, 'title': NOT_SELECTED}]
     only = ['title', 'pk']
@@ -357,6 +384,7 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
         context['attributes'] = self.get_attributes()
         context['options'] = self.get_options()
         context['not_selected'] = NOT_SELECTED
+        context['form'] = QuickOrderForm()
         return context
 
     def get_price(self, context):

@@ -1,8 +1,9 @@
 from oscar.core.loading import is_model_registered
 from oscar.apps.catalogue.abstract_models import *  # noqa
 from apps.catalogue.abstract_models import CustomAbstractProduct, AbstractFeature, CustomAbstractCategory, \
-    AbstractProductVersion, AbstractVersionAttribute, AbstractProductFeature, AbstractProductOptions
+    AbstractProductVersion, AbstractVersionAttribute, AbstractProductFeature, AbstractProductOptions, AbstractQuickOrder
 from django.contrib.sites.models import Site
+from apps.catalogue.abstract_models import REGEXP_PHONE
 from django.contrib.postgres.fields import ArrayField
 from django.forms import TextInput
 
@@ -109,6 +110,12 @@ if not is_model_registered('catalogue', 'ProductImage'):
 
     __all__.append('ProductImage')
 
+
+if not is_model_registered('catalogue', 'QuickOrder'):
+    class QuickOrder(AbstractQuickOrder):
+        pass
+
+    __all__.append('QuickOrder')
 
 # if not is_model_registered('catalogue', 'SiteInfo'):
 class SiteInfo(Site):

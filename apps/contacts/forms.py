@@ -9,7 +9,7 @@ class Feedback(Bootstrap3Form):
                                        initial='hidden value')
     name = forms.CharField(max_length=30, label=_('Name'), required=False)
     phone = forms.RegexField(regex=r'^((8|\+38)[\- ]?)?(\(?\d{3}\)?[\- ]?)?[\d\- ]{7,10}$',
-                                error_message = ("Enter a valid phone number"), required=False)
+                             error_message=_("Enter a valid phone number"), required=False)
     email = forms.EmailField(required=True, label=_('Email'),
                              error_messages={'required': _('Please enter your email.')},
                              widget=forms.widgets.EmailInput(

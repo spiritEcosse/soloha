@@ -7391,13 +7391,6 @@ span,
 div {
   font-size-adjust: 0.45;
 }
-.btn-primary {
-  background-image: linear-gradient(to top, #13dc0e 0%, #2ea32b 50%, #13dc0e 100%);
-  border: 0.290467px solid #6f6f6f;
-  color: white;
-  font-size: 18px;
-  font-weight: 400;
-}
 .btn-orange {
   background-image: linear-gradient(to top, #ffae42 0%, #f08825 44%, #ffae42 100%);
   border: 0.275025px solid #6f6f6e;
@@ -7418,13 +7411,14 @@ div {
 .btn-faster {
   background-image: linear-gradient(to top, white 0%, #e6e6e6 50%, #e6e6e6 50%, white 100%);
   border: 1px solid #e6e6e6;
-  color: black;
+  color: #6f6f6f;
   font-size: 16px;
   font-weight: 400;
 }
-.btn-faster:hover {
+.btn-faster:hover,
+.btn-faster:focus {
   border: 1px solid #e6e6e6;
-  color: black;
+  color: #6f6f6f;
 }
 .btn-white {
   color: #6f6f6f;
