@@ -57,15 +57,17 @@
 {#                                <input class="input-mini form-control" id="lines{{ line.quantity }}quantity" name="lines{{ line.quantity }}quantity" type="number"#}
 {#                                       value="{{ line.quantity }}">#}
 {#                                </input>#}
-                                                                {% for field in subform %}
-                                                                    {% render_field field class+="form-control" id="lines_{{ line.quantity }}_quantity" name="lines_{{ line.quantity }}_quantity" value="{{ line.quantity }}" %}
-{#                                                                    {% render_field field class+="form-control" value="{{ line.quantity }}"%}#}
-                                                                    {% for error in field.errors %}
-                                                                        <ul class="error-block">
-                                                                            <li>{{ error }}</li>
-                                                                        </ul>
-                                                                    {% endfor %}
-                                                                {% endfor %}
+                                {% for field in subform %}
+                                    {#                                    {{ field.auto_id }}#}
+{#                                    <span ng-init="quantity='4'" >#}
+                                    {% render_field field class+="form-control" %}
+{#                                    </span>#}
+                                    {% for error in field.errors %}
+                                        <ul class="error-block">
+                                            <li>{{ error }}</li>
+                                        </ul>
+                                    {% endfor %}
+                                {% endfor %}
                             </td>
                             <td>
                                 <div class="btn-group">
