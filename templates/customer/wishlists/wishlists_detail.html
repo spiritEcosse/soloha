@@ -3,6 +3,7 @@
 {% load i18n %}
 {% load widget_tweaks %}
 
+
 {% block breadcrumbs %}
     <ul class="breadcrumb">
         <li>
@@ -59,7 +60,7 @@
 {#                                </input>#}
                                 {% for field in subform %}
                                     {#                                    {{ field.auto_id }}#}
-{#                                    <span ng-init="quantity='4'" >#}
+{#                                    <span ng-init="dmy0.lines-0-quantity='4'" >#}
                                     {% render_field field class+="form-control" %}
 {#                                    </span>#}
                                     {% for error in field.errors %}
