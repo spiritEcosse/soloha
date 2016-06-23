@@ -1,7 +1,7 @@
 __author__ = 'igor'
 
 from apps.catalogue.models import Category
-from apps.catalogue.models import SiteInfo
+from apps.catalogue.models import Info
 from soloha.settings import MAX_COUNT_CATEGORIES
 from django.contrib.sites.shortcuts import get_current_site
 

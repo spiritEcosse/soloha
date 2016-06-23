@@ -1,7 +1,6 @@
 __author__ = 'igor'
 
 DEFAULT_FROM_EMAIL = ''
-EMAIL_COMPANY = ''
 EMAIL_HOST_USER = ''
 EMAIL_HOST_PASSWORD = ''
 EMAIL_HOST = 'smtp.gmail.com'

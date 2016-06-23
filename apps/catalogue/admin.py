@@ -7,7 +7,7 @@ from django.forms import Textarea
 from django import forms
 from django.contrib.admin import widgets
 from django.contrib.sites.models import Site
-
+from django.contrib.sites.admin import SiteAdmin as BaseSiteAdmin
 
 Feature = get_model('catalogue', 'Feature')
 AttributeOption = get_model('catalogue', 'AttributeOption')
@@ -20,7 +20,7 @@ ProductAttributeValue = get_model('catalogue', 'ProductAttributeValue')
 ProductClass = get_model('catalogue', 'ProductClass')
 ProductImage = get_model('catalogue', 'ProductImage')
 ProductRecommendation = get_model('catalogue', 'ProductRecommendation')
-SiteInfo = get_model('sites', 'SiteInfo')
+Info = get_model('sites', 'Info')
 
 
 class FeatureAdmin(tree_editor.TreeEditor):
@@ -118,6 +118,16 @@ class CategoryAdmin(tree_editor.TreeEditor):
     search_fields = ('name', 'slug', )
 
 
+class InfoInline(admin.StackedInline):
+    model = Info
+    can_delete = False
+    verbose_name_plural = 'info'
+
+
+class InfoAdmin(BaseSiteAdmin):
+    inlines = (InfoInline, )
+
+
 admin.site.register(ProductClass, ProductClassAdmin)
 admin.site.register(Product, ProductAdmin)
 admin.site.register(ProductAttribute, ProductAttributeAdmin)
@@ -127,6 +137,6 @@ admin.site.register(Option, OptionAdmin)
 admin.site.register(ProductImage)
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Feature, FeatureAdmin)
-admin.site.register(SiteInfo)
 
 admin.site.unregister(Site)
+admin.site.register(Site, InfoAdmin)

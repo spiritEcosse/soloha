@@ -41,7 +41,7 @@ app.directive 'focusMe', ($timeout, $parse) ->
         return
     }
 
-app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location', '$compile', '$filter', ($http, $scope, $window, $document, $location, $compile, $filter) ->
+app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location', '$compile', '$filter', 'djangoForm', ($http, $scope, $window, $document, $location, $compile, $filter, djangoForm) ->
     $scope.product = []
     $scope.product.values = []
     $scope.product.attributes = []
@@ -55,6 +55,7 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
     $scope.product.custom_value = []
     $scope.product.dict_attributes = []
     $scope.product.query_attr = []
+    $scope.send_form = false
 
     $scope.change_price = (option_id) ->
         if Object.keys($scope.options_children).length != 0 # && Object.keys($scope.options_children[$scope.option_id]).length != 0
@@ -268,16 +269,14 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
                         selected_attributes.push($scope.product.attributes[attr.pk].pk)
 
     $scope.quick_order = () ->
-        console.log($scope.subscribe_data)
+        console.log($scope.quick_order_data)
 
-        if $scope.subscribe_data
-            $http.post('/catalogue/quick/order/' + clone_data.product.pk, $scope.subscribe_data).success((out_data) ->
-                if !djangoForm.setErrors($scope.my_form, out_data.errors)
-                    $window.location.href = out_data.success_url
-                return
+        if $scope.quick_order_data
+            $http.post('/catalogue/quick/order/' + clone_data.product.pk, $scope.quick_order_data).success((out_data) ->
+                if djangoForm.setErrors($scope.quick_order_form, out_data.errors)
+                    $scope.send_form = true
             ).error ->
                 console.error 'An error occured during submission'
-                return
 ]
 
 app.controller 'More_goods', ['$http', '$scope', '$window', '$document', '$location', '$compile', '$routeParams', ($http, $scope, $window, $document, $location, $compile, $routeParams) ->

@@ -142,11 +142,17 @@
                                                                 <h4 class="modal-title" id="myModalLabel">{% trans 'Quick order' %}</h4>
                                                             </div>
                                                             <div class="modal-body text-left">
-                                                                <form name="{{ form.form_name }}" method="post" action="{% url 'catalogue:quick_order' object.pk %}" novalidate>
+                                                                <form name="{{ form.form_name }}" method="post" ng-if="send_form == false" action="{% url 'catalogue:quick_order' object.pk %}" novalidate>
                                                                     {% csrf_token %}
                                                                     {{ form.as_div }}
                                                                     <button type="button" ng-disabled="{{ form.form_name }}.$invalid" ng-click="quick_order()" class="btn btn-primary">{% trans 'Submit' %}</button>
                                                                 </form>
+
+                                                                <div class="alert alert-success" role="alert" ng-if="send_form == true">
+                                                                    <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                                                                    <span class="sr-only">{% trans 'The form is submitted successfully' %}:</span>
+                                                                    {% trans 'Your message has been sent. We will contact you on the specified details.' %}
+                                                                </div>
                                                             </div>
                                                             <div class="modal-footer">
                                                                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>

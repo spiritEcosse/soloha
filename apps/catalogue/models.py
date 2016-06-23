@@ -118,15 +118,20 @@ if not is_model_registered('catalogue', 'QuickOrder'):
     __all__.append('QuickOrder')
 
 # if not is_model_registered('catalogue', 'SiteInfo'):
-class SiteInfo(Site):
+@python_2_unicode_compatible
+class Info(models.Model):
+    site = models.OneToOneField(Site, on_delete=models.CASCADE, related_name='info')
     work_time = models.CharField(max_length=1000)
     address = models.CharField(max_length=1000)
     phone_number = models.CharField(max_length=19, blank=True)
     # phone_number = ArrayField(models.CharField(max_length=1000), blank=True)
-    email = models.EmailField(max_length=200, blank=True)
+    email = models.EmailField(max_length=200)
     # formfield_overrides = {
     #     models.CharField: {'widget': TextInput(attrs={'size': '80'})},
     # }
+
+    def __str__(self):
+        return self.site.domain
 
     class Meta:
         app_label = 'sites'

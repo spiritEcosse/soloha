@@ -12,16 +12,16 @@ class QuickOrderMeta(type(NgModelForm), type(Bootstrap3Form)):
     pass
 
 
-class QuickOrderForm(NgModelForm, NgFormValidationMixin, Bootstrap3Form):
+class QuickOrderForm(NgModelForm, NgModelFormMixin, NgFormValidationMixin, Bootstrap3Form):
     __metaclass__ = QuickOrderMeta
-    scope_prefix = 'subscribe_data'
-    form_name = 'my_form'
+    scope_prefix = 'quick_order_data'
+    form_name = 'quick_order_form'
 
     class Meta:
         model = QuickOrder
         fields = ['phone_number', 'name', 'comment', 'email']
         widgets = {
-            'comment': forms.Textarea(attrs={'title': _('You comment')}),
+            'comment': forms.Textarea(attrs={'title': _('You comment'), 'rows': 5}),
             'name': forms.TextInput(attrs={'title': _('You name')}),
             'phone_number': forms.TextInput(attrs={'title': _('You phone number'), 'ng-pattern': REGEXP_PHONE}),
             'email': forms.TextInput(attrs={'title': _('You email'), 'ng-pattern': REGEXP_EMAIL}),

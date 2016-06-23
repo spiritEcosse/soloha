@@ -42,6 +42,9 @@ from django.views.generic.edit import FormMixin
 from django.core.urlresolvers import reverse_lazy
 from django.utils.encoding import force_text
 from django.views.generic.edit import FormView
+from django.template.loader import get_template
+from django.core.mail import EmailMultiAlternatives
+from django.contrib.sites.shortcuts import get_current_site
 
 logger = logging.getLogger(__name__)
 
@@ -51,6 +54,8 @@ ProductVersion = get_model('catalogue', 'ProductVersion')
 Feature = get_model('catalogue', 'Feature')
 ProductOptions = get_model('catalogue', 'ProductOptions')
 ProductFeature = get_model('catalogue', 'ProductFeature')
+SiteInfo = get_model('sites', 'Info')
+QuickOrder = get_model('catalogue', 'QuickOrder')
 NOT_SELECTED = str(_('Not selected'))
 
 
@@ -211,9 +216,11 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
         return values
 
 
-class QuickOrderView(FormView):
+class QuickOrderView(views.JSONResponseMixin, views.AjaxResponseMixin, FormView, SingleObjectMixin):
     form_class = QuickOrderForm
     success_url = reverse_lazy('form_data_valid')
+    model = QuickOrder
+    template_send_email = 'catalogue/partials/quick_order.html'
 
     def post(self, request, **kwargs):
         if request.is_ajax():
@@ -222,15 +229,30 @@ class QuickOrderView(FormView):
 
     def ajax(self, request):
         form = self.form_class(data=json.loads(request.body))
-        response_data = {'errors': form.errors, 'success_url': force_text(self.success_url)}
+        response_data = {}
 
         if form.is_valid():
-            quick_order = form.save(commit=False)
-            quick_order.user = request.user
-            quick_order.save()
-            print quick_order
+            self.object = form.save(commit=False)
+            self.object.user = request.user
+            self.object.save()
+            self.send_message()
+        else:
+            response_data = {'errors': form.errors}
 
         return HttpResponse(json.dumps(response_data), content_type="application/json")
+
+    def send_message(self):
+        current_site = get_current_site(self.request)
+        subject = _('Order online %s') % current_site.domain
+
+        msg = EmailMultiAlternatives(subject, '', current_site.info.email, [self.object.email, current_site.info.email])
+        template = get_template(self.template_send_email)
+        html_content = template.render(self.object)
+        msg.attach_alternative(html_content, "text/html")
+        msg.send()
+        msg = EmailMultiAlternatives(subject, '', self.object.email, [current_site.info.email])
+        msg.attach_alternative(html_content, "text/html")
+        msg.send()
 
 
 class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CoreProductDetailView):

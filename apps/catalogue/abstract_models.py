@@ -24,16 +24,13 @@ class EnableManagerProduct(models.Manager):
 class AbstractQuickOrder(models.Model):
     name = models.CharField(verbose_name=_('Name client'), max_length=30)
     phone_number = models.CharField(
-        verbose_name=_('Phone number client'), max_length=19, validators=[
-            RegexValidator(regex=REGEXP_PHONE, message=_("Invalid phone number."))
-        ],
-    )
+        verbose_name=_('Phone number client'), max_length=19)
     email = models.EmailField(verbose_name=_('Email client'), max_length=200, blank=True)
     comment = models.CharField(verbose_name=_('Comment client'), max_length=200, blank=True)
     user = models.ForeignKey(User, blank=True, null=True)
 
     def __str__(self):
-        return self.phone_number, self.email
+        return self.name
 
     class Meta:
         abstract = True

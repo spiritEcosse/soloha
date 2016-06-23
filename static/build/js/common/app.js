@@ -138,7 +138,7 @@
   });
 
   app.controller('Product', [
-    '$http', '$scope', '$window', '$document', '$location', '$compile', '$filter', function($http, $scope, $window, $document, $location, $compile, $filter) {
+    '$http', '$scope', '$window', '$document', '$location', '$compile', '$filter', 'djangoForm', function($http, $scope, $window, $document, $location, $compile, $filter, djangoForm) {
       var attributes, clone_data, prefix, selector_el, set_price;
       $scope.product = [];
       $scope.product.values = [];
@@ -153,6 +153,7 @@
       $scope.product.custom_value = [];
       $scope.product.dict_attributes = [];
       $scope.product.query_attr = [];
+      $scope.send_form = false;
       $scope.change_price = function(option_id) {
         if (Object.keys($scope.options_children).length !== 0) {
           $scope.option_id = Object.keys($scope.options_children[$scope.option_id]).filter(function(key) {
@@ -378,14 +379,14 @@
         }
       };
       return $scope.quick_order = function() {
-        console.log($scope.subscribe_data);
-        if ($scope.subscribe_data) {
-          return $http.post('/catalogue/quick/order/' + clone_data.product.pk, $scope.subscribe_data).success(function(out_data) {
-            if (!djangoForm.setErrors($scope.my_form, out_data.errors)) {
-              $window.location.href = out_data.success_url;
+        console.log($scope.quick_order_data);
+        if ($scope.quick_order_data) {
+          return $http.post('/catalogue/quick/order/' + clone_data.product.pk, $scope.quick_order_data).success(function(out_data) {
+            if (djangoForm.setErrors($scope.quick_order_form, out_data.errors)) {
+              return $scope.send_form = true;
             }
           }).error(function() {
-            console.error('An error occured during submission');
+            return console.error('An error occured during submission');
           });
         }
       };

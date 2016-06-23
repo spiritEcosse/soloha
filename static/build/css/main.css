@@ -8308,7 +8308,7 @@ header .bottom .navbar .nav > li .yamm-content .image .btn-menu {
 .main .product {
   position: relative;
 }
-.main .product .glyphicon {
+.main .product .icon .glyphicon {
   color: #f08825;
 }
 .main .product .prevSlide,

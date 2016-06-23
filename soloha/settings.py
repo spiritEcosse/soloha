@@ -213,7 +213,6 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 IMAGE_NOT_FOUND = 'image_not_found.jpg'
 ADMINS = (('igor', 'shevchenkcoigor@gmail.com'),)
 DEFAULT_FROM_EMAIL = settings_local.DEFAULT_FROM_EMAIL
-EMAIL_COMPANY = settings_local.EMAIL_COMPANY
 EMAIL_HOST_USER = settings_local.EMAIL_HOST_USER
 EMAIL_HOST_PASSWORD = settings_local.EMAIL_HOST_PASSWORD
 EMAIL_HOST = settings_local.EMAIL_HOST

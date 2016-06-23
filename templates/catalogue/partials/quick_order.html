@@ -1,0 +1,18 @@
+{% load i18n %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% trans 'Quick order' %}</title>
+</head>
+    <body>
+
+    <b>{% trans 'Order date:' %}</b><time>{% now 'd.m.Y' %}</time>
+
+    <strong>{% trans 'Name:' %}</strong> {{ object.name }}
+    <strong>{% trans 'Phone number:' %}</strong> {{ object.phone_number }}
+    <strong>{% trans 'Email:' %}</strong> {{ object.email }}
+    <strong>{% trans 'Comment:' %}</strong> {{ object.comment }}
+    </body>
+</html>
