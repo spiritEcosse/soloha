@@ -146,18 +146,20 @@
                             <div class="panel-footer">
                                 <div class="row text-center">
                                     <div class="col-xs-8">
+                                        {% if flatpages.delivery %}
                                         <div class="icon icon-car" title="{% trans 'Delivery' %}" data-toggle="modal" data-target="#DeliveryModal">
                                             <span class="glyphicon glyphicon-info-sign btn-xs"></span>
                                         </div>
-                                        <div class="modal fade" id="DeliveryModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                                        <div class="modal fade" id="DeliveryModal" tabindex="-1" role="dialog" aria-labelledby="Delivery">
                                             <div class="modal-dialog" role="document">
                                                 <div class="modal-content">
                                                     <div class="modal-header">
                                                         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                                                        <h4 class="modal-title" id="myModalLabel">Modal title</h4>
+                                                        <h4 class="modal-title" id="DeliveryModal">{{ flatpages.delivery.title }}</h4>
                                                     </div>
                                                     <div class="modal-body">
-                                                        ...
+                                                        {{ flatpages.delivery.content|truncatewords:35|linebreaks }}
+                                                        <a href="{{ flatpages.delivery.get_absolute_url }}">{% trans 'view on page' %}</a>
                                                     </div>
                                                     <div class="modal-footer">
                                                         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -165,16 +167,55 @@
                                                 </div>
                                             </div>
                                         </div>
+                                        {% endif %}
                                     </div>
                                     <div class="col-xs-8">
-                                        <div class="icon icon-pay" title="{% trans 'Payment' %}">
+                                        {% if flatpages.payment %}
+                                        <div class="icon icon-pay" title="{% trans 'Payment' %}" data-toggle="modal" data-target="#PaymentModal">
                                             <span class="glyphicon glyphicon-info-sign btn-xs"></span>
                                         </div>
+                                        <div class="modal fade" id="PaymentModal" tabindex="-1" role="dialog" aria-labelledby="Payment">
+                                            <div class="modal-dialog" role="document">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                                        <h4 class="modal-title" id="PaymentModal">{{ flatpages.payment.title }}</h4>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        {{ flatpages.payment.content|truncatewords:35|linebreaks }}
+                                                        <a href="{{ flatpages.payment.get_absolute_url }}">{% trans 'view on page' %}</a>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {% endif %}
                                     </div>
                                     <div class="col-xs-8">
-                                        <div class="icon icon-manager" title="{% trans 'Mobile manager' %}">
+                                        {% if flatpages.manager %}
+                                        <div class="icon icon-manager" title="{% trans 'Mobile manager' %}" data-toggle="modal" data-target="#ManagerModal">
                                             <span class="glyphicon glyphicon-info-sign btn-xs"></span>
                                         </div>
+                                        <div class="modal fade" id="ManagerModal" tabindex="-1" role="dialog" aria-labelledby="Manager">
+                                            <div class="modal-dialog" role="document">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                                        <h4 class="modal-title" id="ManagerModal">{{ flatpages.manager.title }}</h4>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        {{ flatpages.manager.content|truncatewords:35|linebreaks }}
+                                                        <a href="{{ flatpages.manager.get_absolute_url }}">{% trans 'view on page' %}</a>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {% endif %}
                                     </div>
                                     <div class="clearfix"></div>
                                 </div>

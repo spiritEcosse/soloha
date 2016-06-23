@@ -27,6 +27,7 @@ from oscar.core.loading import get_class
 from django.db.models import Q
 from soloha import settings
 from django.db.models import Min, Sum
+from apps.catalogue.models import InfoPage
 
 from haystack.query import SearchQuerySet
 from haystack.inputs import AutoQuery
@@ -360,6 +361,7 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
         context['attributes'] = self.get_attributes()
         context['options'] = self.get_options()
         context['not_selected'] = NOT_SELECTED
+        context['flatpages'] = self.get_flatpages()
         return context
 
     def get_price(self, context):
@@ -415,6 +417,15 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
 
     def get_options(self):
         return Feature.objects.filter(Q(level=0), Q(product_options__product=self.object) | Q(children__product_options__product=self.object)).distinct()
+
+    @staticmethod
+    def get_flatpages():
+        context = dict()
+        context['delivery'] = InfoPage.objects.filter(url='delivery').first()
+        context['payment'] = InfoPage.objects.filter(url='payment').first()
+        context['manager'] = InfoPage.objects.filter(url='mobile manager').first()
+
+        return context
 
     def get_wish_list(self):
         wish_list = WishList.objects.filter(owner=self.request.user.id).first()

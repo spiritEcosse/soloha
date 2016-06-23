@@ -140,7 +140,7 @@ class InfoPage(FlatPage):
 
     def get_absolute_url(self):
         link = super(InfoPage, self).get_absolute_url()
-        return '/{}'.format(link.lstrip('/'))
+        return '/{}/'.format(link.lstrip('/'))
 
 from oscar.apps.catalogue.models import *  # noqa
 
