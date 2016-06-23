@@ -27,7 +27,7 @@ from oscar.core.loading import get_class
 from django.db.models import Q
 from soloha import settings
 from django.db.models import Min, Sum
-from apps.catalogue.models import InfoPage
+from apps.flatpages.models import InfoPage
 
 from haystack.query import SearchQuerySet
 from haystack.inputs import AutoQuery
@@ -423,7 +423,7 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
         context = dict()
         context['delivery'] = InfoPage.objects.filter(url='delivery').first()
         context['payment'] = InfoPage.objects.filter(url='payment').first()
-        context['manager'] = InfoPage.objects.filter(url='mobile manager').first()
+        context['manager'] = InfoPage.objects.filter(url='manager').first()
 
         return context
 

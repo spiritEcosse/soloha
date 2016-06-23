@@ -6,7 +6,7 @@ from django.core.exceptions import ObjectDoesNotExist
 
 from apps.catalogue.models import Category
 from apps.catalogue.models import SiteInfo
-from apps.catalogue.models import InfoPage
+from apps.flatpages.models import InfoPage
 from soloha.settings import MAX_COUNT_CATEGORIES
 from django.contrib.sites.shortcuts import get_current_site
 

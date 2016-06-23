@@ -1,7 +1,7 @@
 from oscar import app
 from django.conf.urls import include, url
 from oscar.core.loading import get_class
-from django.contrib.flatpages import views
+from apps.flatpages import views
 
 detail_view = get_class('catalogue.views', 'ProductDetailView')
 catalogue_view = get_class('catalogue.views', 'CatalogueView')
@@ -16,7 +16,7 @@ class Soloha(app.Shop):
             url(r'^search/filter/(?P<filter_slug>[\w-]+(/[\w-]+)*)/', search_view.as_view()),
             url(r'^search/', search_view.as_view()),
             url(r'^contacts/', contacts_view.as_view()),
-            url(r'^(?P<url>.*/)$', views.flatpage),
+            url(r'^pages/(?P<url>[\w-]+)/$', views.flatpage, name='pages'),
         ]
         urlpatterns += super(Soloha, self).get_urls()
         urlpatterns += [

@@ -1,7 +1,7 @@
 from django.contrib.sitemaps import Sitemap
 from apps.catalogue.models import Product
 from apps.catalogue.models import Category
-from apps.catalogue.models import InfoPage
+from apps.flatpages.models import InfoPage
 
 
 class ProductSitemap(Sitemap):

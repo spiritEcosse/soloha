@@ -33,6 +33,8 @@ from soloha.settings import TEST_INDEX
 from django.test import TestCase, override_settings
 from django.core.management import call_command
 from django.contrib.auth.models import User
+from selenium.common.exceptions import NoSuchElementException
+from apps.flatpages.models import InfoPage
 import haystack
 
 Product = get_model('catalogue', 'product')
@@ -1382,3 +1384,62 @@ class TestCatalog(LiveServerTestCase):
 
         self.firefox.get('%s%s' % (self.live_server_url, product_2.get_absolute_url()))
         self.assertIn('Please login to add products to a wish list.', self.firefox.page_source)
+
+    def test_flatpages_selenium(self):
+        self.create_products()
+        product_2 = Product.objects.get(slug='product-2')
+
+        self.firefox.get('%s%s' % (self.live_server_url, product_2.get_absolute_url()))
+
+        self.assertFalse(self.check_exists_element_on_page(".icon-car"))
+        self.assertFalse(self.check_exists_element_on_page(".icon-pay"))
+        self.assertFalse(self.check_exists_element_on_page(".icon-manager"))
+
+        test_catalogue.create_flatpages()
+
+        self.firefox.refresh()
+
+        self.assertTrue(self.check_exists_element_on_page(".icon-car"))
+        self.assertTrue(self.check_exists_element_on_page(".icon-pay"))
+        self.assertTrue(self.check_exists_element_on_page(".icon-manager"))
+
+    def check_exists_element_on_page(self, css):
+        try:
+            self.firefox.find_element_by_css_selector(css)
+        except NoSuchElementException:
+            return False
+        return True
+
+    def test_flatpages(self):
+        self.create_products()
+        test_catalogue.create_flatpages()
+
+        product_2 = Product.objects.get(slug='product-2')
+
+        response = self.client.get(product_2.get_absolute_url())
+        self.assertEqual(response.status_code, STATUS_CODE_200)
+
+        context = dict()
+        context['flatpages'] = self.get_flatpages()
+        dict_values = {'url': 'delivery', 'context_test': context['flatpages'], 'response_context': response.context['flatpages']}
+        self.assertions_flatpages(dict_values=dict_values)
+
+        dict_values['url'] = 'payment'
+        self.assertions_flatpages(dict_values=dict_values)
+
+        dict_values['url'] = 'manager'
+        self.assertions_flatpages(dict_values=dict_values)
+
+    @staticmethod
+    def get_flatpages():
+        context = dict()
+        context['delivery'] = InfoPage.objects.filter(url='delivery').first()
+        context['payment'] = InfoPage.objects.filter(url='payment').first()
+        context['manager'] = InfoPage.objects.filter(url='manager').first()
+
+        return context
+
+    def assertions_flatpages(self, dict_values):
+        self.assertEqual(dict_values['context_test'], dict_values['response_context'])
+        self.assertEqual(dict_values['context_test'][dict_values['url']].title, dict_values['response_context'][dict_values['url']].title)
+        self.assertEqual(dict_values['context_test'][dict_values['url']].content, dict_values['response_context'][dict_values['url']].content)
