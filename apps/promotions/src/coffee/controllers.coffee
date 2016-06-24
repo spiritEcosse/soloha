@@ -8,7 +8,8 @@ app_name = "soloha"
 app = angular.module app_name
 #app = angular.module app_name, ["#{app_name}.controllers"]
 
-app.controller 'Home', ['$http', '$scope', '$window', '$document', '$log', ($http, $scope, $window, $document, $log) ->
+
+#app.controller 'Home', ['$http', '$scope', '$window', '$document', '$log', ($http, $scope, $window, $document, $log) ->
 #app.controller 'Home', ['$http', '$scope', '$window', '$document', '$log', 'djangoUrl', ($http, $scope, $window, $document, $log, djangoUrl) ->
 #  hits = djangoUrl.reverse('promotions:hits')
 #  recommends = djangoUrl.reverse('promotions:recommend')
@@ -44,4 +45,4 @@ app.controller 'Home', ['$http', '$scope', '$window', '$document', '$log', ($htt
 #  $scope.get_hits = ->
 #    $scope.products = []
 
-]
+#]

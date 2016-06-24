@@ -8987,6 +8987,21 @@ header .bottom .navbar .nav > li .yamm-content .image .btn-menu {
 .list-group-submenu {
   margin-left: 25px;
 }
+.tab-content > .tab-pane,
+.pill-content > .pill-pane {
+  display: block;
+  /* undo display:none          */
+  height: 0;
+  /* height:0 is also invisible */
+  overflow: hidden;
+  /* no-overflow                */
+}
+.tab-content > .active,
+.pill-content > .active {
+  height: auto;
+  /* let the content decide it  */
+}
+/* bootstrap hack end */
 footer {
   margin-top: 30px;
 }

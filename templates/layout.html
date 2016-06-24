@@ -272,36 +272,44 @@
                         <div class="row">
                             {% if work_time or address or phone_number or email%}
                                 <div class="title">{% trans "Questions?" %}</div>
-                                <div class="row item line-top">
-                                    <div class="col-xs-4 row icon">
-                                        <span class="glyphicon glyphicon-time"></span>
+                                {% if work_time %}
+                                    <div class="row item line-top">
+                                        <div class="col-xs-4 row icon">
+                                            <span class="glyphicon glyphicon-time"></span>
+                                        </div>
+                                        <div class="col-xs-20 text">
+                                            {{ work_time }}
+                                        </div>
                                     </div>
-                                    <div class="col-xs-20 text">
-                                        {{ work_time }}
+                                {% endif %}
+                                {% if address %}
+                                    <div class="row item line-top">
+                                        <div class="col-xs-4 row icon">
+                                            <span class="glyphicon glyphicon-map-marker"></span>
+                                        </div>
+                                        <div class="col-xs-20 text">
+                                            {{ address }}
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="row item line-top">
-                                    <div class="col-xs-4 row icon">
-                                        <span class="glyphicon glyphicon-map-marker"></span>
+                                {% endif %}
+                                {% if phone_number %}
+                                    <div class="row item line-top">
+                                        <div class="col-xs-4 row icon">
+                                            <span class="glyphicon glyphicon-phone-alt"></span>
+                                        </div>
+                                        <div class="col-xs-20 text">
+                                            {{ phone_number }} <br/>
+                                        </div>
                                     </div>
-                                    <div class="col-xs-20 text">
-                                        {{ address }}
+                                {% endif %}
+                                {% if email %}
+                                    <div class="row item line-top">
+                                        <div class="col-xs-4 row icon">
+                                            <span class="glyphicon glyphicon-envelope"></span>
+                                        </div>
+                                        <div class="col-xs-20 text">{{ email }}</div>
                                     </div>
-                                </div>
-                                <div class="row item line-top">
-                                    <div class="col-xs-4 row icon">
-                                        <span class="glyphicon glyphicon-phone-alt"></span>
-                                    </div>
-                                    <div class="col-xs-20 text">
-                                        {{ phone_number }} <br/>
-                                    </div>
-                                </div>
-                                <div class="row item line-top">
-                                    <div class="col-xs-4 row icon">
-                                        <span class="glyphicon glyphicon-envelope"></span>
-                                    </div>
-                                    <div class="col-xs-20 text">{{ email }}</div>
-                                </div>
+                                {% endif %}
                             {% endif %}
                         </div>
                     </div>

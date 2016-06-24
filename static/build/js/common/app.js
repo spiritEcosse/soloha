@@ -368,8 +368,6 @@
 
   app = angular.module(app_name);
 
-  app.controller('Home', ['$http', '$scope', '$window', '$document', '$log', function($http, $scope, $window, $document, $log) {}]);
-
 }).call(this);
 
 (function() {

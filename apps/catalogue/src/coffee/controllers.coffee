@@ -219,7 +219,7 @@ app.controller 'More_goods', ['$http', '$scope', '$window', '$document', '$locat
   .error ->
     console.error('An error occurred during submission')
 
-  $scope.submit = ->
+  $scope.submit = () ->
     $http.post($location.absUrl(), {'page': $scope.page_number, 'sorting_type': $scope.sorting_type}).success (data) ->
       clear = angular.element('.clear_pagination')
       clear.remove()
