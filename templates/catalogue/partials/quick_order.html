@@ -8,3 +8,4 @@
 <div><strong>{% trans 'Phone number:' %}</strong> {{ object.phone_number }}</div>
 <div><strong>{% trans 'Email:' %}</strong> {{ object.email }} </div>
 <div><strong>{% trans 'Comment:' %}</strong> {{ object.comment }} </div>
+<div><strong>{% trans 'Product:' %}</strong> <a href="http://{{ current_site.domain }}{{ object.product.get_absolute_url }}">{{ object.product.title }}</a> </div>

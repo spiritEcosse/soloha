@@ -251,15 +251,19 @@ class QuickOrderView(views.JSONResponseMixin, views.AjaxResponseMixin, FormView,
         subject = str(_('Order online %s')) % current_site.domain
 
         from_email = current_site.info.email
+        context = {'object': self.object, 'current_site': current_site}
 
         if self.object.email:
-            message = loader.get_template(self.template_send_email).render(Context({'object': self.object, 'answer': ANSWER}))
+            context_user = context
+            context_user = context_user.update({'answer': ANSWER})
+            message = loader.get_template(self.template_send_email).render(Context(context_user))
             from_email = self.object.email
             msg = EmailMultiAlternatives(subject, '', current_site.info.email, [self.object.email])
             msg.attach_alternative(message, "text/html")
             msg.send()
 
-        message = loader.get_template(self.template_send_email).render(Context({'object': self.object}))
+        message = loader.get_template(self.template_send_email).render(Context(context))
+        print message
         msg = EmailMultiAlternatives(subject, '', from_email, [current_site.info.email])
         msg.attach_alternative(message, "text/html")
         msg.send()
