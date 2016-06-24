@@ -9,7 +9,6 @@ from mptt.models import MPTTModel, TreeForeignKey
 from oscar.apps.catalogue.abstract_models import *  # noqa
 from django.db import IntegrityError
 from django.core.exceptions import ValidationError
-from django.contrib.auth.models import User
 
 
 REGEXP_PHONE = r'/^((8|\+38)[\- ]?)?(\(?\d{3}\)?[\- ]?)?[\d\- ]{7,10}$/'
@@ -19,25 +18,6 @@ REGEXP_EMAIL = r'/^[-\w.]+@([A-z0-9][-A-z0-9]+\.)+[A-z]{2,4}$/'
 class EnableManagerProduct(models.Manager):
     def get_queryset(self):
         return self.get_queryset().filter(enable=True)
-
-
-class AbstractQuickOrder(models.Model):
-    name = models.CharField(verbose_name=_('Name client'), max_length=30)
-    phone_number = models.CharField(
-        verbose_name=_('Phone number client'), max_length=19)
-    email = models.EmailField(verbose_name=_('Email client'), max_length=200, blank=True)
-    comment = models.CharField(verbose_name=_('Comment client'), max_length=200, blank=True)
-    user = models.ForeignKey(User, blank=True, null=True)
-
-    def __str__(self):
-        return self.name
-
-    class Meta:
-        abstract = True
-        app_label = 'catalogue'
-        ordering = ['name', 'user', 'email']
-        verbose_name = _('Quick order')
-        verbose_name_plural = _('Quick orders')
 
 
 @python_2_unicode_compatible

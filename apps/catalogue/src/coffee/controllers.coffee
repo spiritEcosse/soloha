@@ -56,6 +56,7 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
     $scope.product.dict_attributes = []
     $scope.product.query_attr = []
     $scope.send_form = false
+    $scope.alert_mode = 'success'
 
     $scope.change_price = (option_id) ->
         if Object.keys($scope.options_children).length != 0 # && Object.keys($scope.options_children[$scope.option_id]).length != 0
@@ -269,11 +270,9 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
                         selected_attributes.push($scope.product.attributes[attr.pk].pk)
 
     $scope.quick_order = () ->
-        console.log($scope.quick_order_data)
-
         if $scope.quick_order_data
             $http.post('/catalogue/quick/order/' + clone_data.product.pk, $scope.quick_order_data).success((out_data) ->
-                if djangoForm.setErrors($scope.quick_order_form, out_data.errors)
+                if !djangoForm.setErrors($scope.quick_order_form, out_data.errors)
                     $scope.send_form = true
             ).error ->
                 console.error 'An error occured during submission'

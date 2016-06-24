@@ -45,6 +45,8 @@ from django.views.generic.edit import FormView
 from django.template.loader import get_template
 from django.core.mail import EmailMultiAlternatives
 from django.contrib.sites.shortcuts import get_current_site
+from django.template import loader, Context
+from django.core.mail import send_mail
 
 logger = logging.getLogger(__name__)
 
@@ -55,8 +57,9 @@ Feature = get_model('catalogue', 'Feature')
 ProductOptions = get_model('catalogue', 'ProductOptions')
 ProductFeature = get_model('catalogue', 'ProductFeature')
 SiteInfo = get_model('sites', 'Info')
-QuickOrder = get_model('catalogue', 'QuickOrder')
+QuickOrder = get_model('order', 'QuickOrder')
 NOT_SELECTED = str(_('Not selected'))
+ANSWER = str(_('Your message has been sent. We will contact you on the specified details.'))
 
 
 class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, SingleObjectMixin, generic.ListView):
@@ -233,7 +236,9 @@ class QuickOrderView(views.JSONResponseMixin, views.AjaxResponseMixin, FormView,
 
         if form.is_valid():
             self.object = form.save(commit=False)
-            self.object.user = request.user
+
+            if not self.request.user.is_anonymous():
+                self.object.user = self.request.user
             self.object.save()
             self.send_message()
         else:
@@ -243,15 +248,20 @@ class QuickOrderView(views.JSONResponseMixin, views.AjaxResponseMixin, FormView,
 
     def send_message(self):
         current_site = get_current_site(self.request)
-        subject = _('Order online %s') % current_site.domain
+        subject = str(_('Order online %s')) % current_site.domain
 
-        msg = EmailMultiAlternatives(subject, '', current_site.info.email, [self.object.email, current_site.info.email])
-        template = get_template(self.template_send_email)
-        html_content = template.render(self.object)
-        msg.attach_alternative(html_content, "text/html")
-        msg.send()
-        msg = EmailMultiAlternatives(subject, '', self.object.email, [current_site.info.email])
-        msg.attach_alternative(html_content, "text/html")
+        from_email = current_site.info.email
+
+        if self.object.email:
+            message = loader.get_template(self.template_send_email).render(Context({'object': self.object, 'answer': ANSWER}))
+            from_email = self.object.email
+            msg = EmailMultiAlternatives(subject, '', current_site.info.email, [self.object.email])
+            msg.attach_alternative(message, "text/html")
+            msg.send()
+
+        message = loader.get_template(self.template_send_email).render(Context({'object': self.object}))
+        msg = EmailMultiAlternatives(subject, '', from_email, [current_site.info.email])
+        msg.attach_alternative(message, "text/html")
         msg.send()
 
 
@@ -406,7 +416,8 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
         context['attributes'] = self.get_attributes()
         context['options'] = self.get_options()
         context['not_selected'] = NOT_SELECTED
-        context['form'] = QuickOrderForm()
+        context['form'] = QuickOrderForm(initial={'product': self.object.pk})
+        context['answer'] = ANSWER
         return context
 
     def get_price(self, context):

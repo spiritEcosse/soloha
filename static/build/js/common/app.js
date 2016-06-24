@@ -2,7 +2,11 @@
   'use strict';
 
   /* Declare app level module which depends on filters, and services */
+  var app, app_name;
 
+  app_name = 'soloha';
+
+  app = angular.module(app_name, ['ngResource', 'ngRoute', 'ng.django.forms', 'ui.bootstrap', 'ngAnimate', 'duScroll']);
 
 }).call(this);
 
@@ -14,7 +18,7 @@
 
   app_name = 'soloha';
 
-  app = angular.module(app_name, ['ngResource', 'ngRoute', 'ng.django.forms', 'ui.bootstrap', 'ngAnimate', 'duScroll']);
+  app = angular.module(app_name);
 
   app.config([
     '$httpProvider', '$routeProvider', function($httpProvider) {
@@ -154,6 +158,7 @@
       $scope.product.dict_attributes = [];
       $scope.product.query_attr = [];
       $scope.send_form = false;
+      $scope.alert_mode = 'success';
       $scope.change_price = function(option_id) {
         if (Object.keys($scope.options_children).length !== 0) {
           $scope.option_id = Object.keys($scope.options_children[$scope.option_id]).filter(function(key) {
@@ -379,10 +384,9 @@
         }
       };
       return $scope.quick_order = function() {
-        console.log($scope.quick_order_data);
         if ($scope.quick_order_data) {
           return $http.post('/catalogue/quick/order/' + clone_data.product.pk, $scope.quick_order_data).success(function(out_data) {
-            if (djangoForm.setErrors($scope.quick_order_form, out_data.errors)) {
+            if (!djangoForm.setErrors($scope.quick_order_form, out_data.errors)) {
               return $scope.send_form = true;
             }
           }).error(function() {

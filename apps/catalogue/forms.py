@@ -3,9 +3,9 @@ from djangular.forms import NgModelFormMixin, NgFormValidationMixin, NgModelForm
 from djangular.styling.bootstrap3.forms import Bootstrap3Form
 from django.utils.translation import ugettext_lazy as _
 from django import forms
-from apps.catalogue.abstract_models import REGEXP_PHONE, REGEXP_EMAIL
+from apps.catalogue.abstract_models import REGEXP_PHONE
 
-QuickOrder = get_model('catalogue', 'QuickOrder')
+QuickOrder = get_model('order', 'QuickOrder')
 
 
 class QuickOrderMeta(type(NgModelForm), type(Bootstrap3Form)):
@@ -19,12 +19,13 @@ class QuickOrderForm(NgModelForm, NgModelFormMixin, NgFormValidationMixin, Boots
 
     class Meta:
         model = QuickOrder
-        fields = ['phone_number', 'name', 'comment', 'email']
+        fields = ['phone_number', 'name', 'comment', 'email', 'product']
         widgets = {
             'comment': forms.Textarea(attrs={'title': _('You comment'), 'rows': 5}),
             'name': forms.TextInput(attrs={'title': _('You name')}),
             'phone_number': forms.TextInput(attrs={'title': _('You phone number'), 'ng-pattern': REGEXP_PHONE}),
-            'email': forms.TextInput(attrs={'title': _('You email'), 'ng-pattern': REGEXP_EMAIL}),
+            'email': forms.TextInput(attrs={'title': _('You email')}),
+            'product': forms.HiddenInput()
         }
         labels = {
             'name': _('You name'),

@@ -1,9 +1,11 @@
 __author__ = 'igor'
 
 from apps.catalogue.models import Category
-from apps.catalogue.models import Info
 from soloha.settings import MAX_COUNT_CATEGORIES
 from django.contrib.sites.shortcuts import get_current_site
+from oscar.core.loading import get_class, get_model
+
+Info = get_model('sites', 'Info')
 
 
 def context_data(request):

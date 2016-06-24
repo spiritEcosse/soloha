@@ -1,11 +1,7 @@
 from oscar.core.loading import is_model_registered
 from oscar.apps.catalogue.abstract_models import *  # noqa
 from apps.catalogue.abstract_models import CustomAbstractProduct, AbstractFeature, CustomAbstractCategory, \
-    AbstractProductVersion, AbstractVersionAttribute, AbstractProductFeature, AbstractProductOptions, AbstractQuickOrder
-from django.contrib.sites.models import Site
-from apps.catalogue.abstract_models import REGEXP_PHONE
-from django.contrib.postgres.fields import ArrayField
-from django.forms import TextInput
+    AbstractProductVersion, AbstractVersionAttribute, AbstractProductFeature, AbstractProductOptions
 
 __all__ = ['ProductAttributesContainer']
 
@@ -109,32 +105,6 @@ if not is_model_registered('catalogue', 'ProductImage'):
         pass
 
     __all__.append('ProductImage')
-
-
-if not is_model_registered('catalogue', 'QuickOrder'):
-    class QuickOrder(AbstractQuickOrder):
-        pass
-
-    __all__.append('QuickOrder')
-
-# if not is_model_registered('catalogue', 'SiteInfo'):
-@python_2_unicode_compatible
-class Info(models.Model):
-    site = models.OneToOneField(Site, on_delete=models.CASCADE, related_name='info')
-    work_time = models.CharField(max_length=1000)
-    address = models.CharField(max_length=1000)
-    phone_number = models.CharField(max_length=19, blank=True)
-    # phone_number = ArrayField(models.CharField(max_length=1000), blank=True)
-    email = models.EmailField(max_length=200)
-    # formfield_overrides = {
-    #     models.CharField: {'widget': TextInput(attrs={'size': '80'})},
-    # }
-
-    def __str__(self):
-        return self.site.domain
-
-    class Meta:
-        app_label = 'sites'
 
 
 from oscar.apps.catalogue.models import *  # noqa

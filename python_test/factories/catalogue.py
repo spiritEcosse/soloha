@@ -6,17 +6,13 @@ from oscar.test import factories
 from oscar.core.loading import get_model
 from soloha.settings import OSCAR_MISSING_IMAGE_URL
 from soloha.settings import MAX_COUNT_PRODUCT, MAX_COUNT_CATEGORIES
-from django.test import TestCase
 from oscar.apps.partner import strategy, availability, prices
 from oscar.core.loading import get_class, get_model
 from decimal import Decimal as D
-from soloha.settings import OSCAR_DEFAULT_CURRENCY
-import random
 from oscar.apps.partner.strategy import Selector
-from django.conf import settings
-from apps.catalogue.models import SiteInfo
 
 Free = get_class('shipping.methods', 'Free')
+Info = get_model('sites', 'Info')
 ProductCategory = get_model('catalogue', 'ProductCategory')
 Category = get_model('catalogue', 'category')
 Product = get_model('catalogue', 'product')
@@ -393,6 +389,6 @@ class Test(object):
         return order
 
     def create_site_info(self):
-        SiteInfo.objects.create(domain='example.com', work_time='9:00-19:00', address=('address'),
+        Info.objects.create(domain='example.com', work_time='9:00-19:00', address=('address'),
                                 phone_number='0959999999', email='test@gmail.com')
 
