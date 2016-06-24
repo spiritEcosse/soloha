@@ -8984,6 +8984,9 @@ header .bottom .navbar .nav > li .yamm-content .image .btn-menu {
 .active .glyphicon-heart:before {
   color: #f08825;
 }
+.list-group-submenu {
+  margin-left: 25px;
+}
 footer {
   margin-top: 30px;
 }

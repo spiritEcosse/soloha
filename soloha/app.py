@@ -8,7 +8,7 @@ catalogue_view = get_class('catalogue.views', 'CatalogueView')
 category_view = get_class('catalogue.views', 'ProductCategoryView')
 search_view = get_class('search.views', 'FacetedSearchView')
 contacts_view = get_class('contacts.views', 'ContactsView')
-
+sitemap_view = get_class('sitemap.views', 'SitemapView')
 
 class Soloha(app.Shop):
     def get_urls(self):
@@ -16,6 +16,7 @@ class Soloha(app.Shop):
             url(r'^search/filter/(?P<filter_slug>[\w-]+(/[\w-]+)*)/', search_view.as_view()),
             url(r'^search/', search_view.as_view()),
             url(r'^contacts/', contacts_view.as_view()),
+            url(r'^sitemap/', sitemap_view.as_view()),
             url(r'^pages/(?P<url>[\w-]+)/$', views.flatpage, name='pages'),
         ]
         urlpatterns += super(Soloha, self).get_urls()
