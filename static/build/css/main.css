@@ -7490,6 +7490,16 @@ div {
 .x-ng-cloak {
   display: none !important;
 }
+.tab-content > .tab-pane,
+.pill-content > .pill-pane {
+  display: block;
+  height: 0;
+  overflow: hidden;
+}
+.tab-content > .active,
+.pill-content > .active {
+  height: auto;
+}
 header .top {
   height: 40px;
   background-color: #f08825;
