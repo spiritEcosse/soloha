@@ -251,7 +251,7 @@
           dropdown_menu.find('li.list:not(:first)').remove();
           li = dropdown_menu.find('li.list');
           li.attr('data-original-index', '{{$index}}');
-          li.find('a').attr('ng-click', 'update_price($index, "' + attr.pk + '")').html("{{value.title}}");
+          li.find('a').attr('ng-click', 'update_price(value, "' + attr.pk + '")').html("{{value.title}}");
           li.find('a').attr('href', "#");
           li.attr('ng-repeat', 'value in product.values[' + attr.pk + '] | filter: {title: query_attr[' + attr.pk + ']}');
           li.attr('ng-class', '{"selected active": value.pk == product.attributes[' + attr.pk + '].pk}');
@@ -350,16 +350,14 @@
         }
         return exist_selected_attr;
       };
-      $scope.update_price = function(index, attr_pk) {
+      $scope.update_price = function(value, attr_pk) {
         var selected_attributes;
-        if ($scope.product.values[attr_pk][index]) {
-          $scope.product.attributes[attr_pk] = $scope.product.values[attr_pk][index];
-        }
-        angular.forEach(clone_data.variant_attributes[$scope.product.attributes[attr_pk].pk], function(attr) {
+        $scope.product.attributes[attr_pk] = value;
+        angular.forEach(clone_data.variant_attributes[value.pk], function(attr) {
           return $scope.product.values[attr.pk] = attr.values;
         });
         if (!set_price()) {
-          angular.forEach(clone_data.variant_attributes[$scope.product.attributes[attr_pk].pk], function(attr) {
+          angular.forEach(clone_data.variant_attributes[value.pk], function(attr) {
             $scope.product.values[attr.pk] = attr.values;
             if (attr.in_group[1] && attr.in_group[1].visible) {
               return $scope.product.attributes[attr.pk] = attr.in_group[1];
