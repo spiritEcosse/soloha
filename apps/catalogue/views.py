@@ -502,6 +502,7 @@ class ProductCalculatePrice(views.JSONRequestResponseMixin, views.AjaxResponseMi
             fields = ' '.join(fields_list)
 
             current_attr = data['current_attr']
+
             product_feature = ProductFeature.objects.get(product=self.object, feature=current_attr['parent'])
 
             context['error'] = {}

@@ -268,7 +268,7 @@
             custom_value_li.find('a').attr('ng-click', 'update_price_with_custom_val(' + attr.pk + ')').html('{{product.custom_value[' + attr.pk + '].title}}');
             custom_values_li.attr('ng-repeat', 'value in product.custom_values[' + attr.pk + '] | filter:{title: query_attr[' + attr.pk + ']} | orderBy: "title" track by $index');
             custom_values_li.attr('ng-class', '{"selected active": value.title == product.attributes[' + attr.pk + '].title}');
-            custom_values_li.find('a').attr('ng-click', 'update_price_with_custom_val(' + attr.pk + ', $index)').html('{{value.title}}');
+            custom_values_li.find('a').attr('ng-click', 'update_price_with_custom_val(' + attr.pk + ', value)').html('{{value.title}}');
           }
           $compile(custom_values_li)($scope);
           $compile(custom_value_li)($scope);
@@ -279,16 +279,14 @@
       }).error(function() {
         return console.error('An error occurred during submission');
       });
-      $scope.update_price_with_custom_val = function(attr_pk, index) {
+      $scope.update_price_with_custom_val = function(attr_pk, value) {
         var selected_attributes;
-        if (index == null) {
-          index = null;
-        }
-        if (index != null) {
-          $scope.product.attributes[attr_pk] = $scope.product.custom_values[attr_pk][index];
+        if (value != null) {
+          $scope.product.attributes[attr_pk] = value;
         } else {
           $scope.product.attributes[attr_pk] = $scope.product.custom_value[attr_pk];
         }
+        console.log($scope.product.attributes[attr_pk]);
         selected_attributes = [];
         angular.forEach(clone_data.attributes, function(attr) {
           var non_standard;
@@ -300,9 +298,9 @@
         if (selected_attributes.length) {
           return $http.post('/catalogue/calculate/price/' + clone_data.product.pk, {
             'selected_attributes': selected_attributes,
-            'current_attr': $scope.product.custom_value[attr_pk]
+            'current_attr': $scope.product.attributes[attr_pk]
           }).success(function(data) {
-            var key, value, _ref, _results;
+            var key, _ref, _results;
             if (data.error == null) {
               $scope.product.price = data.price;
               if ($scope.product.custom_value[attr_pk] && !$filter('search_by_title')($scope.product.custom_values[attr_pk], $scope.product.custom_value[attr_pk].title)) {

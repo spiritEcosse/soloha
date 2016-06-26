@@ -178,7 +178,7 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
                 custom_value_li.find('a').attr('ng-click', 'update_price_with_custom_val(' + attr.pk + ')').html('{{product.custom_value[' + attr.pk + '].title}}')
                 custom_values_li.attr('ng-repeat', 'value in product.custom_values[' + attr.pk + '] | filter:{title: query_attr[' + attr.pk + ']} | orderBy: "title" track by $index')
                 custom_values_li.attr('ng-class', '{"selected active": value.title == product.attributes[' + attr.pk + '].title}')
-                custom_values_li.find('a').attr('ng-click', 'update_price_with_custom_val(' + attr.pk + ', $index)').html('{{value.title}}')
+                custom_values_li.find('a').attr('ng-click', 'update_price_with_custom_val(' + attr.pk + ', value)').html('{{value.title}}')
 
             $compile(custom_values_li)($scope)
             $compile(custom_value_li)($scope)
@@ -188,11 +188,13 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
     .error ->
         console.error('An error occurred during submission')
 
-    $scope.update_price_with_custom_val = (attr_pk, index = null) ->
-        if index?
-            $scope.product.attributes[attr_pk] = $scope.product.custom_values[attr_pk][index]
+    $scope.update_price_with_custom_val = (attr_pk, value) ->
+        if value?
+            $scope.product.attributes[attr_pk] = value
         else
             $scope.product.attributes[attr_pk] = $scope.product.custom_value[attr_pk]
+
+        console.log($scope.product.attributes[attr_pk])
 
         selected_attributes = []
 
@@ -203,7 +205,7 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
                 selected_attributes.push($scope.product.attributes[attr.pk])
 
         if selected_attributes.length
-            $http.post('/catalogue/calculate/price/' + clone_data.product.pk, {'selected_attributes': selected_attributes, 'current_attr': $scope.product.custom_value[attr_pk]}).success (data) ->
+            $http.post('/catalogue/calculate/price/' + clone_data.product.pk, {'selected_attributes': selected_attributes, 'current_attr': $scope.product.attributes[attr_pk]}).success (data) ->
                 if not data.error?
                     $scope.product.price = data.price
 
