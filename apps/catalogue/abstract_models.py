@@ -488,7 +488,11 @@ class CustomAbstractProduct(models.Model):
         selector = Selector()
         strategy = selector.strategy()
         info = strategy.fetch_for_product(self)
-        values['price'] = str(info.stockrecord.price_excl_tax)
+        if info.availability.is_available_to_buy:
+            values['price'] = str(info.stockrecord.price_excl_tax)
+        else:
+            values['price'] = str(info.availability.message)
+
         options = {'size': (220, 165), 'crop': True}
 
         image = getattr(self.primary_image(), 'original', IMAGE_NOT_FOUND)
