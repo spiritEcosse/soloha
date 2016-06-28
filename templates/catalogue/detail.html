@@ -115,24 +115,24 @@
                     <div class="col-xs-24 col-sm-24 col-md-10 price">
                         <div class="panel panel-default">
                             <div class="panel-heading">
-                                Артикул: {{ product.id }}
+                                {% trans 'Vendor code' %}: {{ product.id }}
                                 <div class="pull-right">Под заказ</div>
                             </div>
                             <div class="panel-body">
                                 {% with class_price="number" %}
                                     {% if price %}
-                                        <div class="text-center wrapper-number">
-                                            {% trans "Price:" %}
+                                        <div class="text-center wrapper-number" >
+                                            {% trans "Price" %}:
 
                                             {% angularjs ng %}
                                                 <span {% if ng %}
-                                                    ng-class="'{{ class_price }}'"
+                                                    ng-class="'{{ class_price }}'" ng-cloak=""
                                                 {% else %}
                                                     class="{{ class_price }}"
                                                 {% endif %}>
                                                     {{ price }}
                                                 </span>
-                                                <span {% if ng %}ng-bind="'{{ currency }}'" {% endif %}>
+                                                <span {% if ng %}ng-bind="'{{ currency }}'" ng-cloak=""{% endif %}>
                                                     {% if not ng %}{{ currency }}{% endif %}
                                                 </span>
                                             {% endangularjs %}
