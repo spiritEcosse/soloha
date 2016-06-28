@@ -126,7 +126,7 @@
 
                                             {% angularjs ng %}
                                                 <span {% if ng %}
-                                                    ng-init="price='{{ price }}'" ng-class="'{{ class_price }}'" ng-cloak=""
+                                                    ng-init="price='{{ price }}'; price_start='{{ price }}'" ng-class="'{{ class_price }}'" ng-cloak=""
                                                 {% else %}
                                                     class="{{ class_price }}"
                                                 {% endif %}>

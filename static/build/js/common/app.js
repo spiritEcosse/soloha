@@ -314,7 +314,7 @@
             }
           });
           if (!set_price()) {
-            $scope.price = clone_data.price;
+            $scope.price = $scope.price_start;
             selected_attributes = [];
             return angular.forEach(clone_data.attributes, function(attr) {
               $scope.product.values[attr.pk] = attr.values;

@@ -289,7 +289,7 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
 
     def get_context_data_json(self, **kwargs):
         context = dict()
-        context['product'] = {'pk': self.object.pk, 'non_standard_price_retail': self.object.non_standard_price_retail}
+        context['product'] = {'pk': self.object.pk}
         context['product_versions'] = self.get_product_versions()
         context['attributes'] = []
 
@@ -301,8 +301,6 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
                                           'top_line': attr.top_line})
 
         context['options'] = [{prod_option.option.pk: prod_option.price_retail} for prod_option in ProductOptions.objects.filter(product=self.object)]
-        self.get_price(context)
-        context['not_selected'] = NOT_SELECTED
         context['variant_attributes'] = {}
 
         def get_values(val, tuple_values, attr_pk):

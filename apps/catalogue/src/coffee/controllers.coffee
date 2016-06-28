@@ -55,7 +55,7 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
     $scope.product.query_attr = []
     $scope.send_form = false
     $scope.alert_mode = 'success'
-    
+
     $scope.change_price = (option_id) ->
         if Object.keys($scope.options_children).length != 0 # && Object.keys($scope.options_children[$scope.option_id]).length != 0
             $scope.option_id = Object.keys($scope.options_children[$scope.option_id]).filter((key) ->
@@ -205,7 +205,7 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
                     $scope.product.attributes[attr.pk] = $scope.product.values[attr.pk][0]
 
             if not set_price()
-                $scope.price = clone_data.price
+                $scope.price = $scope.price_start
                 selected_attributes = []
 
                 angular.forEach clone_data.attributes, (attr) ->
