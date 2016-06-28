@@ -143,15 +143,13 @@
 
   app.controller('Product', [
     '$http', '$scope', '$window', '$document', '$location', '$compile', '$filter', 'djangoForm', function($http, $scope, $window, $document, $location, $compile, $filter, djangoForm) {
-      var attributes, clone_data, prefix, selector_el, set_price;
+      var attributes, clone_data, set_price;
       $scope.product = [];
       $scope.product.values = [];
       $scope.product.attributes = [];
       attributes = [];
       clone_data = null;
       $scope.last_select_attr = null;
-      prefix = 'attribute-';
-      selector_el = '.dropdown-menu.inner';
       $scope.isOpen = [];
       $scope.product.custom_values = [];
       $scope.product.custom_value = [];
@@ -159,7 +157,6 @@
       $scope.product.query_attr = [];
       $scope.send_form = false;
       $scope.alert_mode = 'success';
-      $scope.price = null;
       $scope.change_price = function(option_id) {
         if (Object.keys($scope.options_children).length !== 0) {
           $scope.option_id = Object.keys($scope.options_children[$scope.option_id]).filter(function(key) {
