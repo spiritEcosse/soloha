@@ -14,6 +14,7 @@ def context_data(request):
         'categories': Category.objects.filter(enable=True, level=0).select_related(
             'parent__parent'
         ).prefetch_related('children__children')[:MAX_COUNT_CATEGORIES],
+        'ng': not request.user_agent.is_bot
         # 'work_time': queryset.work_time,
         # 'address': queryset.address,
         # 'phone_number': queryset.phone_number,

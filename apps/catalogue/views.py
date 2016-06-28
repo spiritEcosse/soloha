@@ -263,7 +263,6 @@ class QuickOrderView(views.JSONResponseMixin, views.AjaxResponseMixin, FormView,
             msg.send()
 
         message = loader.get_template(self.template_send_email).render(Context(context))
-        print message
         msg = EmailMultiAlternatives(subject, '', from_email, [current_site.info.email])
         msg.attach_alternative(message, "text/html")
         msg.send()
@@ -414,7 +413,6 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
 
     def get_context_data(self, **kwargs):
         context = super(ProductDetailView, self).get_context_data(**kwargs)
-
         self.get_price(context)
         context['product_version_attributes'] = self.product_versions_queryset().first()
         context['attributes'] = self.get_attributes()
@@ -474,6 +472,16 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
         attributes = sorted(attributes,
                             key=lambda attr: attr.product_features.filter(product=self.object).first().sort
                             if attr.product_features.filter(product=self.object).first() else 0)
+
+        new_attributes = []
+
+        for attr in attributes:
+            non_standard = attr.features_by_product[0].non_standard if attr.features_by_product else False
+            values = self.start_option + [{'pk': value.pk, 'title': value.title, 'parent': attr.pk} for value in attr.values]
+            new_attributes.append({'pk': attr.pk, 'title': attr.title, 'values': values,
+                                   'non_standard': non_standard, 'bottom_line': attr.bottom_line,
+                                   'top_line': attr.top_line})
+
         return attributes
 
     def get_options(self):

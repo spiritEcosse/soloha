@@ -47,7 +47,6 @@ INSTALLED_APPS = \
         'debug_toolbar',
          # 'django_select2',
          # 'bootstrap_pagination',
-         # 'djangular',
          # 'ckeditor',
         'django.contrib.auth',
         'django.contrib.contenttypes',
@@ -64,6 +63,7 @@ INSTALLED_APPS = \
         'easy_thumbnails',
         'apps.contacts',
         'apps.ex_sites',
+        'django_user_agents',
         # 'smart_load_tag',
     ] + get_core_apps(['apps.catalogue', 'apps.promotions', 'apps.partner', 'apps.search', 'apps.order', ])
 
@@ -282,7 +282,6 @@ OSCAR_PRODUCTS_PER_PAGE = 24
 #     'STATIC_URL': STATIC_URL,
 #     'use_less': USE_LESS,
 # }
-
 
 MAX_COUNT_PRODUCT = 20
 MAX_COUNT_CATEGORIES = 7
