@@ -159,6 +159,7 @@
       $scope.product.query_attr = [];
       $scope.send_form = false;
       $scope.alert_mode = 'success';
+      $scope.price = null;
       $scope.change_price = function(option_id) {
         if (Object.keys($scope.options_children).length !== 0) {
           $scope.option_id = Object.keys($scope.options_children[$scope.option_id]).filter(function(key) {
@@ -213,21 +214,10 @@
         });
       };
       $http.post($location.absUrl()).success(function(data) {
-        var el;
         clone_data = data;
         $scope.options = data.options;
         $scope.options_children = data.options_children;
         $scope.list_options = data.list_options;
-        if (data.price) {
-          $scope.price = data.price;
-          el = angular.element('#product_price');
-          el.attr('ng-bind', 'price');
-        } else {
-          $scope.product.product_not_availability = data.product_not_availability;
-          el = angular.element('#product_not_availability');
-          el.attr('ng-bind', 'product.product_not_availability');
-        }
-        $compile(el)($scope);
         return angular.forEach(data.attributes, function(attr) {
           attributes.push(attr.pk);
           $scope.product.values[attr.pk] = attr.values;

@@ -57,7 +57,7 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
     $scope.product.query_attr = []
     $scope.send_form = false
     $scope.alert_mode = 'success'
-
+    $scope.price = null
     $scope.change_price = (option_id) ->
         if Object.keys($scope.options_children).length != 0 # && Object.keys($scope.options_children[$scope.option_id]).length != 0
             $scope.option_id = Object.keys($scope.options_children[$scope.option_id]).filter((key) ->
@@ -125,16 +125,6 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
         $scope.options = data.options
         $scope.options_children = data.options_children
         $scope.list_options = data.list_options
-
-        if data.price
-            $scope.price = data.price
-            el = angular.element('#product_price')
-            el.attr('ng-bind', 'price')
-        else
-            $scope.product.product_not_availability = data.product_not_availability
-            el = angular.element('#product_not_availability')
-            el.attr('ng-bind', 'product.product_not_availability')
-        $compile(el)($scope)
 
         angular.forEach data.attributes, (attr) ->
             attributes.push(attr.pk)
