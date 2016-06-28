@@ -460,6 +460,9 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
         ).prefetch_related(
             Prefetch('children', queryset=Feature.objects.only(*self.only).filter(**default_filter_attr_val_args).annotate(
                 price=Min('product_versions__price_retail')
+            ).prefetch_related(
+                Prefetch('product_features', queryset=ProductFeature.objects.filter(product=self.object),
+                         to_attr='features_by_product')
             ).order_by('price', 'title', 'pk'), to_attr='values'),
             Prefetch('product_features', queryset=ProductFeature.objects.filter(product=self.object),
                      to_attr='features_by_product')
