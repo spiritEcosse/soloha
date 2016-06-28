@@ -229,7 +229,6 @@
         }
         $compile(el)($scope);
         return angular.forEach(data.attributes, function(attr) {
-          var custom_value_li, custom_values_li, dropdown, dropdown_menu, element, input, li;
           attributes.push(attr.pk);
           $scope.product.values[attr.pk] = attr.values;
           $scope.product.dict_attributes[attr.pk] = attr;
@@ -238,28 +237,8 @@
           $scope.isOpen[attr.pk] = false;
           $scope.product.custom_values[attr.pk] = [];
           if (data.product_version_attributes[attr.pk]) {
-            $scope.product.attributes[attr.pk] = data.product_version_attributes[attr.pk];
+            return $scope.product.attributes[attr.pk] = data.product_version_attributes[attr.pk];
           }
-          element = angular.element(document).find("[data-id='" + prefix + attr.pk + "']");
-          element.parent().find(selector_el + ' li:not(:first)').remove();
-          dropdown = angular.element(document).find('#' + prefix + attr.pk);
-          dropdown_menu = dropdown.find('.dropdown-menu');
-          li = dropdown_menu.find('li.list');
-          input = dropdown_menu.find('input');
-          custom_value_li = dropdown_menu.find('li.query');
-          custom_values_li = dropdown_menu.find('li.custom');
-          if (attr.non_standard === true && clone_data.product.non_standard_price_retail !== 0) {
-            input.attr('ng-change', "search(" + attr.pk + ")");
-            custom_value_li.find('a').attr('ng-click', 'update_price_with_custom_val(' + attr.pk + ')').html('{{product.custom_value[' + attr.pk + '].title}}');
-            custom_values_li.attr('ng-repeat', 'value in product.custom_values[' + attr.pk + '] | filter:{title: query_attr[' + attr.pk + ']} | orderBy: "title" track by $index');
-            custom_values_li.attr('ng-class', '{"selected active": value.title == product.attributes[' + attr.pk + '].title}');
-            custom_values_li.find('a').attr('ng-click', 'update_price_with_custom_val(' + attr.pk + ', value)').html('{{value.title}}');
-          }
-          $compile(custom_values_li)($scope);
-          $compile(custom_value_li)($scope);
-          $compile(dropdown)($scope);
-          $compile(input)($scope);
-          return $compile(li)($scope);
         });
       }).error(function() {
         return console.error('An error occurred during submission');
