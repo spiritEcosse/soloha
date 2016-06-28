@@ -122,13 +122,20 @@
                                 {% with class_price="number" %}
                                     {% if price %}
                                         <div class="text-center wrapper-number">
-                                            цена:
+                                            {% trans "Price:" %}
 
-                                            <span id="product_price" class="{{ class_price }}">{{ price }}</span>
-                                            <span>{{ currency }}</span>
-                                            {#                                    {% block product_stock_record %}#}
-                                            {#                                        {% include "catalogue/partials/stock_record.html" with verbose=1 %}#}
-                                            {#                                    {% endblock %}#}
+                                            {% angularjs ng %}
+                                                <span {% if ng %}
+                                                    ng-class="'{{ class_price }}'"
+                                                {% else %}
+                                                    class="{{ class_price }}"
+                                                {% endif %}>
+                                                    {{ price }}
+                                                </span>
+                                                <span {% if ng %}ng-bind="'{{ currency }}'" {% endif %}>
+                                                    {% if not ng %}{{ currency }}{% endif %}
+                                                </span>
+                                            {% endangularjs %}
                                         </div>
                                         <div class="row">
                                             <div class="wrapper-btn-primary col-xs-12">
@@ -195,7 +202,7 @@
                     </div>
                     {% if attributes %}
                         <div class="col-xs-24 col-sm-24 col-md-14 options">
-                            <span class="relation">*Цена зависит от выбранных параметров:</span>
+                            <span class="relation">{% trans "*The price depends on the selected parameters:" %}</span>
                             <div class="list_attr">
                                 {% for attribute in attributes %}
                                     <div class="panel panel-default">
@@ -224,7 +231,6 @@
                                                                     </span>
                                                                         <span class="caret"></span>
                                                                         <span class="attr-pk" {% if ng %}ng-bind="product.attributes['{{ attribute.pk }}'].pk"{% endif %}>
-                                                                            {% if not ng %}{{ attr_first.pk }}{% endif %}
                                                                         </span>
                                                                     </button>
                                                                 {% endwith %}
@@ -244,9 +250,10 @@
 
                                                                     <ul role="menu" class="dropdown-menu inner">
                                                                         <li role="presentation" ng-cloak=""
-                                                                            {% if ng %}ng-repeat="value in product.values['{{ attribute.pk }}'] | filter: {title: query_attr['{{ attribute.pk }}']}"
+                                                                                {% if ng %}
+                                                                            ng-repeat="value in product.values['{{ attribute.pk }}'] | filter: {title: query_attr['{{ attribute.pk }}']}"
                                                                             ng-class="{'selected active': value.pk == product.attributes['{{ attribute.pk }}'].pk}"
-                                                                            {% endif %} class="list">
+                                                                                {% endif %} class="list">
                                                                             <a href="#" {% if ng %}ng-click="update_price(value, '{{ attribute.pk }}')" {% endif %}>
                                                                                 {{ value.title }}
                                                                             </a>
@@ -255,13 +262,11 @@
                                                                             <li role="separator" class="divider"
                                                                                 ng-if="product.custom_values['{{ attribute.pk }}'].length || product.custom_value['{{ attribute.pk }}'] !== null">
                                                                             </li>
-                                                                            {% with attribute.pk as attribute_pk %}
-                                                                                <li role="presentation" class="query"
-                                                                                    ng-if="(product.custom_values['{{ attribute.pk }}'] | search_by_title: product.custom_value['{{ attribute.pk }}'].title) == false">
-                                                                                    <a href="#" ng-click="update_price_with_custom_val('{{ attribute.pk }}')" ng-bind="product.custom_value['{{ attribute.pk }}'].title">
-                                                                                    </a>
-                                                                                </li>
-                                                                            {% endwith %}
+                                                                            <li role="presentation" class="query"
+                                                                                ng-if="(product.custom_values['{{ attribute.pk }}'] | search_by_title: product.custom_value['{{ attribute.pk }}'].title) == false">
+                                                                                <a href="#" ng-click="update_price_with_custom_val('{{ attribute.pk }}')" ng-bind="product.custom_value['{{ attribute.pk }}'].title">
+                                                                                </a>
+                                                                            </li>
                                                                             <li role="presentation" class="custom"
                                                                                 ng-repeat="value in product.custom_values['{{ attribute.pk }}'] | filter:{title: query_attr['{{ attribute.pk }}']} | orderBy: 'title' track by $index"
                                                                                 ng-if="product.custom_values['{{ attribute.pk }}'].length"

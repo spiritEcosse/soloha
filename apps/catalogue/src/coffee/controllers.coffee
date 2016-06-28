@@ -127,9 +127,9 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
         $scope.list_options = data.list_options
 
         if data.price
-            $scope.product.price = data.price
+            $scope.price = data.price
             el = angular.element('#product_price')
-            el.attr('ng-bind', 'product.price')
+            el.attr('ng-bind', 'price')
         else
             $scope.product.product_not_availability = data.product_not_availability
             el = angular.element('#product_not_availability')
@@ -167,7 +167,7 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
         if selected_attributes.length
             $http.post('/catalogue/calculate/price/' + clone_data.product.pk, {'selected_attributes': selected_attributes, 'current_attr': $scope.product.attributes[attr_pk]}).success (data) ->
                 if not data.error?
-                    $scope.product.price = data.price
+                    $scope.price = data.price
 
                     if $scope.product.custom_value[attr_pk] and not $filter('search_by_title')($scope.product.custom_values[attr_pk], $scope.product.custom_value[attr_pk].title)
                         $scope.product.custom_values[attr_pk].push($scope.product.custom_value[attr_pk])
@@ -198,7 +198,7 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
         exist_selected_attr = clone_data.product_versions[selected_attributes.toString()]
 
         if exist_selected_attr
-            $scope.product.price = exist_selected_attr
+            $scope.price = exist_selected_attr
         return exist_selected_attr
 
     $scope.update_price = (value, attr_pk) ->
@@ -217,7 +217,7 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
                     $scope.product.attributes[attr.pk] = $scope.product.values[attr.pk][0]
 
             if not set_price()
-                $scope.product.price = clone_data.price
+                $scope.price = clone_data.price
                 selected_attributes = []
 
                 angular.forEach clone_data.attributes, (attr) ->
