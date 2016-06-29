@@ -60,7 +60,6 @@ class TestCatalog(LiveServerTestCase):
         self.client = Client()
         self.firefox = webdriver.Firefox()
         self.firefox.maximize_window()
-        # test_catalogue.create_site_info()
         super(TestCatalog, self).setUp()
 
     def tearDown(self):
@@ -70,17 +69,13 @@ class TestCatalog(LiveServerTestCase):
         time.sleep(2)
         super(TestCatalog, self).tearDown()
 
-    def create_products(self):
-        test_catalogue.create_product_bulk()
-        call_command('rebuild_index', interactive=False, verbosity=0)
-
     def test_page_product(self):
         """
         accessibility page product
         Returns:
             None
         """
-        self.create_products()
+        test_catalogue.create_product_bulk()
         product = Product.objects.get(title='Product 1')
         response = self.client.get(product.get_absolute_url())
         self.equal = self.assertEqual(response.status_code, STATUS_CODE_200)
@@ -180,7 +175,7 @@ class TestCatalog(LiveServerTestCase):
         return product_versions
 
     def test_product_post(self):
-        self.create_products()
+        test_catalogue.create_product_bulk()
         product = Product.objects.get(slug='product-1')
         product_2 = Product.objects.get(slug='product-2')
         test_catalogue.create_options(product, product_2)
@@ -266,7 +261,7 @@ class TestCatalog(LiveServerTestCase):
         test page product with attributes by selenium
         :return:
         """
-        self.create_products()
+        test_catalogue.create_product_bulk()
         product = factories.create_product(slug='product-attributes', title='Product attributes', price=5)
         test_catalogue.create_dynamic_attributes(product)
         attributes = list(self.get_product_attributes(product=product))
@@ -352,7 +347,7 @@ class TestCatalog(LiveServerTestCase):
         return price
 
     def test_get_product_attributes(self):
-        self.create_products()
+        test_catalogue.create_product_bulk()
         product = Product.objects.get(slug='product-1')
         response = self.client.get(product.get_absolute_url())
 
@@ -453,7 +448,7 @@ class TestCatalog(LiveServerTestCase):
         Returns:
             None
         """
-        self.create_products()
+        test_catalogue.create_product_bulk()
         # without products in this category has no descendants in the categories at the same time this very category and its children is not goods
         dict_values = {'page': 1, 'num_queries': 10}
         category = Category.objects.get(name='Category-2')
@@ -481,7 +476,7 @@ class TestCatalog(LiveServerTestCase):
         self.assertions_category(category=category, dict_values=dict_values)
 
     def test_page_category_paginator(self):
-        self.create_products()
+        test_catalogue.create_product_bulk()
 
         dict_values = {'page': 1, 'num_queries': 20}
         category = Category.objects.get(name='Category-12')
@@ -494,7 +489,7 @@ class TestCatalog(LiveServerTestCase):
         self.assertions_category(category=category, dict_values=dict_values)
 
     def test_page_category_sorting_with_filters(self):
-        self.create_products()
+        test_catalogue.create_product_bulk()
 
         category = Category.objects.get(name='Category-12')
         category_1 = Category.objects.get(name='Category-1')
@@ -531,7 +526,7 @@ class TestCatalog(LiveServerTestCase):
         # self.assertions_category(category=category_321, dict_values=dict_values)
 
     def test_page_category_sort(self):
-        self.create_products()
+        test_catalogue.create_product_bulk()
 
         category = Category.objects.get(name='Category-12')
 
@@ -656,7 +651,7 @@ class TestCatalog(LiveServerTestCase):
         self.assertDictEqual(expected, real_data)
 
     def test_page_category_sorting_buttons(self):
-        self.create_products()
+        test_catalogue.create_product_bulk()
 
         category = Category.objects.get(name='Category-12')
 
@@ -698,7 +693,7 @@ class TestCatalog(LiveServerTestCase):
                                         sorting_url, text), count=1, html=True)
 
     def test_filter_click(self):
-        self.create_products()
+        test_catalogue.create_product_bulk()
         category = Category.objects.get(name='Category-12')
         # category = Category.objects.get(name='Category-321')
 
@@ -748,7 +743,7 @@ class TestCatalog(LiveServerTestCase):
         </a>'''.format(filter_url, count_products), count=1, html=True)
 
     def test_filters_concatenation(self):
-        self.create_products()
+        test_catalogue.create_product_bulk()
         category = Category.objects.get(name='Category-12')
         filter = Feature.objects.get(slug='shirina_1000')
 
@@ -797,7 +792,7 @@ class TestCatalog(LiveServerTestCase):
         self.assertEqual(absolute_url, link_concatenate)
 
     def test_product_options(self):
-        self.create_products()
+        test_catalogue.create_product_bulk()
 
         product1 = Product.objects.get(slug='product-1')
         product2 = Product.objects.get(slug='product-2')
@@ -848,7 +843,7 @@ class TestCatalog(LiveServerTestCase):
         # options_on_page_level1 = self.firefox.find_element_by_xpath(".//*[@id='options']/div[2]/div[2]/div[2]/div/label/select/option[2]").text
 
     def test_product_search(self):
-        self.create_products()
+        test_catalogue.create_product_bulk()
 
         # Searching products starting from Product 1
         dict_values = {'search_string': 'Product 1', 'page': 1}
@@ -868,7 +863,7 @@ class TestCatalog(LiveServerTestCase):
         self.assertions_product_search(dict_values=dict_values)
 
     def test_product_search_sorting_with_filters(self):
-        self.create_products()
+        test_catalogue.create_product_bulk()
 
         dict_values = {'search_string': 'product', 'page': 1, 'sorting_type': 'price_ascending', 'num_queries': 20,
                        'filters': 'shirina_1000/shirina_1200/dlina_1100/dlina_1000'}
@@ -891,7 +886,7 @@ class TestCatalog(LiveServerTestCase):
         dict_values = {'search_string': 'product', 'page': 1, 'sorting_type': 'popularity', 'num_queries': 20, 'filters': 'dlina_1100'}
         self.assertions_product_search(dict_values=dict_values)
 
-    def assertions_product_search(self, dict_values={}):
+    def assertions_product_search(self, dict_values=None):
         paginate_by = OSCAR_PRODUCTS_PER_PAGE
         dict_filter = dict()
 
@@ -905,7 +900,7 @@ class TestCatalog(LiveServerTestCase):
         response = self.client.get('/search/?q={}'.format(dict_values['search_string']))
         sqs_search = self.get_search_queryset(dict_values=dict_values)
 
-        searched_products = [{'id': obj.id,
+        searched_products = [{'id': obj.pk,
                               'title': obj.title,
                               'main_image': obj.object.get_values()['image'],
                               'href': obj.object.get_absolute_url(),
@@ -939,7 +934,6 @@ class TestCatalog(LiveServerTestCase):
                                     HTTP_X_REQUESTED_WITH='XMLHttpRequest')
 
         context = dict()
-        # context['page_number'] = dict_values.get('page', 1)
         sqs = self.get_search_queryset(dict_values=dict_values)
         context['searched_products'] = [{'id': int(obj.pk),
                               'title': obj.title,
@@ -950,19 +944,19 @@ class TestCatalog(LiveServerTestCase):
         self.assertListEqual(context['searched_products'], content['products'])
 
     @staticmethod
-    def get_search_queryset(dict_values={}):
+    def get_search_queryset(dict_values=None):
         sqs_search = []
         if dict_values['search_string']:
             sqs = SearchQuerySet()
             sqs_title = sqs.autocomplete(title_ngrams=dict_values['search_string'])
             sqs_slug = sqs.autocomplete(slug_ngrams=dict_values['search_string'])
-            sqs_id = sqs.autocomplete(id_ngrams=dict_values['search_string'])
-            sqs_search = (sqs_title | sqs_slug | sqs_id) #[:OSCAR_PRODUCTS_PER_PAGE]
+            sqs_id = sqs.autocomplete(product_id=dict_values['search_string'])
+            sqs_search = (sqs_title or sqs_slug or sqs_id) #[:OSCAR_PRODUCTS_PER_PAGE]
         return sqs_search
 
     # test input search field in all pages
     def test_product_search_input_selenium(self):
-        self.create_products()
+        test_catalogue.create_product_bulk()
 
         product1 = Product.objects.get(slug='product-1')
         category1 = Category.objects.get(name='Category-1')
@@ -1026,7 +1020,7 @@ class TestCatalog(LiveServerTestCase):
         self.assertEqual(search_menu.is_displayed(), False)
 
     def test_search_page_sorting_buttons(self):
-        self.create_products()
+        test_catalogue.create_product_bulk()
 
         dict_values = {'search_string': 'product', 'sorting_type': 'popularity',
                        'filter_slug': 'filter/dlina_1100/'}
@@ -1057,7 +1051,7 @@ class TestCatalog(LiveServerTestCase):
                                         sorting_url, text), count=1, html=True)
 
     def test_filter_click_search_page(self):
-        self.create_products()
+        test_catalogue.create_product_bulk()
 
         dict_values = {'search_string': 'product', 'filter_slug': 'filter/dlina_1100/'}
         self.assertions_filter_click_search_page(dict_values=dict_values)
@@ -1124,7 +1118,7 @@ class TestCatalog(LiveServerTestCase):
         </a>'''.format(filter_url, dict_values.get('sorting_type', 'popularity'), count_products), count=1, html=True)
 
     def test_filter_checkbox_selenium(self):
-        self.create_products()
+        test_catalogue.create_product_bulk()
 
         category = Category.objects.get(name='Category-12')
 
@@ -1214,7 +1208,7 @@ class TestCatalog(LiveServerTestCase):
         #ToDo taras: add test for scroll
 
     def test_show_more_goods_selenium_search_page(self):
-        self.create_products()
+        test_catalogue.create_product_bulk()
         dict_values = {'search_string': 'product'}
         initial_url = ('%s%s' % (self.live_server_url, '/search/?q={0}'.format(dict_values.get('search_string', ''))))
         self.assertions_show_more_goods_search_page_selenium(url=initial_url)
@@ -1251,7 +1245,6 @@ class TestCatalog(LiveServerTestCase):
         more_goods_button.click()
         time.sleep(4)
         self.assertIn('Product 49', self.firefox.page_source)
-        self.assertIn('Product 96', self.firefox.page_source)
         self.assertNotIn('Product 97', self.firefox.page_source)
         self.assertIn(u'ПОКАЗАТЬ ЕЩЕ', self.firefox.page_source)
 
@@ -1266,7 +1259,7 @@ class TestCatalog(LiveServerTestCase):
         self.assertNotIn(u'ПОКАЗАТЬ ЕЩЕ', self.firefox.page_source)
 
     def test_show_more_goods_category_page_selenium(self):
-        self.create_products()
+        test_catalogue.create_product_bulk()
         category = Category.objects.get(name='Category-12')
 
         initial_url = ('%s%s%s' % (self.live_server_url, category.get_absolute_url(), '?sorting_type=price_ascending'))
@@ -1314,7 +1307,7 @@ class TestCatalog(LiveServerTestCase):
         self.assertNotIn(u'ПОКАЗАТЬ ЕЩЕ', self.firefox.page_source)
 
     def test_wish_list(self):
-        self.create_products()
+        test_catalogue.create_product_bulk()
         product_1 = Product.objects.get(slug='product-1')
 
         # wish list needs loged in user
@@ -1353,7 +1346,7 @@ class TestCatalog(LiveServerTestCase):
         return product_in_wish_list
 
     def test_wish_list_selenium(self):
-        self.create_products()
+        test_catalogue.create_product_bulk()
         product_2 = Product.objects.get(slug='product-2')
 
         # login user in selenium
@@ -1379,14 +1372,14 @@ class TestCatalog(LiveServerTestCase):
         self.assertEqual('Remove from wish list', text_wish_list)
 
     def test_wish_list_selenium_no_login(self):
-        self.create_products()
+        test_catalogue.create_product_bulk()
         product_2 = Product.objects.get(slug='product-2')
 
         self.firefox.get('%s%s' % (self.live_server_url, product_2.get_absolute_url()))
         self.assertIn('Please login to add products to a wish list.', self.firefox.page_source)
 
     def test_flatpages_selenium(self):
-        self.create_products()
+        test_catalogue.create_product_bulk()
         product_2 = Product.objects.get(slug='product-2')
 
         self.firefox.get('%s%s' % (self.live_server_url, product_2.get_absolute_url()))
@@ -1411,7 +1404,7 @@ class TestCatalog(LiveServerTestCase):
         return True
 
     def test_flatpages(self):
-        self.create_products()
+        test_catalogue.create_product_bulk()
         test_catalogue.create_flatpages()
 
         product_2 = Product.objects.get(slug='product-2')
