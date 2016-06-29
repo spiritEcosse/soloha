@@ -1073,7 +1073,6 @@ class TestCatalog(LiveServerTestCase):
         response = self.client.get('/search/?q={0}&sorting_type={1}'.format(dict_values.get('search_string', ''),
                                                                             dict_values.get('sorting_type', '')))
 
-        # products_pk = [product.pk for product in self.get_search_queryset(dict_values=dict_values)]
         products_without_filters = Product.objects.all().distinct()
         queryset_filters = Feature.objects.filter(filter_products__in=products_without_filters).distinct().prefetch_related('filter_products')
         filters = Feature.objects.filter(level=0, children__in=queryset_filters).prefetch_related(
