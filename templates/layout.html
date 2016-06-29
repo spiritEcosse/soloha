@@ -342,25 +342,33 @@
                             </ul>
                         </div>
                     </div>
-                    <div class="col-xs-24 col-sm-12 text-center subscribe">
+                    <div class="col-xs-24 col-sm-12 text-center subscribe" ng-controller="Subscribe">
                         <div class="row">
                             <div class="title line-top">
                                 {% trans "Sign up for discounts!" %}
                             </div>
-                            <div class="input-group">
-                                <div class="col-xs-6 element">
-                                    <input type="text" class="form-control" placeholder="e-mail" aria-describedby="basic-addon1">
+                            <form name="subscribe" method="post" novalidate action=".">
+                                {% csrf_token %}
+                                <div class="input-group">
+                                    <div class="col-xs-6 element">
+                                        <input type="text" class="form-control" placeholder="e-mail" aria-describedby="basic-addon1">
+                                    </div>
+                                    <div class="col-xs-6 element">
+                                        <input type="text" class="form-control" placeholder="имя" aria-describedby="basic-addon1">
+                                    </div>
+                                    <div class="col-xs-6 element">
+                                        <input type="text" class="form-control" placeholder="город" aria-describedby="basic-addon1">
+                                    </div>
+                                    <div class="col-xs-6 element">
+                                        <button type="button" class="btn btn-danger btn-block" ng-disabled="disabled" ng-click="submit()">{% trans "Subscribe" %}</button>
+{#                                        bootstrap alert should be when user subscribed successfully#}
+{#                                        <div class="alert alert-warning alert-dismissible" role="alert">#}
+{#                                            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>#}
+{#                                            <strong>Warning!</strong> Better check yourself, you're not looking too good.#}
+{#                                        </div>#}
+                                    </div>
                                 </div>
-                                <div class="col-xs-6 element">
-                                    <input type="text" class="form-control" placeholder="имя" aria-describedby="basic-addon1">
-                                </div>
-                                <div class="col-xs-6 element">
-                                    <input type="text" class="form-control" placeholder="город" aria-describedby="basic-addon1">
-                                </div>
-                                <div class="col-xs-6 element">
-                                    <button type="button" class="btn btn-danger btn-block">{% trans "Subscribe" %}</button>
-                                </div>
-                            </div>
+                            </form>
                             <div class="social">
                                 <div class="title">{% trans "WE ARE IN SOCIAL NETWORKS JOIN US!" %}</div>
                             </div>
