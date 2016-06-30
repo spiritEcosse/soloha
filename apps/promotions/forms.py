@@ -1,14 +1,38 @@
+from oscar.core.loading import get_model
+from djangular.forms import NgModelFormMixin, NgFormValidationMixin, NgModelForm
 from djangular.styling.bootstrap3.forms import Bootstrap3Form
-from django import forms
 from django.utils.translation import ugettext_lazy as _
+from django import forms
+from apps.catalogue.abstract_models import REGEXP_PHONE
+
+Subscribe = get_model('promotions', 'Subscribe')
 
 
-class Subscribe(Bootstrap3Form):
-    confirmation_key = forms.CharField(max_length=40, required=True, widget=forms.HiddenInput(),
-                                       initial='hidden value')
-    name = forms.CharField(max_length=30, label=_('Name'), required=True)
-    city = forms.CharField(max_length=30, label=_('Name'), required=True)
-    email = forms.EmailField(required=True, label=_('Email'),
-                             error_messages={'required': _('Please enter your email.')},
-                             widget=forms.widgets.EmailInput(
-                                 attrs={'ng-pattern': r'/^[-\w.]+@([A-z0-9][-A-z0-9]+\.)+[A-z]{2,4}$/'}))
+class SubscribeMeta(type(NgModelForm), type(Bootstrap3Form)):
+    pass
+
+
+class SubscribeForm(NgModelForm, NgModelFormMixin, NgFormValidationMixin, Bootstrap3Form):
+    __metaclass__ = SubscribeMeta
+    scope_prefix = 'subscribe_data'
+    form_name = 'subscribe_form'
+
+    class Meta:
+        model = QuickOrder
+        fields = ['email', 'name', 'city']# 'phone_number', 'name', 'comment', 'email', 'product']
+        labels = {
+            'email': _('You email'),
+            'name': _('You name'),
+            'city': _('You city')
+        }
+        error_messages = {
+            'email': {
+                'require': _('This field required.'),
+            },
+            'name': {
+                'require': _('This field required.'),
+            },
+            'city': {
+                'require': _('This field required.')
+            }
+        }
