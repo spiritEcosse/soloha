@@ -5,7 +5,8 @@
 $(document).ready(function() {
     slider = $('.lightSlider').lightSlider({
         item:4,
-        loop:true
+        loop:true,
+        slideMargin: 0
     });
 
     $('#link_news').click(function(){

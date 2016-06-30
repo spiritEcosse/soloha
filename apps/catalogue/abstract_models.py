@@ -127,6 +127,7 @@ class CustomAbstractProduct(models.Model):
     def __init__(self, *args, **kwargs):
         super(CustomAbstractProduct, self).__init__(*args, **kwargs)
         # self.attr = ProductAttributesContainer(product=self)
+        self.has_versions = self.versions.exists()
 
     def __str__(self):
         if self.title:
@@ -225,6 +226,29 @@ class CustomAbstractProduct(models.Model):
         # self.attr.save()
 
     # Properties
+
+    @property
+    def price_original(self):
+        # ToDo make it possible to check whether the product is available for sale
+        selector = Selector()
+        strategy = selector.strategy()
+        return strategy.fetch_for_product(self)
+
+    @property
+    def price_from_version(self):
+        """
+            get main price for product
+            :param self: object product
+            :return:
+                price of product
+            """
+        first_prod_version = self.versions.order_by('price_retail').first()
+        price = first_prod_version.price_retail
+
+        for attribute in first_prod_version.version_attributes.all():
+            if attribute.price_retail is not None:
+                price += attribute.price_retail
+        return price
 
     @property
     def is_standalone(self):
@@ -883,7 +907,7 @@ class AbstractProductFeature(models.Model):
     image = models.ImageField(_('Image'), upload_to='products/feature/%Y/%m/%d/', blank=True, null=True,
                               max_length=255)
     product_with_images = models.ManyToManyField('catalogue.Product', verbose_name=_('Product'),
-                                            related_name='product_feature', blank=True)
+                                                 related_name='product_feature', blank=True)
 
     class Meta:
         abstract = True

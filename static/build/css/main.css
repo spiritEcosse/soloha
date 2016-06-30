@@ -7981,7 +7981,8 @@ header .bottom .navbar .nav > li .yamm-content .image .btn-menu {
   text-decoration: none;
   font-size: 16px;
   line-height: 18px;
-  padding-bottom: 20px;
+  height: 361px;
+  position: relative;
 }
 .main .items .thumbnail .mask {
   position: absolute;
@@ -8014,10 +8015,18 @@ header .bottom .navbar .nav > li .yamm-content .image .btn-menu {
   padding-bottom: 5px;
   line-height: 16px;
   font-size: 16px;
+  height: 214px;
+  overflow: hidden;
+}
+.main .items .thumbnail .mask .filters .option_name {
+  margin-bottom: 5px;
 }
 .main .items .thumbnail .mask .filters .option_name span {
   color: black;
   text-decoration: underline;
+}
+.main .items .thumbnail .mask .filters .option_value {
+  margin-bottom: 5px;
 }
 .main .items .thumbnail .mask .filters .option_value span {
   color: white;

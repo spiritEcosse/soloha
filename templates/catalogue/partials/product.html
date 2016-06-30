@@ -11,7 +11,7 @@
             <div class="caption">
                 <div class="title">
                     {% block product_title %}
-                        <a ng-attr-href="product.absolute_url" href="{{ product.get_absolute_url }}" ng-bind="product.title"
+                        <a ng-attr-href="product.absolute_url" href="{{ product.get_absolute_url }}" {# ng-bind="product.title" #}
                            title="{{ product.get_title }}">
                             {{ product.get_title|truncatewords:7 }}
                         </a>
@@ -27,65 +27,57 @@
                         {% endwith %}
                     </div>
                 {% endblock %}
-                <div ng-bind="product.id" class="model">Артикул {{ product.id }}</div>
+                <div {#  ng-bind="product.id"  #} class="model">{% trans 'Артикул' %}: {{ product.id }}</div>
                 <div class="price">
                     {% block product_price %}
                         <div class="product_price">
-                            {#                            {% include "catalogue/partials/stock_record.html" %}#}
-
-                            {% if not product.is_parent %}
-                                {#                            {% include "catalogue/partials/add_to_basket_form_compact.html" %}#}
+                            {% if product.has_versions %}
+                                <strong>{% trans 'Price' %}:</strong>
+                                {{ product.price_from_version }}
+                            {% else %}
+                                {% if product.price_original.is_available_to_buy %}
+                                    <strong>{% trans 'Price' %}:</strong>
+                                    {{ product.price_original.price.incl_tax }}
+                                {% else %}
+                                    {% trans 'Unavailable' %}
+                                {% endif %}
                             {% endif %}
                         </div>
                     {% endblock %}
-                    <strong>Цена:</strong>5555
                 </div>
-                {#                <p><a href="#" class="btn btn-primary" role="button">Купить</a></p>#}
+                {% if product.has_versions or product.price_original.is_available_to_buy %}
+                    <p><button class="btn btn-primary" role="button">{% trans 'Buy' %}</button></p>
+                {% endif %}
             </div>
             <div class="mask">
                 <div class="title">
                     <a ng-attr-href="product.absolute_url" href="{{ product.get_absolute_url }}"
-                       ng-bind="product.title">
+                            {# ng-bind="product.title" #}>
                         {{ product.get_title|truncatewords:7 }}
                     </a>
                 </div>
                 <div class="filters">
-                    <div class="rows">
-                        <div class="option_name">
-                            <span>По типу:</span>
-                        </div>
+                    {% regroup product.characteristics.all by parent as characteristics %}
 
-                        <div class="option_value"><span>Кровати с мягким изголовьем</span></div>
-                    </div>
-                    <div class="rows">
-                        <div class="option_name">
-                            <span>По размеру:</span>
-                        </div>
-                        <div class="option_value"><span>Полуторные,Двухспальные</span></div>
-                    </div>
-                    <div class="rows">
-                        <div class="option_name">
-                            <span>Каркас:</span>
-                        </div>
+                    {% for characteristic in characteristics %}
+                        <div class="rows">
+                            <div class="option_name">
+                                <span>{{ characteristic.grouper }}</span>
+                            </div>
 
-                        <div class="option_value"><span>Металлический</span></div>
-                    </div>
-                    <div class="rows">
-                        <div class="option_name">
-                            <span>Подъёмный механизм:</span>
+                            {% for value in characteristic.list %}
+                                <div class="option_value">
+                                    <span>{{ value.title }}</span>
+                                </div>
+                            {% endfor %}
                         </div>
-
-                        <div class="option_value"><span>нет</span></div>
-                    </div>
-                    <div class="rows">
-                        <div class="option_name"><span>Ящики:</span></div>
-                        <div class="option_value"><span>нет</span></div>
-                    </div>
+                    {% endfor %}
                 </div>
-                <a href="#">Смотреть все характеристики</a>
-                <div class="btn-block">
-                    <a href="#" class="btn btn-primary" role="button">Купить</a>
-                </div>
+                {% if product.has_versions or product.price_original.is_available_to_buy %}
+                    <div class="btn-block">
+                        <button class="btn btn-primary" role="button">{% trans 'Buy' %}</button>
+                    </div>
+                {% endif %}
             </div>
         </div>
     {% endblock %}
