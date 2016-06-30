@@ -7,10 +7,14 @@ from django.core.exceptions import ObjectDoesNotExist
 from apps.catalogue.models import Category
 from apps.catalogue.models import SiteInfo
 from apps.flatpages.models import InfoPage
+from apps.promotions.forms import SubscribeForm
 from soloha.settings import MAX_COUNT_CATEGORIES
 from django.contrib.sites.shortcuts import get_current_site
+from django.utils.translation import ugettext_lazy as _
+
 
 logger = logging.getLogger(__name__)
+ANSWER = str(_('Subscribed successfully!'))
 
 
 def context_data(request):
@@ -30,6 +34,9 @@ def context_data(request):
         context['address'] = queryset.address
         context['phone_number'] = queryset.phone_number
         context['email'] = queryset.email
+
+    context['form'] = SubscribeForm()
+    context['answer'] = ANSWER
 
     return context
 

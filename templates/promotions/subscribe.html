@@ -1,10 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% load i18n %}
 
-</body>
-</html>
+<b>{% trans 'Subscribe date:' %}</b><time>{% now 'd.m.Y' %}</time> <br>
+
+{% if answer %}<div>{{ answer }}</div>{% endif %}
+<br>
+<div><strong>{% trans 'Email:' %}</strong> {{ object.email }} </div>
+<div><strong>{% trans 'Name:' %}</strong> {{ object.name }}</div>
+<div><strong>{% trans 'City:' %}</strong> {{ object.city }} </div>

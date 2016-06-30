@@ -25,6 +25,8 @@ app.controller 'Header', ['$http', '$scope', '$location', '$window', '$document'
     .error ->
       console.error('An error occurred during submission')
 ]
+
+
 #  categories = djangoUrl.reverse('promotions:categories')
 #  cache = $cacheFactory('superCache')
 #

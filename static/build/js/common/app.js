@@ -377,36 +377,20 @@
   ]);
 
   app.controller('Subscribe', [
-    '$http', '$scope', '$window', 'djangoForm', '$document', function($http, $scope, $window, djangoForm, $document) {
-      $scope.closeAlert = function(index) {
-        return $scope.alerts.splice(index, 1);
-      };
-      return $scope.submit = function() {
-        $scope.disabled = true;
-        if ($scope.subscribe) {
-          $http.post(".", $scope.subscribe).success(function(data) {
-            var duration, offset, someElement;
-            if (!djangoForm.setErrors($scope.form_comment, data.errors)) {
-              duration = 800;
-              offset = 0;
-              $scope.alerts.push({
-                msg: data.msg,
-                type: 'success'
-              });
-              someElement = angular.element(document.getElementById('alerts'));
-              return $document.scrollToElement(someElement, offset, duration);
+    '$http', '$scope', '$window', 'djangoForm', '$document', '$location', function($http, $scope, $window, djangoForm, $document, $location) {
+      return $scope.subscribe = function() {
+        if ($scope.subscribe_data) {
+          return $http.post('/', $scope.subscribe_data).success(function(out_data) {
+            if (!djangoForm.setErrors($scope.subscribe_form, out_data.errors)) {
+              return $scope.send_form = true;
             }
           }).error(function() {
-            return console.error('An error occurred during submission');
+            return console.error('An error occured during submission');
           });
         }
-        $scope.disabled = false;
-        return false;
       };
     }
   ]);
-
-  app.directive('alertSuccess', ['$scope', function($scope) {}]);
 
 }).call(this);
 

@@ -15,16 +15,14 @@ app.config ['$httpProvider', ($httpProvider) ->
   $httpProvider.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest'
 ]
 
-# Here should be other controller (something like quick order)
-app.controller 'Subscribe', ['$http', '$scope', '$window', 'djangoForm', '$document', ($http, $scope, $window, djangoForm, $document) ->
+app.controller 'Subscribe', ['$http', '$scope', '$window', 'djangoForm', '$document', '$location', ($http, $scope, $window, djangoForm, $document, $location) ->
   $scope.subscribe = () ->
-     if $scope.subscribe_data
-         $http.post('' + clone_data.product.pk, $scope.subscribe_data).success((out_data) ->
-             if !djangoForm.setErrors($scope.subscribe_form, out_data.errors)
-                 $scope.send_form = true
-         ).error ->
-             console.error 'An error occured during submission'
-
+    if $scope.subscribe_data
+        $http.post('/', $scope.subscribe_data).success((out_data) ->
+            if !djangoForm.setErrors($scope.subscribe_form, out_data.errors)
+                $scope.send_form = true
+        ).error ->
+            console.error 'An error occured during submission'
 ]
 
 
