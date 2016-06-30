@@ -7368,9 +7368,10 @@ button.close {
 .line-bottom {
   background: url("../../image/product_line_bottom.png") bottom center repeat-x;
 }
-h1 {
-  padding-left: 10px;
-  padding-right: 10px;
+h1,
+h2 {
+  padding-left: 15px;
+  padding-right: 15px;
 }
 a {
   cursor: pointer;
@@ -8086,8 +8087,11 @@ header .bottom .navbar .nav > li .yamm-content .image .btn-menu {
   background: none;
 }
 .main h1 {
-  color: #f08825;
   font-size: 37px;
+}
+.main h1,
+.main h2 {
+  color: #f08825;
   font-weight: 400;
 }
 .main .content-group,

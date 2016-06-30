@@ -3,22 +3,14 @@
 
 {% with products_sliced=products|slice:":6" %}
     {% if products_sliced %}
-        <div class="col-xs-24">
-            <div class="sub-header">
-                <div class="line-bottom row">
-                    <div class="col-xs-24">
-                        <h2>{% trans 'Products you recently viewed' %}</h2>
-                    </div>
-                </div>
-            </div>
+        <h2 class="line-bottom row">{% trans 'Products you recently viewed' %}</h2>
 
-            <div class="lightSlider">
-                {% for product in products_sliced %}
-                    <div class="col-sm-6 col-md-6">
-                        {% render_product product %}
-                    </div>
-                {% endfor %}
-            </div>
+        <div class="lightSlider">
+            {% for product in products_sliced %}
+                <div class="col-sm-6 col-md-6">
+                    {% render_product product %}
+                </div>
+            {% endfor %}
         </div>
     {% endif %}
 {% endwith %}

@@ -8,20 +8,15 @@
 
 {% block ngController %}ng-controller="Home"{% endblock ngController %}
 
-
-{% block extrascripts %}
-    {{ block.super }}
-    <script src="{% static 'bower_components/lightslider/dist/js/lightslider.min.js' %}"></script>
-    <script src="{% static 'src/js/custom.js' %}"></script>
-{% endblock extrascripts %}
-
 {% block main %}
     {% include "partials/alert_messages.html" %}
-    <h1>{% block headertext %}{{ current_site.name }}
-        {% if current_site.info.shop_short_desc %}
-            - {{ current_site.info.shop_short_desc }}
-        {% endif %}
-    {% endblock %}</h1>
+    <h1>
+        {% block headertext %}{{ current_site.name }}
+            {% if current_site.info.shop_short_desc %}
+                - {{ current_site.info.shop_short_desc }}
+            {% endif %}
+        {% endblock %}
+    </h1>
 
     {% for promotion in promotions_0 %}
         {% include "promotions/multiimage.html" %}
