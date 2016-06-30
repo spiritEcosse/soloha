@@ -347,28 +347,49 @@
                             <div class="title line-top">
                                 {% trans "Sign up for discounts!" %}
                             </div>
-                            <form name="subscribe" method="post" novalidate action=".">
-                                {% csrf_token %}
-                                <div class="input-group">
+                            <div class="input-group">
+                                <form name="{{ form.form_name }}" method="post" ng-hide="send_form" novalidate>
+                                    {% csrf_token %}
+                                    {% for field in form %}
+                                        <div class="col-xs-6 element">
+                                            {{ field.label_tag }}
+                                            {{ field }}
+                                            {{ field.errors }}
+                                        </div>
+                                    {% endfor %}
                                     <div class="col-xs-6 element">
-                                        <input type="text" class="form-control" placeholder="e-mail" aria-describedby="basic-addon1">
+                                        <button type="button" ng-disabled="{{ form.form_name }}.$invalid" ng-click="subscribe()" class="btn btn-danger btn-block">{% trans "Subscribe" %}</button>
                                     </div>
-                                    <div class="col-xs-6 element">
-                                        <input type="text" class="form-control" placeholder="имя" aria-describedby="basic-addon1">
-                                    </div>
-                                    <div class="col-xs-6 element">
-                                        <input type="text" class="form-control" placeholder="город" aria-describedby="basic-addon1">
-                                    </div>
-                                    <div class="col-xs-6 element">
-                                        <button type="button" class="btn btn-danger btn-block" ng-disabled="disabled" ng-click="submit()">{% trans "Subscribe" %}</button>
-{#                                        bootstrap alert should be when user subscribed successfully#}
-{#                                        <div class="alert alert-warning alert-dismissible" role="alert">#}
-{#                                            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>#}
-{#                                            <strong>Warning!</strong> Better check yourself, you're not looking too good.#}
-{#                                        </div>#}
-                                    </div>
+                                </form>
+                                {% verbatim %}
+                                <div class="alert alert-{{ alert_mode }}" role="alert" ng-show="send_form">
+                                    {% endverbatim %}
+                                    <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                                    <span class="sr-only">{% trans 'The form is submitted successfully' %}:</span>
+                                    {{ answer }}
                                 </div>
-                            </form>
+
+                                {#                                    <div class="col-xs-6 element">#}
+                                {#                                        <input type="text" class="form-control" placeholder="e-mail" aria-describedby="basic-addon1">#}
+                                {#                                    </div>#}
+                                {#                                    <div class="col-xs-6 element">#}
+                                {#                                        <input type="text" class="form-control" placeholder="имя" aria-describedby="basic-addon1">#}
+                                {#                                    </div>#}
+                                {#                                    <div class="col-xs-6 element">#}
+                                {#                                        <input type="text" class="form-control" placeholder="город" aria-describedby="basic-addon1">#}
+                                {#                                    </div>#}
+
+                                {#                                <div class="col-xs-6 element">#}
+                                {#                                    <button type="button" class="btn btn-danger btn-block" ng-disabled="disabled" ng-click="submit()">{% trans "Subscribe" %}</button>#}
+
+                                {#                                        bootstrap alert should be when user subscribed successfully#}
+                                {#                                        <div class="alert alert-warning alert-dismissible" role="alert">#}
+                                {#                                            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>#}
+                                {#                                            <strong>Warning!</strong> Better check yourself, you're not looking too good.#}
+                                {#                                        </div>#}
+                                {#                                </div>#}
+
+                            </div>
                             <div class="social">
                                 <div class="title">{% trans "WE ARE IN SOCIAL NETWORKS JOIN US!" %}</div>
                             </div>

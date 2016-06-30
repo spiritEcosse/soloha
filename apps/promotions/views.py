@@ -29,7 +29,7 @@ Subscribe = get_model('promotions', 'Subscribe')
 ANSWER = str(_('Your message has been sent. We will contact you on the specified details.'))
 
 
-class HomeView(views.JSONResponseMixin, views.AjaxResponseMixin, FormView, SingleObjectMixin, CoreHomeView):
+class HomeView(views.JSONResponseMixin, views.AjaxResponseMixin, FormView, CoreHomeView):
     form_class = SubscribeForm
     success_url = reverse_lazy('form_data_valid')
     model = Subscribe
@@ -45,11 +45,8 @@ class HomeView(views.JSONResponseMixin, views.AjaxResponseMixin, FormView, Singl
         response_data = {}
 
         if form.is_valid():
-            self.object = form.save(commit=False)
-
-            if not self.request.user.is_anonymous():
-                self.object.user = self.request.user
-            self.object.save()
+            form.save()
+            self.form = form
             self.send_message()
         else:
             response_data = {'errors': form.errors}
@@ -61,14 +58,14 @@ class HomeView(views.JSONResponseMixin, views.AjaxResponseMixin, FormView, Singl
         subject = str(_('Order online %s')) % current_site.domain
 
         from_email = current_site.info.email
-        context = {'object': self.object, 'current_site': current_site}
+        context = {'object': self.form, 'current_site': current_site}
 
-        if self.object.email:
+        if self.form.email:
             context_user = context
             context_user = context_user.update({'answer': ANSWER})
             message = loader.get_template(self.template_send_email).render(Context(context_user))
-            from_email = self.object.email
-            msg = EmailMultiAlternatives(subject, '', current_site.info.email, [self.object.email])
+            from_email = self.form.email
+            msg = EmailMultiAlternatives(subject, '', current_site.info.email, [self.form.email])
             msg.attach_alternative(message, "text/html")
             msg.send()
 
@@ -107,6 +104,8 @@ class HomeView(views.JSONResponseMixin, views.AjaxResponseMixin, FormView, Singl
         ).order_by('-date_created')[:MAX_COUNT_PRODUCT]
 
         context['products_special'] = []
+        context['form'] = SubscribeForm()
+        context['answer'] = ANSWER
         return context
 
 queryset_product = Product.objects.only('title')

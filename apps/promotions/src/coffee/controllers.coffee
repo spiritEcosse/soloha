@@ -17,29 +17,14 @@ app.config ['$httpProvider', ($httpProvider) ->
 
 # Here should be other controller (something like quick order)
 app.controller 'Subscribe', ['$http', '$scope', '$window', 'djangoForm', '$document', ($http, $scope, $window, djangoForm, $document) ->
-  $scope.closeAlert = (index) ->
-    $scope.alerts.splice(index, 1)
+  $scope.subscribe = () ->
+     if $scope.subscribe_data
+         $http.post('' + clone_data.product.pk, $scope.subscribe_data).success((out_data) ->
+             if !djangoForm.setErrors($scope.subscribe_form, out_data.errors)
+                 $scope.send_form = true
+         ).error ->
+             console.error 'An error occured during submission'
 
-#  $scope.disabled = true
-
-  $scope.submit = ->
-    $scope.disabled = true
-
-    if $scope.subscribe
-      $http.post(".", $scope.subscribe).success (data) ->
-        if not djangoForm.setErrors($scope.form_comment, data.errors)
-          duration = 800
-          offset = 0
-          $scope.alerts.push({msg: data.msg, type: 'success'})
-          someElement = angular.element(document.getElementById('alerts'))
-          $document.scrollToElement(someElement, offset, duration)
-      .error ->
-        console.error('An error occurred during submission')
-
-    $scope.disabled = false
-    return false
-]
-app.directive 'alertSuccess', ['$scope', ($scope) ->
 ]
 
 
