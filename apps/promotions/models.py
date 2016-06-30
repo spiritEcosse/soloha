@@ -6,6 +6,4 @@ class Subscribe(models.Model):
     name = models.CharField(pgettext_lazy(u'User name', u'Name'), max_length=50)
     city = models.CharField(pgettext_lazy(u'User city', u'City'), max_length=50)
 
-    class Meta:
-        app_label = 'subscribe'
 

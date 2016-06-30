@@ -3,7 +3,7 @@ from djangular.forms import NgModelFormMixin, NgFormValidationMixin, NgModelForm
 from djangular.styling.bootstrap3.forms import Bootstrap3Form
 from django.utils.translation import ugettext_lazy as _
 from django import forms
-from apps.catalogue.abstract_models import REGEXP_PHONE
+# from apps.catalogue.abstract_models import REGEXP_PHONE
 
 Subscribe = get_model('promotions', 'Subscribe')
 
@@ -18,8 +18,13 @@ class SubscribeForm(NgModelForm, NgModelFormMixin, NgFormValidationMixin, Bootst
     form_name = 'subscribe_form'
 
     class Meta:
-        model = QuickOrder
-        fields = ['email', 'name', 'city']# 'phone_number', 'name', 'comment', 'email', 'product']
+        model = Subscribe
+        fields = ['email', 'name', 'city']
+        widgets = {
+            'city': forms.Textarea(attrs={'title': _('You comment'), 'rows': 5}),
+            'name': forms.TextInput(attrs={'title': _('You name')}),
+            'email': forms.TextInput(attrs={'title': _('You email')}),
+        }
         labels = {
             'email': _('You email'),
             'name': _('You name'),
