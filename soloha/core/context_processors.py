@@ -7,7 +7,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from apps.catalogue.models import Category
 from apps.catalogue.models import SiteInfo
 from apps.flatpages.models import InfoPage
-from apps.promotions.forms import SubscribeForm
+from apps.subscribe.forms import SubscribeForm
 from soloha.settings import MAX_COUNT_CATEGORIES
 from django.contrib.sites.shortcuts import get_current_site
 from django.utils.translation import ugettext_lazy as _

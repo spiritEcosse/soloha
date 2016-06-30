@@ -376,42 +376,6 @@
     }
   ]);
 
-  app.controller('Subscribe', [
-    '$http', '$scope', '$window', 'djangoForm', '$document', '$location', function($http, $scope, $window, djangoForm, $document, $location) {
-      return $scope.subscribe = function() {
-        if ($scope.subscribe_data) {
-          return $http.post('/', $scope.subscribe_data).success(function(out_data) {
-            if (!djangoForm.setErrors($scope.subscribe_form, out_data.errors)) {
-              return $scope.send_form = true;
-            }
-          }).error(function() {
-            return console.error('An error occured during submission');
-          });
-        }
-      };
-    }
-  ]);
-
-}).call(this);
-
-(function() {
-  'use strict';
-
-  /* Controllers */
-  var app, app_name;
-
-  app_name = "soloha";
-
-  app = angular.module(app_name);
-
-  app.config([
-    '$httpProvider', function($httpProvider) {
-      $httpProvider.defaults.xsrfCookieName = 'csrftoken';
-      $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
-      return $httpProvider.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
-    }
-  ]);
-
   app.controller('Search', [
     '$http', '$scope', '$window', '$document', '$location', '$routeParams', '$compile', function($http, $scope, $window, $document, $location, $routeParams, $compile) {
       $http.post($location.absUrl()).success(function(data) {
@@ -455,6 +419,42 @@
         }).error(function() {
           return console.error('An error occurred during submission');
         });
+      };
+    }
+  ]);
+
+}).call(this);
+
+(function() {
+  'use strict';
+
+  /* Controllers */
+  var app, app_name;
+
+  app_name = "soloha";
+
+  app = angular.module(app_name);
+
+  app.config([
+    '$httpProvider', function($httpProvider) {
+      $httpProvider.defaults.xsrfCookieName = 'csrftoken';
+      $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
+      return $httpProvider.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+    }
+  ]);
+
+  app.controller('Subscribe', [
+    '$http', '$scope', '$window', 'djangoForm', '$document', '$location', function($http, $scope, $window, djangoForm, $document, $location) {
+      return $scope.subscribe = function() {
+        if ($scope.subscribe_data) {
+          return $http.post('/subscribe/', $scope.subscribe_data).success(function(out_data) {
+            if (!djangoForm.setErrors($scope.subscribe_form, out_data.errors)) {
+              return $scope.send_form = true;
+            }
+          }).error(function() {
+            return console.error('An error occured during submission');
+          });
+        }
       };
     }
   ]);

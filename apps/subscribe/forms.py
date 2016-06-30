@@ -3,8 +3,7 @@ from djangular.forms import NgModelFormMixin, NgFormValidationMixin, NgModelForm
 from djangular.styling.bootstrap3.forms import Bootstrap3Form
 from django.utils.translation import ugettext_lazy as _
 from django import forms
-
-Subscribe = get_model('promotions', 'Subscribe')
+from models import Subscribe
 
 
 class SubscribeMeta(type(NgModelForm), type(Bootstrap3Form)):
