@@ -9,6 +9,7 @@ from oscar.core.loading import get_model
 Category = get_model('catalogue', 'category')
 Product = get_model('catalogue', 'product')
 Line = get_model('order', 'Line')
+PagePromotion = get_model('promotions', 'PagePromotion')
 ProductRecommendation = get_model('catalogue', 'ProductRecommendation')
 
 

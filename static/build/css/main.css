@@ -7353,6 +7353,9 @@ button.close {
     display: none !important;
   }
 }
+.lSAction > a {
+  background-image: url('../../image/controls.png');
+}
 .navbar-primary .navbar-toggle {
   background-image: linear-gradient(to top, #ffae42 0%, #f08825 44%, #ffae42 100%);
   border: 0.275025px solid #6f6f6e;
