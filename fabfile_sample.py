@@ -101,3 +101,6 @@ def local_act():
         local("git push origin")
 
 # sudo apt-get install libjpeg-dev
+# sudo apt-get install libmysqlclient-dev
+# sudo apt-get install python-psycopg2
+# sudo apt-get install libpq-dev python-dev
