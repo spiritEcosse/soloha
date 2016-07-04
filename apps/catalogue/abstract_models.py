@@ -27,7 +27,7 @@ class CustomAbstractProduct(models.Model):
     slug = models.SlugField(_('Slug'), max_length=400, unique=True)
     enable = models.BooleanField(verbose_name=_('Enable'), default=True)
     h1 = models.CharField(verbose_name=_('h1'), blank=True, max_length=310)
-    meta_title = models.CharField(verbose_name=_('Meta tag: title'), blank=True, max_length=320)
+    meta_title = models.CharField(verbose_name=_('Meta tag: title'), blank=True, max_length=520)
     meta_description = models.TextField(verbose_name=_('Meta tag: description'), blank=True)
     meta_keywords = models.TextField(verbose_name=_('Meta tag: keywords'), blank=True)
     description = models.TextField(_('Description'), blank=True)
