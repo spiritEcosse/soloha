@@ -575,21 +575,21 @@ class AbstractFeature(MPTTModel):
 
 @python_2_unicode_compatible
 class CustomAbstractCategory(MPTTModel):
-    name = models.CharField(_('Name'), max_length=255, db_index=True)
+    name = models.CharField(_('Name'), max_length=500, db_index=True)
     slug = models.SlugField(verbose_name=_('Slug'), max_length=200, unique=True)
     enable = models.BooleanField(verbose_name=_('Enable'), default=True)
     parent = TreeForeignKey('self', verbose_name=_('Parent'), related_name='children', blank=True, null=True)
     meta_title = models.CharField(verbose_name=_('Meta tag: title'), blank=True, max_length=1000)
-    h1 = models.CharField(verbose_name=_('h1'), blank=True, max_length=255)
+    h1 = models.CharField(verbose_name=_('h1'), blank=True, max_length=300)
     meta_description = models.TextField(verbose_name=_('Meta tag: description'), blank=True)
     meta_keywords = models.TextField(verbose_name=_('Meta tag: keywords'), blank=True)
     sort = models.IntegerField(blank=True, null=True, default=0)
     icon = models.ImageField(_('Icon'), upload_to='categories', blank=True, null=True, max_length=255)
     created = models.DateTimeField(auto_now_add=True)
-    image_banner = models.ImageField(_('Image banner'), upload_to='categories/%Y/%m/%d/', blank=True, null=True, max_length=255)
+    image_banner = models.ImageField(_('Image banner'), upload_to='categories/%Y/%m/%d/', blank=True, null=True, max_length=600)
     link_banner = models.URLField(_('Link banner'), blank=True, null=True, max_length=255)
     description = models.TextField(_('Description'), blank=True)
-    image = models.ImageField(_('Image'), upload_to='categories/%Y/%m/%d/', blank=True, null=True, max_length=255)
+    image = models.ImageField(_('Image'), upload_to='categories/%Y/%m/%d/', blank=True, null=True, max_length=500)
 
     _slug_separator = '/'
     _full_name_separator = ' > '
