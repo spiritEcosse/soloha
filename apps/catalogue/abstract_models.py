@@ -579,7 +579,7 @@ class CustomAbstractCategory(MPTTModel):
     slug = models.SlugField(verbose_name=_('Slug'), max_length=400, unique=True)
     enable = models.BooleanField(verbose_name=_('Enable'), default=True)
     parent = TreeForeignKey('self', verbose_name=_('Parent'), related_name='children', blank=True, null=True)
-    meta_title = models.CharField(verbose_name=_('Meta tag: title'), blank=True, max_length=255)
+    meta_title = models.CharField(verbose_name=_('Meta tag: title'), blank=True, max_length=480)
     h1 = models.CharField(verbose_name=_('h1'), blank=True, max_length=310)
     meta_description = models.TextField(verbose_name=_('Meta tag: description'), blank=True)
     meta_keywords = models.TextField(verbose_name=_('Meta tag: keywords'), blank=True)
