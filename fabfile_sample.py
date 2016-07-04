@@ -104,3 +104,5 @@ def local_act():
 # sudo apt-get install libmysqlclient-dev
 # sudo apt-get install python-psycopg2
 # sudo apt-get install libpq-dev python-dev
+# apt-get install libjpeg-dev libfreetype6-dev zlib1g-dev libpng12-dev
+# ln -s /usr/bin/nodejs /usr/bin/node
