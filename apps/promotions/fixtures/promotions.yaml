@@ -1,0 +1,50 @@
+[
+{
+    "fields": {
+        "display_order": 0,
+        "object_id": 1,
+        "content_type": [
+            "promotions",
+            "multiimage"
+        ],
+        "date_created": "2016-06-30T13:37:37.067Z",
+        "position": "0",
+        "clicks": 0,
+        "page_url": "/"
+    },
+    "model": "promotions.pagepromotion",
+    "pk": 1
+},
+{
+    "fields": {
+        "date_created": "2016-06-30T13:20:28.565Z",
+        "link_url": "/category-1/",
+        "name": "Name Name Name Name Name ",
+        "image": "images/promotions/banner_image.png"
+    },
+    "model": "promotions.image",
+    "pk": 1
+},
+{
+    "fields": {
+        "date_created": "2016-06-30T13:20:47.343Z",
+        "link_url": "/category-2/",
+        "name": "Name Name Name",
+        "image": "images/promotions/banner_image_gJ0jv7g.png"
+    },
+    "model": "promotions.image",
+    "pk": 2
+},
+{
+    "fields": {
+        "images": [
+            1,
+            2
+        ],
+        "date_created": "2016-06-30T13:22:35.119Z",
+        "name": "banner"
+    },
+    "model": "promotions.multiimage",
+    "pk": 1
+}
+]

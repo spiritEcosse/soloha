@@ -63,7 +63,6 @@ INSTALLED_APPS = \
         'easy_thumbnails',
         'apps.contacts',
         'apps.ex_sites',
-        'django_user_agents',
         # 'smart_load_tag',
     ] + get_core_apps(['apps.catalogue', 'apps.promotions', 'apps.partner', 'apps.search', 'apps.order', ])
 

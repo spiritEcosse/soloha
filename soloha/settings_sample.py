@@ -21,10 +21,8 @@ CACHE_MIDDLEWARE_SECONDS = 24 * 60 * 60
 CACHE_MIDDLEWARE_KEY_PREFIX = 'soloha_'
 
 MIDDLEWARE_CLASSES = (
-    # """START for production"""
     # 'django.middleware.cache.UpdateCacheMiddleware',
     # 'django.middleware.cache.FetchFromCacheMiddleware',
-    # """END for production"""
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.gzip.GZipMiddleware',
@@ -55,6 +53,9 @@ DB_BACKEND_MYSQL = 'django.db.backends.mysql',
 DB_NAME_MYSQL = 'soloha',
 DB_USER_MYSQL = 'soloha',
 DB_PASSWORD_MYSQL = ''
+DB_HOST_MYSQL = ''
+DB_PORT_MYSQL = ''
+DB_ATOMIC_REQUESTS_MYSQL = True
 
 
 MY_SERVER = {'server': '78.24.216.187', 'path': '/home/igor/web/www/cinema/', 'venv': '.env/bin/activate'}
