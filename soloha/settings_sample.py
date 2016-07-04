@@ -1,3 +1,6 @@
+import sys, os
+location = lambda x: os.path.join(os.path.dirname(os.path.realpath(__file__)), x)
+
 __author__ = 'igor'
 
 DEFAULT_FROM_EMAIL = ''
@@ -58,4 +61,36 @@ DB_PORT_MYSQL = ''
 DB_ATOMIC_REQUESTS_MYSQL = True
 
 
-MY_SERVER = {'server': '78.24.216.187', 'path': '/home/igor/web/www/cinema/', 'venv': '.env/bin/activate'}
+if 'test' in sys.argv:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': location('db.sqlite3'),
+            'USER': '',
+            'PASSWORD': '',
+            'HOST': '',
+            'PORT': '',
+            'ATOMIC_REQUESTS': True
+        },
+    }
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': DB_BACKEND,
+            'NAME': DB_NAME,
+            'USER': DB_USER,
+            'PASSWORD': DB_PASSWORD,
+            'HOST': DB_HOST,
+            'POST': DB_PORT,
+            'ATOMIC_REQUESTS': DB_ATOMIC_REQUESTS,
+        },
+        'mysql': {
+            'ENGINE': DB_BACKEND_MYSQL,
+            'NAME': DB_NAME_MYSQL,
+            'USER': DB_USER_MYSQL,
+            'PASSWORD': DB_PASSWORD_MYSQL,
+            'HOST': DB_HOST_MYSQL,
+            'POST': DB_PORT_MYSQL,
+            'ATOMIC_REQUESTS': DB_ATOMIC_REQUESTS_MYSQL,
+        },
+    }

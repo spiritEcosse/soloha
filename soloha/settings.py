@@ -105,48 +105,7 @@ RECOMMENDED_PRODUCTS = 20
 # Database
 # https://docs.djangoproject.com/en/1.8/ref/settings/#databases
 
-if 'test' in sys.argv:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': location('db.sqlite3'),
-            'USER': '',
-            'PASSWORD': '',
-            'HOST': '',
-            'PORT': '',
-            'ATOMIC_REQUESTS': True
-        },
-    }
-else:
-    DATABASES = {
-        'default': {
-            'ENGINE': settings_local.DB_BACKEND,
-            'NAME': settings_local.DB_NAME,
-            'USER': settings_local.DB_USER,
-            'PASSWORD': settings_local.DB_PASSWORD,
-            'HOST': settings_local.DB_HOST,
-            'POST': settings_local.DB_PORT,
-            'ATOMIC_REQUESTS': settings_local.DB_ATOMIC_REQUESTS,
-        },
-            'mysql': {
-            'ENGINE': settings_local.DB_BACKEND_MYSQL,
-            'NAME': settings_local.DB_NAME_MYSQL,
-            'USER': settings_local.DB_USER_MYSQL,
-            'PASSWORD': settings_local.DB_PASSWORD_MYSQL,
-            'HOST': settings_local.DB_HOST_MYSQL,
-            'POST': settings_local.DB_PORT_MYSQL,
-            'ATOMIC_REQUESTS': settings_local.DB_ATOMIC_REQUESTS_MYSQL,
-        },
-        # 'default': {
-        #     'ENGINE': 'django.db.backends.sqlite3',
-        #     'NAME': location('db.sqlite3'),
-        #     'USER': '',
-        #     'PASSWORD': '',
-        #     'HOST': '',
-        #     'PORT': '',
-        #     'ATOMIC_REQUESTS': True
-        # },
-    }
+DATABASES = settings_local.DATABASES
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/
