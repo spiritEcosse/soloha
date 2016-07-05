@@ -51,8 +51,6 @@ def remote_act():
             with prefix('source %s' % MY_SERVER['venv']):
                 run('pip install -r %s' % REQUIREMENTS_FILE)
                 run("./manage.py migrate")
-    #             run("./manage.py flush --noinput")
-    #             run("./manage.py loaddata db.json")
                 run("./manage.py clear_cache")
 
 
