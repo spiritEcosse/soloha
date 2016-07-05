@@ -131,6 +131,7 @@ LANGUAGES = (
 TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.Loader',
     'django.template.loaders.app_directories.Loader',
+    'django.template.loaders.eggs.Loader',
 )
 
 import os
@@ -138,7 +139,6 @@ location = lambda x: os.path.join(os.path.dirname(os.path.realpath(__file__)), '
 from oscar import OSCAR_MAIN_TEMPLATE_DIR
 TEMPLATE_DIRS = (
     location('templates'),
-    OSCAR_MAIN_TEMPLATE_DIR,
 )
 
 STATIC_URL = '/static_root/'
