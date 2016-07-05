@@ -67,46 +67,48 @@
             </a>
         {% endif %}
         <div class="row">
-            <div class="col-xs-17 col-sm-8 col-md-9 scrollspy">
-                {% block product_gallery %}
-                    {% include "catalogue/partials/gallery.html" %}
-                {% endblock %}
+            <div class="col-xs-17 col-sm-8 col-md-9 scrollspy" >
+                <div id="primary_info" data-spy="affix">
+                    {% block product_gallery %}
+                        {% include "catalogue/partials/gallery.html" %}
+                    {% endblock %}
 
-                <div class="wrapper">
-                    <div class="reviews pull-left">
-                        <a href="#" class="pull-left">
+                    <div class="wrapper">
+                        <div class="reviews pull-left">
+                            <a href="#" class="pull-left">
+                                {% iffeature "reviews" %}
+                                    {{ product.num_approved_reviews }}
+                                    {% trans "reviews" %}
+                                {% endiffeature %}
+                            </a>
                             {% iffeature "reviews" %}
-                                {{ product.num_approved_reviews }}
-                                {% trans "reviews" %}
+                                <p class="star-rating Four pull-left">
+                                    {% include "catalogue/reviews/partials/review_stars.html" %}
+                                </p>
                             {% endiffeature %}
-                        </a>
-                        {% iffeature "reviews" %}
-                            <p class="star-rating Four pull-left">
-                                {% include "catalogue/reviews/partials/review_stars.html" %}
-                            </p>
-                        {% endiffeature %}
-                        <div class="social">Поделиться:</div>
+                            <div class="social">Поделиться:</div>
+                        </div>
+                        <div class="defer pull-right">
+                            <a class="love" href="#">
+                                Отложить
+                            </a>
+                            {#                        {% iffeature "wishlists" %}#}
+                            {#                            {% include "catalogue/partials/add_to_wishlist.html" %}#}
+                            {#                        {% endiffeature %}#}
+                            <a class="compare" href="#">Сравнить</a>
+                        </div>
                     </div>
-                    <div class="defer pull-right">
-                        <a class="love" href="#">
-                            Отложить
-                        </a>
-                        {#                        {% iffeature "wishlists" %}#}
-                        {#                            {% include "catalogue/partials/add_to_wishlist.html" %}#}
-                        {#                        {% endiffeature %}#}
-                        <a class="compare" href="#">Сравнить</a>
-                    </div>
-                </div>
-                <div class="row liner" id="nav-fix">
-                    <div class="col-xs-22">
-                        <ul class="nav nav-tabs nav-stacked">
-                            <li class="active"><a data-toggle="tab" href="#info">Общая информация</a></li>
-                            <li><a data-toggle="tab" href="#options">Выбрать дополнительные опции</a></li>
-                            <li><a data-toggle="tab" href="#characteristics">Характеристики</a></li>
-                            <li><a data-toggle="tab" href="#description">Описание</a></li>
-                            <li><a data-toggle="tab" href="#reviews">Отзывы</a></li>
-                            <li><a data-toggle="tab" href="#delivery">Доставка и оплата</a></li>
-                        </ul>
+                    <div class="row liner">
+                        <div class="col-xs-22">
+                            <ul class="nav nav-tabs nav-stacked">
+                                <li class="active"><a data-toggle="tab" href="#info">Общая информация</a></li>
+                                <li><a data-toggle="tab" href="#options">Выбрать дополнительные опции</a></li>
+                                <li><a data-toggle="tab" href="#characteristics">Характеристики</a></li>
+                                <li><a data-toggle="tab" href="#description">Описание</a></li>
+                                <li><a data-toggle="tab" href="#reviews">Отзывы</a></li>
+                                <li><a data-toggle="tab" href="#delivery">Доставка и оплата</a></li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -501,7 +503,7 @@
             </div>
         </div>
     </div>
-    <div class="col-xs-24 items">
+    <div class="col-xs-24 items" id="items">
         {% recommended_products product %}
         {% recently_viewed_products %}
     </div>

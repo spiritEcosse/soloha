@@ -61,6 +61,7 @@ INSTALLED_APPS = \
         'mptt',
         'feincms',
         'easy_thumbnails',
+        'filer',
         'apps.contacts',
         'apps.ex_sites',
         # 'smart_load_tag',
@@ -143,7 +144,7 @@ TEMPLATE_DIRS = (
 STATIC_URL = '/static_root/'
 STATIC_ROOT = os.path.join(BASE_DIR,  'static_root')
 MEDIA_ROOT = os.path.join(BASE_DIR,  'media')
-MEDIA_URL = "/data/"
+MEDIA_URL = "/media/"
 
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static'),
@@ -223,6 +224,16 @@ OSCAR_ORDER_STATUS_PIPELINE = {
     'Being processed': ('Processed', 'Cancelled',),
     'Cancelled': (),
 }
+
+THUMBNAIL_HIGH_RESOLUTION = True
+
+THUMBNAIL_PROCESSORS = (
+    'easy_thumbnails.processors.colorspace',
+    'easy_thumbnails.processors.autocrop',
+    #'easy_thumbnails.processors.scale_and_crop',
+    'filer.thumbnail_processors.scale_and_crop_with_subject_location',
+    'easy_thumbnails.processors.filters',
+)
 
 THUMBNAIL_DUMMY = True
 THUMBNAIL_FORCE_OVERWRITE = True

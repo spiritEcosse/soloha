@@ -9,7 +9,7 @@ from mptt.models import MPTTModel, TreeForeignKey
 from oscar.apps.catalogue.abstract_models import *  # noqa
 from django.db import IntegrityError
 from django.core.exceptions import ValidationError
-
+from filer.fields.image import FilerImageField
 
 REGEXP_PHONE = r'/^((8|\+38)[\- ]?)?(\(?\d{3}\)?[\- ]?)?[\d\- ]{7,10}$/'
 REGEXP_EMAIL = r'/^[-\w.]+@([A-z0-9][-A-z0-9]+\.)+[A-z]{2,4}$/'

@@ -8360,6 +8360,19 @@ header .bottom .navbar .nav > li .yamm-content .image .btn-menu {
   margin-top: 20px;
   margin-bottom: 30px;
 }
+.main .product .gallery .lSSlideOuter {
+  width: 414px;
+}
+.main .product .affix {
+  top: 0px;
+  width: 414px;
+}
+.main .product .scrollspy {
+  height: 656px;
+}
+.main .product .affix-bottom {
+  position: absolute;
+}
 .main .product .wrapper {
   overflow: hidden;
   color: #c2c2c2;

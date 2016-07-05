@@ -14,4 +14,11 @@ $(document).ready(function() {
         slideMargin:0,
         loop:true
     });
+
+    $('#primary_info').affix({
+        offset: {
+            top: $('#primary_info').offset().top,
+            bottom: ($('#items').outerHeight(true)) + 360
+        }
+    });
 });
