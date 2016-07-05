@@ -590,7 +590,6 @@ class CustomAbstractCategory(MPTTModel):
     link_banner = models.URLField(_('Link banner'), blank=True, null=True, max_length=555)
     description = models.TextField(_('Description'), blank=True)
     image = models.ImageField(_('Image'), upload_to='categories/%Y/%m/%d/', blank=True, null=True, max_length=500)
-
     _slug_separator = '/'
     _full_name_separator = ' > '
 

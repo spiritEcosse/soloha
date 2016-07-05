@@ -1,0 +1,100 @@
+{% load i18n %}
+{% load djangular_tags %}
+
+<div class="col-xs-24 col-sm-24 col-md-10 price">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            {% trans 'Vendor code' %}: {{ product.id }}
+            <div class="pull-right">Под заказ</div>
+        </div>
+        <div class="panel-body">
+            {% with class_price="number" %}
+                {% if price %}
+                    <div class="text-center wrapper-number" >
+                        {% trans "Price" %}:
+
+                        {% angularjs ng %}
+                            <span {% if ng %}
+                                ng-init="price='{{ price }}'; price_start='{{ price }}'" ng-class="'{{ class_price }}'" ng-cloak=""
+                            {% else %}
+                                class="{{ class_price }}"
+                            {% endif %}>
+                                                    {{ price }}
+                                                </span>
+                            <span {% if ng %}ng-bind="'{{ currency }}'"{% endif %}>
+                                                    {% if not ng %}{{ currency }}{% endif %}
+                                                </span>
+                        {% endangularjs %}
+                    </div>
+                    <div class="row">
+                        <div class="wrapper-btn-primary col-xs-12">
+                            <button type="button" class="btn btn-block btn-md btn-success">{% trans 'Buy' %}</button>
+                        </div>
+                        <div class="wrapper-btn-faster col-xs-12">
+                            <button type="button" data-toggle="modal" data-target="#quick_order" class="btn btn-block btn-md btn-default">{% trans 'Quick order' %}</button>
+                            <div class="modal fade" id="quick_order" tabindex="-1" role="dialog" aria-labelledby="quick order">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                            <h4 class="modal-title" id="myModalLabel">{% trans 'Quick order' %}</h4>
+                                        </div>
+                                        <div class="modal-body text-left">
+                                            <form name="{{ form.form_name }}" method="post" ng-hide="send_form" novalidate>
+                                                {% csrf_token %}
+                                                {{ form.as_div }}
+                                                <button type="button" ng-disabled="{{ form.form_name }}.$invalid" ng-click="quick_order()" class="btn btn-primary">{% trans 'Submit' %}</button>
+                                            </form>
+
+                                            {% verbatim %}
+                                            <div class="alert alert-{{ alert_mode }}" role="alert" ng-show="send_form">
+                                                {% endverbatim %}
+                                                <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                                                <span class="sr-only">{% trans 'The form is submitted successfully' %}:</span>
+                                                {{ answer }}
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="wrapper-number">
+                                            <span {% if ng %}
+                                                ng-class="'{{ class_price }}'" ng-cloak=""
+                                            {% else %}
+                                                class="{{ class_price }}"
+                                            {% endif %}>
+                                                {{ product_not_availability }}
+                                            </span>
+                    </div>
+                {% endif %}
+            {% endwith %}
+        </div>
+        <div class="panel-footer">
+            <div class="row text-center">
+                <div class="col-xs-8">
+                    <div class="icon icon-car">
+                        <span class="glyphicon glyphicon-info-sign btn-xs"></span>
+                    </div>
+                </div>
+                <div class="col-xs-8">
+                    <div class="icon icon-pay">
+                        <span class="glyphicon glyphicon-info-sign btn-xs"></span>
+                    </div>
+                </div>
+                <div class="col-xs-8">
+                    <div class="icon icon-manager">
+                        <span class="glyphicon glyphicon-info-sign btn-xs"></span>
+                    </div>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+

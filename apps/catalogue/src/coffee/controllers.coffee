@@ -55,7 +55,8 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
     $scope.product.query_attr = []
     $scope.send_form = false
     $scope.alert_mode = 'success'
-
+    $scope.prod_images = []
+    
     $scope.change_price = (option_id) ->
         if Object.keys($scope.options_children).length != 0 # && Object.keys($scope.options_children[$scope.option_id]).length != 0
             $scope.option_id = Object.keys($scope.options_children[$scope.option_id]).filter((key) ->
@@ -174,6 +175,12 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
     $scope.click_dropdown = (attr_id) ->
 #Todo bug with focus. If click on button three times, open dropdown without focus on us input.
         $scope.isOpen[attr_id] = if $scope.isOpen[attr_id] is false then true else false
+
+    $scope.attr_prod_images = (product_pk, attr_first) ->
+        $http.post('/catalogue/attr/' + attr_first + '/prod/images/' + product_pk).success (data) ->
+            $scope.prod_images[attr_first] = data.products
+        .error ->
+            console.error('An error occurred during submission')
 
     set_price = () ->
         selected_attributes = []

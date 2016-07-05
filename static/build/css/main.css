@@ -8662,6 +8662,9 @@ header .bottom .navbar .nav > li .yamm-content .image .btn-menu {
   background: url("../../image/more_products.png") left center no-repeat;
   background-size: 34px 36px;
 }
+.main .product .common .options .more_options .image {
+  margin-bottom: 20px;
+}
 .main .product .common .options .more_options a {
   line-height: 12px;
   font-size: 12px;

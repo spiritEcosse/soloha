@@ -47,6 +47,7 @@ from django.core.mail import EmailMultiAlternatives
 from django.contrib.sites.shortcuts import get_current_site
 from django.template import loader, Context
 from django.core.mail import send_mail
+from easy_thumbnails.files import get_thumbnailer
 
 logger = logging.getLogger(__name__)
 
@@ -566,4 +567,33 @@ class ProductCalculatePrice(views.JSONRequestResponseMixin, views.AjaxResponseMi
             error = 'Price not available for non-standard'
             logger.error(error)
             raise Exception(error)
+        return context
+
+
+class AttrProdImages(views.JSONRequestResponseMixin, views.AjaxResponseMixin, SingleObjectMixin, View):
+    model = Product
+
+    def post(self, *args, **kwargs):
+        self.object = self.get_object()
+
+    def post_ajax(self, request, *args, **kwargs):
+        super(AttrProdImages, self).post_ajax(request, *args, **kwargs)
+        return self.render_json_response(self.get_context_data_json())
+
+    def get_context_data_json(self):
+        context = {}
+        options = {'size': (120, 120), 'crop': True}
+        products = ProductFeature.objects.get(product=self.object, feature=self.kwargs['attr_pk']).product_with_images.all()
+        context['products'] = []
+
+        for product in products:
+            images = []
+
+            for image in product.images.all():
+                images.append({
+                    'image': get_thumbnailer(image.original).get_thumbnail(options).url,
+                    'caption': image.caption
+                })
+            context['products'].append({'title': product.get_title(), 'images': images})
+
         return context

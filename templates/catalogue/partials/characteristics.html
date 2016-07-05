@@ -1,0 +1,40 @@
+{% load reviews_tags %}
+{% load display_tags %}
+{% load i18n %}
+{% load djangular_tags %}
+
+<div class="panel panel-default characteristics" id="characteristics">
+    <div class="panel-heading text-center">
+        Характеристики:
+    </div>
+    <div class="panel-body">
+        <div class="row option">
+            <div class="col-xs-12">
+                Артикул:
+            </div>
+            <div class="col-xs-12 values">
+                {{ product.id }}
+            </div>
+        </div>
+        {% for av in product.attribute_values.all %}
+            <div class="row option">
+                <div class="col-xs-12">
+                    {{ av.attribute.name }}
+                </div>
+                <div class="col-xs-12 values">
+                    {{ av.value_as_html }}
+                </div>
+            </div>
+        {% endfor %}
+        {% iffeature "reviews" %}
+            <div class="row option">
+                <div class="col-xs-12">
+                    {% trans "Number of reviews" %}
+                </div>
+                <div class="col-xs-12 values">
+                    {{ product.num_approved_reviews }}
+                </div>
+            </div>
+        {% endiffeature %}
+    </div>
+</div>
