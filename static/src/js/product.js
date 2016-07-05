@@ -15,10 +15,14 @@ $(document).ready(function() {
         loop:true
     });
 
+    $( "#primary_info a" ).click(function(){
+        $('html, body').animate({scrollTop: $(this.hash).offset().top}, 400);
+    });
+
     $('#primary_info').affix({
         offset: {
             top: $('#primary_info').offset().top,
-            bottom: ($('#items').outerHeight(true)) + 360
+            bottom: ($('#items').outerHeight(true)) + 400
         }
     });
 });

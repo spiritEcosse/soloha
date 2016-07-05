@@ -8419,12 +8419,8 @@ header .bottom .navbar .nav > li .yamm-content .image .btn-menu {
     width: 334px;
   }
 }
-@media (min-width: 1200px) {
-  .main .product .liner {
-    width: 390px;
-  }
-}
 .main .product .liner {
+  width: 100%;
   top: 10px;
   margin-bottom: 15px;
 }

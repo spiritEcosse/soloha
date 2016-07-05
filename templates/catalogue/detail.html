@@ -92,9 +92,6 @@
                             <a class="love" href="#">
                                 Отложить
                             </a>
-                            {#                        {% iffeature "wishlists" %}#}
-                            {#                            {% include "catalogue/partials/add_to_wishlist.html" %}#}
-                            {#                        {% endiffeature %}#}
                             <a class="compare" href="#">Сравнить</a>
                         </div>
                     </div>
@@ -102,9 +99,14 @@
                         <div class="col-xs-22">
                             <ul class="nav nav-tabs nav-stacked">
                                 <li class="active"><a data-toggle="tab" href="#info">Общая информация</a></li>
-                                <li><a data-toggle="tab" href="#options">Выбрать дополнительные опции</a></li>
+                                {% if object.options.exists %}
+                                    <li><a data-toggle="tab" href="#options">Выбрать дополнительные опции</a></li>
+                                {% endif %}
                                 <li><a data-toggle="tab" href="#characteristics">Характеристики</a></li>
-                                <li><a data-toggle="tab" href="#description">Описание</a></li>
+
+                                {% if product.description %}
+                                    <li><a data-toggle="tab" href="#description">Описание</a></li>
+                                {% endif %}
                                 <li><a data-toggle="tab" href="#reviews">Отзывы</a></li>
                                 <li><a data-toggle="tab" href="#delivery">Доставка и оплата</a></li>
                             </ul>
