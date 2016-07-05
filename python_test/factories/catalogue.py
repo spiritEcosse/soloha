@@ -185,12 +185,15 @@ class Test(object):
 
     def create_dynamic_attributes(self, product):
         self.create_feature()
-        feature_11 = Feature.objects.get(title='1100')
-        feature_21 = Feature.objects.get(title='2100')
-        feature_22 = Feature.objects.get(title='2200')
-        feature_31 = Feature.objects.get(title='3100')
-        feature_32 = Feature.objects.get(title='3200')
-        feature_33 = Feature.objects.get(title='3300')
+        feature_1 = Feature.objects.get(title='Feature 1')
+        feature_2 = Feature.objects.get(title='Feature 2')
+        feature_3 = Feature.objects.get(title='Feature 3')
+        feature_11 = Feature.objects.get(title='1100', parent=feature_1)
+        feature_21 = Feature.objects.get(title='2100', parent=feature_2)
+        feature_22 = Feature.objects.get(title='2200', parent=feature_2)
+        feature_31 = Feature.objects.get(title='3100', parent=feature_3)
+        feature_32 = Feature.objects.get(title='3200', parent=feature_3)
+        feature_33 = Feature.objects.get(title='3300', parent=feature_3)
         feature_41 = Feature.objects.get(title='Feature 41')
 
         price_retail = D(2000)

@@ -98,9 +98,16 @@ def local_act():
         local("git push bit")
         local("git push origin")
 
-# sudo apt-get install libjpeg-dev
-# sudo apt-get install libmysqlclient-dev
-# sudo apt-get install python-psycopg2
-# sudo apt-get install libpq-dev python-dev
-# apt-get install libjpeg-dev libfreetype6-dev zlib1g-dev libpng12-dev
-# ln -s /usr/bin/nodejs /usr/bin/node
+        # sudo apt-get install libjpeg-dev
+        # sudo apt-get install libmysqlclient-dev
+        # sudo apt-get install python-psycopg2
+        # sudo apt-get install libpq-dev python-dev
+
+        # install libjpeg-dev with apt
+        # sudo apt - get install libjpeg
+
+        # reinstall pillow
+        # pip install - -no - cache - dir - I pillow
+
+        # apt-get install libjpeg-dev libfreetype6-dev zlib1g-dev libpng12-dev
+        # ln -s /usr/bin/nodejs /usr/bin/node
