@@ -21,7 +21,7 @@ $(document).ready(function() {
 
     $('#primary_info').affix({
         offset: {
-            top: $('#primary_info').offset().top,
+            top: $('#primary_info').offset().top - 20,
             bottom: ($('#items').outerHeight(true)) + 400
         }
     });

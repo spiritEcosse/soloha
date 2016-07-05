@@ -118,129 +118,129 @@
                 <div class="row common" >
                     {% include "catalogue/partials/price.html" %}
                     {% include "catalogue/partials/attributes.html" %}
+                </div>
 
-                    {% if options %}
-                        <div class="col-xs-24 tab-content-info">
-                            <div class="panel panel-default info" id="options">
-                                <div class="panel-heading text-center">
-                                    Выбрать дополнительные опции:
-                                </div>
-                                <div class="panel-body">
-                                    <div class="col-xs-24">
-                                        <div class="row option form-inline"></div>
-                                    </div>
-                                </div>
+                {% if options %}
+                    <div class="col-xs-24 tab-content-info">
+                        <div class="panel panel-default info" id="options">
+                            <div class="panel-heading text-center">
+                                Выбрать дополнительные опции:
                             </div>
-                        </div>
-                    {% endif %}
-
-                    {% include "catalogue/partials/characteristics.html" %}
-                    {% block product_description %}
-                        {% if product.description %}
-                            <div class="panel panel-default" id="description">
-                                <div class="panel-heading text-center">{% trans "Product Description" %}</div>
-                                <div class="panel-body">
-                                    <p>{{ product.description|safe }}</p>
-                                </div>
-                            </div>
-                        {% endif %}
-                    {% endblock %}
-
-                    <div class="panel panel-default reviews" id="reviews">
-                        <div class="panel-heading text-center">Отзывы:</div>
-                        <div class="panel-body">
-                            <div class="write">
-                                <span class="glyphicon glyphicon-pencil"></span>
-                                Написать отзыв о товаре
-                            </div>
-                            <div class="row list">
-                                {% iffeature "reviews" %}
-                                    {% block product_review %}
-                                        <section>
-                                            <div id="reviews" class="sub-header">
-                                                {% if product.num_approved_reviews > 3 %}
-                                                    <a href="{% url 'catalogue:reviews-list' product_slug=product.slug product_pk=product.id %}" class="btn pull-right">{% trans "See all reviews" %}</a>
-                                                {% endif %}
-                                                <h2>{% trans "Customer Reviews" %}</h2>
-                                            </div>
-
-                                            {% if product.num_approved_reviews == 0 %}
-                                                <p>
-                                                    {% if product|is_review_permitted:user %}
-                                                        {% url 'catalogue:reviews-add' product_slug=product.slug product_pk=product.id as add_review_url %}
-                                                        {% blocktrans %}This product does not have any reviews yet -
-                                                            <a href="{{ add_review_url }}#addreview">be the first to write one</a>.
-                                                        {% endblocktrans %}
-                                                    {% else %}
-                                                        {% trans "This product does not have any reviews yet" %}.
-                                                    {% endif %}
-                                                </p>
-                                            {% else %}
-                                                <ol class="list-unstyled review-list">
-                                                    {% for review in reviews|slice:":3" %}
-                                                        <li>
-                                                            {% include 'catalogue/partials/review.html' %}
-                                                        </li>
-                                                    {% endfor %}
-                                                </ol>
-                                            {% endif %}
-                                        </section>
-                                    {% endblock product_review %}
-                                {% endiffeature %}
-
-                                <div class="col-xs-24 head">
-                                    <div class="name pull-left">Валерий</div>
-                                    <p class="star-rating Four pull-left">
-                                        <span class="glyphicon glyphicon-star"></span>
-                                        <span class="glyphicon glyphicon-star"></span>
-                                        <span class="glyphicon glyphicon-star"></span>
-                                        <span class="glyphicon glyphicon-star"></span>
-                                    </p>
-                                    <div class="date pull-left">
-                                        <time>04.01.2016</time>
-                                    </div>
-                                    <div class="clearfix"></div>
-                                    <div class="full-text">
-                                        <span class="text">Комментарий:</span>
-                                        <p>
-                                            Очень довольны покупкой и работой компании. В ходе приёма заявки уделили
-                                            должное внимание все рассказали, показали. Сроки по изготовлению выдерживают.
-                                        </p>
-                                        <a href="#" class="answer pull-right">Ответить</a>
-                                    </div>
-                                </div>
-                                <div class="col-xs-24 head">
-                                    <div class="name pull-left">Валерий</div>
-                                    <p class="star-rating Four pull-left">
-                                        <span class="glyphicon glyphicon-star"></span>
-                                        <span class="glyphicon glyphicon-star"></span>
-                                        <span class="glyphicon glyphicon-star"></span>
-                                        <span class="glyphicon glyphicon-star"></span>
-                                    </p>
-                                    <div class="date pull-left">
-                                        <time>04.01.2016</time>
-                                    </div>
-                                    <div class="clearfix"></div>
-                                    <div class="full-text">
-                                        <span class="text">Комментарий:</span>
-                                        <p>
-                                            Очень довольны покупкой и работой компании. В ходе приёма заявки уделили
-                                            должное внимание все рассказали, показали. Сроки по изготовлению выдерживают.
-                                        </p>
-                                        <a href="#" class="answer pull-right">Ответить</a>
-                                    </div>
-                                </div>
+                            <div class="panel-body">
                                 <div class="col-xs-24">
-                                    <a class="pull-right more" href="#">Посмотреть все отзывы >> </a>
+                                    <div class="row option form-inline"></div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="panel panel-default reviews" id="delivery">
-                        <div class="panel-heading text-center">Доставка и оплата:</div>
-                        <div class="panel-body">
-                            Часть информации и ссылка на страницу с полной информацией
+                {% endif %}
+
+                {% include "catalogue/partials/characteristics.html" %}
+                {% block product_description %}
+                    {% if product.description %}
+                        <div class="panel panel-default" id="description">
+                            <div class="panel-heading text-center">{% trans "Product Description" %}</div>
+                            <div class="panel-body">
+                                <p>{{ product.description|safe }}</p>
+                            </div>
                         </div>
+                    {% endif %}
+                {% endblock %}
+
+                <div class="panel panel-default reviews" id="reviews">
+                    <div class="panel-heading text-center">Отзывы:</div>
+                    <div class="panel-body">
+                        <div class="write">
+                            <span class="glyphicon glyphicon-pencil"></span>
+                            Написать отзыв о товаре
+                        </div>
+                        <div class="row list">
+                            {% iffeature "reviews" %}
+                                {% block product_review %}
+                                    <section>
+                                        <div id="reviews" class="sub-header">
+                                            {% if product.num_approved_reviews > 3 %}
+                                                <a href="{% url 'catalogue:reviews-list' product_slug=product.slug product_pk=product.id %}" class="btn pull-right">{% trans "See all reviews" %}</a>
+                                            {% endif %}
+                                            <h2>{% trans "Customer Reviews" %}</h2>
+                                        </div>
+
+                                        {% if product.num_approved_reviews == 0 %}
+                                            <p>
+                                                {% if product|is_review_permitted:user %}
+                                                    {% url 'catalogue:reviews-add' product_slug=product.slug product_pk=product.id as add_review_url %}
+                                                    {% blocktrans %}This product does not have any reviews yet -
+                                                        <a href="{{ add_review_url }}#addreview">be the first to write one</a>.
+                                                    {% endblocktrans %}
+                                                {% else %}
+                                                    {% trans "This product does not have any reviews yet" %}.
+                                                {% endif %}
+                                            </p>
+                                        {% else %}
+                                            <ol class="list-unstyled review-list">
+                                                {% for review in reviews|slice:":3" %}
+                                                    <li>
+                                                        {% include 'catalogue/partials/review.html' %}
+                                                    </li>
+                                                {% endfor %}
+                                            </ol>
+                                        {% endif %}
+                                    </section>
+                                {% endblock product_review %}
+                            {% endiffeature %}
+
+                            <div class="col-xs-24 head">
+                                <div class="name pull-left">Валерий</div>
+                                <p class="star-rating Four pull-left">
+                                    <span class="glyphicon glyphicon-star"></span>
+                                    <span class="glyphicon glyphicon-star"></span>
+                                    <span class="glyphicon glyphicon-star"></span>
+                                    <span class="glyphicon glyphicon-star"></span>
+                                </p>
+                                <div class="date pull-left">
+                                    <time>04.01.2016</time>
+                                </div>
+                                <div class="clearfix"></div>
+                                <div class="full-text">
+                                    <span class="text">Комментарий:</span>
+                                    <p>
+                                        Очень довольны покупкой и работой компании. В ходе приёма заявки уделили
+                                        должное внимание все рассказали, показали. Сроки по изготовлению выдерживают.
+                                    </p>
+                                    <a href="#" class="answer pull-right">Ответить</a>
+                                </div>
+                            </div>
+                            <div class="col-xs-24 head">
+                                <div class="name pull-left">Валерий</div>
+                                <p class="star-rating Four pull-left">
+                                    <span class="glyphicon glyphicon-star"></span>
+                                    <span class="glyphicon glyphicon-star"></span>
+                                    <span class="glyphicon glyphicon-star"></span>
+                                    <span class="glyphicon glyphicon-star"></span>
+                                </p>
+                                <div class="date pull-left">
+                                    <time>04.01.2016</time>
+                                </div>
+                                <div class="clearfix"></div>
+                                <div class="full-text">
+                                    <span class="text">Комментарий:</span>
+                                    <p>
+                                        Очень довольны покупкой и работой компании. В ходе приёма заявки уделили
+                                        должное внимание все рассказали, показали. Сроки по изготовлению выдерживают.
+                                    </p>
+                                    <a href="#" class="answer pull-right">Ответить</a>
+                                </div>
+                            </div>
+                            <div class="col-xs-24">
+                                <a class="pull-right more" href="#">Посмотреть все отзывы >> </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel panel-default reviews" id="delivery">
+                    <div class="panel-heading text-center">Доставка и оплата:</div>
+                    <div class="panel-body">
+                        Часть информации и ссылка на страницу с полной информацией
                     </div>
                 </div>
             </div>
