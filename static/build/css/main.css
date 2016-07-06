@@ -8655,21 +8655,10 @@ header .bottom .navbar .nav > li .yamm-content .image .btn-menu {
 }
 .main .product .common .options .radio-btn label {
   cursor: pointer;
+  margin-bottom: 0;
 }
-.main .product .common .options .more_options {
-  min-height: 36px;
-  padding-left: 35px;
-  background: url("../../image/more_products.png") left center no-repeat;
-  background-size: 34px 36px;
-}
-.main .product .common .options .more_options .image {
-  margin-bottom: 20px;
-}
-.main .product .common .options .more_options a {
-  line-height: 12px;
-  font-size: 12px;
-  font-weight: 400;
-  color: #6f6f6f;
+.main .product .common .options .more-image {
+  margin-top: 10px;
 }
 .main .product .common .panel {
   margin-bottom: 5px;

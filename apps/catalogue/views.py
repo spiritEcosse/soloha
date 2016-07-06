@@ -583,7 +583,7 @@ class AttrProdImages(views.JSONRequestResponseMixin, views.AjaxResponseMixin, Si
     def get_context_data_json(self):
         context = {}
         options = {'size': (120, 120), 'crop': True}
-        products = ProductFeature.objects.get(product=self.object, feature=self.kwargs['attr_pk']).product_with_images.all()
+        products = ProductFeature.objects.get(product=self.object, feature=self.kwargs['attr_pk']).product_with_images.all()[:2]
         context['products'] = []
 
         for product in products:
@@ -591,9 +591,9 @@ class AttrProdImages(views.JSONRequestResponseMixin, views.AjaxResponseMixin, Si
 
             for image in product.images.all():
                 images.append({
-                    'image': get_thumbnailer(image.original).get_thumbnail(options).url,
-                    'caption': image.caption
+                    'url': get_thumbnailer(image.original).get_thumbnail(options).url,
+                    'caption': image.caption or product.get_title()
                 })
-            context['products'].append({'title': product.get_title(), 'images': images})
+            context['products'].append({'title': product.get_title(), 'pk': product.pk, 'images': images})
 
         return context

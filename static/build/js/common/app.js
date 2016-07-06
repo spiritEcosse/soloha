@@ -285,9 +285,9 @@
       $scope.click_dropdown = function(attr_id) {
         return $scope.isOpen[attr_id] = $scope.isOpen[attr_id] === false ? true : false;
       };
-      $scope.attr_prod_images = function(product_pk, attr_first) {
-        return $http.post('/catalogue/attr/' + attr_first + '/prod/images/' + product_pk).success(function(data) {
-          return $scope.prod_images[attr_first] = data.products;
+      $scope.attr_prod_images = function(product_pk, attr) {
+        return $http.post('/catalogue/attr/' + attr.pk + '/prod/images/' + product_pk).success(function(data) {
+          return $scope.prod_images[attr.pk] = data.products;
         }).error(function() {
           return console.error('An error occurred during submission');
         });

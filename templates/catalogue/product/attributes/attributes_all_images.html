@@ -1,0 +1,84 @@
+{% load i18n %}
+{% load thumbnail %}
+{% load djangular_tags %}
+
+{% angularjs ng %}
+    {% if attr_first in product_version_attributes.attributes.all and attr_first.features_by_product %}
+        {% with attr_first.features_by_product|first as feature_product %}
+            <div class="row option more-image">
+                <div class="col-xs-14 btn-radio-group">
+                    {% for product in feature_product.product_with_images.all|slice:':5' %}
+                        <div class="radio-btn pull-left">
+                            <label>
+                                <div class="image">
+                                    {% thumbnail product.primary_image 30x30 crop as thumb %}
+                                    <img src="{{ thumb.url }}" alt="{{ product.title }}" title="{{ product.title }}">
+                                </div>
+                                <input name="optionsRadios" value="option1" checked="" type="radio">
+                            </label>
+                        </div>
+                    {% endfor %}
+                </div>
+                <div class="col-xs-10">
+                    <button class="btn btn-default btn-block" role="button"
+                            {% if ng %}
+                            ng-click="attr_prod_images('{{ product.pk }}', product.attributes['{{ attribute.pk }}'])"
+                            {% endif %}
+                            data-toggle="modal" data-target="#attribute-{{ attribute.pk }}">
+                        {% trans 'View all fabrics' %}
+                    </button>
+                    {% if ng %}
+                        <div class="modal fade" id="attribute-{{ attribute.pk }}" tabindex="-1" role="dialog"
+                             aria-labelledby="image of {{ attr_first.title }}">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <button type="button" class="close" data-dismiss="modal" title="{% trans 'Close' %}"
+                                                aria-label="{% trans 'Close' %}">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                        <h4 class="modal-title">{% trans 'All fabrics' %}</h4>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+                                            <div class="panel panel-default"
+                                                 ng-repeat="product in prod_images[product.attributes['{{ attribute.pk }}'].pk]">
+                                                <div class="panel-heading" role="tab" >
+                                                    <div class="panel-title">
+                                                        <a role="button" ng-bind="product.title"
+                                                           data-toggle="collapse" data-parent="#accordion"
+                                                           href="#product-{{ product.pk }}" aria-expanded="true"
+                                                           aria-controls="product-{{ product.pk }}">
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                                <div id="product-{{ product.pk }}"
+                                                     class="panel-collapse collapse in" role="tabpanel"
+                                                     aria-labelledby="heading-{{ product.pk }}">
+                                                    <div class="panel-body">
+                                                        <div class="row">
+                                                            <div class="col-xs-6 image" ng-repeat="image in product.images">
+                                                                <img ng-src="{{ image.url }}" src="{{ image.url }}" alt="{{ image.caption }}"
+                                                                     title="{{ image.caption }}">
+                                                                <span class="text-center" ng-bind="image.caption"></span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-default" data-dismiss="modal">
+                                                {% trans 'Close' %}
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        {% endwith %}
+    {% endif %}
+{% endangularjs %}
