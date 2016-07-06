@@ -7,8 +7,12 @@ $(document).ready(function() {
         event.stopPropagation();
     });
 
+    $('.dropdown-menu li a').click(function (e) {
+        e.stopPropagation();
+    });
+
     $('#categories a[role="tab"]').click(function (e) {
         e.preventDefault();
         $(this).tab('show')
-    })
+    });
 });

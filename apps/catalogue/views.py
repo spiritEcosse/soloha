@@ -48,6 +48,7 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.template import loader, Context
 from django.core.mail import send_mail
 from easy_thumbnails.files import get_thumbnailer
+from django.core.exceptions import ObjectDoesNotExist
 
 logger = logging.getLogger(__name__)
 
@@ -582,18 +583,35 @@ class AttrProdImages(views.JSONRequestResponseMixin, views.AjaxResponseMixin, Si
 
     def get_context_data_json(self):
         context = {}
-        options = {'size': (120, 120), 'crop': True}
-        products = ProductFeature.objects.get(product=self.object, feature=self.kwargs['attr_pk']).product_with_images.all()[:2]
+        options = {'size': (400, 400), 'crop': True}
+        options_thumb = {'size': (110, 110), 'crop': True}
+        options_small_thumb = {'size': (30, 30), 'crop': True}
         context['products'] = []
+        context['product_primary_images'] = []
 
-        for product in products:
-            images = []
+        try:
+            product_feature = ProductFeature.objects.get(product=self.object, feature=self.kwargs['attr_pk'])
+        except ObjectDoesNotExist:
+            pass
+        else:
+            products = product_feature.product_with_images.all()
 
-            for image in product.images.all():
-                images.append({
-                    'url': get_thumbnailer(image.original).get_thumbnail(options).url,
-                    'caption': image.caption or product.get_title()
+            for product in products[:2]:
+                images = []
+
+                for image in product.images.all():
+                    images.append({
+                        'url': get_thumbnailer(image.original).get_thumbnail(options).url,
+                        'thumb_url': get_thumbnailer(image.original).get_thumbnail(options_thumb).url,
+                        'caption': image.caption or product.get_title(),
+                    })
+                context['products'].append({'title': product.get_title(), 'pk': product.pk, 'images': images})
+
+            for product in products[:5]:
+                context['product_primary_images'].append({
+                    'title': product.get_title(),
+                    'pk': product.pk,
+                    'thumb_url': get_thumbnailer(product.primary_image()).get_thumbnail(options_small_thumb).url
                 })
-            context['products'].append({'title': product.get_title(), 'pk': product.pk, 'images': images})
-
-        return context
+        finally:
+            return context

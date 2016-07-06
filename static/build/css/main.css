@@ -8660,6 +8660,9 @@ header .bottom .navbar .nav > li .yamm-content .image .btn-menu {
 .main .product .common .options .more-image {
   margin-top: 10px;
 }
+.main .product .common .list_attr > .panel > .panel-heading {
+  padding: 3px;
+}
 .main .product .common .panel {
   margin-bottom: 5px;
 }
@@ -8670,9 +8673,6 @@ header .bottom .navbar .nav > li .yamm-content .image .btn-menu {
 .main .product .common .panel .alert {
   margin-bottom: 0;
   padding: 5px;
-}
-.main .product .common .panel .panel-heading {
-  padding: 3px 3px;
 }
 .main .product .common .panel .panel-heading .option {
   position: relative;

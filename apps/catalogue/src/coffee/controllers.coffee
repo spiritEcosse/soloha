@@ -56,7 +56,9 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
     $scope.send_form = false
     $scope.alert_mode = 'success'
     $scope.prod_images = []
-
+    $scope.product_primary_images = []
+    $scope.selected_image = []
+    
     $scope.change_price = (option_id) ->
         if Object.keys($scope.options_children).length != 0 # && Object.keys($scope.options_children[$scope.option_id]).length != 0
             $scope.option_id = Object.keys($scope.options_children[$scope.option_id]).filter((key) ->
@@ -176,11 +178,15 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
 #Todo bug with focus. If click on button three times, open dropdown without focus on us input.
         $scope.isOpen[attr_id] = if $scope.isOpen[attr_id] is false then true else false
 
-    $scope.attr_prod_images = (product_pk, attr) ->
-        $http.post('/catalogue/attr/' + attr.pk + '/prod/images/' + product_pk).success (data) ->
-            $scope.prod_images[attr.pk] = data.products
+    get_prod_images = (value) ->
+        $http.post('/catalogue/attr/' + value.pk + '/prod/images/' + clone_data.product.pk).success (data) ->
+            $scope.prod_images[value.pk] = data.products
+            $scope.product_primary_images[value.pk] = data.product_primary_images
         .error ->
             console.error('An error occurred during submission')
+
+    $scope.attr_prod_images = (value) ->
+        get_prod_images(value)
 
     set_price = () ->
         selected_attributes = []
@@ -198,6 +204,7 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
 
     $scope.update_price = (value, attr_pk) ->
         $scope.product.attributes[attr_pk] = value
+        get_prod_images(value)
 
         angular.forEach clone_data.variant_attributes[value.pk], (attr) ->
             $scope.product.values[attr.pk] = attr.values
@@ -232,6 +239,9 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
                     $scope.send_form = true
             ).error ->
                 console.error 'An error occured during submission'
+
+    $scope.add_to_basket = () ->
+        console.log($scope.selected_image)
 ]
 
 app.controller 'More_goods', ['$http', '$scope', '$window', '$document', '$location', '$compile', '$routeParams', ($http, $scope, $window, $document, $location, $compile, $routeParams) ->

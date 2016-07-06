@@ -30,7 +30,7 @@
                     </div>
                     <div class="row">
                         <div class="wrapper-btn-primary col-xs-12">
-                            <button type="button" class="btn btn-block btn-md btn-success">{% trans 'Buy' %}</button>
+                            <button type="button" ng-click="add_to_basket()" class="btn btn-block btn-md btn-success">{% trans 'Buy' %}</button>
                         </div>
                         <div class="wrapper-btn-faster col-xs-12">
                             <button type="button" data-toggle="modal" data-target="#quick_order" class="btn btn-block btn-md btn-default">{% trans 'Quick order' %}</button>
@@ -66,13 +66,13 @@
                     </div>
                 {% else %}
                     <div class="wrapper-number">
-                                            <span {% if ng %}
-                                                ng-class="'{{ class_price }}'" ng-cloak=""
-                                            {% else %}
-                                                class="{{ class_price }}"
-                                            {% endif %}>
-                                                {{ product_not_availability }}
-                                            </span>
+                        <span {% if ng %}
+                            ng-class="'{{ class_price }}'" ng-cloak=""
+                        {% else %}
+                            class="{{ class_price }}"
+                        {% endif %}>
+                            {{ product_not_availability }}
+                        </span>
                     </div>
                 {% endif %}
             {% endwith %}
