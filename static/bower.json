@@ -28,7 +28,9 @@
     "yamm": "https://github.com/geedmo/yamm.git",
     "lightslider": "~1.1.5",
     "seiyria-bootstrap-slider": "~6.0.6",
-    "angular-md5": "~0.1.10"
+    "angular-md5": "~0.1.10",
+    "blueimp-bootstrap-image-gallery": "^3.4.2",
+    "blueimp-gallery": "^2.21.3"
   },
   "devDependencies": {
     "angular-route": "^1.5.3",

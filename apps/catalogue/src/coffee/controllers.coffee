@@ -240,8 +240,10 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
             ).error ->
                 console.error 'An error occured during submission'
 
-    $scope.add_to_basket = () ->
-        console.log($scope.selected_image)
+#    $scope.add_to_basket = () ->
+#        angular.forEach $scope.selected_image, (key, product) ->
+#            console.log(product)
+#            console.log(key)
 ]
 
 app.controller 'More_goods', ['$http', '$scope', '$window', '$document', '$location', '$compile', '$routeParams', ($http, $scope, $window, $document, $location, $compile, $routeParams) ->

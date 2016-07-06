@@ -4,86 +4,32 @@
 
 {% angularjs ng %}
     {% if ng and attr_first in product_version_attributes.attributes.all and attr_first.features_by_product %}
-    {% with attr_first.features_by_product|first as feature_product %}
-    <div class="row option more-image" ng-cloak="" ng-if="prod_images[product.attributes['{{ attribute.pk }}'].pk].length">
-        <div class="col-xs-14 btn-radio-group">
-            <div class="radio-btn pull-left"
-                 ng-repeat="product in product_primary_images[product.attributes['{{ attribute.pk }}'].pk]">
-                <label ng-if="product.thumb_url">
-                    <div class="image">
-                        {% verbatim %}
-                        <img ng-src="{{ product.thumb_url }}" alt="{{ product.title }}"
-                             title="{{ product.title }}">
-                        {% endverbatim %}
-                    </div>
-
-
-                    <input ng-model="selected_image[product.attributes['{{ attribute.pk }}'].pk].product"
-                            {% verbatim %} value="{{ product.pk }}" {% endverbatim %} type="radio">
-                </label>
-            </div>
-        </div>
-        <div class="col-xs-10">
-            <button class="btn btn-default btn-block" role="button"
-                    ng-click="attr_prod_images(product.attributes['{{ attribute.pk }}'])"
-                    data-toggle="modal" data-target="#attribute-{{ attribute.pk }}">
-                {% trans 'View all fabrics' %}
-            </button>
-            <div class="modal fade" id="attribute-{{ attribute.pk }}" tabindex="-1" role="dialog"
-                 aria-labelledby="image of {{ attr_first.title }}">
-                <div class="modal-dialog" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <button type="button" class="close" data-dismiss="modal" title="{% trans 'Close' %}"
-                                    aria-label="{% trans 'Close' %}">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                            <h4 class="modal-title">{% trans 'All fabrics' %}</h4>
-                        </div>
-                        <div class="modal-body">
-                            <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
-                                <div class="panel panel-default"
-                                     ng-repeat="product in prod_images[product.attributes['{{ attribute.pk }}'].pk]">
-                                    <div class="panel-heading" role="tab" >
-                                        <div class="panel-title">
-
-                                            <a role="button" ng-bind="product.title"
-                                               data-toggle="collapse" data-parent="#accordion"
-                                               {% verbatim %} href="#product-{{ product.pk }}" aria-expanded="true"
-                                               aria-controls="product-{{ product.pk }}" {% endverbatim %}
-                                               title="{% trans 'Click to expand' %}" class="stop-propagation">
-                                            </a>
-                                        </div>
-                                    </div>
-
-                                    <div {% verbatim %} aria-labelledby="heading-{{ product.pk }}"
-                                         id="product-{{ product.pk }}" {% endverbatim %}
-                                         class="panel-collapse collapse in" role="tabpanel">
-                                        <div class="panel-body">
-                                            <div class="row">
-                                                <div class="col-xs-6 image" ng-repeat="image in product.images">
-                                                    <img {% verbatim %} ng-src="{{ image.thumb_url }}" alt="{{ image.caption }}"
-                                                         title="{{ image.caption }}" {% endverbatim %}>
-                                                    <input ng-model="selected_image[product.attributes['{{ attribute.pk }}'].pk].image"
-                                                           {% verbatim %} value="{{ image }}" {% endverbatim %} type="radio">
-                                                    <span class="text-center" ng-bind="image.caption"></span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+        {% with attr_first.features_by_product|first as feature_product %}
+            <div class="row option more-image" ng-cloak="" ng-if="prod_images[product.attributes['{{ attribute.pk }}'].pk].length">
+                <div class="col-xs-14 btn-radio-group">
+                    <div class="radio-btn pull-left"
+                         ng-repeat="product in product_primary_images[product.attributes['{{ attribute.pk }}'].pk]">
+                        <label ng-if="product.thumb_url">
+                            <div class="image">
+                                {% verbatim %}
+                                <img ng-src="{{ product.thumb_url }}" alt="{{ product.title }}"
+                                     title="{{ product.title }}">
+                                {% endverbatim %}
                             </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-default" data-dismiss="modal">
-                                    {% trans 'Close' %}
-                                </button>
-                            </div>
-                        </div>
+                            <input ng-model="selected_image['{{ attribute.pk }}'].product"
+                                   {% verbatim %} value="{{ product }}" {% endverbatim %} type="radio">
+                        </label>
                     </div>
                 </div>
+                <div class="col-xs-10">
+                    <button class="btn btn-default btn-block" role="button"
+                            ng-click="attr_prod_images(product.attributes['{{ attribute.pk }}'])"
+                            data-toggle="modal" data-target="#attribute-{{ attribute.pk }}">
+                        {% trans 'View all fabrics' %}
+                    </button>
+                    {% include 'catalogue/product/attributes/attribute_images_modal.html' %}
+                </div>
             </div>
-        </div>
-    </div>
-    {% endwith %}
+        {% endwith %}
     {% endif %}
 {% endangularjs %}

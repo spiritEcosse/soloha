@@ -344,7 +344,7 @@
           }
         }
       };
-      $scope.quick_order = function() {
+      return $scope.quick_order = function() {
         if ($scope.quick_order_data) {
           return $http.post('/catalogue/quick/order/' + clone_data.product.pk, $scope.quick_order_data).success(function(out_data) {
             if (!djangoForm.setErrors($scope.quick_order_form, out_data.errors)) {
@@ -354,9 +354,6 @@
             return console.error('An error occured during submission');
           });
         }
-      };
-      return $scope.add_to_basket = function() {
-        return console.log($scope.selected_image);
       };
     }
   ]);
