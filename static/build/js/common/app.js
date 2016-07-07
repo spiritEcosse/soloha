@@ -142,8 +142,8 @@
   });
 
   app.controller('Product', [
-    '$http', '$scope', '$window', '$document', '$location', '$compile', '$filter', 'djangoForm', function($http, $scope, $window, $document, $location, $compile, $filter, djangoForm) {
-      var attributes, clone_data, get_prod_images, set_price;
+    '$http', '$scope', '$window', '$document', '$location', '$compile', '$filter', 'djangoForm', '$rootScope', function($http, $scope, $window, $document, $location, $compile, $filter, djangoForm, $rootScope) {
+      var attributes, clone_data, get_prod, set_price;
       $scope.product = [];
       $scope.product.values = [];
       $scope.product.attributes = [];
@@ -160,6 +160,9 @@
       $scope.prod_images = [];
       $scope.product_primary_images = [];
       $scope.selected_image = [];
+      $rootScope.Object = Object;
+      $rootScope.keys = Object.keys;
+      $scope.sent_signal = [];
       $scope.change_price = function(option_id) {
         if (Object.keys($scope.options_children).length !== 0) {
           $scope.option_id = Object.keys($scope.options_children[$scope.option_id]).filter(function(key) {
@@ -287,16 +290,36 @@
       $scope.click_dropdown = function(attr_id) {
         return $scope.isOpen[attr_id] = $scope.isOpen[attr_id] === false ? true : false;
       };
-      get_prod_images = function(value) {
-        return $http.post('/catalogue/attr/' + value.pk + '/prod/images/' + clone_data.product.pk).success(function(data) {
-          $scope.prod_images[value.pk] = data.products;
-          return $scope.product_primary_images[value.pk] = data.product_primary_images;
-        }).error(function() {
-          return console.error('An error occurred during submission');
-        });
+      get_prod = function(value) {
+        if ($scope.prod_images[value.pk] == null) {
+          return $http.post('/catalogue/attr/' + value.pk + '/product/' + clone_data.product.pk + '/').success(function(data) {
+            $scope.prod_images[value.pk] = data.products;
+            return $scope.product_primary_images[value.pk] = data.product_primary_images;
+          }).error(function() {
+            return console.error('An error occurred during submission');
+          });
+        }
       };
-      $scope.attr_prod_images = function(value) {
-        return get_prod_images(value);
+      $scope.attr_prod = function(value) {
+        return get_prod(value);
+      };
+      $scope.attr_prod_images = function(attr_pk, product) {
+        var images, value;
+        value = $scope.product.attributes[attr_pk];
+        images = $scope.prod_images[value.pk][product.pk].images.length;
+        if (!images && images !== null) {
+          $scope.sent_signal[product.pk] = true;
+          return $http.post('/catalogue/attr/product/' + product.pk + '/images/').success(function(data) {
+            $scope.sent_signal[product.pk] = false;
+            images = data.images;
+            if (!data.images.length) {
+              images = null;
+            }
+            return $scope.prod_images[value.pk][product.pk].images = images;
+          }).error(function() {
+            return console.error('An error occurred during submission');
+          });
+        }
       };
       set_price = function() {
         var exist_selected_attr, selected_attributes;
@@ -315,7 +338,7 @@
       $scope.update_price = function(value, attr_pk) {
         var selected_attributes;
         $scope.product.attributes[attr_pk] = value;
-        get_prod_images(value);
+        get_prod(value);
         angular.forEach(clone_data.variant_attributes[value.pk], function(attr) {
           return $scope.product.values[attr.pk] = attr.values;
         });

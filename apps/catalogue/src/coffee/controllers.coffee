@@ -41,7 +41,7 @@ app.directive 'focusMe', ($timeout, $parse) ->
         return
     }
 
-app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location', '$compile', '$filter', 'djangoForm', ($http, $scope, $window, $document, $location, $compile, $filter, djangoForm) ->
+app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location', '$compile', '$filter', 'djangoForm', '$rootScope', ($http, $scope, $window, $document, $location, $compile, $filter, djangoForm, $rootScope) ->
     $scope.product = []
     $scope.product.values = []
     $scope.product.attributes = []
@@ -58,7 +58,10 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
     $scope.prod_images = []
     $scope.product_primary_images = []
     $scope.selected_image = []
-    
+    $rootScope.Object = Object
+    $rootScope.keys = Object.keys
+    $scope.sent_signal = []
+
     $scope.change_price = (option_id) ->
         if Object.keys($scope.options_children).length != 0 # && Object.keys($scope.options_children[$scope.option_id]).length != 0
             $scope.option_id = Object.keys($scope.options_children[$scope.option_id]).filter((key) ->
@@ -178,15 +181,33 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
 #Todo bug with focus. If click on button three times, open dropdown without focus on us input.
         $scope.isOpen[attr_id] = if $scope.isOpen[attr_id] is false then true else false
 
-    get_prod_images = (value) ->
-        $http.post('/catalogue/attr/' + value.pk + '/prod/images/' + clone_data.product.pk).success (data) ->
-            $scope.prod_images[value.pk] = data.products
-            $scope.product_primary_images[value.pk] = data.product_primary_images
-        .error ->
-            console.error('An error occurred during submission')
+    get_prod = (value) ->
+        if not $scope.prod_images[value.pk]?
+            $http.post('/catalogue/attr/' + value.pk + '/product/' + clone_data.product.pk + '/').success (data) ->
+                $scope.prod_images[value.pk] = data.products
+                $scope.product_primary_images[value.pk] = data.product_primary_images
+            .error ->
+                console.error('An error occurred during submission')
 
-    $scope.attr_prod_images = (value) ->
-        get_prod_images(value)
+    $scope.attr_prod = (value) ->
+        get_prod(value)
+
+    $scope.attr_prod_images = (attr_pk, product) ->
+        value = $scope.product.attributes[attr_pk]
+        images = $scope.prod_images[value.pk][product.pk].images.length
+
+        if not images and images != null
+            $scope.sent_signal[product.pk] = true
+
+            $http.post('/catalogue/attr/product/' + product.pk  + '/images/').success (data) ->
+                $scope.sent_signal[product.pk] = false
+                images = data.images
+
+                if not data.images.length
+                    images = null
+                $scope.prod_images[value.pk][product.pk].images = images
+            .error ->
+                console.error('An error occurred during submission')
 
     set_price = () ->
         selected_attributes = []
@@ -204,7 +225,7 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
 
     $scope.update_price = (value, attr_pk) ->
         $scope.product.attributes[attr_pk] = value
-        get_prod_images(value)
+        get_prod(value)
 
         angular.forEach clone_data.variant_attributes[value.pk], (attr) ->
             $scope.product.values[attr.pk] = attr.values

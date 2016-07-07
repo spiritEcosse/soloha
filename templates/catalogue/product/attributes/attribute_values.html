@@ -39,7 +39,7 @@
                     filter: {title: query_attr['{{ attribute.pk }}']}"
                     ng-class="{'selected active': value.pk == product.attributes['{{ attribute.pk }}'].pk}"
                         {% endif %} class="list">
-                    <a href="#" {% if ng %}ng-click="update_price(value, '{{ attribute.pk }}')" {% endif %}>
+                    <a {% if ng %}ng-click="update_price(value, '{{ attribute.pk }}')" {% endif %}>
                         {{ value.title }}
                     </a>
                 </li>

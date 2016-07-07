@@ -17,14 +17,14 @@
                                      title="{{ product.title }}">
                                 {% endverbatim %}
                             </div>
-                            <input ng-model="selected_image['{{ attribute.pk }}'].product"
+                            <input name="attr-{{ attribute.pk }}" ng-model="selected_image['{{ attribute.pk }}'].product"
                                    {% verbatim %} value="{{ product }}" {% endverbatim %} type="radio">
                         </label>
                     </div>
                 </div>
-                <div class="col-xs-10" ng-if="prod_images[product.attributes['{{ attribute.pk }}'].pk].length">
+                <div class="col-xs-10" ng-if="keys(prod_images[product.attributes['{{ attribute.pk }}'].pk]).length">
                     <button class="btn btn-default btn-block" role="button"
-                            ng-click="attr_prod_images(product.attributes['{{ attribute.pk }}'])"
+                            ng-click="attr_prod(product.attributes['{{ attribute.pk }}'])"
                             data-toggle="modal" data-target="#attribute-{{ attribute.pk }}">
                         {% trans 'View all fabrics' %}
                     </button>

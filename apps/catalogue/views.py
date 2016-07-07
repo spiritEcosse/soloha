@@ -571,6 +571,42 @@ class ProductCalculatePrice(views.JSONRequestResponseMixin, views.AjaxResponseMi
         return context
 
 
+class AttrProd(views.JSONRequestResponseMixin, views.AjaxResponseMixin, SingleObjectMixin, View):
+    model = Product
+
+    def post(self, *args, **kwargs):
+        self.object = self.get_object()
+
+    def post_ajax(self, request, *args, **kwargs):
+        super(AttrProd, self).post_ajax(request, *args, **kwargs)
+        return self.render_json_response(self.get_context_data_json())
+
+    def get_context_data_json(self):
+        context = {}
+        options_small_thumb = {'size': (30, 30), 'crop': True}
+        context['products'] = {}
+        context['product_primary_images'] = []
+
+        try:
+            product_feature = ProductFeature.objects.get(product=self.object, feature=self.kwargs['attr_pk'])
+        except ObjectDoesNotExist:
+            pass
+        else:
+            products = product_feature.product_with_images.all()
+
+            for product in products:
+                context['products'][product.pk] = {'title': product.get_title(), 'pk': product.pk, 'images': []}
+
+            for product in products[:5]:
+                context['product_primary_images'].append({
+                    'title': product.get_title(),
+                    'pk': product.pk,
+                    'thumb_url': get_thumbnailer(product.primary_image()).get_thumbnail(options_small_thumb).url
+                })
+        finally:
+            return context
+
+
 class AttrProdImages(views.JSONRequestResponseMixin, views.AjaxResponseMixin, SingleObjectMixin, View):
     model = Product
 
@@ -585,33 +621,13 @@ class AttrProdImages(views.JSONRequestResponseMixin, views.AjaxResponseMixin, Si
         context = {}
         options = {'size': (400, 400), 'crop': True}
         options_thumb = {'size': (110, 110), 'crop': True}
-        options_small_thumb = {'size': (30, 30), 'crop': True}
-        context['products'] = []
-        context['product_primary_images'] = []
+        context['images'] = []
 
-        try:
-            product_feature = ProductFeature.objects.get(product=self.object, feature=self.kwargs['attr_pk'])
-        except ObjectDoesNotExist:
-            pass
-        else:
-            products = product_feature.product_with_images.all()
+        for image in self.object.images.all():
+            context['images'].append({
+                'original_url': get_thumbnailer(image.original).get_thumbnail(options).url,
+                'thumb_url': get_thumbnailer(image.original).get_thumbnail(options_thumb).url,
+                'caption': image.caption or self.object.get_title(),
+            })
 
-            for product in products[:2]:
-                images = []
-
-                for image in product.images.all():
-                    images.append({
-                        'url': get_thumbnailer(image.original).get_thumbnail(options).url,
-                        'thumb_url': get_thumbnailer(image.original).get_thumbnail(options_thumb).url,
-                        'caption': image.caption or product.get_title(),
-                    })
-                context['products'].append({'title': product.get_title(), 'pk': product.pk, 'images': images})
-
-            for product in products[:5]:
-                context['product_primary_images'].append({
-                    'title': product.get_title(),
-                    'pk': product.pk,
-                    'thumb_url': get_thumbnailer(product.primary_image()).get_thumbnail(options_small_thumb).url
-                })
-        finally:
-            return context
+        return context
