@@ -194,9 +194,8 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
 
     $scope.attr_prod_images = (attr_pk, product) ->
         value = $scope.product.attributes[attr_pk]
-        images = $scope.prod_images[value.pk][product.pk].images.length
 
-        if not images and images != null
+        if $scope.prod_images[value.pk][product.pk].images.length != null and not $scope.prod_images[value.pk][product.pk].images.length
             $scope.sent_signal[product.pk] = true
 
             $http.post('/catalogue/attr/product/' + product.pk  + '/images/').success (data) ->

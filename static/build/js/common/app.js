@@ -304,12 +304,12 @@
         return get_prod(value);
       };
       $scope.attr_prod_images = function(attr_pk, product) {
-        var images, value;
+        var value;
         value = $scope.product.attributes[attr_pk];
-        images = $scope.prod_images[value.pk][product.pk].images.length;
-        if (!images && images !== null) {
+        if ($scope.prod_images[value.pk][product.pk].images.length !== null && !$scope.prod_images[value.pk][product.pk].images.length) {
           $scope.sent_signal[product.pk] = true;
           return $http.post('/catalogue/attr/product/' + product.pk + '/images/').success(function(data) {
+            var images;
             $scope.sent_signal[product.pk] = false;
             images = data.images;
             if (!data.images.length) {
