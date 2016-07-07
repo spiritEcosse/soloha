@@ -15,79 +15,52 @@
                 <h4 class="modal-title">{% trans 'All fabrics' %}</h4>
             </div>
             <div class="modal-body">
-                <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
-                    <div class="panel panel-default"
-                         ng-repeat="product in prod_images[product.attributes['{{ attribute.pk }}'].pk]">
-                        <div class="panel-heading" role="tab" >
-                            <div class="panel-title">
-
-                                <a role="button" ng-bind="product.title"
-                                   data-toggle="collapse" data-parent="#accordion"
-                                   {% verbatim %} href="#product-{{ product.pk }}" aria-expanded="true"
-                                   aria-controls="product-{{ product.pk }}" {% endverbatim %}
-                                   title="{% trans 'Click to expand' %}" class="stop-propagation">
-                                </a>
+                <div class="btn-group" data-toggle="buttons">
+                    <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+                        <div class="panel panel-default"
+                             ng-repeat="product in prod_images[product.attributes['{{ attribute.pk }}'].pk]">
+                            <div class="panel-heading" role="tab" >
+                                <div class="panel-title">
+                                    <a role="button" ng-bind="product.title"
+                                       data-toggle="collapse" data-parent="#accordion"
+                                       {% verbatim %} href="#product-{{ product.pk }}" aria-expanded="true"
+                                       aria-controls="product-{{ product.pk }}" {% endverbatim %}
+                                       title="{% trans 'Click to expand' %}" class="stop-propagation">
+                                    </a>
+                                </div>
                             </div>
-                        </div>
 
-                        <div {% verbatim %} aria-labelledby="heading-{{ product.pk }}"
-                             id="product-{{ product.pk }}" {% endverbatim %}
-                             class="panel-collapse collapse in" role="tabpanel">
-                            <div class="panel-body">
-                                <div class="row" id="links">
-{#                                    <div class="col-xs-6 image" ng-repeat="image in product.images">#}
-                                        <a ng-repeat="image in product.images" data-gallery {% verbatim %} ng-href="{{ image.url }}"
-                                           title="{{ image.title }}" {% endverbatim %}>
-                                            <img {% verbatim %} ng-src="{{ image.thumb_url }}" alt="{{ image.caption }}"
-                                                 title="{{ image.caption }}" {% endverbatim %}>
-                                        </a>
-{#                                        <input ng-model="selected_image['{{ attribute.pk }}'].image"#}
-{#                                               {% verbatim %} value="{{ image }}" {% endverbatim %} type="radio">#}
-{#                                        <span class="text-center" ng-bind="image.caption"></span>#}
-{#                                    </div>#}
+                            <div {% verbatim %} aria-labelledby="heading-{{ product.pk }}"
+                                 id="product-{{ product.pk }}" {% endverbatim %}
+                                 class="panel-collapse collapse in" role="tabpanel">
+                                <div class="panel-body">
+                                    <div class="row">
+                                        <div class="col-xs-6 image" ng-repeat="image in product.images">
+                                            <a data-gallery {% verbatim %} ng-href="{{ image.url }}"
+                                               title="{{ image.title }}" {% endverbatim %}>
+                                                <img {% verbatim %} ng-src="{{ image.thumb_url }}" alt="{{ image.caption }}"
+                                                     title="{{ image.caption }}" {% endverbatim %}>
+                                            </a>
+                                            <span class="text-center" ng-bind="image.caption"></span>
+                                            <div class="wrapp-button">
+                                                <label class="btn btn-success btn-block">
+                                                    <input ng-model="selected_image['{{ attribute.pk }}'].image" autocomplete="off"
+                                                           name="{{ attribute.pk }}"
+                                                           {% verbatim %} value="{{ image }}" {% endverbatim %} type="radio">
+                                                    {% trans 'Choose' %}
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">
-                        {% trans 'Close' %}
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div id="blueimp-gallery" class="blueimp-gallery">
-    <!-- The container for the modal slides -->
-    <div class="slides"></div>
-    <!-- Controls for the borderless lightbox -->
-    <h3 class="title"></h3>
-    <a class="prev">‹</a>
-    <a class="next">›</a>
-    <a class="close">×</a>
-    <a class="play-pause"></a>
-    <ol class="indicator"></ol>
-    <!-- The modal dialog, which will be used to wrap the lightbox content -->
-    <div class="modal fade">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" aria-hidden="true">&times;</button>
-                    <h4 class="modal-title"></h4>
-                </div>
-                <div class="modal-body next"></div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default pull-left prev">
-                        <i class="glyphicon glyphicon-chevron-left"></i>
-                        Previous
-                    </button>
-                    <button type="button" class="btn btn-primary next">
-                        Next
-                        <i class="glyphicon glyphicon-chevron-right"></i>
-                    </button>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">
+                            {% trans 'Close' %}
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

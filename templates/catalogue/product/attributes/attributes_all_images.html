@@ -5,7 +5,8 @@
 {% angularjs ng %}
     {% if ng and attr_first in product_version_attributes.attributes.all and attr_first.features_by_product %}
         {% with attr_first.features_by_product|first as feature_product %}
-            <div class="row option more-image" ng-cloak="" ng-if="prod_images[product.attributes['{{ attribute.pk }}'].pk].length">
+            <div class="row option more-image" ng-cloak=""
+                 ng-if="product_primary_images[product.attributes['{{ attribute.pk }}'].pk].length">
                 <div class="col-xs-14 btn-radio-group">
                     <div class="radio-btn pull-left"
                          ng-repeat="product in product_primary_images[product.attributes['{{ attribute.pk }}'].pk]">
@@ -21,7 +22,7 @@
                         </label>
                     </div>
                 </div>
-                <div class="col-xs-10">
+                <div class="col-xs-10" ng-if="prod_images[product.attributes['{{ attribute.pk }}'].pk].length">
                     <button class="btn btn-default btn-block" role="button"
                             ng-click="attr_prod_images(product.attributes['{{ attribute.pk }}'])"
                             data-toggle="modal" data-target="#attribute-{{ attribute.pk }}">
