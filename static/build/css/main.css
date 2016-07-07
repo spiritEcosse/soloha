@@ -8663,8 +8663,11 @@ header .bottom .navbar .nav > li .yamm-content .image .btn-menu {
 .main .product .common .options .more-image .modal .btn-group {
   display: block;
 }
+.main .product .common .options .more-image .modal a {
+  text-decoration: underline;
+}
 .main .product .common .options .more-image .modal .image {
-  margin-bottom: 10px;
+  margin-bottom: 20px;
 }
 .main .product .common .options .more-image .modal .image .wrapp-button {
   margin-top: 10px;
