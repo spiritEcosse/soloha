@@ -164,7 +164,6 @@
       $rootScope.Object = Object;
       $rootScope.keys = Object.keys;
       $scope.sent_signal = [];
-      $scope.product.dict_attributes = [];
       $scope.change_price = function(option_id) {
         if (Object.keys($scope.options_children).length !== 0) {
           $scope.option_id = Object.keys($scope.options_children[$scope.option_id]).filter(function(key) {
@@ -225,6 +224,7 @@
         $scope.list_options = data.list_options;
         $scope.attributes = data.attributes;
         $scope.product = data.product;
+        $scope.product.custom_values = $scope.isOpen = $scope.product.dict_attributes = $scope.product.custom_value = [];
         return angular.forEach($scope.attributes, function(attr) {
           attributes.push(attr.pk);
           $scope.product.dict_attributes[attr.pk] = attr;
@@ -324,9 +324,9 @@
       set_price = function() {
         var exist_selected_attr, selected_attributes;
         selected_attributes = [];
-        angular.forEach(attributes, function(key) {
-          if ($scope.product.attributes[key].pk !== 0) {
-            return selected_attributes.push($scope.product.attributes[key].pk);
+        angular.forEach($scope.attributes, function(attribute) {
+          if (attribute.selected_val.pk !== 0) {
+            return selected_attributes.push(attribute.selected_val.pk);
           }
         });
         exist_selected_attr = clone_data.product_versions[selected_attributes.toString()];
@@ -335,20 +335,28 @@
         }
         return exist_selected_attr;
       };
-      $scope.update_price = function(value, attr_pk) {
+      $scope.update_price = function(value, current_attribute) {
         var selected_attributes;
-        $scope.product.attributes[attr_pk] = value;
+        current_attribute.selected_val = value;
         get_prod(value);
         angular.forEach(clone_data.variant_attributes[value.pk], function(attr) {
-          return $scope.product.values[attr.pk] = attr.values;
+          var attribute;
+          attribute = $filter('filter')($scope.attributes, {
+            pk: attr.pk
+          })[0];
+          return attribute.values = attr.values;
         });
         if (!set_price()) {
           angular.forEach(clone_data.variant_attributes[value.pk], function(attr) {
-            $scope.product.values[attr.pk] = attr.values;
+            var attribute;
+            attribute = $filter('filter')($scope.attributes, {
+              pk: attr.pk
+            })[0];
+            attribute.values = attr.values;
             if (attr.in_group[1] && attr.in_group[1].visible) {
-              return $scope.product.attributes[attr.pk] = attr.in_group[1];
-            } else if ($scope.product.values[attr.pk]) {
-              return $scope.product.attributes[attr.pk] = $scope.product.values[attr.pk][0];
+              return attribute.selected_val = attr.in_group[1];
+            } else if (attribute.values) {
+              return attribute.selected_val = attribute.values[0];
             }
           });
           if (!set_price()) {

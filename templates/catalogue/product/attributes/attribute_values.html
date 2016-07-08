@@ -21,7 +21,7 @@
             <div class="bs-searchbox">
                 <form>
                     <input ng-model="query_attr['{{ attribute.pk }}']"
-                           ng-change="'{attribute.non_standard && product.non_standard) ? search({{ attribute.pk }})}'"
+                           ng-change="'{attribute.non_standard && product.non_standard) ? search(attribute.pk)}'"
                            type="text"
                            focus-me="isOpen['{{ attribute.pk }}']"
                            placeholder="{% trans "Search" %}"
@@ -30,37 +30,39 @@
             </div>
 
             {% with 'role="menu" class="dropdown-menu inner"' as el_attr %}
-                <ul {{ el_attr }} ng-if="!product.values['{{ attribute.pk }}']">
-                    {% for value in attribute.values %}
-                        {% include 'catalogue/product/attributes/list_values.html' with ng=0 %}
-                    {% endfor %}
-                </ul>
+                {% if ng %}
+                    <ul {{ el_attr }} ng-if="attribute.values">
+                        {% include 'catalogue/product/attributes/list_values.html' %}
 
-                <ul {{ el_attr }} ng-if="product.values['{{ attribute.pk }}']">
-                    {% include 'catalogue/product/attributes/list_values.html' with ng=1 %}
-
-                    {% if object.non_standard_price_retail and attribute.features_by_product.0.non_standard %}
-                        <li role="separator" class="divider"
-                            ng-if="product.custom_values['{{ attribute.pk }}'].length ||
+                        {% if object.non_standard_price_retail and attribute.features_by_product.0.non_standard %}
+                            <li role="separator" class="divider"
+                                ng-if="product.custom_values['{{ attribute.pk }}'].length ||
                     product.custom_value['{{ attribute.pk }}'] !== null">
-                        </li>
-                        <li role="presentation" class="query"
-                            ng-if="(product.custom_values['{{ attribute.pk }}'] |
+                            </li>
+                            <li role="presentation" class="query"
+                                ng-if="(product.custom_values['{{ attribute.pk }}'] |
                     search_by_title: product.custom_value['{{ attribute.pk }}'].title) == false">
-                            <a href="#" ng-click="update_price_with_custom_val('{{ attribute.pk }}')"
-                               ng-bind="product.custom_value['{{ attribute.pk }}'].title">
-                            </a>
-                        </li>
-                        <li role="presentation" class="custom"
-                            ng-repeat="value in product.custom_values['{{ attribute.pk }}'] |
+                                <a href="#" ng-click="update_price_with_custom_val('{{ attribute.pk }}')"
+                                   ng-bind="product.custom_value['{{ attribute.pk }}'].title">
+                                </a>
+                            </li>
+                            <li role="presentation" class="custom"
+                                ng-repeat="value in product.custom_values['{{ attribute.pk }}'] |
                     filter:{title: query_attr['{{ attribute.pk }}']} | orderBy: 'title' track by $index"
-                            ng-if="product.custom_values['{{ attribute.pk }}'].length"
-                            ng-class='{"selected active": value.title == product.attributes["{{ attribute.pk }}"].title}'>
-                            <a href="#" ng-click="update_price_with_custom_val('{{ attribute.pk }}', value)" ng-bind="value.title">
-                            </a>
-                        </li>
-                    {% endif %}
-                </ul>
+                                ng-if="product.custom_values['{{ attribute.pk }}'].length"
+                                ng-class='{"selected active": value.title == product.attributes["{{ attribute.pk }}"].title}'>
+                                <a href="#" ng-click="update_price_with_custom_val('{{ attribute.pk }}', value)" ng-bind="value.title">
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                {% else %}
+                    <ul {{ el_attr }}>
+                        {% for value in attribute.values %}
+                            {% include 'catalogue/product/attributes/list_values.html' %}
+                        {% endfor %}
+                    </ul>
+                {% endif %}
             {% endwith %}
         </div>
     </div>

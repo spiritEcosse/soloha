@@ -62,7 +62,6 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
     $rootScope.Object = Object
     $rootScope.keys = Object.keys
     $scope.sent_signal = []
-    $scope.product.dict_attributes = []
 
     $scope.change_price = (option_id) ->
         if Object.keys($scope.options_children).length != 0 # && Object.keys($scope.options_children[$scope.option_id]).length != 0
@@ -133,15 +132,14 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
         $scope.list_options = data.list_options
         $scope.attributes = data.attributes
         $scope.product = data.product
-        
+        $scope.product.custom_values = $scope.isOpen = $scope.product.dict_attributes = $scope.product.custom_value = []
+
         angular.forEach $scope.attributes, (attr) ->
             attributes.push(attr.pk)
-#            $scope.product.values[attr.pk] = attr.values
             $scope.product.dict_attributes[attr.pk] = attr
             $scope.product.custom_value[attr.pk] = null
             $scope.isOpen[attr.pk] = false
             $scope.product.custom_values[attr.pk] = []
-
     .error ->
         console.error('An error occurred during submission')
 
@@ -213,9 +211,9 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
     set_price = () ->
         selected_attributes = []
 
-        angular.forEach attributes, (key) ->
-            if $scope.product.attributes[key].pk != 0
-                selected_attributes.push($scope.product.attributes[key].pk)
+        angular.forEach $scope.attributes, (attribute) ->
+            if attribute.selected_val.pk != 0
+                selected_attributes.push(attribute.selected_val.pk)
         #    Todo igor: if selected_attributes is empty - message select - attribute for display price
 
         exist_selected_attr = clone_data.product_versions[selected_attributes.toString()]
@@ -224,21 +222,23 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
             $scope.price = exist_selected_attr
         return exist_selected_attr
 
-    $scope.update_price = (value, attr_pk) ->
-        $scope.product.attributes[attr_pk] = value
+    $scope.update_price = (value, current_attribute) ->
+        current_attribute.selected_val = value
         get_prod(value)
 
         angular.forEach clone_data.variant_attributes[value.pk], (attr) ->
-            $scope.product.values[attr.pk] = attr.values
+            attribute = $filter('filter')($scope.attributes, { pk: attr.pk })[0]
+            attribute.values = attr.values
 
         if not set_price()
             angular.forEach clone_data.variant_attributes[value.pk], (attr) ->
-                $scope.product.values[attr.pk] = attr.values
+                attribute = $filter('filter')($scope.attributes, { pk: attr.pk })[0]
+                attribute.values = attr.values
 
                 if attr.in_group[1] and attr.in_group[1].visible
-                    $scope.product.attributes[attr.pk] = attr.in_group[1]
-                else if $scope.product.values[attr.pk]
-                    $scope.product.attributes[attr.pk] = $scope.product.values[attr.pk][0]
+                    attribute.selected_val = attr.in_group[1]
+                else if attribute.values
+                    attribute.selected_val = attribute.values[0]
 
             if not set_price()
                 $scope.price = $scope.price_start
