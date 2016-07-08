@@ -14,19 +14,10 @@
                 {% if price %}
                     <div class="text-center wrapper-number" >
                         {% trans "Price" %}:
-
-                        {% angularjs ng %}
-                            <span {% if ng %}
-                                ng-init="price='{{ price }}'; price_start='{{ price }}'" ng-class="'{{ class_price }}'" ng-cloak=""
-                            {% else %}
-                                class="{{ class_price }}"
-                            {% endif %}>
-                                                    {{ price }}
-                                                </span>
-                            <span {% if ng %}ng-bind="'{{ currency }}'"{% endif %}>
-                                                    {% if not ng %}{{ currency }}{% endif %}
-                                                </span>
-                        {% endangularjs %}
+                            <span ng-init="price='{{ price }}';
+                            price_start='{{ price }}'" ng-class="'{{ class_price }}'"
+                                class="{{ class_price }}" ng-bind="price">{{ price }}</span>
+                            <span>{{ currency }}</span>
                     </div>
                     <div class="row">
                         <div class="wrapper-btn-primary col-xs-12">
@@ -66,11 +57,7 @@
                     </div>
                 {% else %}
                     <div class="wrapper-number">
-                        <span {% if ng %}
-                            ng-class="'{{ class_price }}'" ng-cloak=""
-                        {% else %}
-                            class="{{ class_price }}"
-                        {% endif %}>
+                        <span ng-class="'{{ class_price }}'" class="{{ class_price }}">
                             {{ product_not_availability }}
                         </span>
                     </div>

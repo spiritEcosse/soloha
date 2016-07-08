@@ -1,0 +1,13 @@
+{% load djangular_tags %}
+
+{% angularjs ng %}
+    <li role="presentation" ng-cloak=""
+            {% if ng %}
+        ng-repeat="value in product.values['{{ attribute.pk }}'] | filter: {title: query_attr['{{ attribute.pk }}']}"
+        ng-class="{'selected active': value.pk == product.attributes['{{ attribute.pk }}'].pk}"
+            {% endif %} class="list">
+        <a {% if ng %}ng-click="update_price(value, '{{ attribute.pk }}')" {% endif %}>
+            {{ value.title }}
+        </a>
+    </li>
+{% endangularjs %}

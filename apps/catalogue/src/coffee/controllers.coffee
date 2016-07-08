@@ -45,6 +45,7 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
     $scope.product = []
     $scope.product.values = []
     $scope.product.attributes = []
+    $scope.attributes = []
     attributes = []
     clone_data = null
     $scope.last_select_attr = null
@@ -129,7 +130,8 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
         $scope.options = data.options
         $scope.options_children = data.options_children
         $scope.list_options = data.list_options
-
+        $scope.attributes = data.attributes
+        
         angular.forEach data.attributes, (attr) ->
             attributes.push(attr.pk)
             $scope.product.values[attr.pk] = attr.values
@@ -186,6 +188,7 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
             $http.post('/catalogue/attr/' + value.pk + '/product/' + clone_data.product.pk + '/').success (data) ->
                 $scope.prod_images[value.pk] = data.products
                 $scope.product_primary_images[value.pk] = data.product_primary_images
+                console.log($scope.product_primary_images[value.pk])
             .error ->
                 console.error('An error occurred during submission')
 
