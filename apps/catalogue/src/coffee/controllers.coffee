@@ -132,17 +132,20 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
         $scope.list_options = data.list_options
         $scope.attributes = data.attributes
         
-        angular.forEach data.attributes, (attr) ->
+        angular.forEach $scope.attributes, (attr) ->
+            if attr.values.length
+                attr.selected_val = attr.values[0]
+
+            if data.product_version_attributes[attr.pk]
+                attr.selected_val = data.product_version_attributes[attr.pk]
+
             attributes.push(attr.pk)
             $scope.product.values[attr.pk] = attr.values
             $scope.product.dict_attributes[attr.pk] = attr
-            $scope.product.attributes[attr.pk] = $scope.product.values[attr.pk][0]
             $scope.product.custom_value[attr.pk] = null
             $scope.isOpen[attr.pk] = false
             $scope.product.custom_values[attr.pk] = []
 
-            if data.product_version_attributes[attr.pk]
-                $scope.product.attributes[attr.pk] = data.product_version_attributes[attr.pk]
     .error ->
         console.error('An error occurred during submission')
 

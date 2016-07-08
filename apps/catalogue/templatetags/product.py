@@ -16,3 +16,7 @@ def recommended_products(product):
     """
     return {'recommended_products': product.recommended_products.all()[:settings.RECOMMENDED_PRODUCTS]}
 
+
+@register.simple_tag(name='first')
+def first(values):
+    return {'attr_first': values[0]}

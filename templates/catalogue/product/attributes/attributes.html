@@ -1,34 +1,28 @@
 {% load i18n %}
-{% load thumbnail %}
 {% load djangular_tags %}
 
-{% if attributes %}
-    <div class="col-xs-24 col-sm-24 col-md-14 options">
-        <span class="relation">{% trans "*The price depends on the selected parameters:" %}</span>
-        <div class="list_attr">
-            {% for attribute in attributes %}
-                <div class="panel panel-default">
-                    <div class="alert alert-warning" role="alert" ng-cloak=""
-                         ng-if="product.attributes['{{ attribute.pk }}'].error"
-                         ng-bind="product.attributes['{{ attribute.pk }}'].error"></div>
-                    <div class="panel-heading">
-                        {% with attribute.values|first as attr_first %}
-                            <div class="row option">
-                                <div class="col-xs-14 name">
-                                    {{ attribute.title }}
-                                </div>
-                                {% if attribute.values %}
-                                    <div class="col-xs-10 pull-right values">
-                                        {% include 'catalogue/product/attributes/attribute_values.html' %}
-                                    </div>
-                                {% endif %}
-                            </div>
-
-                            {% include 'catalogue/product/attributes/attributes_all_images.html' %}
-                        {% endwith %}
-                    </div>
+{% angularjs ng %}
+    <div class="panel panel-default" ng-repeat="attribute in attributes" {% if ng %} ng-cloak="" {% endif %}>
+        <div class="alert alert-warning" role="alert" ng-if="attribute.error" ng-bind="attribute.error" ng-cloak=""></div>
+        <div class="panel-heading">
+            <div class="row option">
+                <div class="col-xs-14 name" ng-bind="attribute.title">
+                    {% if not ng %}{{ attribute.title }}{% endif %}
                 </div>
-            {% endfor %}
+                {% if ng %}
+                    <div class="col-xs-10 pull-right values" ng-if="attribute.values.length">
+                        {% include 'catalogue/product/attributes/attribute_values.html' %}
+                    </div>
+                {% else %}
+                    {% if attribute.values %}
+                        <div class="col-xs-10 pull-right values">
+                            {% include 'catalogue/product/attributes/attribute_values.html' %}
+                        </div>
+                    {% endif %}
+                {% endif %}
+            </div>
+
+            {% include 'catalogue/product/attributes/attributes_all_images.html' %}
         </div>
     </div>
-{% endif %}
+{% endangularjs %}
