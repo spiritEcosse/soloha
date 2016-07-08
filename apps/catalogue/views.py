@@ -291,16 +291,23 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
 
     def get_context_data_json(self, **kwargs):
         context = dict()
-        context['product'] = {'pk': self.object.pk}
+        context['product'] = {'pk': self.object.pk, 'non_standard': self.object.non_standard_price_retail}
         context['product_versions'] = self.get_product_versions()
         context['attributes'] = []
 
         for attr in self.get_attributes():
             non_standard = attr.features_by_product[0].non_standard if attr.features_by_product else False
+
             values = self.start_option + [{'pk': value.pk, 'title': value.title, 'parent': attr.pk} for value in attr.values]
-            context['attributes'].append({'pk': attr.pk, 'title': attr.title, 'values': values,
-                                          'non_standard': non_standard, 'bottom_line': attr.bottom_line,
-                                          'top_line': attr.top_line})
+            context['attributes'].append(
+                {'pk': attr.pk, 'title': attr.title, 'values': values,
+                 'non_standard': non_standard, 'bottom_line': attr.bottom_line,
+                 'top_line': attr.top_line,
+                 'selected_val': {
+                     'pk': attr.selected_val.pk,
+                     'title': attr.selected_val.title} if hasattr(attr, 'selected_val') else self.start_option[0]
+                 }
+            )
 
         context['options'] = [{prod_option.option.pk: prod_option.price_retail} for prod_option in ProductOptions.objects.filter(product=self.object)]
         context['variant_attributes'] = {}
@@ -476,14 +483,16 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
                             key=lambda attr: attr.product_features.filter(product=self.object).first().sort
                             if attr.product_features.filter(product=self.object).first() else 0)
 
-        new_attributes = []
+        product_versions = self.product_versions_queryset().first()
 
-        for attr in attributes:
-            non_standard = attr.features_by_product[0].non_standard if attr.features_by_product else False
-            values = self.start_option + [{'pk': value.pk, 'title': value.title, 'parent': attr.pk} for value in attr.values]
-            new_attributes.append({'pk': attr.pk, 'title': attr.title, 'values': values,
-                                   'non_standard': non_standard, 'bottom_line': attr.bottom_line,
-                                   'top_line': attr.top_line})
+        if product_versions:
+            target_attributes = set(product_versions.attributes.all())
+
+            for attr in attributes:
+                intersection = set(attr.values).intersection(target_attributes)
+
+                if len(intersection) == 1:
+                    setattr(attr, 'selected_val', intersection.pop())
 
         return attributes
 

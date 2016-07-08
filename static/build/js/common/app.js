@@ -164,6 +164,7 @@
       $rootScope.Object = Object;
       $rootScope.keys = Object.keys;
       $scope.sent_signal = [];
+      $scope.product.dict_attributes = [];
       $scope.change_price = function(option_id) {
         if (Object.keys($scope.options_children).length !== 0) {
           $scope.option_id = Object.keys($scope.options_children[$scope.option_id]).filter(function(key) {
@@ -223,15 +224,9 @@
         $scope.options_children = data.options_children;
         $scope.list_options = data.list_options;
         $scope.attributes = data.attributes;
+        $scope.product = data.product;
         return angular.forEach($scope.attributes, function(attr) {
-          if (attr.values.length) {
-            attr.selected_val = attr.values[0];
-          }
-          if (data.product_version_attributes[attr.pk]) {
-            attr.selected_val = data.product_version_attributes[attr.pk];
-          }
           attributes.push(attr.pk);
-          $scope.product.values[attr.pk] = attr.values;
           $scope.product.dict_attributes[attr.pk] = attr;
           $scope.product.custom_value[attr.pk] = null;
           $scope.isOpen[attr.pk] = false;

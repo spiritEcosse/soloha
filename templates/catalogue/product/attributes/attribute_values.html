@@ -1,6 +1,5 @@
 {% load i18n %}
 {% load djangular_tags %}
-{% load product %}
 
 {% angularjs ng %}
     <div class="dropdown btn-group bootstrap-select"
@@ -8,26 +7,22 @@
         <button class="btn btn-default dropdown-toggle btn-block" type="button" data-toggle="dropdown">
             <span class="title" ng-bind="attribute.selected_val.title">
                 {% if not ng %}
-                    {% with attribute.values|first as attr_first %}
-                        {% if attr_first in product_version_attributes.attributes.all %}
-                            {{ attr_first.title }}
-                        {% else %}
-                            {{ not_selected }}
-                        {% endif %}
-                    {% endwith %}
+                    {% if attribute.selected_val %}
+                        {{ attribute.selected_val.title }}
+                    {% else %}
+                        {{ not_selected }}
+                    {% endif %}
                 {% endif %}
             </span>
             <span class="caret"></span>
             <span class="attr-pk" ng-bind="attribute.selected_val.pk"></span>
         </button>
-        <div class="dropdown-menu open" ng-cloak="">
-            <div class="bs-searchbox" >
+        <div class="dropdown-menu open">
+            <div class="bs-searchbox">
                 <form>
                     <input ng-model="query_attr['{{ attribute.pk }}']"
+                           ng-change="'{attribute.non_standard && product.non_standard) ? search({{ attribute.pk }})}'"
                            type="text"
-                            {% if object.non_standard_price_retail and attribute.features_by_product.0.non_standard %}
-                           ng-change="search('{{ attribute.pk }}')"
-                            {% endif %}
                            focus-me="isOpen['{{ attribute.pk }}']"
                            placeholder="{% trans "Search" %}"
                            class="form-control">
