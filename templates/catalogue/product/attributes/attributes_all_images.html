@@ -2,28 +2,24 @@
 {% load thumbnail %}
 {% load djangular_tags %}
 
-{% if attr_first in product_version_attributes.attributes.all and attr_first.features_by_product %}
-    {% with attr_first.features_by_product|first as feature_product %}
-        <div class="row option more-image"
-             ng-if="product_primary_images[product.attributes['{{ attribute.pk }}'].pk].length">
-            <div class="col-xs-14 btn-radio-group">
-                <div ng-if="!product_primary_images[product.attributes['{{ attribute.pk }}'].pk]">
-                    {% for product in feature_product.product_with_images.all|slice:":5" %}
-                        {% include 'catalogue/product/attributes/product_primary_images.html' with ng=0 %}
-                    {% endfor %}
-                </div>
-                <div ng-if="product_primary_images[product.attributes['{{ attribute.pk }}'].pk]">
-                    {% include 'catalogue/product/attributes/product_primary_images.html' with ng=1 %}
-                </div>
-            </div>
-            <div class="col-xs-10" ng-if="keys(prod_images[product.attributes['{{ attribute.pk }}'].pk]).length">
-                <button class="btn btn-default btn-block" role="button"
-                        ng-click="attr_prod(product.attributes['{{ attribute.pk }}'])"
-                        data-toggle="modal" data-target="#attribute-{{ attribute.pk }}">
-                    {% trans 'View all fabrics' %}
-                </button>
-                {% include 'catalogue/product/attributes/attribute_images_modal.html' %}
-            </div>
+{% angularjs ng %}
+    <div class="row option more-image" {% if ng %} ng-if="attribute.selected_val.images.length"{% endif %}>
+        <div class="col-xs-14 btn-radio-group">
+            {% if ng %}
+                {% include 'catalogue/product/attributes/product_primary_images.html' %}
+            {% else %}
+                {% for product in feature_product.product_with_images.all|slice:":5" %}
+                    {% include 'catalogue/product/attributes/product_primary_images.html' %}
+                {% endfor %}
+            {% endif %}
         </div>
-    {% endwith %}
-{% endif %}
+        <div class="col-xs-10">
+            <button class="btn btn-default btn-block" role="button"
+                    {% if ng %} ng-click="attr_prod(attribute.selected_val)" {% endif %}
+                    data-toggle="modal" data-target="#attribute-{{ attribute.pk }}">
+                {% trans 'View all fabrics' %}
+            </button>
+            {% include 'catalogue/product/attributes/attribute_modal.html' %}
+        </div>
+    </div>
+{% endangularjs %}

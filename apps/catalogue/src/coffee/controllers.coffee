@@ -62,6 +62,7 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
     $rootScope.Object = Object
     $rootScope.keys = Object.keys
     $scope.sent_signal = []
+    clone_attributes = []
 
     $scope.change_price = (option_id) ->
         if Object.keys($scope.options_children).length != 0 # && Object.keys($scope.options_children[$scope.option_id]).length != 0
@@ -131,6 +132,8 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
         $scope.options_children = data.options_children
         $scope.list_options = data.list_options
         $scope.attributes = data.attributes
+        angular.copy(data.attributes, clone_attributes)
+
         $scope.product = data.product
         $scope.product.custom_values = $scope.isOpen = $scope.product.dict_attributes = $scope.product.custom_value = []
 
@@ -180,31 +183,28 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
 #Todo bug with focus. If click on button three times, open dropdown without focus on us input.
         $scope.isOpen[attr_id] = if $scope.isOpen[attr_id] is false then true else false
 
-    get_prod = (value) ->
-        if not $scope.prod_images[value.pk]?
-            $http.post('/catalogue/attr/' + value.pk + '/product/' + clone_data.product.pk + '/').success (data) ->
-                $scope.prod_images[value.pk] = data.products
-                $scope.product_primary_images[value.pk] = data.product_primary_images
-                console.log($scope.product_primary_images[value.pk])
+    get_prod = (selected_val) ->
+        if selected_val.products? and not selected_val.products.length or not selected_val.products?
+            $http.post('/catalogue/attr/' + selected_val.pk + '/product/' + clone_data.product.pk + '/').success (data) ->
+                selected_val.products = data.products
+                selected_val.images = data.product_primary_images
             .error ->
                 console.error('An error occurred during submission')
 
     $scope.attr_prod = (value) ->
         get_prod(value)
 
-    $scope.attr_prod_images = (attr_pk, product) ->
-        value = $scope.product.attributes[attr_pk]
-
-        if $scope.prod_images[value.pk][product.pk].images.length != null and not $scope.prod_images[value.pk][product.pk].images.length
-            $scope.sent_signal[product.pk] = true
+    $scope.attr_prod_images = (value, product) ->
+        if product.images? and not product.images.length
+            product.sent_signal = true
 
             $http.post('/catalogue/attr/product/' + product.pk  + '/images/').success (data) ->
-                $scope.sent_signal[product.pk] = false
+                product.sent_signal = false
                 images = data.images
 
                 if not data.images.length
                     images = null
-                $scope.prod_images[value.pk][product.pk].images = images
+                product.images = images
             .error ->
                 console.error('An error occurred during submission')
 
@@ -239,20 +239,16 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
                     attribute.selected_val = attr.in_group[1]
                 else if attribute.values
                     attribute.selected_val = attribute.values[0]
+                get_prod(attribute.selected_val)
 
             if not set_price()
                 $scope.price = $scope.price_start
-                selected_attributes = []
 
-                angular.forEach clone_data.attributes, (attr) ->
-                    $scope.product.values[attr.pk] = attr.values
-                    $scope.product.attributes[attr.pk] = $scope.product.values[attr.pk][0]
-
-                    if clone_data.product_version_attributes[attr.pk]
-                        $scope.product.attributes[attr.pk] = clone_data.product_version_attributes[attr.pk]
-
-                    if $scope.product.attributes[attr.pk].pk != 0
-                        selected_attributes.push($scope.product.attributes[attr.pk].pk)
+                angular.forEach $scope.attributes, (attr) ->
+                    attribute = $filter('filter')(clone_attributes, { pk: attr.pk })[0]
+                    attr.values = attribute.values
+                    attr.selected_val = attribute.selected_val
+                    get_prod(attribute.selected_val)
 
     $scope.quick_order = () ->
         if $scope.quick_order_data

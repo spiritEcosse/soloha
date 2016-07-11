@@ -3,17 +3,17 @@
 {% load djangular_tags %}
 
 {% angularjs ng %}
-    <div class="radio-btn pull-left"
-            {% if ng %} ng-repeat="product in product_primary_images[product.attributes['{{ attribute.pk }}'].pk]"{% endif %}>
-        <label {% if ng %} ng-if="product.thumb_url"{% endif %}>
+    <div class="radio-btn pull-left" {% if ng %} ng-repeat="product in attribute.selected_val.images" {% endif %}>
+        <label>
             <div class="image">
                 {% if not ng %}
                     {% thumbnail product.primary_image 30x30 crop as thumb %}
                 {% endif %}
                 <img ng-src="{{ product.thumb_url }}" ng-attr-title="{{ product.title }}" ng-attr-alt="{{ product.title }}"
-                     {% if not ng %} src="{{ thumb.url }}" alt="{{ product.title }}" title="{{ product.title }}" {% endif %}>
+                {% if not ng %} src="{{ thumb.url }}" alt="{{ product.title }}" title="{{ product.title }}" {% endif %}>
             </div>
-            <input name="attr-{{ product.pk }}" ng-model="selected_image['{{ attribute.pk }}'].product"
+            <input name="attr-{{ product.pk }}"
+                    {% if ng %} ng-model="selected_image['{{ attribute.pk }}'].product" {% endif %}
                    value="{{ product }}" type="radio">
         </label>
     </div>

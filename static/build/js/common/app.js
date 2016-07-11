@@ -143,7 +143,7 @@
 
   app.controller('Product', [
     '$http', '$scope', '$window', '$document', '$location', '$compile', '$filter', 'djangoForm', '$rootScope', function($http, $scope, $window, $document, $location, $compile, $filter, djangoForm, $rootScope) {
-      var attributes, clone_data, get_prod, set_price;
+      var attributes, clone_attributes, clone_data, get_prod, set_price;
       $scope.product = [];
       $scope.product.values = [];
       $scope.product.attributes = [];
@@ -164,6 +164,7 @@
       $rootScope.Object = Object;
       $rootScope.keys = Object.keys;
       $scope.sent_signal = [];
+      clone_attributes = [];
       $scope.change_price = function(option_id) {
         if (Object.keys($scope.options_children).length !== 0) {
           $scope.option_id = Object.keys($scope.options_children[$scope.option_id]).filter(function(key) {
@@ -223,6 +224,7 @@
         $scope.options_children = data.options_children;
         $scope.list_options = data.list_options;
         $scope.attributes = data.attributes;
+        angular.copy(data.attributes, clone_attributes);
         $scope.product = data.product;
         $scope.product.custom_values = $scope.isOpen = $scope.product.dict_attributes = $scope.product.custom_value = [];
         return angular.forEach($scope.attributes, function(attr) {
@@ -289,12 +291,11 @@
       $scope.click_dropdown = function(attr_id) {
         return $scope.isOpen[attr_id] = $scope.isOpen[attr_id] === false ? true : false;
       };
-      get_prod = function(value) {
-        if ($scope.prod_images[value.pk] == null) {
-          return $http.post('/catalogue/attr/' + value.pk + '/product/' + clone_data.product.pk + '/').success(function(data) {
-            $scope.prod_images[value.pk] = data.products;
-            $scope.product_primary_images[value.pk] = data.product_primary_images;
-            return console.log($scope.product_primary_images[value.pk]);
+      get_prod = function(selected_val) {
+        if ((selected_val.products != null) && !selected_val.products.length || (selected_val.products == null)) {
+          return $http.post('/catalogue/attr/' + selected_val.pk + '/product/' + clone_data.product.pk + '/').success(function(data) {
+            selected_val.products = data.products;
+            return selected_val.images = data.product_primary_images;
           }).error(function() {
             return console.error('An error occurred during submission');
           });
@@ -303,19 +304,17 @@
       $scope.attr_prod = function(value) {
         return get_prod(value);
       };
-      $scope.attr_prod_images = function(attr_pk, product) {
-        var value;
-        value = $scope.product.attributes[attr_pk];
-        if ($scope.prod_images[value.pk][product.pk].images.length !== null && !$scope.prod_images[value.pk][product.pk].images.length) {
-          $scope.sent_signal[product.pk] = true;
+      $scope.attr_prod_images = function(value, product) {
+        if ((product.images != null) && !product.images.length) {
+          product.sent_signal = true;
           return $http.post('/catalogue/attr/product/' + product.pk + '/images/').success(function(data) {
             var images;
-            $scope.sent_signal[product.pk] = false;
+            product.sent_signal = false;
             images = data.images;
             if (!data.images.length) {
               images = null;
             }
-            return $scope.prod_images[value.pk][product.pk].images = images;
+            return product.images = images;
           }).error(function() {
             return console.error('An error occurred during submission');
           });
@@ -336,7 +335,6 @@
         return exist_selected_attr;
       };
       $scope.update_price = function(value, current_attribute) {
-        var selected_attributes;
         current_attribute.selected_val = value;
         get_prod(value);
         angular.forEach(clone_data.variant_attributes[value.pk], function(attr) {
@@ -354,23 +352,22 @@
             })[0];
             attribute.values = attr.values;
             if (attr.in_group[1] && attr.in_group[1].visible) {
-              return attribute.selected_val = attr.in_group[1];
+              attribute.selected_val = attr.in_group[1];
             } else if (attribute.values) {
-              return attribute.selected_val = attribute.values[0];
+              attribute.selected_val = attribute.values[0];
             }
+            return get_prod(attribute.selected_val);
           });
           if (!set_price()) {
             $scope.price = $scope.price_start;
-            selected_attributes = [];
-            return angular.forEach(clone_data.attributes, function(attr) {
-              $scope.product.values[attr.pk] = attr.values;
-              $scope.product.attributes[attr.pk] = $scope.product.values[attr.pk][0];
-              if (clone_data.product_version_attributes[attr.pk]) {
-                $scope.product.attributes[attr.pk] = clone_data.product_version_attributes[attr.pk];
-              }
-              if ($scope.product.attributes[attr.pk].pk !== 0) {
-                return selected_attributes.push($scope.product.attributes[attr.pk].pk);
-              }
+            return angular.forEach($scope.attributes, function(attr) {
+              var attribute;
+              attribute = $filter('filter')(clone_attributes, {
+                pk: attr.pk
+              })[0];
+              attr.values = attribute.values;
+              attr.selected_val = attribute.selected_val;
+              return get_prod(attribute.selected_val);
             });
           }
         }

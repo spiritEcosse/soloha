@@ -1,0 +1,39 @@
+{% load i18n %}
+{% load thumbnail %}
+{% load djangular_tags %}
+{% load staticfiles %}
+
+{% angularjs ng %}
+    <div class="modal fade" id="attribute-{{ attribute.pk }}" tabindex="-1" role="dialog"
+         aria-labelledby="image of {{ attr_first.title }}">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" title="{% trans 'Close' %}"
+                            aria-label="{% trans 'Close' %}">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title">{% trans 'All fabrics' %}</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="btn-group" data-toggle="buttons">
+                        <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+                            {% if ng %}
+                                {% include 'catalogue/product/attributes/attribute_products_modal.html' %}
+                            {% else %}
+                                {% for product in feature_product.product_with_images.all|slice:":5" %}
+                                    {% include 'catalogue/product/attributes/attribute_products_modal.html' %}
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">
+                                {% trans 'Close' %}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endangularjs %}

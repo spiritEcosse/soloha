@@ -22,7 +22,15 @@
                 {% endif %}
             </div>
 
-            {% include 'catalogue/product/attributes/attributes_all_images.html' %}
+            {% if ng %}
+                {% include 'catalogue/product/attributes/attributes_all_images.html' %}
+            {% else %}
+                {% if attribute.selected_val.features_by_product %}
+                    {% with attribute.selected_val.features_by_product|first as feature_product %}
+                        {% include 'catalogue/product/attributes/attributes_all_images.html' %}
+                    {% endwith %}
+                {% endif %}
+            {% endif %}
         </div>
     </div>
 {% endangularjs %}

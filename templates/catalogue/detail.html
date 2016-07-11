@@ -14,7 +14,8 @@
 
 {% block styles %}
     {{ block.super }}
-    <link rel="stylesheet" href="{% static "bower_components/blueimp-gallery/css/blueimp-gallery.min.css" %}">
+{#    <link rel="stylesheet" href="{% static "bower_components/blueimp-gallery/css/blueimp-gallery.min.css" %}">#}
+    <link rel="stylesheet" href="//blueimp.github.io/Gallery/css/blueimp-gallery.min.css">
     <link rel="stylesheet" href="{% static "bower_components/blueimp-bootstrap-image-gallery/css/bootstrap-image-gallery.min.css" %}">
 {% endblock %}
 
@@ -22,7 +23,8 @@
     {{ block.super }}
     <script src="{% static 'bower_components/lightslider/dist/js/lightslider.min.js' %}"></script>
     <script src="{% static 'src/js/product.js' %}"></script>
-    <script src="{% static "bower_components/blueimp-gallery/js/blueimp-gallery.min.js" %}"></script>
+{#    <script src="{% static "bower_components/blueimp-gallery/js/blueimp-gallery.min.js" %}"></script>#}
+    <script src="//blueimp.github.io/Gallery/js/jquery.blueimp-gallery.min.js"></script>
     <script src="{% static "bower_components/blueimp-bootstrap-image-gallery/js/bootstrap-image-gallery.min.js" %}"></script>
 {% endblock %}
 
@@ -273,7 +275,7 @@
     </div>
 {% endblock main %}
 
-{% block footer %}
+{% block before_end_body %}
     {{ block.super }}
     <div id="blueimp-gallery" class="blueimp-gallery">
         <!-- The container for the modal slides -->

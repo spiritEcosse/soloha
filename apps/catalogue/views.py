@@ -294,20 +294,39 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
         context['product'] = {'pk': self.object.pk, 'non_standard': self.object.non_standard_price_retail}
         context['product_versions'] = self.get_product_versions()
         context['attributes'] = []
+        options_small_thumb = {'size': (30, 30), 'crop': True}
 
         for attr in self.get_attributes():
             non_standard = attr.features_by_product[0].non_standard if attr.features_by_product else False
 
-            values = self.start_option + [{'pk': value.pk, 'title': value.title, 'parent': attr.pk} for value in attr.values]
-            context['attributes'].append(
-                {'pk': attr.pk, 'title': attr.title, 'values': values,
-                 'non_standard': non_standard, 'bottom_line': attr.bottom_line,
-                 'top_line': attr.top_line,
-                 'selected_val': {
-                     'pk': attr.selected_val.pk,
-                     'title': attr.selected_val.title} if hasattr(attr, 'selected_val') else self.start_option[0]
-                 }
-            )
+            values = self.start_option + [{'pk': value.pk, 'title': value.title, 'parent': attr.pk, 'products': []} for value in attr.values]
+            images = []
+            selected_val = self.start_option[0]
+            selected_val.update({'images': images, 'parent': attr.pk})
+
+            if hasattr(attr, 'selected_val'):
+                if attr.selected_val.features_by_product:
+                    for product in attr.selected_val.features_by_product[0].product_with_images.all()[:5]:
+                        images.append({
+                            'title': product.get_title(),
+                            'pk': product.pk,
+                            'thumb_url': get_thumbnailer(product.primary_image()).get_thumbnail(options_small_thumb).url
+                        })
+
+                selected_val = {
+                    'pk': attr.selected_val.pk,
+                    'parent': attr.pk,
+                    'products': [],
+                    'images': images,
+                    'title': attr.selected_val.title
+                }
+
+            context['attributes'].append({
+                'pk': attr.pk, 'title': attr.title, 'values': values,
+                'non_standard': non_standard, 'bottom_line': attr.bottom_line,
+                'top_line': attr.top_line,
+                'selected_val': selected_val
+            })
 
         context['options'] = [{prod_option.option.pk: prod_option.price_retail} for prod_option in ProductOptions.objects.filter(product=self.object)]
         context['variant_attributes'] = {}
@@ -331,14 +350,6 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
                 })
 
             context['variant_attributes'][attribute.pk] = attributes
-
-        product_versions_attributes = {}
-        product_versions = self.product_versions_queryset().first()
-
-        if product_versions:
-            for attr in product_versions.attributes.all():
-                product_versions_attributes[attr.parent.pk] = {'pk': attr.pk, 'title': attr.title, 'parent': attr.parent.pk}
-        context['product_version_attributes'] = product_versions_attributes
         return context
 
     def product_versions_queryset(self):
@@ -489,7 +500,7 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
             target_attributes = set(product_versions.attributes.all())
 
             for attr in attributes:
-                intersection = set(attr.values).intersection(target_attributes)
+                intersection = target_attributes.intersection(set(attr.values))
 
                 if len(intersection) == 1:
                     setattr(attr, 'selected_val', intersection.pop())
@@ -593,7 +604,7 @@ class AttrProd(views.JSONRequestResponseMixin, views.AjaxResponseMixin, SingleOb
     def get_context_data_json(self):
         context = {}
         options_small_thumb = {'size': (30, 30), 'crop': True}
-        context['products'] = {}
+        context['products'] = []
         context['product_primary_images'] = []
 
         try:
@@ -604,7 +615,7 @@ class AttrProd(views.JSONRequestResponseMixin, views.AjaxResponseMixin, SingleOb
             products = product_feature.product_with_images.all()
 
             for product in products:
-                context['products'][product.pk] = {'title': product.get_title(), 'pk': product.pk, 'images': []}
+                context['products'].append({'title': product.get_title(), 'pk': product.pk, 'images': []})
 
             for product in products[:5]:
                 context['product_primary_images'].append({

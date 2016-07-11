@@ -8660,6 +8660,9 @@ header .bottom .navbar .nav > li .yamm-content .image .btn-menu {
 .main .product .common .options .more-image {
   margin-top: 10px;
 }
+.main .product .common .options .more-image .modal .progress {
+  margin-bottom: 0;
+}
 .main .product .common .options .more-image .modal .btn-group {
   display: block;
 }

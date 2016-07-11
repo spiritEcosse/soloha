@@ -59,6 +59,8 @@
 {# Main content goes in this 'layout' block #}
 {% block layout %}{% endblock %}
 
+{% block before_end_body %}{% endblock %}
+
 {% comment %}
         Scripts loaded from a CDN.  These can't be wrapped by the 'compress' tag and so we
         use a separate block for them.
