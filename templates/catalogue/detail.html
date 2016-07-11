@@ -14,7 +14,6 @@
 
 {% block styles %}
     {{ block.super }}
-{#    <link rel="stylesheet" href="{% static "bower_components/blueimp-gallery/css/blueimp-gallery.min.css" %}">#}
     <link rel="stylesheet" href="//blueimp.github.io/Gallery/css/blueimp-gallery.min.css">
     <link rel="stylesheet" href="{% static "bower_components/blueimp-bootstrap-image-gallery/css/bootstrap-image-gallery.min.css" %}">
 {% endblock %}
@@ -23,7 +22,6 @@
     {{ block.super }}
     <script src="{% static 'bower_components/lightslider/dist/js/lightslider.min.js' %}"></script>
     <script src="{% static 'src/js/product.js' %}"></script>
-{#    <script src="{% static "bower_components/blueimp-gallery/js/blueimp-gallery.min.js" %}"></script>#}
     <script src="//blueimp.github.io/Gallery/js/jquery.blueimp-gallery.min.js"></script>
     <script src="{% static "bower_components/blueimp-bootstrap-image-gallery/js/bootstrap-image-gallery.min.js" %}"></script>
 {% endblock %}
@@ -275,19 +273,17 @@
     </div>
 {% endblock main %}
 
+
 {% block before_end_body %}
     {{ block.super }}
     <div id="blueimp-gallery" class="blueimp-gallery">
-        <!-- The container for the modal slides -->
         <div class="slides"></div>
-        <!-- Controls for the borderless lightbox -->
         <h3 class="title"></h3>
         <a class="prev">‹</a>
         <a class="next">›</a>
         <a class="close">×</a>
         <a class="play-pause"></a>
         <ol class="indicator"></ol>
-        <!-- The modal dialog, which will be used to wrap the lightbox content -->
         <div class="modal fade">
             <div class="modal-dialog">
                 <div class="modal-content">
