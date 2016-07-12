@@ -9,7 +9,7 @@ from django.contrib.admin import widgets
 from django.contrib.sites.models import Site
 from django.contrib.sites.admin import SiteAdmin as BaseSiteAdmin
 from import_export import resources
-from import_export.admin import ImportExportModelAdmin
+from import_export.admin import ImportExportMixin, ImportExportModelAdmin, ImportExportActionModelAdmin
 
 Feature = get_model('catalogue', 'Feature')
 AttributeOption = get_model('catalogue', 'AttributeOption')
@@ -22,6 +22,7 @@ ProductAttributeValue = get_model('catalogue', 'ProductAttributeValue')
 ProductClass = get_model('catalogue', 'ProductClass')
 ProductImage = get_model('catalogue', 'ProductImage')
 ProductRecommendation = get_model('catalogue', 'ProductRecommendation')
+StockRecord = get_model('partner', 'StockRecord')
 Info = get_model('sites', 'Info')
 
 
@@ -55,6 +56,10 @@ class ProductImageInline(admin.TabularInline):
     model = ProductImage
 
 
+class StockRecordInline(admin.TabularInline):
+    model = StockRecord
+
+
 class ProductForm(forms.ModelForm):
     filters = MPTTModelMultipleChoiceField(
                     Feature.objects.all(),
@@ -76,9 +81,9 @@ class ProductForm(forms.ModelForm):
 
 class ProductAdmin(admin.ModelAdmin):
     date_hierarchy = 'date_created'
-    list_display = ('title', 'date_updated', 'slug', 'get_product_class', 'structure', 'attribute_summary', 'date_created', 'pk')
+    list_display = ('title', 'date_updated', 'slug', 'get_product_class', 'structure', 'attribute_summary', 'pk')
     list_filter = ['structure', 'is_discountable']
-    inlines = [ProductImageInline, ProductRecommendationInline]
+    inlines = [StockRecordInline, ProductImageInline, ProductRecommendationInline]
     prepopulated_fields = {"slug": ("title",)}
     search_fields = ('upc', 'title', 'slug', )
     form = ProductForm
@@ -86,11 +91,20 @@ class ProductAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
         qs = super(ProductAdmin, self).get_queryset(request)
         return (
-            qs
-                .select_related('product_class', 'parent')
-                .prefetch_related(
-                'attribute_values',
-                'attribute_values__attribute'))
+            qs.select_related(
+                'product_class', 'parent'
+            ).prefetch_related(
+                'images',
+                'attributes',
+                'product_class__options',
+                'categories__parent__parent__parent__parent',
+                'stockrecords',
+                'filters',
+                'attributes',
+                'characteristics',
+                'options',
+            )
+        )
 
 
 class ProductAttributeAdmin(admin.ModelAdmin):
@@ -120,7 +134,7 @@ class CategoryResource(resources.ModelResource):
         model = Category
 
 
-class CategoryAdmin(tree_editor.TreeEditor):
+class CategoryAdmin(ImportExportModelAdmin, ImportExportActionModelAdmin, tree_editor.TreeEditor):
     prepopulated_fields = {'slug': ("name", )}
     list_display = ("name", 'slug', 'parent', 'enable', 'sort', 'created')
     formfield_overrides = {

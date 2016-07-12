@@ -16,7 +16,7 @@
                         {% trans "Price" %}:
                             <span ng-init="price='{{ price }}';
                             price_start='{{ price }}'" ng-class="'{{ class_price }}'"
-                                class="{{ class_price }}" ng-bind="price">{{ price }}</span>
+                                class="{{ class_price }}" ng-bind="price">{% if not ng %}{{ price }}{% endif %}</span>
                             <span>{{ currency }}</span>
                     </div>
                     <div class="row">
