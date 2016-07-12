@@ -72,7 +72,7 @@ class ProductForm(forms.ModelForm):
 
 class ProductAdmin(admin.ModelAdmin):
     date_hierarchy = 'date_created'
-    list_display = ('get_title', 'upc', 'slug', 'get_product_class', 'structure',
+    list_display = ('pk', 'title', 'date_updated', 'slug', 'get_product_class', 'structure',
                     'attribute_summary', 'date_created')
     list_filter = ['structure', 'is_discountable']
     inlines = [AttributeInline, ProductRecommendationInline]

@@ -121,7 +121,7 @@ class CustomAbstractProduct(models.Model):
     class Meta:
         abstract = True
         app_label = 'catalogue'
-        ordering = ['-views_count', 'title', 'pk']
+        ordering = ['-date_updated', '-views_count', 'title', 'slug', 'pk']
         verbose_name = _('Product')
         verbose_name_plural = _('Products')
 
