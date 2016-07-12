@@ -12,6 +12,7 @@ django-angular==0.7.15
 django-appconf==1.0.1
 django-bootstrap3==7.0.1
 django-braces==1.8.1
+django-ckeditor==5.0.3
 django-compressor==1.6
 django-debug-toolbar==1.4
 django-extra-views==0.6.4
