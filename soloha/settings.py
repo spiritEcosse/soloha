@@ -60,6 +60,7 @@ INSTALLED_APPS = \
         'djangular',
         'mptt',
         'feincms',
+        'ckeditor',
         'easy_thumbnails',
         'filer',
         'apps.contacts',

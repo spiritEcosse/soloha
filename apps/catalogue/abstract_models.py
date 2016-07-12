@@ -10,6 +10,7 @@ from oscar.apps.catalogue.abstract_models import *  # noqa
 from django.db import IntegrityError
 from django.core.exceptions import ValidationError
 from filer.fields.image import FilerImageField
+from ckeditor_uploader.fields import RichTextUploadingField
 
 REGEXP_PHONE = r'/^((8|\+38)[\- ]?)?(\(?\d{3}\)?[\- ]?)?[\d\- ]{7,10}$/'
 REGEXP_EMAIL = r'/^[-\w.]+@([A-z0-9][-A-z0-9]+\.)+[A-z]{2,4}$/'
@@ -30,7 +31,7 @@ class CustomAbstractProduct(models.Model):
     meta_title = models.CharField(verbose_name=_('Meta tag: title'), blank=True, max_length=520)
     meta_description = models.TextField(verbose_name=_('Meta tag: description'), blank=True)
     meta_keywords = models.TextField(verbose_name=_('Meta tag: keywords'), blank=True)
-    description = models.TextField(_('Description'), blank=True)
+    description = RichTextUploadingField(_('Description'), blank=True)
     views_count = models.IntegerField(verbose_name='views count', editable=False, default=0)
 
     STANDALONE, PARENT, CHILD = 'standalone', 'parent', 'child'
@@ -588,7 +589,7 @@ class CustomAbstractCategory(MPTTModel):
     created = models.DateTimeField(auto_now_add=True)
     image_banner = models.ImageField(_('Image banner'), upload_to='categories/%Y/%m/%d/', blank=True, null=True, max_length=600)
     link_banner = models.URLField(_('Link banner'), blank=True, null=True, max_length=555)
-    description = models.TextField(_('Description'), blank=True)
+    description = RichTextUploadingField(_('Description'), blank=True)
     image = models.ImageField(_('Image'), upload_to='categories/%Y/%m/%d/', blank=True, null=True, max_length=500)
     _slug_separator = '/'
     _full_name_separator = ' > '
