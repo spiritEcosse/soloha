@@ -60,9 +60,13 @@ class ProductForm(forms.ModelForm):
                     Category.objects.all(),
                     widget=MPTTFilteredSelectMultiple("Categories", False, attrs={'rows':'10'})
                 )
+    characteristics = MPTTModelMultipleChoiceField(
+                    Feature.objects.all(),
+                    widget=MPTTFilteredSelectMultiple("Characteristics", False, attrs={'rows':'10'})
+                )
 
     class Meta:
-        model = Feature
+        model = Product
         fields = '__all__'
 
 
@@ -74,7 +78,7 @@ class ProductAdmin(admin.ModelAdmin):
     inlines = [AttributeInline, ProductRecommendationInline]
     prepopulated_fields = {"slug": ("title",)}
     search_fields = ('upc', 'title', 'slug', )
-    form = ProductForm
+    # form = ProductForm
 
     def get_queryset(self, request):
         qs = super(ProductAdmin, self).get_queryset(request)
