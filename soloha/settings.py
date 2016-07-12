@@ -47,7 +47,6 @@ INSTALLED_APPS = \
         'debug_toolbar',
          # 'django_select2',
          # 'bootstrap_pagination',
-         # 'ckeditor',
         'django.contrib.auth',
         'django.contrib.contenttypes',
         'django.contrib.sessions',
@@ -60,12 +59,11 @@ INSTALLED_APPS = \
         'djangular',
         'mptt',
         'feincms',
-        'ckeditor',
         'easy_thumbnails',
-        'filer',
         'apps.contacts',
         'apps.ex_sites',
         'import_export',
+        'ckeditor',
         # 'smart_load_tag',
     ] + get_core_apps(['apps.catalogue', 'apps.promotions', 'apps.partner', 'apps.search', 'apps.order', ])
 

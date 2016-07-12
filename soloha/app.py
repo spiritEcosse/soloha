@@ -16,7 +16,7 @@ class Soloha(app.Shop):
             url(r'^search/filter/(?P<filter_slug>[\w-]+(/[\w-]+)*)/', search_view.as_view()),
             url(r'^search/', search_view.as_view()),
             url(r'^contacts/', contacts_view.as_view()),
-            url(r'^filer/', include('filer.urls')),
+            url(r'^ckeditor/', include('ckeditor_uploader.urls')),
         ]
         urlpatterns += super(Soloha, self).get_urls()
         urlpatterns += [
