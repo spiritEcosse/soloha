@@ -102,7 +102,6 @@ class ProductAdmin(admin.ModelAdmin):
                 'filters',
                 'attributes',
                 'characteristics',
-                'options',
             )
         )
 
