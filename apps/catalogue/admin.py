@@ -51,6 +51,10 @@ class ProductClassAdmin(admin.ModelAdmin):
     inlines = [ProductAttributeInline]
 
 
+class ProductImageInline(admin.TabularInline):
+    model = ProductImage
+
+
 class ProductForm(forms.ModelForm):
     filters = MPTTModelMultipleChoiceField(
                     Feature.objects.all(),
@@ -72,10 +76,9 @@ class ProductForm(forms.ModelForm):
 
 class ProductAdmin(admin.ModelAdmin):
     date_hierarchy = 'date_created'
-    list_display = ('pk', 'title', 'date_updated', 'slug', 'get_product_class', 'structure',
-                    'attribute_summary', 'date_created')
+    list_display = ('title', 'date_updated', 'slug', 'get_product_class', 'structure', 'attribute_summary', 'date_created', 'pk')
     list_filter = ['structure', 'is_discountable']
-    inlines = [AttributeInline, ProductRecommendationInline]
+    inlines = [ProductImageInline, ProductRecommendationInline]
     prepopulated_fields = {"slug": ("title",)}
     search_fields = ('upc', 'title', 'slug', )
     form = ProductForm
