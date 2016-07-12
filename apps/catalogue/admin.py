@@ -8,6 +8,8 @@ from django import forms
 from django.contrib.admin import widgets
 from django.contrib.sites.models import Site
 from django.contrib.sites.admin import SiteAdmin as BaseSiteAdmin
+from import_export import resources
+from import_export.admin import ImportExportModelAdmin
 
 Feature = get_model('catalogue', 'Feature')
 AttributeOption = get_model('catalogue', 'AttributeOption')
@@ -104,6 +106,11 @@ class AttributeOptionInline(admin.TabularInline):
 class AttributeOptionGroupAdmin(admin.ModelAdmin):
     list_display = ('name', 'option_summary')
     inlines = [AttributeOptionInline, ]
+
+
+class CategoryResource(resources.ModelResource):
+    class Meta:
+        model = Category
 
 
 class CategoryAdmin(tree_editor.TreeEditor):

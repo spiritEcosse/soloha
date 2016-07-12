@@ -64,6 +64,7 @@ INSTALLED_APPS = \
         'filer',
         'apps.contacts',
         'apps.ex_sites',
+        'import_export',
         # 'smart_load_tag',
     ] + get_core_apps(['apps.catalogue', 'apps.promotions', 'apps.partner', 'apps.search', 'apps.order', ])
 
@@ -153,6 +154,7 @@ STATICFILES_DIRS = (
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'compressor.finders.CompressorFinder',
 )
 CKEDITOR_JQUERY_URL = '//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js'
 CKEDITOR_UPLOAD_PATH = 'images/'
