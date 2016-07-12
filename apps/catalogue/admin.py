@@ -66,7 +66,7 @@ class ProductForm(forms.ModelForm):
                 )
 
     class Meta:
-        model = Product
+        model = Feature
         fields = '__all__'
 
 
