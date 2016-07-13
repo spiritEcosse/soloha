@@ -22,7 +22,7 @@ class EnableManagerProduct(models.Manager):
 
 
 @python_2_unicode_compatible
-class CustomAbstractProduct(models.Model):
+class AbstractProduct(models.Model):
     # Title is mandatory for canonical products but optional for child products
     title = models.CharField(pgettext_lazy(u'Product title', u'Title'), max_length=300)
     slug = models.SlugField(_('Slug'), max_length=400, unique=True)
@@ -126,9 +126,9 @@ class CustomAbstractProduct(models.Model):
         verbose_name_plural = _('Products')
 
     def __init__(self, *args, **kwargs):
-        super(CustomAbstractProduct, self).__init__(*args, **kwargs)
+        super(AbstractProduct, self).__init__(*args, **kwargs)
         # self.attr = ProductAttributesContainer(product=self)
-        self.has_versions = self.versions.exists()
+        # self.has_versions = self.versions.exists()
 
     def __str__(self):
         if self.title:
@@ -223,7 +223,7 @@ class CustomAbstractProduct(models.Model):
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(self.get_title())
-        super(CustomAbstractProduct, self).save(*args, **kwargs)
+        super(AbstractProduct, self).save(*args, **kwargs)
         # self.attr.save()
 
     # Properties

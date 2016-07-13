@@ -78,7 +78,7 @@ class ProductAdmin(admin.ModelAdmin):
     inlines = [AttributeInline, ProductRecommendationInline]
     prepopulated_fields = {"slug": ("title",)}
     search_fields = ('upc', 'title', 'slug', )
-    # form = ProductForm
+    form = ProductForm
 
     def get_queryset(self, request):
         qs = super(ProductAdmin, self).get_queryset(request)
