@@ -10,6 +10,7 @@ from django.contrib.sites.models import Site
 from django.contrib.sites.admin import SiteAdmin as BaseSiteAdmin
 from import_export import resources
 from import_export.admin import ImportExportMixin, ImportExportModelAdmin, ImportExportActionModelAdmin
+from django.template import loader, Context
 
 Feature = get_model('catalogue', 'Feature')
 AttributeOption = get_model('catalogue', 'AttributeOption')
@@ -81,12 +82,17 @@ class ProductForm(forms.ModelForm):
 
 class ProductAdmin(admin.ModelAdmin):
     date_hierarchy = 'date_created'
-    list_display = ('title', 'date_updated', 'slug', 'get_product_class', 'structure', 'attribute_summary', 'pk')
+    list_display = ('title', 'thumb', 'date_updated', 'slug', 'get_product_class', 'structure', 'attribute_summary', 'pk')
     list_filter = ['structure', 'is_discountable']
     inlines = [StockRecordInline, ProductImageInline, ProductRecommendationInline]
     prepopulated_fields = {"slug": ("title",)}
     search_fields = ('upc', 'title', 'slug', )
     form = ProductForm
+
+    def thumb(self, obj):
+        return loader.get_template('admin/catalogue/product/thumb.html').render(Context({'image': obj.primary_image()}))
+    thumb.allow_tags = True
+    short_description = 'Image'
 
     def get_queryset(self, request):
         qs = super(ProductAdmin, self).get_queryset(request)

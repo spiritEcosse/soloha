@@ -427,20 +427,26 @@ class CustomAbstractProduct(models.Model):
             # the ProductManager
             images = images.order_by('display_order')
         try:
-            image = images[0].original.name or IMAGE_NOT_FOUND
+            image = images[0].original
         except IndexError:
             # We return a dict with fields that mirror the key properties of
             # the ProductImage class so this missing image can be used
             # interchangeably in templates.  Strategy pattern ftw!
-            image = self.get_missing_image().name
+            image = self.get_missing_image()
 
-        #Todo igor: dry
-        if not os.path.exists('{}/{}'.format(MEDIA_ROOT, image)):
+        if image is None:
             image = IMAGE_NOT_FOUND
 
-        #Todo igor: dry, set python Exception file not found
-        if not os.path.exists('{}/{}'.format(MEDIA_ROOT, image)):
-            raise Exception('image - "{}/{}" not found!'.format(MEDIA_ROOT, image))
+            current_path = os.getcwd()
+            os.chdir(MEDIA_ROOT)
+
+            if not os.path.exists(os.path.abspath(image)):
+                try:
+                    raise Exception('image - {} not found!'.format(os.path.abspath(image)))
+                except Exception:
+                    raise
+                finally:
+                    os.chdir(current_path)
         return image
 
     # Updating methods

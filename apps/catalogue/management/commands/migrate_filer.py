@@ -19,43 +19,38 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         fancies = ProductImage.objects.all()
         name_image_map = {}
+        os.chdir(MEDIA_ROOT)
 
         for fancy in fancies:
             if fancy.original is None:
-                print fancy.original_image, "needs migration"
-                name = os.path.basename(fancy.original_image.name)
-
-                if not os.path.exists(name):
-                    name = None
-
-                if name is not None:
-                    i = name_image_map.get(name)
-                    # image = slugify(name.split('/'))
-                    # path = image[:-1]
-                    # image = image[-1].split('.')
-
-                    # if len(image) == 2:
-                    #     extend = image[-1]
-                    #     name_file = image[0]
-                    #     new_name_file = slugify(name_file)
-                    #     new_name_file = '{}.{}'.format(new_name_file, extend)
-                    #     path.append(new_name_file)
-                    #     new_file = '/'.join(path)
-
-                    if i is None:
-                        i = Image(
-                            file=fancy.original_image.name,
-                            height=fancy.original_image.height,
-                            width=fancy.original_image.width,
-                            author="migrated",
-                            original_filename=os.path.basename(fancy.original_image.name),
-                            )
-                        i.save()
-                        name_image_map[name] = i
+                if fancy.original_image:
+                    if not os.path.exists(os.path.abspath(fancy.original_image.name)):
+                        name = None
                     else:
-                        print "already have ", name
-                    fancy.original = i
-                    fancy.save()
+                        name = os.path.basename(fancy.original_image.name)
+
+                    print fancy.original_image, "needs migration"
+                    print fancy.id
+                    print name
+                    print os.path.exists(os.path.abspath(fancy.original_image.name)), os.path.abspath(fancy.original_image.name)
+
+                    if name is not None:
+                        i = name_image_map.get(name)
+
+                        if i is None:
+                            i = Image(
+                                file=fancy.original_image.name,
+                                height=fancy.original_image.height,
+                                width=fancy.original_image.width,
+                                author="migrated",
+                                original_filename=os.path.basename(fancy.original_image.name),
+                                )
+                            i.save()
+                            name_image_map[name] = i
+                        else:
+                            print "already have ", name
+                        fancy.original = i
+                        fancy.save()
 
 # alter table catalogue_productimage RENAME COLUMN original TO original_image;
 # alter table catalogue_productimage ALTER COLUMN "original_image" drop not null;
