@@ -85,7 +85,7 @@ class ProductAdmin(admin.ModelAdmin):
     date_hierarchy = 'date_created'
     list_display = ('title', 'thumb', 'date_updated', 'slug', 'get_product_class', 'structure', 'attribute_summary', 'pk')
     list_filter = ['structure', 'is_discountable']
-    inlines = [StockRecordInline, ProductImageInline, ProductRecommendationInline]
+    inlines = [StockRecordInline, ProductRecommendationInline, ProductImageInline]
     prepopulated_fields = {"slug": ("title",)}
     search_fields = ('upc', 'title', 'slug', )
     form = ProductForm
