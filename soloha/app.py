@@ -17,6 +17,7 @@ class Soloha(app.Shop):
             url(r'^search/', search_view.as_view()),
             url(r'^contacts/', contacts_view.as_view()),
             url(r'^ckeditor/', include('ckeditor_uploader.urls')),
+            url(r'^filer/', include('filer.urls')),
         ]
         urlpatterns += super(Soloha, self).get_urls()
         urlpatterns += [

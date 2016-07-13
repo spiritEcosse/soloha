@@ -1,7 +1,7 @@
 from oscar.core.loading import is_model_registered
 from oscar.apps.catalogue.abstract_models import *  # noqa
 from apps.catalogue.abstract_models import AbstractProduct, AbstractFeature, CustomAbstractCategory, \
-    AbstractProductVersion, AbstractVersionAttribute, AbstractProductFeature, AbstractProductOptions
+    AbstractProductVersion, AbstractVersionAttribute, AbstractProductFeature, AbstractProductOptions, AbstractProductImage
 
 __all__ = ['ProductAttributesContainer']
 

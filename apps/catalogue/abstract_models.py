@@ -11,6 +11,7 @@ from django.db import IntegrityError
 from django.core.exceptions import ValidationError
 from filer.fields.image import FilerImageField
 from ckeditor_uploader.fields import RichTextUploadingField
+from filer.fields.image import FilerImageField
 
 REGEXP_PHONE = r'/^((8|\+38)[\- ]?)?(\(?\d{3}\)?[\- ]?)?[\d\- ]{7,10}$/'
 REGEXP_EMAIL = r'/^[-\w.]+@([A-z0-9][-A-z0-9]+\.)+[A-z]{2,4}$/'
@@ -426,20 +427,26 @@ class AbstractProduct(models.Model):
             # the ProductManager
             images = images.order_by('display_order')
         try:
-            image = images[0].original.name or IMAGE_NOT_FOUND
+            image = images[0].original
         except IndexError:
             # We return a dict with fields that mirror the key properties of
             # the ProductImage class so this missing image can be used
             # interchangeably in templates.  Strategy pattern ftw!
-            image = self.get_missing_image().name
+            image = self.get_missing_image()
 
-        #Todo igor: dry
-        if not os.path.exists('{}/{}'.format(MEDIA_ROOT, image)):
+        if image is None:
             image = IMAGE_NOT_FOUND
 
-        #Todo igor: dry, set python Exception file not found
-        if not os.path.exists('{}/{}'.format(MEDIA_ROOT, image)):
-            raise Exception('image - "{}/{}" not found!'.format(MEDIA_ROOT, image))
+            current_path = os.getcwd()
+            os.chdir(MEDIA_ROOT)
+
+            if not os.path.exists(os.path.abspath(image)):
+                try:
+                    raise Exception('image - {} not found!'.format(os.path.abspath(image)))
+                except Exception:
+                    raise
+                finally:
+                    os.chdir(current_path)
         return image
 
     # Updating methods
@@ -575,6 +582,51 @@ class AbstractFeature(MPTTModel):
 
 
 @python_2_unicode_compatible
+class AbstractProductImage(models.Model):
+    """
+    An image of a product
+    """
+    product = models.ForeignKey('catalogue.Product', related_name='images', verbose_name=_("Product"))
+    original = FilerImageField(verbose_name=_("Original"), null=True, blank=True, related_name="original")
+    original_image = models.ImageField(_("Original"), upload_to=settings.OSCAR_IMAGE_FOLDER, max_length=255, blank=True, null=True)
+    caption = models.CharField(_("Caption"), max_length=200, blank=True)
+
+    #: Use display_order to determine which is the "primary" image
+    display_order = models.PositiveIntegerField(_("Display order"), default=0,
+        help_text=_("An image with a display order of zero will be the primary image for a product"))
+    date_created = models.DateTimeField(_("Date created"), auto_now_add=True)
+
+    class Meta:
+        abstract = True
+        app_label = 'catalogue'
+        # Any custom models should ensure that this ordering is unchanged, or
+        # your query count will explode. See AbstractProduct.primary_image.
+        ordering = ["display_order"]
+        unique_together = ("product", "display_order")
+        verbose_name = _('Product image')
+        verbose_name_plural = _('Product images')
+
+    def __str__(self):
+        return u"Image of '%s'" % self.product
+
+    def is_primary(self):
+        """
+        Return bool if image display order is 0
+        """
+        return self.display_order == 0
+
+    def delete(self, *args, **kwargs):
+        """
+        Always keep the display_order as consecutive integers. This avoids
+        issue #855.
+        """
+        super(AbstractProductImage, self).delete(*args, **kwargs)
+        for idx, image in enumerate(self.product.images.all()):
+            image.display_order = idx
+            image.save()
+
+
+@python_2_unicode_compatible
 class CustomAbstractCategory(MPTTModel):
     name = models.CharField(_('Name'), max_length=300, db_index=True)
     slug = models.SlugField(verbose_name=_('Slug'), max_length=400, unique=True)
@@ -591,6 +643,8 @@ class CustomAbstractCategory(MPTTModel):
     link_banner = models.URLField(_('Link banner'), blank=True, null=True, max_length=555)
     description = RichTextUploadingField(_('Description'), blank=True)
     image = models.ImageField(_('Image'), upload_to='categories/%Y/%m/%d/', blank=True, null=True, max_length=500)
+    # image = FilerImageField(verbose_name=_('Image'), null=True, blank=True, related_name="image")
+    category_image = FilerImageField(verbose_name=_('Image'), null=True, blank=True, related_name="category_image")
     _slug_separator = '/'
     _full_name_separator = ' > '
 
