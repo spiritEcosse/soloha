@@ -80,6 +80,7 @@ class ProductForm(forms.ModelForm):
 
 
 class ProductAdmin(admin.ModelAdmin):
+    save_as = True
     date_hierarchy = 'date_created'
     list_display = ('title', 'date_updated', 'slug', 'get_product_class', 'structure', 'attribute_summary', 'pk')
     list_filter = ['structure', 'is_discountable']
