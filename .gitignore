@@ -26,6 +26,7 @@ npm-debug.log
 .~lock.*
 *.DS_Store
 .python-version
+**/migrations/
 
 # IDE files
 .project
