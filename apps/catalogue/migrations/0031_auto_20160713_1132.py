@@ -8,10 +8,15 @@ import filer.fields.image
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('catalogue', '0027_category_category_image'),
+        ('catalogue', '0030_remove_productimage_original_image'),
     ]
 
     operations = [
+        migrations.AddField(
+            model_name='productimage',
+            name='original_image',
+            field=models.ImageField(max_length=255, upload_to=b'images/products/%Y/%m/', null=True, verbose_name='Original', blank=True),
+        ),
         migrations.AlterField(
             model_name='productimage',
             name='original',

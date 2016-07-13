@@ -580,17 +580,14 @@ class AbstractProductImage(models.Model):
     """
     An image of a product
     """
-    product = models.ForeignKey(
-        'catalogue.Product', related_name='images', verbose_name=_("Product"))
-
+    product = models.ForeignKey('catalogue.Product', related_name='images', verbose_name=_("Product"))
     original = FilerImageField(verbose_name=_("Original"), null=True, blank=True, related_name="original")
+    original_image = models.ImageField(_("Original"), upload_to=settings.OSCAR_IMAGE_FOLDER, max_length=255, blank=True, null=True)
     caption = models.CharField(_("Caption"), max_length=200, blank=True)
 
     #: Use display_order to determine which is the "primary" image
-    display_order = models.PositiveIntegerField(
-        _("Display order"), default=0,
-        help_text=_("An image with a display order of zero will be the primary"
-                    " image for a product"))
+    display_order = models.PositiveIntegerField(_("Display order"), default=0,
+        help_text=_("An image with a display order of zero will be the primary image for a product"))
     date_created = models.DateTimeField(_("Date created"), auto_now_add=True)
 
     class Meta:
@@ -640,6 +637,7 @@ class CustomAbstractCategory(MPTTModel):
     link_banner = models.URLField(_('Link banner'), blank=True, null=True, max_length=555)
     description = RichTextUploadingField(_('Description'), blank=True)
     image = models.ImageField(_('Image'), upload_to='categories/%Y/%m/%d/', blank=True, null=True, max_length=500)
+    # image = FilerImageField(verbose_name=_('Image'), null=True, blank=True, related_name="image")
     category_image = FilerImageField(verbose_name=_('Image'), null=True, blank=True, related_name="category_image")
     _slug_separator = '/'
     _full_name_separator = ' > '
