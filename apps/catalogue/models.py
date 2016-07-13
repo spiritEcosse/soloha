@@ -1,6 +1,6 @@
 from oscar.core.loading import is_model_registered
 from oscar.apps.catalogue.abstract_models import *  # noqa
-from apps.catalogue.abstract_models import CustomAbstractProduct, AbstractFeature, CustomAbstractCategory, \
+from apps.catalogue.abstract_models import AbstractProduct, AbstractFeature, CustomAbstractCategory, \
     AbstractProductVersion, AbstractVersionAttribute, AbstractProductFeature, AbstractProductOptions
 
 __all__ = ['ProductAttributesContainer']
@@ -52,7 +52,7 @@ if not is_model_registered('catalogue', 'Feature'):
 
 
 if not is_model_registered('catalogue', 'Product'):
-    class Product(CustomAbstractProduct):
+    class Product(AbstractProduct):
         pass
 
     __all__.append('Product')
