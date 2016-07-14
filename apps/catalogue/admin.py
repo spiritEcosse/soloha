@@ -9,7 +9,8 @@ from django.contrib.admin import widgets
 from django.contrib.sites.models import Site
 from django.contrib.sites.admin import SiteAdmin as BaseSiteAdmin
 from import_export import resources
-from import_export.admin import ImportExportMixin, ImportExportModelAdmin, ImportExportActionModelAdmin
+from import_export.admin import ImportExportMixin, ImportExportActionModelAdmin, ImportExportActionModelAdmin
+from mptt.admin import DraggableMPTTAdmin
 
 Feature = get_model('catalogue', 'Feature')
 AttributeOption = get_model('catalogue', 'AttributeOption')
@@ -26,11 +27,30 @@ StockRecord = get_model('partner', 'StockRecord')
 Info = get_model('sites', 'Info')
 
 
-class FeatureAdmin(tree_editor.TreeEditor):
+class ProductImageResource(resources.ModelResource):
+    class Meta:
+        model = ProductImage
+        exclude = ('original', 'date_created', )
+
+
+class ProductImageAdmin(ImportExportMixin, ImportExportActionModelAdmin):
+    pass
+
+
+class FeatureResource(resources.ModelResource):
+    class Meta:
+        model = Feature
+        skip_unchanged = True
+        report_skipped = False
+        exclude = ('lft', 'rght', 'tree_id', 'level', )
+
+
+class FeatureAdmin(ImportExportMixin, ImportExportActionModelAdmin):
     list_display = ('title', 'slug', 'parent', )
     list_filter = ('title', 'slug', 'parent')
     prepopulated_fields = {"slug": ("title",)}
     search_fields = ('title', 'slug', )
+    resource_class = FeatureResource
 
 
 class AttributeInline(admin.TabularInline):
@@ -130,13 +150,16 @@ class AttributeOptionGroupAdmin(admin.ModelAdmin):
 
 
 class CategoryResource(resources.ModelResource):
+
     class Meta:
         model = Category
+        exclude = ('lft', 'rght', 'tree_id', 'level', 'parent', )
 
 
-class CategoryAdmin(ImportExportModelAdmin, ImportExportActionModelAdmin, tree_editor.TreeEditor):
+class CategoryAdmin(ImportExportMixin, ImportExportActionModelAdmin, DraggableMPTTAdmin):
     prepopulated_fields = {'slug': ("name", )}
-    list_display = ("name", 'slug', 'parent', 'enable', 'sort', 'created')
+    empty_value_display = '-empty-'
+    list_display = ('indented_title', 'slug', 'parent', 'enable', 'sort', 'created')
     formfield_overrides = {
         models.ManyToManyField: {'widget': MPTTFilteredSelectMultiple("", False, attrs={'rows': '10'})},
         models.TextField: {'widget': Textarea(attrs={'cols': 40, 'rows': 4})},
@@ -162,7 +185,7 @@ admin.site.register(ProductAttribute, ProductAttributeAdmin)
 admin.site.register(ProductAttributeValue, ProductAttributeValueAdmin)
 admin.site.register(AttributeOptionGroup, AttributeOptionGroupAdmin)
 admin.site.register(Option, OptionAdmin)
-admin.site.register(ProductImage)
+admin.site.register(ProductImage, ProductImageAdmin)
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Feature, FeatureAdmin)
 
