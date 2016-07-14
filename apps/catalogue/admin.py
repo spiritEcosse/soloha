@@ -80,7 +80,14 @@ class ProductForm(forms.ModelForm):
         fields = '__all__'
 
 
-class ProductAdmin(admin.ModelAdmin):
+class ProductResource(resources.ModelResource):
+    class Meta:
+        model = Product
+        exclude = ('views_count', 'upc', 'rating', 'attributes', 'options', 'recommended_products', 'date_created',
+                   'date_updated', 'structure', 'parent')
+
+
+class ProductAdmin(ImportExportMixin, ImportExportActionModelAdmin, admin.ModelAdmin):
     save_as = True
     date_hierarchy = 'date_created'
     list_display = ('title', 'thumb', 'date_updated', 'slug', 'get_product_class', 'structure', 'attribute_summary', 'pk')
@@ -89,6 +96,7 @@ class ProductAdmin(admin.ModelAdmin):
     prepopulated_fields = {"slug": ("title",)}
     search_fields = ('upc', 'title', 'slug', )
     form = ProductForm
+    resource_class = ProductResource
 
     def thumb(self, obj):
         return loader.get_template('admin/catalogue/product/thumb.html').render(Context({'image': obj.primary_image()}))

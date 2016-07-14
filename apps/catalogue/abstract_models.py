@@ -78,7 +78,7 @@ class AbstractProduct(models.Model):
     #: "Kind" of product, e.g. T-Shirt, Book, etc.
     #: None for child products, they inherit their parent's product class
     product_class = models.ForeignKey(
-        'catalogue.ProductClass', null=True, blank=True, on_delete=models.PROTECT,
+        'catalogue.ProductClass', on_delete=models.PROTECT,
         verbose_name=_('Product type'), related_name="products",
         help_text=_("Choose what type of product this is"))
     # attributes = models.ManyToManyField(
@@ -432,7 +432,7 @@ class AbstractProduct(models.Model):
             # We return a dict with fields that mirror the key properties of
             # the ProductImage class so this missing image can be used
             # interchangeably in templates.  Strategy pattern ftw!
-            image = self.get_missing_image()
+            image = self.get_missing_image().name
 
         if image is None:
             image = IMAGE_NOT_FOUND
