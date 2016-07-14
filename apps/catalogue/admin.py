@@ -63,17 +63,17 @@ class StockRecordInline(admin.TabularInline):
 
 class ProductForm(forms.ModelForm):
     filters = MPTTModelMultipleChoiceField(
-                    Feature.objects.all(),
-                    widget=MPTTFilteredSelectMultiple("Filters", False, attrs={'rows':'10'})
-                )
+        Feature.objects.all(),
+        widget=MPTTFilteredSelectMultiple("Filters", False, attrs={'rows':'10'})
+    )
     categories = MPTTModelMultipleChoiceField(
-                    Category.objects.all(),
-                    widget=MPTTFilteredSelectMultiple("Categories", False, attrs={'rows':'10'})
-                )
+        Category.objects.all(),
+        widget=MPTTFilteredSelectMultiple("Categories", False, attrs={'rows':'10'})
+    )
     characteristics = MPTTModelMultipleChoiceField(
-                    Feature.objects.all(),
-                    widget=MPTTFilteredSelectMultiple("Characteristics", False, attrs={'rows':'10'})
-                )
+        Feature.objects.all(),
+        widget=MPTTFilteredSelectMultiple("Characteristics", False, attrs={'rows':'10'})
+    )
 
     class Meta:
         model = Product
@@ -86,9 +86,11 @@ class ProductResource(resources.ModelResource):
         exclude = ('views_count', 'upc', 'rating', 'attributes', 'options', 'recommended_products', 'date_created',
                    'date_updated', 'structure', 'parent')
 
+    def dehydrate_categories(self, obj):
+        return ','.join([cat.name for cat in obj.categories.all()])
+
 
 class ProductAdmin(ImportExportMixin, ImportExportActionModelAdmin, admin.ModelAdmin):
-    save_as = True
     date_hierarchy = 'date_created'
     list_display = ('title', 'thumb', 'date_updated', 'slug', 'get_product_class', 'structure', 'attribute_summary', 'pk')
     list_filter = ['structure', 'is_discountable']
