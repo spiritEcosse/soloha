@@ -11,6 +11,7 @@ from django.contrib.sites.admin import SiteAdmin as BaseSiteAdmin
 from import_export import resources
 from import_export.admin import ImportExportMixin, ImportExportModelAdmin, ImportExportActionModelAdmin
 from django.template import loader, Context
+from dal import autocomplete
 
 Feature = get_model('catalogue', 'Feature')
 AttributeOption = get_model('catalogue', 'AttributeOption')
@@ -38,9 +39,19 @@ class AttributeInline(admin.TabularInline):
     model = ProductAttributeValue
 
 
+class ProductRecommendationForm(forms.ModelForm):
+    class Meta:
+        model = ProductRecommendation
+        fields = '__all__'
+        widgets = {
+            'recommendation': autocomplete.ModelSelect2(url='product_recommendation_select2_fk')
+        }
+
+
 class ProductRecommendationInline(admin.TabularInline):
     model = ProductRecommendation
     fk_name = 'primary'
+    form = ProductRecommendationForm
 
 
 class ProductAttributeInline(admin.TabularInline):
@@ -63,21 +74,25 @@ class StockRecordInline(admin.TabularInline):
 
 class ProductForm(forms.ModelForm):
     filters = MPTTModelMultipleChoiceField(
-                    Feature.objects.all(),
-                    widget=MPTTFilteredSelectMultiple("Filters", False, attrs={'rows':'10'})
-                )
+        Feature.objects.all(),
+        widget=MPTTFilteredSelectMultiple("Filters", False, attrs={'rows':'10'})
+    )
     categories = MPTTModelMultipleChoiceField(
-                    Category.objects.all(),
-                    widget=MPTTFilteredSelectMultiple("Categories", False, attrs={'rows':'10'})
-                )
+        Category.objects.all(),
+        widget=MPTTFilteredSelectMultiple("Categories", False, attrs={'rows':'10'})
+    )
     characteristics = MPTTModelMultipleChoiceField(
-                    Feature.objects.all(),
-                    widget=MPTTFilteredSelectMultiple("Characteristics", False, attrs={'rows':'10'})
-                )
+        Feature.objects.all(),
+        widget=MPTTFilteredSelectMultiple("Characteristics", False, attrs={'rows':'10'})
+    )
 
     class Meta:
         model = Product
         fields = '__all__'
+        widgets = {
+            'parent': autocomplete.ModelSelect2(url='select2_fk')
+        }
+        exclude = ('name', )
 
 
 class ProductAdmin(admin.ModelAdmin):
@@ -109,6 +124,7 @@ class ProductAdmin(admin.ModelAdmin):
                 'filters',
                 'attributes',
                 'characteristics',
+                'recommended_products',
             )
         )
 

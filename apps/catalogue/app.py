@@ -1,7 +1,7 @@
 from oscar.apps.catalogue.app import CatalogueApplication as CoreCatalogueApplication
 from django.views.generic.list import MultipleObjectMixin
 from django.conf.urls import url
-from oscar.core.loading import get_class
+from oscar.core.loading import get_class, get_model
 
 calculate_price = get_class('catalogue.views', 'ProductCalculatePrice')
 quick_order_view = get_class('catalogue.views', 'QuickOrderView')

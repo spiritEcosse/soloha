@@ -42,6 +42,8 @@ ALLOWED_HOSTS = settings_local.ALLOWED_HOSTS
 INSTALLED_APPS = \
     [
         'flat',
+        'dal',
+        'dal_select2',
         'django.contrib.admin',
         'django.contrib.sitemaps',
         'debug_toolbar',
