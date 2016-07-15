@@ -19,29 +19,14 @@ class AbstractStockRecord(models.Model):
     Stockrecords are used by 'strategies' to determine availability and pricing
     information for the customer.
     """
-    product = models.ForeignKey(
-        'catalogue.Product', related_name="stockrecords",
-        verbose_name=_("Product"))
-    partner = models.ForeignKey(
-        'partner.Partner', verbose_name=_("Partner"),
-        related_name='stockrecords', blank=True, null=True)
-
-    product_version = models.ForeignKey(
-        'catalogue.ProductVersion', related_name="stockrecords", verbose_name=_("Product version"),
-        blank=True, null=True
-    )
-    product_options = models.ForeignKey(
-        'catalogue.ProductOptions', related_name='stockrecords', verbose_name=_('Product options'),
-        blank=True, null=True
-    )
-    plus = models.BooleanField(verbose_name=_('Plus on main price'), default=False)
-    percent = models.IntegerField(verbose_name=_('Percent'), null=True, blank=True, default=0)
+    product = models.ForeignKey('catalogue.Product', related_name="stockrecords",verbose_name=_("Product"))
+    partner = models.ForeignKey('partner.Partner', verbose_name=_("Partner"),related_name='stockrecords', null=True)
 
     #: The fulfilment partner will often have their own SKU for a product,
     #: which we store here.  This will sometimes be the same the product's UPC
     #: but not always.  It should be unique per partner.
     #: See also http://en.wikipedia.org/wiki/Stock-keeping_unit
-    partner_sku = models.CharField(_("Partner SKU"), max_length=128)
+    partner_sku = models.CharField(_("Partner SKU"), max_length=128, blank=True)
 
     # Price info:
     price_currency = models.CharField(

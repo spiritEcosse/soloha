@@ -41,7 +41,7 @@ ALLOWED_HOSTS = settings_local.ALLOWED_HOSTS
 
 INSTALLED_APPS = \
     [
-        'suit',
+        'flat',
         'django.contrib.admin',
         'django.contrib.sitemaps',
         'debug_toolbar',
@@ -54,12 +54,14 @@ INSTALLED_APPS = \
         'django.contrib.messages',
         'django.contrib.staticfiles',
         'django.contrib.flatpages',
+        'django.contrib.redirects',
         'compressor',
         'widget_tweaks',
         'djangular',
         'mptt',
         'feincms',
         'easy_thumbnails',
+        'filer',
         'apps.contacts',
         'apps.ex_sites',
         'import_export',
@@ -227,7 +229,9 @@ OSCAR_ORDER_STATUS_PIPELINE = {
 }
 
 THUMBNAIL_HIGH_RESOLUTION = True
-
+FILER_CANONICAL_URL = 'sharing/'
+FILER_DEBUG = DEBUG
+FILER_ENABLE_LOGGING = DEBUG
 THUMBNAIL_PROCESSORS = (
     'easy_thumbnails.processors.colorspace',
     'easy_thumbnails.processors.autocrop',
