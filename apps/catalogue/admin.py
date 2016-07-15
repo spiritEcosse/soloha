@@ -11,6 +11,8 @@ from django.contrib.sites.admin import SiteAdmin as BaseSiteAdmin
 from import_export import resources
 from import_export.admin import ImportExportMixin, ImportExportModelAdmin, ImportExportActionModelAdmin
 from django.template import loader, Context
+from import_export import fields, widgets
+from filer.models import File
 
 Feature = get_model('catalogue', 'Feature')
 AttributeOption = get_model('catalogue', 'AttributeOption')
@@ -81,13 +83,18 @@ class ProductForm(forms.ModelForm):
 
 
 class ProductResource(resources.ModelResource):
+    categories_slug = fields.Field(column_name='categories', attribute='categories',
+                                   widget=widgets.ManyToManyWidget(model=Category, field='slug'))
+    filters_slug = fields.Field(column_name='filters', attribute='filters',
+                                widget=widgets.ManyToManyWidget(model=Feature, field='slug'))
+    characteristics_slug = fields.Field(column_name='characteristics', attribute='characteristics',
+                                        widget=widgets.ManyToManyWidget(model=Feature, field='slug'))
+
     class Meta:
         model = Product
-        exclude = ('views_count', 'upc', 'rating', 'attributes', 'options', 'recommended_products', 'date_created',
-                   'date_updated', 'structure', 'parent')
-
-    def dehydrate_categories(self, obj):
-        return ','.join([cat.name for cat in obj.categories.all()])
+        fields = ('id', 'title', 'slug', 'enable', 'h1', 'meta_title', 'meta_description', 'meta_keywords',
+                  'description', 'categories_slug', 'filters_slug', 'characteristics_slug', )
+        export_order = fields
 
 
 class ProductAdmin(ImportExportMixin, ImportExportActionModelAdmin, admin.ModelAdmin):
