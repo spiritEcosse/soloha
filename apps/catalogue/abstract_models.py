@@ -607,7 +607,7 @@ class AbstractProductImage(models.Model):
         verbose_name_plural = _('Product images')
 
     def __str__(self):
-        return u"Image of '%s'" % self.product
+        return u"Image of '%s'" % getattr(self, 'product', None)
 
     def is_primary(self):
         """

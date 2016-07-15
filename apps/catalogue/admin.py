@@ -13,6 +13,8 @@ from mptt.admin import DraggableMPTTAdmin
 from import_export.admin import ImportExportMixin, ImportExportModelAdmin, ImportExportActionModelAdmin
 from django.template import loader, Context
 from import_export import fields, widgets
+from filer.models.imagemodels import Image
+import os
 
 Feature = get_model('catalogue', 'Feature')
 AttributeOption = get_model('catalogue', 'AttributeOption')
@@ -30,13 +32,31 @@ Info = get_model('sites', 'Info')
 
 
 class ProductImageResource(resources.ModelResource):
+    original_name = fields.Field(column_name='original', attribute='original',
+                                 widget=widgets.ForeignKeyWidget(model=Image, field='original_filename'))
+    product_slug = fields.Field(column_name='product', attribute='Product',
+                                widget=widgets.ForeignKeyWidget(model=Product, field='slug'))
+
     class Meta:
         model = ProductImage
-        exclude = ('original', 'date_created', )
+        fields = ('id', 'product_slug', 'original_name', 'caption', 'display_order', )
+        export_order = fields
+
+    def import_field(self, field, obj, data):
+        print data[field.column_name]
+        
+        super(ProductImageResource, self).import_field(field, obj, data)
+
+    def before_save_instance(self, instance, dry_run):
+        image = Image.objects.create()
+        image.file = instance.original
+        image.original_filename = os.path.basename(instance.original)
+        image.save()
+        instance.original = image
 
 
 class ProductImageAdmin(ImportExportMixin, ImportExportActionModelAdmin):
-    pass
+    resource_class = ProductImageResource
 
 
 class FeatureResource(resources.ModelResource):
@@ -112,7 +132,7 @@ class ProductResource(resources.ModelResource):
     class Meta:
         model = Product
         fields = ('id', 'title', 'slug', 'enable', 'h1', 'meta_title', 'meta_description', 'meta_keywords',
-                  'description', 'categories_slug', 'filters_slug', 'characteristics_slug', )
+                  'description', 'categories_slug', 'filters_slug', 'characteristics_slug', 'product_class', )
         export_order = fields
 
 
