@@ -11,6 +11,8 @@ from django.contrib.sites.admin import SiteAdmin as BaseSiteAdmin
 from import_export import resources
 from import_export.admin import ImportExportMixin, ImportExportModelAdmin, ImportExportActionModelAdmin
 from django.template import loader, Context
+from import_export import fields, widgets
+from filer.models import File
 
 Feature = get_model('catalogue', 'Feature')
 AttributeOption = get_model('catalogue', 'AttributeOption')
@@ -63,25 +65,39 @@ class StockRecordInline(admin.TabularInline):
 
 class ProductForm(forms.ModelForm):
     filters = MPTTModelMultipleChoiceField(
-                    Feature.objects.all(),
-                    widget=MPTTFilteredSelectMultiple("Filters", False, attrs={'rows':'10'})
-                )
+        Feature.objects.all(),
+        widget=MPTTFilteredSelectMultiple("Filters", False, attrs={'rows':'10'})
+    )
     categories = MPTTModelMultipleChoiceField(
-                    Category.objects.all(),
-                    widget=MPTTFilteredSelectMultiple("Categories", False, attrs={'rows':'10'})
-                )
+        Category.objects.all(),
+        widget=MPTTFilteredSelectMultiple("Categories", False, attrs={'rows':'10'})
+    )
     characteristics = MPTTModelMultipleChoiceField(
-                    Feature.objects.all(),
-                    widget=MPTTFilteredSelectMultiple("Characteristics", False, attrs={'rows':'10'})
-                )
+        Feature.objects.all(),
+        widget=MPTTFilteredSelectMultiple("Characteristics", False, attrs={'rows':'10'})
+    )
 
     class Meta:
         model = Product
         fields = '__all__'
 
 
-class ProductAdmin(admin.ModelAdmin):
-    save_as = True
+class ProductResource(resources.ModelResource):
+    categories_slug = fields.Field(column_name='categories', attribute='categories',
+                                   widget=widgets.ManyToManyWidget(model=Category, field='slug'))
+    filters_slug = fields.Field(column_name='filters', attribute='filters',
+                                widget=widgets.ManyToManyWidget(model=Feature, field='slug'))
+    characteristics_slug = fields.Field(column_name='characteristics', attribute='characteristics',
+                                        widget=widgets.ManyToManyWidget(model=Feature, field='slug'))
+
+    class Meta:
+        model = Product
+        fields = ('id', 'title', 'slug', 'enable', 'h1', 'meta_title', 'meta_description', 'meta_keywords',
+                  'description', 'categories_slug', 'filters_slug', 'characteristics_slug', )
+        export_order = fields
+
+
+class ProductAdmin(ImportExportMixin, ImportExportActionModelAdmin, admin.ModelAdmin):
     date_hierarchy = 'date_created'
     list_display = ('title', 'thumb', 'date_updated', 'slug', 'get_product_class', 'structure', 'attribute_summary', 'pk')
     list_filter = ['structure', 'is_discountable']
@@ -89,6 +105,7 @@ class ProductAdmin(admin.ModelAdmin):
     prepopulated_fields = {"slug": ("title",)}
     search_fields = ('upc', 'title', 'slug', )
     form = ProductForm
+    resource_class = ProductResource
 
     def thumb(self, obj):
         return loader.get_template('admin/catalogue/product/thumb.html').render(Context({'image': obj.primary_image()}))
