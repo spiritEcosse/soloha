@@ -43,6 +43,9 @@ class ProductImageResource(resources.ModelResource):
         fields = ('id', 'product_slug', 'original', 'caption', 'display_order', )
         export_order = fields
 
+    def dehydrate_original(self, obj):
+        return obj.original.file.name
+
 
 class ProductImageAdmin(ImportExportMixin, ImportExportActionModelAdmin):
     resource_class = ProductImageResource
