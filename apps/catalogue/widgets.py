@@ -6,7 +6,9 @@ from django.utils.html import escape, conditional_escape
 from django.contrib.admin import widgets
 from import_export import widgets as import_export_widgets
 import os
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
+from filer.models.imagemodels import Image
+from django.db import transaction
 
 
 class MPTTModelChoiceIterator(forms.models.ModelChoiceIterator):
@@ -78,10 +80,10 @@ class MPTTFilteredSelectMultiple(widgets.FilteredSelectMultiple):
 
 class ImageForeignKeyWidget(import_export_widgets.ForeignKeyWidget):
     def clean(self, value):
-        try:
-            super(ImageForeignKeyWidget, self).clean(value)
-        except ObjectDoesNotExist:
-            val = super(import_export_widgets.ForeignKeyWidget, self).clean(value)
-            obj = self.model.objects.create(file=val, original_filename=os.path.basename(val))
-            obj.save()
-            return obj
+        val = super(import_export_widgets.ForeignKeyWidget, self).clean(value)
+        image = Image.objects.filter(file=val).first()
+
+        if image is None:
+            image = Image.objects.create(file=val, original_filename=val)
+            image.save()
+        return image

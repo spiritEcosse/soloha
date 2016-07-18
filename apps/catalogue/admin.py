@@ -14,7 +14,7 @@ from django.template import loader, Context
 from import_export import fields, widgets
 from filer.models.imagemodels import Image
 import os
-from widgets import ImageForeignKeyWidget
+from widgets import ImageForeignKeyWidget, ImageManyToManyWidget
 
 
 Feature = get_model('catalogue', 'Feature')
@@ -44,7 +44,10 @@ class ProductImageResource(resources.ModelResource):
         export_order = fields
 
     def dehydrate_original(self, obj):
-        return obj.original.file.name
+        if obj.original is not None:
+            return obj.original.file.name
+        else:
+            return ''
 
 
 class ProductImageAdmin(ImportExportMixin, ImportExportActionModelAdmin):
