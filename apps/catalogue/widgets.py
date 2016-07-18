@@ -1,10 +1,12 @@
 from itertools import chain
 from django import forms
 from django.conf import settings
-from django.contrib.admin import widgets
 from django.utils.encoding import smart_unicode, force_unicode
-from django.utils.safestring import mark_safe
 from django.utils.html import escape, conditional_escape
+from django.contrib.admin import widgets
+from import_export import widgets as import_export_widgets
+import os
+from django.core.exceptions import ObjectDoesNotExist
 
 
 class MPTTModelChoiceIterator(forms.models.ModelChoiceIterator):
@@ -72,3 +74,14 @@ class MPTTFilteredSelectMultiple(widgets.FilteredSelectMultiple):
             settings.STATIC_URL + "admin/js/mptt_m2m_selectbox.js",
             settings.STATIC_URL + "admin/js/SelectFilter2.js",
         )
+
+
+class ImageForeignKeyWidget(import_export_widgets.ForeignKeyWidget):
+    def clean(self, value):
+        try:
+            super(ImageForeignKeyWidget, self).clean(value)
+        except ObjectDoesNotExist:
+            val = super(import_export_widgets.ForeignKeyWidget, self).clean(value)
+            obj = self.model.objects.create(file=val, original_filename=os.path.basename(val))
+            obj.save()
+            return obj

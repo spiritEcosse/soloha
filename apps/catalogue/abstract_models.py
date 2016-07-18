@@ -601,7 +601,7 @@ class AbstractProductImage(models.Model):
         app_label = 'catalogue'
         # Any custom models should ensure that this ordering is unchanged, or
         # your query count will explode. See AbstractProduct.primary_image.
-        ordering = ["display_order"]
+        ordering = ("product", "display_order", )
         unique_together = ("product", "display_order")
         verbose_name = _('Product image')
         verbose_name_plural = _('Product images')

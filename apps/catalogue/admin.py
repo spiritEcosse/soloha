@@ -5,7 +5,6 @@ from oscar.core.loading import get_model
 from feincms.admin import tree_editor
 from django.forms import Textarea
 from django import forms
-from django.contrib.admin import widgets
 from django.contrib.sites.models import Site
 from django.contrib.sites.admin import SiteAdmin as BaseSiteAdmin
 from import_export import resources
@@ -15,6 +14,8 @@ from django.template import loader, Context
 from import_export import fields, widgets
 from filer.models.imagemodels import Image
 import os
+from widgets import ImageForeignKeyWidget
+
 
 Feature = get_model('catalogue', 'Feature')
 AttributeOption = get_model('catalogue', 'AttributeOption')
@@ -32,31 +33,25 @@ Info = get_model('sites', 'Info')
 
 
 class ProductImageResource(resources.ModelResource):
-    original_name = fields.Field(column_name='original', attribute='original',
-                                 widget=widgets.ForeignKeyWidget(model=Image, field='original_filename'))
-    product_slug = fields.Field(column_name='product', attribute='Product',
+    original = fields.Field(column_name='original', attribute='original',
+                            widget=ImageForeignKeyWidget(model=Image, field='original_filename'))
+    product_slug = fields.Field(column_name='product', attribute='product',
                                 widget=widgets.ForeignKeyWidget(model=Product, field='slug'))
 
     class Meta:
         model = ProductImage
-        fields = ('id', 'product_slug', 'original_name', 'caption', 'display_order', )
+        fields = ('id', 'product_slug', 'original', 'caption', 'display_order', )
         export_order = fields
-
-    def import_field(self, field, obj, data):
-        print data[field.column_name]
-        
-        super(ProductImageResource, self).import_field(field, obj, data)
-
-    def before_save_instance(self, instance, dry_run):
-        image = Image.objects.create()
-        image.file = instance.original
-        image.original_filename = os.path.basename(instance.original)
-        image.save()
-        instance.original = image
 
 
 class ProductImageAdmin(ImportExportMixin, ImportExportActionModelAdmin):
     resource_class = ProductImageResource
+    list_display = ('thumb', 'product', )
+
+    def thumb(self, obj):
+        return loader.get_template('admin/catalogue/product/thumb.html').render(Context({'image': obj.original}))
+    thumb.allow_tags = True
+    short_description = 'Image'
 
 
 class FeatureResource(resources.ModelResource):
