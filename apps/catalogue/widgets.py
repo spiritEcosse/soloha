@@ -115,3 +115,20 @@ class ImageManyToManyWidget(import_export_widgets.ManyToManyWidget):
                 images.append(product_image)
             ProductImage.objects.filter(product=self.obj).exclude(pk__in=[image.pk for image in images]).delete()
         return images
+
+
+class PriceForeignKeyWidget(import_export_widgets.ForeignKeyWidget):
+    def __init__(self, model, field='pk', *args, **kwargs):
+        super(PriceForeignKeyWidget, self).__init__(model, field=field, *args, **kwargs)
+        self.related_obj = None
+        self.obj = self.model
+
+    def clean(self, value):
+        super(PriceForeignKeyWidget, self).clean(value)
+        setattr(self.obj, self.field.column_name, value)
+        # self.obj = self.model.objects.get_or_create(product=self.related_obj, partner=)
+        # stock.product = item
+        # stock.partner = partner
+        # stock.partner_sku = partner_sku
+        # stock.price_excl_tax = D(price_excl_tax)
+        # stock.num_in_stock = num_in_stock

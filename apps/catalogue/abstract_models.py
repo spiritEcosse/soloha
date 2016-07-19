@@ -67,10 +67,10 @@ class AbstractProduct(models.Model):
         _("Date updated"), auto_now=True, db_index=True)
 
     categories = models.ManyToManyField('catalogue.Category', related_name="products", verbose_name=_("Categories"), blank=True)
-    filters = models.ManyToManyField('catalogue.Feature', related_name="filter_products", verbose_name=_('Filters of product'), blank=True, null=True)
+    filters = models.ManyToManyField('catalogue.Feature', related_name="filter_products", verbose_name=_('Filters of product'), blank=True)
     attributes = models.ManyToManyField('catalogue.Feature', through='ProductFeature', verbose_name=_('Attribute of product'), related_name="attr_products", blank=True)
     characteristics = models.ManyToManyField('catalogue.Feature', verbose_name='Characteristics', related_name='characteristic_products', blank=True)
-    options = models.ManyToManyField('catalogue.Feature', through='ProductOptions', related_name='option_products', verbose_name='Additional options')
+    options = models.ManyToManyField('catalogue.Feature', through='ProductOptions', related_name='option_products', verbose_name='Additional options', blank=True)
 
     non_standard_price_retail = models.DecimalField(_("Non-standard retail price"), decimal_places=2, max_digits=12, blank=True, default=0)
     non_standard_cost_price = models.DecimalField(_("Non-standard cost price"), decimal_places=2, max_digits=12, blank=True, default=0)

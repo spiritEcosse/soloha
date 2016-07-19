@@ -14,7 +14,7 @@ from django.template import loader, Context
 from import_export import fields, widgets
 from filer.models.imagemodels import Image
 import os
-from widgets import ImageForeignKeyWidget, ImageManyToManyWidget
+from widgets import ImageForeignKeyWidget, ImageManyToManyWidget, PriceForeignKeyWidget
 
 
 Feature = get_model('catalogue', 'Feature')
@@ -111,15 +111,18 @@ class StockRecordInline(admin.TabularInline):
 class ProductForm(forms.ModelForm):
     filters = MPTTModelMultipleChoiceField(
         Feature.objects.all(),
-        widget=MPTTFilteredSelectMultiple("Filters", False, attrs={'rows':'10'})
+        widget=MPTTFilteredSelectMultiple("Filters", False, attrs={'rows': '10'}),
+        required=False,
     )
     categories = MPTTModelMultipleChoiceField(
         Category.objects.all(),
-        widget=MPTTFilteredSelectMultiple("Categories", False, attrs={'rows':'10'})
+        widget=MPTTFilteredSelectMultiple("Categories", False, attrs={'rows': '10'}),
+        required=False,
     )
     characteristics = MPTTModelMultipleChoiceField(
         Feature.objects.all(),
-        widget=MPTTFilteredSelectMultiple("Characteristics", False, attrs={'rows':'10'})
+        widget=MPTTFilteredSelectMultiple("Characteristics", False, attrs={'rows': '10'}),
+        required=False,
     )
 
     class Meta:
@@ -136,13 +139,21 @@ class ProductResource(resources.ModelResource):
                                         widget=widgets.ManyToManyWidget(model=Feature, field='slug'))
     images = fields.Field(column_name='images', attribute='images',
                           widget=ImageManyToManyWidget(model=ProductImage, field='original'))
+    price_excl_tax = fields.Field(column_name='price_excl_tax', attribute='price_excl_tax',
+                                  widget=PriceForeignKeyWidget(model=StockRecord, field='price_excl_tax'))
+    cost_price = fields.Field(column_name='cost_price', attribute='cost_price',
+                              widget=PriceForeignKeyWidget(model=StockRecord, field='cost_price'))
+    num_in_stock = fields.Field(column_name='num_in_stock', attribute='num_in_stock',
+                                widget=PriceForeignKeyWidget(model=StockRecord, field='num_in_stock'))
+    partner = fields.Field(column_name='partner', attribute='partner',
+                           widget=PriceForeignKeyWidget(model=StockRecord, field='partner'))
     delete = fields.Field(widget=widgets.BooleanWidget())
 
     class Meta:
         model = Product
-        fields = ('id', 'title', 'slug', 'enable', 'h1', 'meta_title', 'meta_description', 'meta_keywords',
+        fields = ('id', 'delete', 'title', 'slug', 'enable', 'h1', 'meta_title', 'meta_description', 'meta_keywords',
                   'description', 'categories_slug', 'filters_slug', 'characteristics_slug', 'product_class', 'images',
-                  'delete', )
+                  'price_excl_tax', 'cost_price', )
         export_order = fields
 
     #ToDo @igor: user cannot delete if has permission
@@ -163,6 +174,22 @@ class ProductResource(resources.ModelResource):
                 if not isinstance(field.widget, widgets.ManyToManyWidget) and not isinstance(field.widget, ImageManyToManyWidget):
                     continue
                 self.import_field(field, obj, data)
+
+    def dehydrate_partner(self, obj):
+        stockrecords = [str(stockrecord.partner.code) for stockrecord in obj.stockrecords.all()]
+        return ','.join(stockrecords)
+
+    def dehydrate_price_excl_tax(self, obj):
+        stockrecords = [str(stockrecord.price_excl_tax) for stockrecord in obj.stockrecords.all()]
+        return ','.join(stockrecords)
+
+    def dehydrate_cost_price(self, obj):
+        stockrecords = [str(stockrecord.cost_price) for stockrecord in obj.stockrecords.all()]
+        return ','.join(stockrecords)
+
+    def dehydrate_num_in_stock(self, obj):
+        stockrecords = [str(stockrecord.num_in_stock) for stockrecord in obj.stockrecords.all()]
+        return ','.join(stockrecords)
 
     def dehydrate_images(self, obj):
         images = [prod_image.original.file.name for prod_image in obj.images.all()]
