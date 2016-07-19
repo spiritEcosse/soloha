@@ -44,6 +44,7 @@ class ProductImageResource(resources.ModelResource):
         fields = ('id', 'product_slug', 'original', 'caption', 'display_order', 'delete', )
         export_order = fields
 
+    #ToDo @igor: user cannot delete if has permission
     def for_delete(self, row, instance):
         return self.fields['delete'].clean(row)
 
