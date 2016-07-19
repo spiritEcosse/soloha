@@ -136,12 +136,18 @@ class ProductResource(resources.ModelResource):
                                         widget=widgets.ManyToManyWidget(model=Feature, field='slug'))
     images = fields.Field(column_name='images', attribute='images',
                           widget=ImageManyToManyWidget(model=ProductImage, field='original'))
+    delete = fields.Field(widget=widgets.BooleanWidget())
 
     class Meta:
         model = Product
         fields = ('id', 'title', 'slug', 'enable', 'h1', 'meta_title', 'meta_description', 'meta_keywords',
-                  'description', 'categories_slug', 'filters_slug', 'characteristics_slug', 'product_class', 'images', )
+                  'description', 'categories_slug', 'filters_slug', 'characteristics_slug', 'product_class', 'images',
+                  'delete', )
         export_order = fields
+
+    #ToDo @igor: user cannot delete if has permission
+    def for_delete(self, row, instance):
+        return self.fields['delete'].clean(row)
 
     def save_m2m(self, obj, data, dry_run):
         """
