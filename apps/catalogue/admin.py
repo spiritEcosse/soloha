@@ -149,7 +149,7 @@ class ProductResource(resources.ModelResource):
             for field in self.get_fields():
                 field.widget.obj = obj
 
-                if not isinstance(field.widget, widgets.ManyToManyWidget) or not isinstance(field.widget, ImageManyToManyWidget):
+                if not isinstance(field.widget, widgets.ManyToManyWidget) and not isinstance(field.widget, ImageManyToManyWidget):
                     continue
                 self.import_field(field, obj, data)
 

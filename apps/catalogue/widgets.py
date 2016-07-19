@@ -110,7 +110,7 @@ class ImageManyToManyWidget(import_export_widgets.ManyToManyWidget):
 
                     if image is None:
                         image = Image.objects.create(file=val, original_filename=val)
-                        image.save()
                     product_image = ProductImage.objects.create(product=self.obj, original=image, display_order=display_order)
                 images.append(product_image)
+            ProductImage.objects.filter(product=self.obj).exclude(pk__in=[image.pk for image in images]).delete()
         return images
