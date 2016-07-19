@@ -89,7 +89,6 @@ class ImageForeignKeyWidget(import_export_widgets.ForeignKeyWidget):
 
         if image is None:
             image = Image.objects.create(file=val, original_filename=val)
-            image.save()
         return image
 
 

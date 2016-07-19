@@ -37,11 +37,15 @@ class ProductImageResource(resources.ModelResource):
                             widget=ImageForeignKeyWidget(model=Image, field='original_filename'))
     product_slug = fields.Field(column_name='product', attribute='product',
                                 widget=widgets.ForeignKeyWidget(model=Product, field='slug'))
+    delete = fields.Field(widget=widgets.BooleanWidget())
 
     class Meta:
         model = ProductImage
-        fields = ('id', 'product_slug', 'original', 'caption', 'display_order', )
+        fields = ('id', 'product_slug', 'original', 'caption', 'display_order', 'delete', )
         export_order = fields
+
+    def for_delete(self, row, instance):
+        return self.fields['delete'].clean(row)
 
     def dehydrate_original(self, obj):
         if obj.original is not None:
