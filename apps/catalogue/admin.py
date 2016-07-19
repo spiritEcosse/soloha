@@ -129,12 +129,33 @@ class ProductResource(resources.ModelResource):
                                 widget=widgets.ManyToManyWidget(model=Feature, field='slug'))
     characteristics_slug = fields.Field(column_name='characteristics', attribute='characteristics',
                                         widget=widgets.ManyToManyWidget(model=Feature, field='slug'))
+    images = fields.Field(column_name='images', attribute='images',
+                          widget=ImageManyToManyWidget(model=ProductImage, field='original'))
 
     class Meta:
         model = Product
         fields = ('id', 'title', 'slug', 'enable', 'h1', 'meta_title', 'meta_description', 'meta_keywords',
-                  'description', 'categories_slug', 'filters_slug', 'characteristics_slug', 'product_class', )
+                  'description', 'categories_slug', 'filters_slug', 'characteristics_slug', 'product_class', 'images', )
         export_order = fields
+
+    def save_m2m(self, obj, data, dry_run):
+        """
+        Saves m2m fields.
+
+        Model instance need to have a primary key value before
+        a many-to-many relationship can be used.
+        """
+        if not dry_run:
+            for field in self.get_fields():
+                field.widget.obj = obj
+
+                if not isinstance(field.widget, widgets.ManyToManyWidget) or not isinstance(field.widget, ImageManyToManyWidget):
+                    continue
+                self.import_field(field, obj, data)
+
+    def dehydrate_images(self, obj):
+        images = [prod_image.original.file.name for prod_image in obj.images.all()]
+        return ','.join(images)
 
 
 class ProductAdmin(ImportExportMixin, ImportExportActionModelAdmin, admin.ModelAdmin):

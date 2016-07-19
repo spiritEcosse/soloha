@@ -9,6 +9,10 @@ import os
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from filer.models.imagemodels import Image
 from django.db import transaction
+from oscar.core.loading import get_model
+
+
+ProductImage = get_model('catalogue', 'ProductImage')
 
 
 class MPTTModelChoiceIterator(forms.models.ModelChoiceIterator):
@@ -87,3 +91,26 @@ class ImageForeignKeyWidget(import_export_widgets.ForeignKeyWidget):
             image = Image.objects.create(file=val, original_filename=val)
             image.save()
         return image
+
+
+class ImageManyToManyWidget(import_export_widgets.ManyToManyWidget):
+    def __init__(self, model, separator=None, field=None, *args, **kwargs):
+        super(ImageManyToManyWidget, self).__init__(model, separator=separator, field=field, *args, **kwargs)
+        self.obj = None
+
+    def clean(self, value):
+        images = []
+
+        with transaction.atomic():
+            for display_order, val in enumerate(value.split(self.separator)):
+                product_image = ProductImage.objects.filter(product=self.obj, original__file=val).first()
+
+                if product_image is None:
+                    image = Image.objects.filter(file=val).first()
+
+                    if image is None:
+                        image = Image.objects.create(file=val, original_filename=val)
+                        image.save()
+                    product_image = ProductImage.objects.create(product=self.obj, original=image, display_order=display_order)
+                images.append(product_image)
+        return images
