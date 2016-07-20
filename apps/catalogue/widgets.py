@@ -10,7 +10,9 @@ from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from filer.models.imagemodels import Image
 from django.db import transaction
 from oscar.core.loading import get_model
-
+from import_export import resources, fields
+from django.db.models.fields.related import ForeignKey
+import functools
 
 ProductImage = get_model('catalogue', 'ProductImage')
 
@@ -115,3 +117,46 @@ class ImageManyToManyWidget(import_export_widgets.ManyToManyWidget):
                 images.append(product_image)
             ProductImage.objects.filter(product=self.obj).exclude(pk__in=[image.pk for image in images]).delete()
         return images
+
+
+class IntermediateModelManyToManyWidget(import_export_widgets.ManyToManyWidget):
+
+    def __init__(self, *args, **kwargs):
+        self.rel = kwargs.pop('rel', None)
+        super(IntermediateModelManyToManyWidget, self).__init__(*args,
+                                                                **kwargs)
+
+    def clean(self, value):
+        ids = [item for item in value.split(self.separator)]
+        objects = self.model.objects.filter(**{
+            '%s__in' % self.field: ids
+        })
+        return objects
+
+    def render(self, value, obj):
+        objects = [self.related_object_representation(obj, related_obj) for related_obj in value.all()]
+        return self.separator.join(objects)
+
+    def related_object_representation(self, obj, related_obj):
+        result = {
+            "uid": related_obj.uid,
+            "name": related_obj.name
+        }
+        if self.rel.through._meta.auto_created:
+            return result
+        intermediate_own_fields = [
+            field for field in self.rel.through._meta.fields
+            if field is not self.rel.through._meta.pk
+            and not isinstance(field, ForeignKey)
+        ]
+        for field in intermediate_own_fields:
+            result[field.name] = "foo"
+        set_name = "{}_set".format(self.rel.through._meta.model_name)
+        related_field_name = self.rel.to._meta.model_name
+        intermediate_set = getattr(obj, set_name)
+        intermediate_obj = intermediate_set.filter(**{
+            related_field_name: related_obj
+        }).first()
+        for field in intermediate_own_fields:
+            result[field.name] = getattr(intermediate_obj, field.name)
+        return result

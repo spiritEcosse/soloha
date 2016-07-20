@@ -7,15 +7,15 @@ from django.forms import Textarea
 from django import forms
 from django.contrib.sites.models import Site
 from django.contrib.sites.admin import SiteAdmin as BaseSiteAdmin
-from import_export import resources
+from import_export import resources as import_export_resources
 from mptt.admin import DraggableMPTTAdmin
 from import_export.admin import ImportExportMixin, ImportExportModelAdmin, ImportExportActionModelAdmin
 from django.template import loader, Context
-from import_export import fields, widgets
+from import_export import fields, widgets as import_export_widgets
 from filer.models.imagemodels import Image
 import os
-from widgets import ImageForeignKeyWidget, ImageManyToManyWidget
-
+import widgets
+import resources
 
 Feature = get_model('catalogue', 'Feature')
 AttributeOption = get_model('catalogue', 'AttributeOption')
@@ -32,12 +32,12 @@ StockRecord = get_model('partner', 'StockRecord')
 Info = get_model('sites', 'Info')
 
 
-class ProductImageResource(resources.ModelResource):
+class ProductImageResource(import_export_resources.ModelResource):
     original = fields.Field(column_name='original', attribute='original',
-                            widget=ImageForeignKeyWidget(model=Image, field='original_filename'))
+                            widget=widgets.ImageForeignKeyWidget(model=Image, field='original_filename'))
     product_slug = fields.Field(column_name='product', attribute='product',
-                                widget=widgets.ForeignKeyWidget(model=Product, field='slug'))
-    delete = fields.Field(widget=widgets.BooleanWidget())
+                                widget=import_export_widgets.ForeignKeyWidget(model=Product, field='slug'))
+    delete = fields.Field(widget=import_export_widgets.BooleanWidget())
 
     class Meta:
         model = ProductImage
@@ -65,7 +65,7 @@ class ProductImageAdmin(ImportExportMixin, ImportExportActionModelAdmin):
     short_description = 'Image'
 
 
-class FeatureResource(resources.ModelResource):
+class FeatureResource(import_export_resources.ModelResource):
     class Meta:
         model = Feature
         skip_unchanged = True
@@ -129,20 +129,24 @@ class ProductForm(forms.ModelForm):
 
 class ProductResource(resources.ModelResource):
     categories_slug = fields.Field(column_name='categories', attribute='categories',
-                                   widget=widgets.ManyToManyWidget(model=Category, field='slug'))
+                                   widget=import_export_widgets.ManyToManyWidget(model=Category, field='slug'))
     filters_slug = fields.Field(column_name='filters', attribute='filters',
-                                widget=widgets.ManyToManyWidget(model=Feature, field='slug'))
+                                widget=import_export_widgets.ManyToManyWidget(model=Feature, field='slug'))
     characteristics_slug = fields.Field(column_name='characteristics', attribute='characteristics',
-                                        widget=widgets.ManyToManyWidget(model=Feature, field='slug'))
+                                        widget=import_export_widgets.ManyToManyWidget(model=Feature, field='slug'))
     images = fields.Field(column_name='images', attribute='images',
-                          widget=ImageManyToManyWidget(model=ProductImage, field='original'))
-    delete = fields.Field(widget=widgets.BooleanWidget())
+                          widget=widgets.ImageManyToManyWidget(model=ProductImage, field='original'))
+    recommended_products = resources.Field(column_name='recommended_products', attribute='recommended_products',
+                                           widget=widgets.IntermediateModelManyToManyWidget(
+                                               model=Product, field='slug'
+                                           ))
+    delete = fields.Field(widget=import_export_widgets.BooleanWidget())
 
     class Meta:
         model = Product
         fields = ('id', 'title', 'slug', 'enable', 'h1', 'meta_title', 'meta_description', 'meta_keywords',
                   'description', 'categories_slug', 'filters_slug', 'characteristics_slug', 'product_class', 'images',
-                  'delete', )
+                  'delete', 'recommended_products', )
         export_order = fields
 
     #ToDo @igor: user cannot delete if has permission
@@ -160,7 +164,8 @@ class ProductResource(resources.ModelResource):
             for field in self.get_fields():
                 field.widget.obj = obj
 
-                if not isinstance(field.widget, widgets.ManyToManyWidget) and not isinstance(field.widget, ImageManyToManyWidget):
+                if not isinstance(field.widget, import_export_widgets.ManyToManyWidget) \
+                        and not isinstance(field.widget, widgets.ImageManyToManyWidget):
                     continue
                 self.import_field(field, obj, data)
 
@@ -224,7 +229,7 @@ class AttributeOptionGroupAdmin(admin.ModelAdmin):
     inlines = [AttributeOptionInline, ]
 
 
-class CategoryResource(resources.ModelResource):
+class CategoryResource(import_export_resources.ModelResource):
 
     class Meta:
         model = Category
