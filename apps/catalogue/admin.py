@@ -73,9 +73,9 @@ class FeatureResource(resources.ModelResource):
         exclude = ('lft', 'rght', 'tree_id', 'level', )
 
 
-class FeatureAdmin(ImportExportMixin, ImportExportActionModelAdmin):
-    list_display = ('title', 'slug', 'parent', )
-    list_filter = ('title', 'slug', 'parent')
+class FeatureAdmin(ImportExportMixin, ImportExportActionModelAdmin, DraggableMPTTAdmin):
+    list_display = ('indented_title', 'slug', 'parent', )
+    list_filter = ('created', )
     prepopulated_fields = {"slug": ("title",)}
     search_fields = ('title', 'slug', )
     resource_class = FeatureResource
