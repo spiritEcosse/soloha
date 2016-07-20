@@ -150,6 +150,9 @@ class AbstractProduct(models.Model):
 
         return reverse('detail', kwargs=dict_values)
 
+    def partner(self):
+        return ','.join([stock.partner.code for stock in self.stockrecords.all()])
+
     def clean(self):
         """
         Validate a product. Those are the rules:
