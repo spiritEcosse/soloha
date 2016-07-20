@@ -123,7 +123,7 @@ class IntermediateModelManyToManyWidget(import_export_widgets.ManyToManyWidget):
 
     def __init__(self, *args, **kwargs):
         self.rel = kwargs.pop('rel', None)
-        print self.rel
+        raise Exception(kwargs)
         super(IntermediateModelManyToManyWidget, self).__init__(*args, **kwargs)
 
     def clean(self, value):
