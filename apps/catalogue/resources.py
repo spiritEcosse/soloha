@@ -15,6 +15,7 @@ class Field(fields.Field):
         IntermediateModel = field.rel.through
         from_field_name = field.m2m_field_name()
         to_field_name = field.rel.to.__name__.lower()
+        to_field_name = 'recommendation'
         return IntermediateModel, from_field_name, to_field_name
 
     def remove_old_intermediates(self, obj, data):
@@ -33,7 +34,7 @@ class Field(fields.Field):
     def ensure_current_intermediates_created(self, obj, data):
         IntermediateModel, from_field_name, to_field_name = \
             self.get_intermediate_model(obj)
-        print IntermediateModel
+        print self.clean(data)
 
         for related_object in self.clean(data):
             attributes = {from_field_name: obj, to_field_name: related_object}

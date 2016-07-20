@@ -138,7 +138,7 @@ class ProductResource(resources.ModelResource):
                           widget=widgets.ImageManyToManyWidget(model=ProductImage, field='original'))
     recommended_products = resources.Field(column_name='recommended_products', attribute='recommended_products',
                                            widget=widgets.IntermediateModelManyToManyWidget(
-                                               model=ProductRecommendation, field='primary',
+                                               model=Product,
                                            ))
     delete = fields.Field(widget=import_export_widgets.BooleanWidget())
 
