@@ -123,8 +123,8 @@ class IntermediateModelManyToManyWidget(import_export_widgets.ManyToManyWidget):
 
     def __init__(self, *args, **kwargs):
         self.rel = kwargs.pop('rel', None)
-        super(IntermediateModelManyToManyWidget, self).__init__(*args,
-                                                                **kwargs)
+        print self.rel
+        super(IntermediateModelManyToManyWidget, self).__init__(*args, **kwargs)
 
     def clean(self, value):
         ids = [item for item in value.split(self.separator)]
@@ -139,9 +139,10 @@ class IntermediateModelManyToManyWidget(import_export_widgets.ManyToManyWidget):
 
     def related_object_representation(self, obj, related_obj):
         result = {
-            "uid": related_obj.uid,
-            "name": related_obj.name
+            "id": related_obj.id,
+            "name": related_obj.title
         }
+        print self.rel
         if self.rel.through._meta.auto_created:
             return result
         intermediate_own_fields = [
