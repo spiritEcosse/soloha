@@ -122,9 +122,8 @@ class ImageManyToManyWidget(import_export_widgets.ManyToManyWidget):
 class IntermediateModelManyToManyWidget(import_export_widgets.ManyToManyWidget):
 
     def __init__(self, *args, **kwargs):
-        self.rel = kwargs.pop('rel', None)
-        print self.rel
         super(IntermediateModelManyToManyWidget, self).__init__(*args, **kwargs)
+        self.rel = kwargs.pop('rel', None)
 
     def clean(self, value):
         ids = [item for item in value.split(self.separator)]
@@ -134,30 +133,26 @@ class IntermediateModelManyToManyWidget(import_export_widgets.ManyToManyWidget):
         return objects
 
     def render(self, value, obj):
-        objects = [self.related_object_representation(obj, related_obj) for related_obj in value.all()]
-        return self.separator.join(objects)
+        return [self.related_object_representation(obj, related_obj) for related_obj in value.all()]
 
     def related_object_representation(self, obj, related_obj):
-        result = {
-            "id": related_obj.id,
-            "name": related_obj.title
-        }
-        print self.rel
+        result = {self.field: getattr(related_obj, self.field, None)}
         if self.rel.through._meta.auto_created:
             return result
         intermediate_own_fields = [
             field for field in self.rel.through._meta.fields
-            if field is not self.rel.through._meta.pk
-            and not isinstance(field, ForeignKey)
+            if field is not self.rel.through._meta.pk and not isinstance(field, ForeignKey)
         ]
         for field in intermediate_own_fields:
             result[field.name] = "foo"
         set_name = "{}_set".format(self.rel.through._meta.model_name)
         related_field_name = self.rel.to._meta.model_name
+        related_field_name = 'primary'
         intermediate_set = getattr(obj, set_name)
         intermediate_obj = intermediate_set.filter(**{
             related_field_name: related_obj
         }).first()
-        for field in intermediate_own_fields:
-            result[field.name] = getattr(intermediate_obj, field.name)
+        if intermediate_obj is not None:
+            for field in intermediate_own_fields:
+                result[field.name] = getattr(intermediate_obj, field.name)
         return result
