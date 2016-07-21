@@ -13,10 +13,9 @@ class Field(fields.Field):
     def get_intermediate_model(self, obj):
         field = obj._meta.get_field_by_name(self.attribute)[0]
         IntermediateModel = field.rel.through
-        from_field_name = field.m2m_field_name()
-        from_field_name = 'primary'
-        to_field_name = field.rel.to.__name__.lower()
-        to_field_name = 'recommendation'
+        print self.widget.rel.__dict__
+        from_field_name = self.widget.rel.field._m2m_name_cache
+        to_field_name = self.widget.rel.field._m2m_reverse_name_cache
         return IntermediateModel, from_field_name, to_field_name
 
     def remove_old_intermediates(self, obj, data):
@@ -65,6 +64,8 @@ class Field(fields.Field):
         Returns value from the provided object converted to export
         representation.
         """
+        self.widget.rel = obj._meta.get_field_by_name(self.attribute)[0].rel
+
         value = self.get_value(obj)
         if value is None:
             return ""

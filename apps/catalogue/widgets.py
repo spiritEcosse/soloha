@@ -13,7 +13,7 @@ from oscar.core.loading import get_model
 from import_export import resources, fields
 from django.db.models.fields.related import ForeignKey
 import functools
-
+import json
 ProductImage = get_model('catalogue', 'ProductImage')
 
 
@@ -133,7 +133,7 @@ class IntermediateModelManyToManyWidget(import_export_widgets.ManyToManyWidget):
         return objects
 
     def render(self, value, obj):
-        return [self.related_object_representation(obj, related_obj) for related_obj in value.all()]
+        return json.dumps([self.related_object_representation(obj, related_obj) for related_obj in value.all()])
 
     def related_object_representation(self, obj, related_obj):
         result = {self.field: getattr(related_obj, self.field, None)}
@@ -144,15 +144,13 @@ class IntermediateModelManyToManyWidget(import_export_widgets.ManyToManyWidget):
             if field is not self.rel.through._meta.pk and not isinstance(field, ForeignKey)
         ]
         for field in intermediate_own_fields:
-            result[field.name] = "foo"
-        set_name = "{}_set".format(self.rel.through._meta.model_name)
-        related_field_name = self.rel.to._meta.model_name
-        related_field_name = 'primary'
-        intermediate_set = getattr(obj, set_name)
-        intermediate_obj = intermediate_set.filter(**{
-            related_field_name: related_obj
+            result[field.name] = field.default if field.default else None
+        intermediate_obj = self.rel.through.objects.filter(**{
+            self.rel.field._m2m_reverse_name_cache: related_obj,
+            self.rel.field._m2m_name_cache: obj
         }).first()
         if intermediate_obj is not None:
             for field in intermediate_own_fields:
+                print field.name
                 result[field.name] = getattr(intermediate_obj, field.name)
         return result
