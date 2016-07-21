@@ -178,6 +178,7 @@ class ProductAdmin(ImportExportMixin, ImportExportActionModelAdmin, admin.ModelA
     prepopulated_fields = {"slug": ("title",)}
     search_fields = ('upc', 'title', 'slug', )
     form = ProductForm
+    list_select_related = ('product_class', 'parent', )
     resource_class = ProductResource
 
     def thumb(self, obj):
@@ -188,12 +189,10 @@ class ProductAdmin(ImportExportMixin, ImportExportActionModelAdmin, admin.ModelA
     def get_queryset(self, request):
         qs = super(ProductAdmin, self).get_queryset(request)
         return (
-            qs.select_related(
-                'product_class', 'parent',
-            ).prefetch_related(
-                'images',
+            qs.prefetch_related(
+                # 'images',
                 'attribute_values',
-                'categories__parent__parent',
+                # 'categories__parent__parent',
                 'stockrecords__partner',
                 'filters',
                 'characteristics',
