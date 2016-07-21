@@ -102,14 +102,15 @@ class ImageManyToManyWidget(import_export_widgets.ManyToManyWidget):
 
         with transaction.atomic():
             for display_order, val in enumerate(value.split(self.separator)):
-                product_image = ProductImage.objects.filter(product=self.obj, original__file=val).first()
+                if val:
+                    product_image = ProductImage.objects.filter(product=self.obj, original__file=val).first()
 
-                if product_image is None:
-                    image = Image.objects.filter(file=val).first()
+                    if product_image is None:
+                        image = Image.objects.filter(file=val).first()
 
-                    if image is None:
-                        image = Image.objects.create(file=val, original_filename=val)
-                    product_image = ProductImage.objects.create(product=self.obj, original=image, display_order=display_order)
-                images.append(product_image)
+                        if image is None:
+                            image = Image.objects.create(file=val, original_filename=val)
+                        product_image = ProductImage.objects.create(product=self.obj, original=image, display_order=display_order)
+                    images.append(product_image)
             ProductImage.objects.filter(product=self.obj).exclude(pk__in=[image.pk for image in images]).delete()
         return images
