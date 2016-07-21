@@ -165,7 +165,7 @@ class ProductResource(resources.ModelResource):
                 self.import_field(field, obj, data)
 
     def dehydrate_images(self, obj):
-        images = [prod_image.original.file.name for prod_image in obj.images.all()]
+        images = [prod_image.original.file.name for prod_image in obj.images.all() if prod_image.original]
         return ','.join(images)
 
 
