@@ -189,15 +189,13 @@ class ProductAdmin(ImportExportMixin, ImportExportActionModelAdmin, admin.ModelA
         qs = super(ProductAdmin, self).get_queryset(request)
         return (
             qs.select_related(
-                'product_class', 'parent'
+                'product_class', 'parent',
             ).prefetch_related(
                 'images',
-                'attributes',
-                'product_class__options',
-                'categories__parent__parent__parent__parent',
-                'stockrecords',
+                'attribute_values',
+                'categories__parent__parent',
+                'stockrecords__partner',
                 'filters',
-                'attributes',
                 'characteristics',
             )
         )
