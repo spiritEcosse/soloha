@@ -120,37 +120,36 @@ class ImageManyToManyWidget(import_export_widgets.ManyToManyWidget):
 
 
 class IntermediateModelManyToManyWidget(import_export_widgets.ManyToManyWidget):
-
     def __init__(self, *args, **kwargs):
         super(IntermediateModelManyToManyWidget, self).__init__(*args, **kwargs)
-        self.rel = kwargs.pop('rel', None)
+        self.rel_field = None
+        self.intermediate_own_fields = []
 
     def clean(self, value):
-        ids = [item for item in value.split(self.separator)]
-        objects = self.model.objects.filter(**{
-            '%s__in' % self.field: ids
-        })
-        return objects
+        items = json.loads(value)
+        for key, item in enumerate(items[:]):
+            items[key][self.field] = self.model.objects.get(**{self.field: item[self.field]})
+        return items
 
     def render(self, value, obj):
         return json.dumps([self.related_object_representation(obj, related_obj) for related_obj in value.all()])
 
     def related_object_representation(self, obj, related_obj):
         result = {self.field: getattr(related_obj, self.field, None)}
-        if self.rel.through._meta.auto_created:
+
+        if self.rel_field.rel.through._meta.auto_created:
             return result
-        intermediate_own_fields = [
-            field for field in self.rel.through._meta.fields
-            if field is not self.rel.through._meta.pk and not isinstance(field, ForeignKey)
-        ]
-        for field in intermediate_own_fields:
+
+        for field in self.intermediate_own_fields:
             result[field.name] = field.default if field.default else None
-        intermediate_obj = self.rel.through.objects.filter(**{
-            self.rel.field._m2m_reverse_name_cache: related_obj,
-            self.rel.field._m2m_name_cache: obj
+
+        intermediate_obj = self.rel_field.rel.through.objects.filter(**{
+            self.rel_field.m2m_reverse_field_name(): related_obj,
+            self.rel_field.m2m_field_name(): obj
         }).first()
+
         if intermediate_obj is not None:
-            for field in intermediate_own_fields:
-                print field.name
+            for field in self.intermediate_own_fields:
                 result[field.name] = getattr(intermediate_obj, field.name)
+
         return result

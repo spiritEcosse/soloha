@@ -2,6 +2,13 @@ from import_export import widgets as import_export_widgets
 from import_export import resources, fields
 import functools
 import widgets
+from django.db.models.fields.related import ForeignKey
+from diff_match_patch import diff_match_patch
+try:
+    from django.utils.encoding import force_text
+except ImportError:
+    from django.utils.encoding import force_unicode as force_text
+from django.utils.safestring import mark_safe
 
 
 class Field(fields.Field):
@@ -13,16 +20,15 @@ class Field(fields.Field):
     def get_intermediate_model(self, obj):
         field = obj._meta.get_field_by_name(self.attribute)[0]
         IntermediateModel = field.rel.through
-        print self.widget.rel.__dict__
-        from_field_name = self.widget.rel.field._m2m_name_cache
-        to_field_name = self.widget.rel.field._m2m_reverse_name_cache
+        from_field_name = self.widget.rel_field.m2m_field_name()
+        to_field_name = self.widget.rel_field.m2m_reverse_field_name()
         return IntermediateModel, from_field_name, to_field_name
 
     def remove_old_intermediates(self, obj, data):
-        IntermediateModel, from_field_name, to_field_name = \
-            self.get_intermediate_model(obj)
-        imported_ids = set(import_obj.pk for import_obj in self.clean(data))
+        IntermediateModel, from_field_name, to_field_name = self.get_intermediate_model(obj)
+        imported_ids = set(import_obj[self.widget.field].pk for import_obj in self.clean(data))
         related_objects = getattr(obj, self.attribute).all()
+
         for related_object in related_objects:
             if related_object.pk not in imported_ids:
                 queryset = IntermediateModel.objects.filter(**{
@@ -32,26 +38,34 @@ class Field(fields.Field):
                 queryset.delete()
 
     def ensure_current_intermediates_created(self, obj, data):
-        IntermediateModel, from_field_name, to_field_name = \
-            self.get_intermediate_model(obj)
+        IntermediateModel, from_field_name, to_field_name = self.get_intermediate_model(obj)
 
         for related_object in self.clean(data):
-            attributes = {from_field_name: obj, to_field_name: related_object}
-            self.create_if_not_existing(IntermediateModel, attributes)
+            attributes_check = {from_field_name: obj, to_field_name: related_object[self.widget.field]}
+            attributes = attributes_check.copy()
 
-    @staticmethod
-    def create_if_not_existing(IntermediateModel, attributes):
+            for field in self.widget.intermediate_own_fields:
+                attributes[field.name] = related_object[field.name]
+            self.create_if_not_existing(IntermediateModel, attributes, attributes_check)
+
+    def create_if_not_existing(self, IntermediateModel, attributes, attributes_check):
         # Use this instead of get_or_create in case we have duplicate
         # associations. (get_or_create would raise a DoesNotExist exception)
-        if not IntermediateModel.objects.filter(**attributes).exists():
+
+        if not IntermediateModel.objects.filter(**attributes_check).exists():
             IntermediateModel.objects.create(**attributes)
+        else:
+            intermediate_model = IntermediateModel.objects.filter(**attributes_check).first()
+
+            for attribute, value in attributes.items():
+                setattr(intermediate_model, attribute, value)
+
+            intermediate_model.save()
 
     def save(self, obj, data):
         """
         Cleans this field value and assign it to provided object.
         """
-        self.widget.rel = obj._meta.get_field_by_name(self.attribute)[0].rel
-
         if not self.readonly:
             if self.is_m2m_with_intermediate_object(obj):
                 self.remove_old_intermediates(obj, data)
@@ -64,8 +78,6 @@ class Field(fields.Field):
         Returns value from the provided object converted to export
         representation.
         """
-        self.widget.rel = obj._meta.get_field_by_name(self.attribute)[0].rel
-
         value = self.get_value(obj)
         if value is None:
             return ""
@@ -76,7 +88,6 @@ class Field(fields.Field):
 
 
 class ModelResource(resources.ModelResource):
-
     @classmethod
     def widget_from_django_field(cls, f, default=import_export_widgets.Widget):
         """
@@ -104,7 +115,6 @@ class ModelResource(resources.ModelResource):
         elif internal_type in ('BooleanField', 'NullBooleanField'):
             result = import_export_widgets.BooleanWidget
         return result
-
 
     @classmethod
     def field_from_django_field(self, field_name, django_field, readonly):
