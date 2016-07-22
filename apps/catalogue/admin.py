@@ -28,7 +28,6 @@ except ImportError:
         def emit(self, record):
             pass
 import traceback
-from soloha.core import utils
 from django.db.models.fields.related import ForeignKey
 
 logging.getLogger(__name__).addHandler(NullHandler())
