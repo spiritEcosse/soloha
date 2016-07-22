@@ -100,11 +100,13 @@ class ImageManyToManyWidget(import_export_widgets.ManyToManyWidget):
         self.obj = None
 
     def clean(self, value):
-        images = []
+        product_images = []
 
         with transaction.atomic():
-            for display_order, val in enumerate(value.split(self.separator)):
-                if val:
+            ProductImage.objects.filter(product=self.obj).delete()
+
+            if value:
+                for display_order, val in enumerate(value.split(self.separator)):
                     product_image = ProductImage.objects.filter(product=self.obj, original__file=val).first()
 
                     if product_image is None:
@@ -113,9 +115,11 @@ class ImageManyToManyWidget(import_export_widgets.ManyToManyWidget):
                         if image is None:
                             image = Image.objects.create(file=val, original_filename=val)
                         product_image = ProductImage.objects.create(product=self.obj, original=image, display_order=display_order)
-                    images.append(product_image)
-            ProductImage.objects.filter(product=self.obj).exclude(pk__in=[image.pk for image in images]).delete()
-        return images
+                    else:
+                        product_image.display_order = display_order
+                        product_image.save()
+                    product_images.append(product_image)
+        return product_images
 
 
 class IntermediateModelManyToManyWidget(import_export_widgets.ManyToManyWidget):
