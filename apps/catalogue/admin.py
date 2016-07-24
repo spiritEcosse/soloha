@@ -269,16 +269,24 @@ class AttributeOptionGroupAdmin(admin.ModelAdmin):
     inlines = [AttributeOptionInline, ]
 
 
-class CategoryResource(import_export_resources.ModelResource):
+class CategoryResource(resources.ModelResource):
+    parent = fields.Field(attribute='parent', column_name='parent', widget=import_export_widgets.ForeignKeyWidget(
+        model=Category, field='slug'))
+    delete = fields.Field(widget=import_export_widgets.BooleanWidget())
 
     class Meta:
         model = Category
-        exclude = ('lft', 'rght', 'tree_id', 'level', 'parent', )
+        fields = ('id', 'delete', 'enable', 'name', 'slug', 'parent', 'sort', 'meta_title', 'h1', 'meta_description',
+                  'meta_keywords', 'icon', 'image_banner', 'link_banner', 'description', 'image', )
+        export_order = fields
+
+    #ToDo @igor: user cannot delete if has permission
+    def for_delete(self, row, instance):
+        return self.fields['delete'].clean(row)
 
 
 class CategoryAdmin(ImportExportMixin, ImportExportActionModelAdmin, DraggableMPTTAdmin):
     prepopulated_fields = {'slug': ("name", )}
-    empty_value_display = '-empty-'
     list_display = ('indented_title', 'slug', 'parent', 'enable', 'sort', 'created')
     formfield_overrides = {
         models.ManyToManyField: {'widget': MPTTFilteredSelectMultiple("", False, attrs={'rows': '10'})},
@@ -287,6 +295,7 @@ class CategoryAdmin(ImportExportMixin, ImportExportActionModelAdmin, DraggableMP
     list_filter = ('name', 'slug', 'parent', 'enable', 'sort', 'created')
     mptt_level_indent = 20
     search_fields = ('name', 'slug', )
+    resource_class = CategoryResource
 
 
 class InfoInline(admin.StackedInline):

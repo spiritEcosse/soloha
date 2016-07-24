@@ -558,7 +558,7 @@ class AbstractFeature(MPTTModel):
 
     def __str__(self):
         if self.parent:
-            return u'{}->{}'.format(self.parent, self.title)
+            return u'{} > {}'.format(self.parent, self.title)
         return self.title
 
     def save(self, *args, **kwargs):
@@ -663,7 +663,7 @@ class CustomAbstractCategory(MPTTModel):
         verbose_name_plural = _('Categories')
 
     def __str__(self):
-        return u'{}'.format(self.name)
+        return self.full_name
 
     @property
     def full_name(self):
@@ -676,7 +676,7 @@ class CustomAbstractCategory(MPTTModel):
         sufficiently useful to keep around.
         """
         #Todo category.name to str
-        names = [category.name for category in self.get_ancestors_and_self()]
+        names = [unicode(category.name) for category in self.get_ancestors_and_self()]
         return self._full_name_separator.join(names)
 
     @property
