@@ -633,15 +633,15 @@ class AbstractProductImage(models.Model):
 class CustomAbstractCategory(MPTTModel):
     name = models.CharField(_('Name'), max_length=300, db_index=True)
     slug = models.SlugField(verbose_name=_('Slug'), max_length=400, unique=True)
-    enable = models.BooleanField(verbose_name=_('Enable'), default=True)
-    parent = TreeForeignKey('self', verbose_name=_('Parent'), related_name='children', blank=True, null=True)
+    enable = models.BooleanField(verbose_name=_('Enable'), default=True, db_index=True)
+    parent = TreeForeignKey('self', verbose_name=_('Parent'), related_name='children', blank=True, null=True, db_index=True)
     meta_title = models.CharField(verbose_name=_('Meta tag: title'), blank=True, max_length=480)
     h1 = models.CharField(verbose_name=_('h1'), blank=True, max_length=310)
     meta_description = models.TextField(verbose_name=_('Meta tag: description'), blank=True)
     meta_keywords = models.TextField(verbose_name=_('Meta tag: keywords'), blank=True)
-    sort = models.IntegerField(blank=True, null=True, default=0)
+    sort = models.IntegerField(blank=True, null=True, default=0, db_index=True)
     icon = models.ImageField(_('Icon'), upload_to='categories', blank=True, null=True, max_length=455)
-    created = models.DateTimeField(auto_now_add=True)
+    created = models.DateTimeField(auto_now_add=True, db_index=True)
     image_banner = models.ImageField(_('Image banner'), upload_to='categories/%Y/%m/%d/', blank=True, null=True, max_length=600)
     link_banner = models.URLField(_('Link banner'), blank=True, null=True, max_length=555)
     description = RichTextUploadingField(_('Description'), blank=True)
@@ -652,13 +652,14 @@ class CustomAbstractCategory(MPTTModel):
     _full_name_separator = ' > '
 
     class MPTTMeta:
-        ordering = ['tree_id', 'lft']
+        order_insertion_by = ('sort', 'name', 'id', )
 
     class Meta:
         abstract = True
+        #Todo add index_together like this
+        # index_together = (('name', 'slug', ), ('enable', 'created', 'sort', ), )
         unique_together = ('slug', 'parent')
         app_label = 'catalogue'
-        ordering = ('sort', 'name', 'id', )
         verbose_name = _('Category')
         verbose_name_plural = _('Categories')
 

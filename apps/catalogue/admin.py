@@ -217,7 +217,7 @@ class ProductAdmin(ImportExportMixin, ImportExportActionModelAdmin, admin.ModelA
     date_hierarchy = 'date_created'
     list_display = ('title', 'thumb', 'enable', 'date_updated', 'slug', 'get_product_class', 'structure', 'partner',
                     'attribute_summary', 'pk', )
-    list_filter = ['enable', 'structure', 'is_discountable']
+    list_filter = ('enable', 'structure', 'is_discountable', )
     inlines = [StockRecordInline, ProductRecommendationInline, ProductImageInline]
     prepopulated_fields = {"slug": ("title",)}
     search_fields = ('upc', 'title', 'slug', )
@@ -289,11 +289,11 @@ class CategoryResource(resources.ModelResource):
 class CategoryAdmin(ImportExportMixin, ImportExportActionModelAdmin, DraggableMPTTAdmin):
     prepopulated_fields = {'slug': ("name", )}
     list_display = ('indented_title', 'slug', 'parent', 'enable', 'sort', 'created')
+    list_filter = ('enable', 'created', 'sort', )
     formfield_overrides = {
         models.ManyToManyField: {'widget': MPTTFilteredSelectMultiple("", False, attrs={'rows': '10'})},
         models.TextField: {'widget': Textarea(attrs={'cols': 40, 'rows': 4})},
     }
-    list_filter = ('name', 'slug', 'parent', 'enable', 'sort', 'created')
     mptt_level_indent = 20
     search_fields = ('name', 'slug', )
     resource_class = CategoryResource
