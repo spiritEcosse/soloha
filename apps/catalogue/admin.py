@@ -276,8 +276,9 @@ class CategoryResource(resources.ModelResource):
 
     class Meta:
         model = Category
+        #Todo add: 'icon', 'image_banner', 'image'
         fields = ('id', 'delete', 'enable', 'name', 'slug', 'parent', 'sort', 'meta_title', 'h1', 'meta_description',
-                  'meta_keywords', 'icon', 'image_banner', 'link_banner', 'description', 'image', )
+                  'meta_keywords', 'link_banner', 'description', )
         export_order = fields
 
     #ToDo @igor: user cannot delete if has permission
