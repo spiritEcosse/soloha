@@ -652,10 +652,11 @@ class CustomAbstractCategory(MPTTModel):
     _full_name_separator = ' > '
 
     class MPTTMeta:
-        order_insertion_by = ('sort', 'name', 'id', )
+        order_insertion_by = ('name', )
 
     class Meta:
         abstract = True
+        ordering = ('sort', 'name', 'id', )
         #Todo add index_together like this
         # index_together = (('name', 'slug', ), ('enable', 'created', 'sort', ), )
         unique_together = ('slug', 'parent')
