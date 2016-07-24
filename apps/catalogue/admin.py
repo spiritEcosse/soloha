@@ -16,11 +16,8 @@ from filer.models.imagemodels import Image
 import os
 import widgets
 import resources
-from import_export.results import RowResult
-from copy import deepcopy
-from django.db import transaction
-from django.db.transaction import TransactionManagementError
 import logging  # isort:skip
+#Todo change list import module
 try:  # Python 2.7+
     from logging import NullHandler
 except ImportError:
@@ -37,8 +34,6 @@ try:
 except ImportError:
     from django.utils.encoding import force_unicode as force_text
 
-from diff_match_patch import diff_match_patch
-from django.utils.safestring import mark_safe
 
 Feature = get_model('catalogue', 'Feature')
 AttributeOption = get_model('catalogue', 'AttributeOption')
@@ -64,6 +59,7 @@ class ProductImageResource(import_export_resources.ModelResource):
 
     class Meta:
         model = ProductImage
+        #ToDo delete column to start list
         fields = ('id', 'product_slug', 'original', 'caption', 'display_order', 'delete', )
         export_order = fields
 
@@ -88,12 +84,15 @@ class ProductImageAdmin(ImportExportMixin, ImportExportActionModelAdmin):
     short_description = 'Image'
 
 
-class FeatureResource(import_export_resources.ModelResource):
+class FeatureResource(resources.ModelResource):
+    parent = fields.Field(attribute='parent', column_name='parent', widget=import_export_widgets.ForeignKeyWidget(
+        model=Feature, field='slug'))
+    delete = fields.Field(widget=import_export_widgets.BooleanWidget())
+
     class Meta:
         model = Feature
-        skip_unchanged = True
-        report_skipped = False
-        exclude = ('lft', 'rght', 'tree_id', 'level', )
+        fields = ('id', 'delete', 'title', 'slug', 'parent', 'sort', 'bottom_line', 'top_line', )
+        export_order = fields
 
 
 class FeatureAdmin(ImportExportMixin, ImportExportActionModelAdmin, DraggableMPTTAdmin):
@@ -102,6 +101,10 @@ class FeatureAdmin(ImportExportMixin, ImportExportActionModelAdmin, DraggableMPT
     prepopulated_fields = {"slug": ("title",)}
     search_fields = ('title', 'slug', )
     resource_class = FeatureResource
+
+    #ToDo @igor: user cannot delete if has permission
+    def for_delete(self, row, instance):
+        return self.fields['delete'].clean(row)
 
 
 class AttributeInline(admin.TabularInline):
@@ -164,10 +167,10 @@ class ProductResource(resources.ModelResource):
                                                model=Product, field='slug',
                                            ))
     delete = fields.Field(widget=import_export_widgets.BooleanWidget())
-    prefix = 'rel_'
 
     class Meta:
         model = Product
+        #ToDo delete column to start list
         fields = ('id', 'title', 'slug', 'enable', 'h1', 'meta_title', 'meta_description', 'meta_keywords',
                   'description', 'categories_slug', 'filters_slug', 'characteristics_slug', 'product_class', 'images',
                   'delete', 'recommended_products', )
@@ -198,13 +201,6 @@ class ProductResource(resources.ModelResource):
         images = [prod_image.original.file.name for prod_image in obj.images.all() if prod_image.original]
         return ','.join(images)
 
-    def copy_relation(self, obj):
-        for field in self.get_fields():
-            if isinstance(field.widget, widgets.IntermediateModelManyToManyWidget)\
-                    or isinstance(field.widget, import_export_widgets.ManyToManyWidget)\
-                    or isinstance(field.widget, widgets.ImageManyToManyWidget):
-                setattr(obj, '{}{}'.format(self.prefix, field.column_name), self.export_field(field, obj))
-
     def before_import(self, dataset, dry_run, **kwargs):
         for field in self.get_fields():
             if isinstance(field.widget, widgets.IntermediateModelManyToManyWidget):
@@ -215,87 +211,6 @@ class ProductResource(resources.ModelResource):
                 for rel_field in field.widget.rel_field.rel.through._meta.fields:
                     if rel_field is not field.widget.rel_field.rel.through._meta.pk and not isinstance(rel_field, ForeignKey):
                         field.widget.intermediate_own_fields.append(rel_field)
-
-    def import_row(self, row, instance_loader, dry_run=False, **kwargs):
-        """
-        Imports data from ``tablib.Dataset``. Refer to :doc:`import_workflow`
-        for a more complete description of the whole import process.
-
-        :param row: A ``dict`` of the row to import
-
-        :param instance_loader: The instance loader to be used to load the row
-
-        :param dry_run: If ``dry_run`` is set, or error occurs, transaction
-            will be rolled back.
-        """
-        try:
-            row_result = self.get_row_result_class()()
-            instance, new = self.get_or_init_instance(instance_loader, row)
-            if new:
-                row_result.import_type = RowResult.IMPORT_TYPE_NEW
-            else:
-                row_result.import_type = RowResult.IMPORT_TYPE_UPDATE
-            row_result.new_record = new
-            row_result.object_repr = force_text(instance)
-            row_result.object_id = instance.pk
-            original = deepcopy(instance)
-            self.copy_relation(original)
-
-            if self.for_delete(row, instance):
-                if new:
-                    row_result.import_type = RowResult.IMPORT_TYPE_SKIP
-                    row_result.diff = self.get_diff(None, None, dry_run)
-                else:
-                    row_result.import_type = RowResult.IMPORT_TYPE_DELETE
-                    self.delete_instance(instance, dry_run)
-                    row_result.diff = self.get_diff(original, None, dry_run)
-            else:
-                self.import_obj(instance, row, dry_run)
-                if self.skip_row(instance, original):
-                    row_result.import_type = RowResult.IMPORT_TYPE_SKIP
-                else:
-                    with transaction.atomic():
-                        self.save_instance(instance, dry_run)
-                    self.save_m2m(instance, row, dry_run)
-                    # Add object info to RowResult for LogEntry
-                    row_result.object_repr = force_text(instance)
-                    row_result.object_id = instance.pk
-                row_result.diff = self.get_diff(original, instance, row, dry_run)
-        except Exception as e:
-            # There is no point logging a transaction error for each row
-            # when only the original error is likely to be relevant
-            if not isinstance(e, TransactionManagementError):
-                logging.exception(e)
-            tb_info = traceback.format_exc()
-            row_result.errors.append(self.get_error_result_class()(e, tb_info, row))
-        return row_result
-
-    def get_diff(self, original, current, row, dry_run=False):
-        """
-        Get diff between original and current object when ``import_data``
-        is run.
-
-        ``dry_run`` allows handling special cases when object is not saved
-        to database (ie. m2m relationships).
-        """
-        data = []
-        dmp = diff_match_patch()
-        for field in self.get_fields():
-            attr = '{}{}'.format(self.prefix, field.column_name)
-
-            if hasattr(original, attr):
-                v1 = getattr(original, attr)
-            else:
-                v1 = self.export_field(field, original) if original else ""
-
-            v2 = self.export_field(field, current) if current else ""
-
-            diff = dmp.diff_main(force_text(v1), force_text(v2))
-            dmp.diff_cleanupSemantic(diff)
-            html = dmp.diff_prettyHtml(diff)
-            html = mark_safe(html)
-            data.append(html)
-        return data
 
 
 class ProductAdmin(ImportExportMixin, ImportExportActionModelAdmin, admin.ModelAdmin):
