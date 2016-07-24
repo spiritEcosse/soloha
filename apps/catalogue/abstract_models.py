@@ -549,10 +549,13 @@ class AbstractFeature(MPTTModel):
     bottom_line = models.IntegerField(verbose_name=_('Bottom line size'), blank=True, null=True)
     top_line = models.IntegerField(verbose_name=_('Top line size'), blank=True, null=True)
 
+    class MPTTMeta:
+        order_insertion_by = ('sort', 'title', )
+
     class Meta:
         abstract = True
         unique_together = ('slug', 'parent', )
-        ordering = ('sort', 'title', 'id', )
+        ordering = ('sort', 'title', )
         verbose_name = _('Feature')
         verbose_name_plural = _('Features')
 
@@ -652,11 +655,11 @@ class CustomAbstractCategory(MPTTModel):
     _full_name_separator = ' > '
 
     class MPTTMeta:
-        order_insertion_by = ('name', )
+        order_insertion_by = ('sort', 'name', )
 
     class Meta:
         abstract = True
-        ordering = ('sort', 'name', 'id', )
+        ordering = ('sort', 'name', )
         #Todo add index_together like this
         # index_together = (('name', 'slug', ), ('enable', 'created', 'sort', ), )
         unique_together = ('slug', 'parent')
