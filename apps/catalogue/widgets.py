@@ -10,7 +10,15 @@ from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from filer.models.imagemodels import Image
 from django.db import transaction
 from oscar.core.loading import get_model
-
+from import_export import resources, fields
+from django.db.models.fields.related import ForeignKey
+import functools
+import json
+try:
+    from django.utils.encoding import force_text
+except ImportError:
+    from django.utils.encoding import force_unicode as force_text
+from django.db.transaction import atomic, savepoint, savepoint_rollback, savepoint_commit  # noqa
 
 ProductImage = get_model('catalogue', 'ProductImage')
 
@@ -98,37 +106,89 @@ class ImageManyToManyWidget(import_export_widgets.ManyToManyWidget):
         self.obj = None
 
     def clean(self, value):
-        images = []
+        product_images = []
 
         with transaction.atomic():
-            for display_order, val in enumerate(value.split(self.separator)):
-                product_image = ProductImage.objects.filter(product=self.obj, original__file=val).first()
+            ProductImage.objects.filter(product=self.obj).delete()
 
-                if product_image is None:
-                    image = Image.objects.filter(file=val).first()
+            if value:
+                for display_order, val in enumerate(value.split(self.separator)):
+                    product_image = ProductImage.objects.filter(product=self.obj, original__file=val).first()
 
-                    if image is None:
-                        image = Image.objects.create(file=val, original_filename=val)
-                    product_image = ProductImage.objects.create(product=self.obj, original=image, display_order=display_order)
-                product_image.display_order = display_order
-                product_image.save()
-                images.append(product_image)
-            ProductImage.objects.filter(product=self.obj).exclude(pk__in=[image.pk for image in images]).delete()
-        return images
+                    if product_image is None:
+                        image = Image.objects.filter(file=val).first()
+
+                        if image is None:
+                            image = Image.objects.create(file=val, original_filename=val)
+                        product_image = ProductImage.objects.create(product=self.obj, original=image, display_order=display_order)
+                    else:
+                        product_image.display_order = display_order
+                        product_image.save()
+                    product_images.append(product_image)
+        return product_images
 
 
-class PriceForeignKeyWidget(import_export_widgets.ForeignKeyWidget):
-    def __init__(self, model, field='pk', *args, **kwargs):
-        super(PriceForeignKeyWidget, self).__init__(model, field=field, *args, **kwargs)
-        self.related_obj = None
-        self.obj = self.model
+class IntermediateModelManyToManyWidget(import_export_widgets.ManyToManyWidget):
+    def __init__(self, *args, **kwargs):
+        super(IntermediateModelManyToManyWidget, self).__init__(*args, **kwargs)
+        self.rel_field = None
+        self.intermediate_own_fields = []
 
     def clean(self, value):
-        super(PriceForeignKeyWidget, self).clean(value)
-        setattr(self.obj, self.field.column_name, value)
-        # self.obj = self.model.objects.get_or_create(product=self.related_obj, partner=)
-        # stock.product = item
-        # stock.partner = partner
-        # stock.partner_sku = partner_sku
-        # stock.price_excl_tax = D(price_excl_tax)
-        # stock.num_in_stock = num_in_stock
+        items = json.loads(value)
+        for key, item in enumerate(items[:]):
+            items[key][self.field] = self.model.objects.get(**{self.field: item[self.field]})
+        return items
+
+    def render(self, value, obj):
+        return json.dumps([self.related_object_representation(obj, related_obj) for related_obj in value.all()])
+
+    def related_object_representation(self, obj, related_obj):
+        result = {self.field: getattr(related_obj, self.field, None)}
+
+        if self.rel_field.rel.through._meta.auto_created:
+            return result
+
+        for field in self.intermediate_own_fields:
+            result[field.name] = field.default if field.default else None
+
+        intermediate_obj = self.rel_field.rel.through.objects.filter(**{
+            self.rel_field.m2m_reverse_field_name(): related_obj,
+            self.rel_field.m2m_field_name(): obj
+        }).first()
+
+        if intermediate_obj is not None:
+            for field in self.intermediate_own_fields:
+                result[field.name] = getattr(intermediate_obj, field.name)
+
+        return result
+
+
+class CharWidget(import_export_widgets.Widget):
+    """
+    Widget for converting text fields.
+    """
+
+    def render(self, value):
+        try:
+            featured_value = force_text(int(float(value)))
+        except ValueError:
+            featured_value = force_text(value)
+        return featured_value
+
+
+class ManyToManyWidget(import_export_widgets.ManyToManyWidget):
+    def clean(self, value):
+        if not value:
+            return self.model.objects.none()
+        ids = filter(None, value.split(self.separator))
+        objects = []
+        
+        with transaction.atomic():
+            for id in ids:
+                try:
+                    objects.append(self.model.objects.get(**{self.field: id}))
+                except ObjectDoesNotExist as e:
+                    raise ValueError('{} {}: \'{}\'.'.format(e, self.model._meta.object_name, id))
+
+        return objects

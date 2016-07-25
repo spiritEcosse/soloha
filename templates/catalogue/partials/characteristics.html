@@ -2,6 +2,7 @@
 {% load display_tags %}
 {% load i18n %}
 {% load djangular_tags %}
+{% load product %}
 
 <div class="panel panel-default characteristics" id="characteristics">
     <div class="panel-heading text-center">
@@ -10,22 +11,25 @@
     <div class="panel-body">
         <div class="row option">
             <div class="col-xs-12">
-                Артикул:
+                {% trans "ISBN" %}:
             </div>
             <div class="col-xs-12 values">
                 {{ product.id }}
             </div>
         </div>
-        {% for av in product.attribute_values.all %}
+        {% regroup product.characteristics.all by parent as characteristics %}
+
+        {% for characteristic in characteristics %}
             <div class="row option">
                 <div class="col-xs-12">
-                    {{ av.attribute.name }}
+                    {{ characteristic.grouper }}
                 </div>
                 <div class="col-xs-12 values">
-                    {{ av.value_as_html }}
+                    {{ characteristic.list | join:', ' }}
                 </div>
             </div>
         {% endfor %}
+
         {% iffeature "reviews" %}
             <div class="row option">
                 <div class="col-xs-12">

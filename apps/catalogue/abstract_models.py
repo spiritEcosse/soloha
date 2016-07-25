@@ -150,6 +150,9 @@ class AbstractProduct(models.Model):
 
         return reverse('detail', kwargs=dict_values)
 
+    def partner(self):
+        return ','.join([stock.partner.code for stock in self.stockrecords.all()])
+
     def clean(self):
         """
         Validate a product. Those are the rules:
@@ -546,21 +549,31 @@ class AbstractFeature(MPTTModel):
     bottom_line = models.IntegerField(verbose_name=_('Bottom line size'), blank=True, null=True)
     top_line = models.IntegerField(verbose_name=_('Top line size'), blank=True, null=True)
 
+    class MPTTMeta:
+        order_insertion_by = ('sort', 'title', )
+
     class Meta:
         abstract = True
         unique_together = ('slug', 'parent', )
-        ordering = ('sort', 'title', 'id', )
+        ordering = ('sort', 'title', )
         verbose_name = _('Feature')
         verbose_name_plural = _('Features')
 
     def __str__(self):
         if self.parent:
-            return u'{}->{}'.format(self.parent, self.title)
+            return u'{} > {}'.format(self.parent, self.title)
         return self.title
 
     def save(self, *args, **kwargs):
-        if not self.slug:
-            self.slug = slugify(self.title)
+        if not self.sort:
+            self.sort = 0
+
+        if not self.slug and self.title:
+            self.slug = ''
+
+            if self.parent:
+                self.slug = self.parent.slug + '-'
+            self.slug += slugify(self.title)
 
         super(AbstractFeature, self).save(*args, **kwargs)
 
@@ -630,15 +643,15 @@ class AbstractProductImage(models.Model):
 class CustomAbstractCategory(MPTTModel):
     name = models.CharField(_('Name'), max_length=300, db_index=True)
     slug = models.SlugField(verbose_name=_('Slug'), max_length=400, unique=True)
-    enable = models.BooleanField(verbose_name=_('Enable'), default=True)
-    parent = TreeForeignKey('self', verbose_name=_('Parent'), related_name='children', blank=True, null=True)
+    enable = models.BooleanField(verbose_name=_('Enable'), default=True, db_index=True)
+    parent = TreeForeignKey('self', verbose_name=_('Parent'), related_name='children', blank=True, null=True, db_index=True)
     meta_title = models.CharField(verbose_name=_('Meta tag: title'), blank=True, max_length=480)
     h1 = models.CharField(verbose_name=_('h1'), blank=True, max_length=310)
     meta_description = models.TextField(verbose_name=_('Meta tag: description'), blank=True)
     meta_keywords = models.TextField(verbose_name=_('Meta tag: keywords'), blank=True)
-    sort = models.IntegerField(blank=True, null=True, default=0)
+    sort = models.IntegerField(blank=True, null=True, default=0, db_index=True)
     icon = models.ImageField(_('Icon'), upload_to='categories', blank=True, null=True, max_length=455)
-    created = models.DateTimeField(auto_now_add=True)
+    created = models.DateTimeField(auto_now_add=True, db_index=True)
     image_banner = models.ImageField(_('Image banner'), upload_to='categories/%Y/%m/%d/', blank=True, null=True, max_length=600)
     link_banner = models.URLField(_('Link banner'), blank=True, null=True, max_length=555)
     description = RichTextUploadingField(_('Description'), blank=True)
@@ -649,18 +662,20 @@ class CustomAbstractCategory(MPTTModel):
     _full_name_separator = ' > '
 
     class MPTTMeta:
-        ordering = ['tree_id', 'lft']
+        order_insertion_by = ('sort', 'name', )
 
     class Meta:
         abstract = True
+        ordering = ('sort', 'name', )
+        #Todo add index_together like this
+        # index_together = (('name', 'slug', ), ('enable', 'created', 'sort', ), )
         unique_together = ('slug', 'parent')
         app_label = 'catalogue'
-        ordering = ('sort', 'name', 'id', )
         verbose_name = _('Category')
         verbose_name_plural = _('Categories')
 
     def __str__(self):
-        return u'{}'.format(self.name)
+        return self.full_name
 
     @property
     def full_name(self):
@@ -673,7 +688,7 @@ class CustomAbstractCategory(MPTTModel):
         sufficiently useful to keep around.
         """
         #Todo category.name to str
-        names = [category.name for category in self.get_ancestors_and_self()]
+        names = [unicode(category.name) for category in self.get_ancestors_and_self()]
         return self._full_name_separator.join(names)
 
     @property

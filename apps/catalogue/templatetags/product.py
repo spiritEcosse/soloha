@@ -15,3 +15,7 @@ def recommended_products(product):
     Inclusion tag listing recommended products
     """
     return {'recommended_products': product.recommended_products.all()[:settings.RECOMMENDED_PRODUCTS]}
+
+@register.filter
+def join(list, separator):
+    return separator.join([item.title for item in list])
