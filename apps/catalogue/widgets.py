@@ -189,6 +189,6 @@ class ManyToManyWidget(import_export_widgets.ManyToManyWidget):
                 try:
                     objects.append(self.model.objects.get(**{self.field: id}))
                 except ObjectDoesNotExist as e:
-                    raise ValueError(e)
+                    raise ValueError('{} {}: \'{}\'.'.format(e, self.model._meta.object_name, id))
 
         return objects
