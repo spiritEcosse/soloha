@@ -156,11 +156,11 @@ class ProductForm(forms.ModelForm):
 
 class ProductResource(resources.ModelResource):
     categories_slug = fields.Field(column_name='categories', attribute='categories',
-                                   widget=import_export_widgets.ManyToManyWidget(model=Category, field='slug'))
+                                   widget=widgets.ManyToManyWidget(model=Category, field='slug'))
     filters_slug = fields.Field(column_name='filters', attribute='filters',
-                                widget=import_export_widgets.ManyToManyWidget(model=Feature, field='slug'))
+                                widget=widgets.ManyToManyWidget(model=Feature, field='slug'))
     characteristics_slug = fields.Field(column_name='characteristics', attribute='characteristics',
-                                        widget=import_export_widgets.ManyToManyWidget(model=Feature, field='slug'))
+                                        widget=widgets.ManyToManyWidget(model=Feature, field='slug'))
     images = fields.Field(column_name='images', attribute='images',
                           widget=widgets.ImageManyToManyWidget(model=ProductImage, field='original'))
     recommended_products = resources.Field(column_name='recommended_products', attribute='recommended_products',

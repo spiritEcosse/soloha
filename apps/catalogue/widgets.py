@@ -18,6 +18,7 @@ try:
     from django.utils.encoding import force_text
 except ImportError:
     from django.utils.encoding import force_unicode as force_text
+from django.db.transaction import atomic, savepoint, savepoint_rollback, savepoint_commit  # noqa
 
 ProductImage = get_model('catalogue', 'ProductImage')
 
@@ -174,3 +175,20 @@ class CharWidget(import_export_widgets.Widget):
         except ValueError:
             featured_value = force_text(value)
         return featured_value
+
+
+class ManyToManyWidget(import_export_widgets.ManyToManyWidget):
+    def clean(self, value):
+        if not value:
+            return self.model.objects.none()
+        ids = filter(None, value.split(self.separator))
+        objects = []
+
+        with transaction.atomic():
+            for id in ids:
+                try:
+                    objects.append(self.model.objects.get(**{self.field: id}))
+                except ObjectDoesNotExist as e:
+                    raise ValueError(e)
+
+        return objects
