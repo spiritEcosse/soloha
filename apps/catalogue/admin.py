@@ -85,6 +85,7 @@ class ProductImageAdmin(ImportExportMixin, ImportExportActionModelAdmin):
 
 
 class FeatureResource(resources.ModelResource):
+    title = fields.Field(column_name='title', attribute='title', widget=widgets.CharWidget())
     parent = fields.Field(attribute='parent', column_name='parent', widget=import_export_widgets.ForeignKeyWidget(
         model=Feature, field='slug'))
     delete = fields.Field(widget=import_export_widgets.BooleanWidget())
