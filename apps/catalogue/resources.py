@@ -95,6 +95,7 @@ class Field(fields.Field):
         representation.
         """
         value = self.get_value(obj)
+
         if value is None:
             return ""
         if isinstance(self.widget, widgets.IntermediateModelManyToManyWidget):

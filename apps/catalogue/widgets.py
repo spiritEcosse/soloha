@@ -14,6 +14,11 @@ from import_export import resources, fields
 from django.db.models.fields.related import ForeignKey
 import functools
 import json
+try:
+    from django.utils.encoding import force_text
+except ImportError:
+    from django.utils.encoding import force_unicode as force_text
+
 ProductImage = get_model('catalogue', 'ProductImage')
 
 
@@ -156,3 +161,16 @@ class IntermediateModelManyToManyWidget(import_export_widgets.ManyToManyWidget):
                 result[field.name] = getattr(intermediate_obj, field.name)
 
         return result
+
+
+class CharWidget(import_export_widgets.Widget):
+    """
+    Widget for converting text fields.
+    """
+
+    def render(self, value):
+        try:
+            featured_value = force_text(int(float(value)))
+        except ValueError:
+            featured_value = force_text(value)
+        return featured_value
