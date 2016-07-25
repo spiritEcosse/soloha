@@ -183,7 +183,7 @@ class ManyToManyWidget(import_export_widgets.ManyToManyWidget):
             return self.model.objects.none()
         ids = filter(None, value.split(self.separator))
         objects = []
-
+        
         with transaction.atomic():
             for id in ids:
                 try:
