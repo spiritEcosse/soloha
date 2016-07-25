@@ -565,8 +565,15 @@ class AbstractFeature(MPTTModel):
         return self.title
 
     def save(self, *args, **kwargs):
-        if not self.slug:
-            self.slug = slugify(self.title)
+        if not self.sort:
+            self.sort = 0
+
+        if not self.slug and self.title:
+            self.slug = ''
+
+            if self.parent:
+                self.slug = self.parent.slug + '-'
+            self.slug += slugify(self.title)
 
         super(AbstractFeature, self).save(*args, **kwargs)
 
