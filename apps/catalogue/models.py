@@ -108,7 +108,3 @@ if not is_model_registered('catalogue', 'ProductImage'):
 
 
 from oscar.apps.catalogue.models import *  # noqa
-
-
-
-

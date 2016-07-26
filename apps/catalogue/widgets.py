@@ -109,22 +109,32 @@ class ImageManyToManyWidget(import_export_widgets.ManyToManyWidget):
         product_images = []
 
         with transaction.atomic():
-            ProductImage.objects.filter(product=self.obj).delete()
-
             if value:
                 for display_order, val in enumerate(value.split(self.separator)):
-                    product_image = ProductImage.objects.filter(product=self.obj, original__file=val).first()
+                    product_image = ProductImage.objects.filter(
+                        product=self.obj, display_order=display_order
+                    ).first()
+
+                    image = Image.objects.filter(file=val).first()
+
+                    if image is None:
+                        image = Image.objects.create(file=val, original_filename=val)
 
                     if product_image is None:
-                        image = Image.objects.filter(file=val).first()
+                        product_image = ProductImage.objects.filter(product=self.obj, original__file=val).first()
 
-                        if image is None:
-                            image = Image.objects.create(file=val, original_filename=val)
-                        product_image = ProductImage.objects.create(product=self.obj, original=image, display_order=display_order)
+                        if product_image is None:
+                            product_image = ProductImage.objects.create(product=self.obj, original=image, display_order=display_order)
+                        else:
+                            product_image.display_order = display_order
+                            product_image.save()
+                        product_images.append(product_image)
                     else:
-                        product_image.display_order = display_order
+                        product_image.original = image
                         product_image.save()
-                    product_images.append(product_image)
+                        product_images.append(product_image)
+
+                ProductImage.objects.filter(product=self.obj).exclude(pk__in=[obj.pk for obj in product_images]).delete()
         return product_images
 
 
