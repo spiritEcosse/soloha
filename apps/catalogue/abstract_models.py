@@ -121,6 +121,7 @@ class AbstractProduct(models.Model):
     objects = ProductManager()
     objects_enable = EnableManagerProduct()
     browsable = BrowsableProductManager()
+    separator = ','
 
     class Meta:
         abstract = True
@@ -155,6 +156,10 @@ class AbstractProduct(models.Model):
 
     def partner(self):
         return ','.join([stock.partner.code for stock in self.stockrecords.all()])
+
+    def categories_to_str(self):
+        return self.separator.join([category.name for category in self.get_categories().all()])
+    categories_to_str.short_description = _("Categories")
 
     def clean(self):
         """
