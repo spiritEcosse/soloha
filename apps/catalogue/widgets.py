@@ -182,10 +182,10 @@ class CharWidget(import_export_widgets.Widget):
 class ManyToManyWidget(import_export_widgets.ManyToManyWidget):
     def __init__(self, *args, **kwargs):
         self.fields_all = kwargs.pop('fields_all', False)
-        self.model_related_fields = kwargs.pop('model_related_fields', False)
+        self.model_related_fields = kwargs.pop('model_related_fields', ())
         super(ManyToManyWidget, self).__init__(*args, **kwargs)
         self.model_fields = []
-        print self.__dict__
+        self.resource_field = None
 
         if self.fields_all is True:
             for field in self.model._meta.fields:
@@ -222,7 +222,7 @@ class ManyToManyWidget(import_export_widgets.ManyToManyWidget):
         result = {}
 
         for field in self.model_fields:
-            result[field.name] = field.default() or '' if not isinstance(field.default(), fields.NOT_PROVIDED) else ''
+            result[field.name] = field.default() if not isinstance(field.default(), fields.NOT_PROVIDED) else ''
         return result
 
     def object_representation(self, obj, related_obj):

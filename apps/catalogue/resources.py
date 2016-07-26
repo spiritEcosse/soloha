@@ -23,7 +23,6 @@ except ImportError:
         def emit(self, record):
             pass
 import traceback
-
 logging.getLogger(__name__).addHandler(NullHandler())
 
 
@@ -31,7 +30,7 @@ class Field(fields.Field):
 
     def __init__(self, *args, **kwargs):
         super(Field, self).__init__(*args, **kwargs)
-        raise Exception(dir(self))
+        self.widget.resource_field = self
 
     def is_m2m_with_intermediate_object(self, obj):
         field, _, _, m2m = obj._meta.get_field_by_name(self.attribute)
