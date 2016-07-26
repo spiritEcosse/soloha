@@ -218,7 +218,7 @@ class ProductAdmin(ImportExportMixin, ImportExportActionModelAdmin, admin.ModelA
     date_hierarchy = 'date_created'
     list_display = ('title', 'thumb', 'enable', 'date_updated', 'slug', 'get_product_class', 'structure', 'partner',
                     'attribute_summary', 'pk', )
-    list_filter = ('enable', 'structure', 'is_discountable', )
+    list_filter = ('enable', 'stockrecords__partner', 'structure', 'is_discountable', )
     inlines = [StockRecordInline, ProductRecommendationInline, ProductImageInline]
     prepopulated_fields = {"slug": ("title",)}
     search_fields = ('upc', 'title', 'slug', )
