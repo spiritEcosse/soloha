@@ -157,29 +157,29 @@ class ProductForm(forms.ModelForm):
 
 
 class ProductResource(resources.ModelResource):
-    categories_slug = fields.Field(column_name='categories', attribute='categories',
+    categories_slug = resources.Field(column_name='categories', attribute='categories',
                                    widget=widgets.ManyToManyWidget(model=Category, field='slug'))
-    filters_slug = fields.Field(column_name='filters', attribute='filters',
+    filters_slug = resources.Field(column_name='filters', attribute='filters',
                                 widget=widgets.ManyToManyWidget(model=Feature, field='slug'))
-    characteristics_slug = fields.Field(column_name='characteristics', attribute='characteristics',
+    characteristics_slug = resources.Field(column_name='characteristics', attribute='characteristics',
                                         widget=widgets.ManyToManyWidget(model=Feature, field='slug'))
-    images = fields.Field(column_name='images', attribute='images',
+    images = resources.Field(column_name='images', attribute='images',
                           widget=widgets.ImageManyToManyWidget(model=ProductImage, field='original'))
     recommended_products = resources.Field(column_name='recommended_products', attribute='recommended_products',
                                            widget=widgets.IntermediateModelManyToManyWidget(
                                                model=Product, field='slug',
                                            ))
-    price = fields.Field(column_name='stockrecords', attribute='stockrecords', widget=widgets.ManyToManyWidget(
-        model=StockRecord, fields_all=True
+    price = resources.Field(column_name='stockrecords', attribute='stockrecords', widget=widgets.ManyToManyWidget(
+        model=StockRecord, fields_all=True, model_related_fields=(('partner', 'code'), )
     ))
     delete = fields.Field(widget=import_export_widgets.BooleanWidget())
 
     class Meta:
         model = Product
         #ToDo delete column to start list
-        fields = ('id', 'title', 'slug', 'enable', 'h1', 'meta_title', 'meta_description', 'meta_keywords',
+        fields = ('id', 'delete', 'title', 'slug', 'enable', 'price', 'h1', 'meta_title', 'meta_description', 'meta_keywords',
                   'description', 'categories_slug', 'filters_slug', 'characteristics_slug', 'product_class', 'images',
-                  'delete', 'recommended_products', )
+                  'recommended_products', )
         export_order = fields
 
     #ToDo @igor: user cannot delete if has permission

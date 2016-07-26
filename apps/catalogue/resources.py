@@ -29,6 +29,10 @@ logging.getLogger(__name__).addHandler(NullHandler())
 
 class Field(fields.Field):
 
+    def __init__(self, *args, **kwargs):
+        super(Field, self).__init__(*args, **kwargs)
+        raise Exception(dir(self))
+
     def is_m2m_with_intermediate_object(self, obj):
         field, _, _, m2m = obj._meta.get_field_by_name(self.attribute)
         return m2m and field.rel.through._meta.auto_created is False
@@ -98,7 +102,8 @@ class Field(fields.Field):
 
         if value is None:
             return ""
-        if isinstance(self.widget, widgets.IntermediateModelManyToManyWidget):
+        if isinstance(self.widget, widgets.IntermediateModelManyToManyWidget) \
+                or isinstance(self.widget, widgets.ManyToManyWidget):
             return self.widget.render(value, obj)
         else:
             return self.widget.render(value)

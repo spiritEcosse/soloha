@@ -19,6 +19,8 @@ try:
 except ImportError:
     from django.utils.encoding import force_unicode as force_text
 from django.db.transaction import atomic, savepoint, savepoint_rollback, savepoint_commit  # noqa
+from django.db.models import fields
+from django.db.models.fields.related import ForeignKey
 
 ProductImage = get_model('catalogue', 'ProductImage')
 
@@ -178,12 +180,27 @@ class CharWidget(import_export_widgets.Widget):
 
 
 class ManyToManyWidget(import_export_widgets.ManyToManyWidget):
+    def __init__(self, *args, **kwargs):
+        self.fields_all = kwargs.pop('fields_all', False)
+        self.model_related_fields = kwargs.pop('model_related_fields', False)
+        super(ManyToManyWidget, self).__init__(*args, **kwargs)
+        self.model_fields = []
+        print self.__dict__
+
+        if self.fields_all is True:
+            for field in self.model._meta.fields:
+                if field is not self.model._meta.pk and not isinstance(field, fields.DateTimeField):
+                    #ToDo: add and field.related_model != model
+                    if isinstance(field, ForeignKey):
+                        continue
+                    self.model_fields.append(field)
+
     def clean(self, value):
         if not value:
             return self.model.objects.none()
         ids = filter(None, value.split(self.separator))
         objects = []
-        
+
         with transaction.atomic():
             for id in ids:
                 try:
@@ -192,3 +209,35 @@ class ManyToManyWidget(import_export_widgets.ManyToManyWidget):
                     raise ValueError('{} {}: \'{}\'.'.format(e, self.model._meta.object_name, id))
 
         return objects
+
+    def render(self, value, obj):
+        if self.fields_all:
+            if not value.all():
+                return json.dumps([self.workpiece()])
+            return json.dumps([self.object_representation(obj, related_obj) for related_obj in value.all()])
+
+        super(ManyToManyWidget, self).render(value)
+
+    def workpiece(self):
+        result = {}
+
+        for field in self.model_fields:
+            result[field.name] = field.default() or '' if not isinstance(field.default(), fields.NOT_PROVIDED) else ''
+        return result
+
+    def object_representation(self, obj, related_obj):
+        result = {self.field: getattr(related_obj, self.field, None)}
+
+        for field in self.model_fields:
+            result[field.name] = field.default if field.default else None
+
+        intermediate_obj = self.model.objects.filter(**{
+            self.model.m2m_reverse_field_name(): related_obj,
+            self.model.m2m_field_name(): obj
+        }).first()
+
+        if intermediate_obj is not None:
+            for field in self.model_fields:
+                result[field.name] = getattr(intermediate_obj, field.name)
+
+        return result
