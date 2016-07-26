@@ -12,6 +12,9 @@ from django.core.exceptions import ValidationError
 from filer.fields.image import FilerImageField
 from ckeditor_uploader.fields import RichTextUploadingField
 from filer.fields.image import FilerImageField
+import logging
+
+logger = logging.getLogger(__name__)
 
 REGEXP_PHONE = r'/^((8|\+38)[\- ]?)?(\(?\d{3}\)?[\- ]?)?[\d\- ]{7,10}$/'
 REGEXP_EMAIL = r'/^[-\w.]+@([A-z0-9][-A-z0-9]+\.)+[A-z]{2,4}$/'
@@ -430,26 +433,23 @@ class AbstractProduct(models.Model):
             # the ProductManager
             images = images.order_by('display_order')
         try:
-            image = images[0].original
+            image = images[0].original.file.name
         except IndexError:
             # We return a dict with fields that mirror the key properties of
             # the ProductImage class so this missing image can be used
             # interchangeably in templates.  Strategy pattern ftw!
             image = self.get_missing_image().name
 
-        if image is None:
+        current_path = os.getcwd()
+        os.chdir(MEDIA_ROOT)
+
+        if not os.path.exists(os.path.abspath(image)) or not os.path.isfile(os.path.abspath(image)):
             image = IMAGE_NOT_FOUND
 
-            current_path = os.getcwd()
-            os.chdir(MEDIA_ROOT)
-
             if not os.path.exists(os.path.abspath(image)):
-                try:
-                    raise Exception('image - {} not found!'.format(os.path.abspath(image)))
-                except Exception:
-                    raise
-                finally:
-                    os.chdir(current_path)
+                logger.error('image - {} not found!'.format(os.path.abspath(image)))
+
+        os.chdir(current_path)
         return image
 
     # Updating methods
