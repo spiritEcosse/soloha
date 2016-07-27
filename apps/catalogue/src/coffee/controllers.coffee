@@ -285,23 +285,22 @@ app.controller 'More_goods', ['$http', '$scope', '$window', '$document', '$locat
         $scope.page_number = getParameterByName('page')
     console.log($scope.page_number)
 
-    $http.post($location.absUrl(), {'page': $scope.page_number, 'sorting_type': $scope.sorting_type}).success (data) ->
-        items = angular.element(document).find('#product')
-        items.attr('ng-repeat', 'product in products')
-        $compile(items)($scope)
-        clear = angular.element('.clear')
-        clear.remove()
-        $scope.products = data.products
-        $scope.initial_page_number = data.page_number
+#    $http.post($location.absUrl(), {'page': $scope.page_number, 'sorting_type': $scope.sorting_type}).success (data) ->
+#        items = angular.element(document).find('#product')
+#        items.attr('ng-repeat', 'product in products')
+#        $compile(items)($scope)
+#        clear = angular.element('.clear')
+#        clear.remove()
+#        $scope.products = data.products
+#        $scope.initial_page_number = data.page_number
         #    $scope.page_number = data.page_number
-        $scope.num_pages = data.num_pages
-        $scope.pages = [data.pages[parseInt($scope.initial_page_number)-1]]
-        $scope.pages[0].active = "True"
-        $scope.pages[0].link = ""
-        $scope.sorting_type = data.sorting_type
-        console.log(data)
-    .error ->
-        console.error('An error occurred during submission')
+#        $scope.num_pages = data.num_pages
+#        $scope.pages = [data.pages[parseInt($scope.initial_page_number)-1]]
+#        $scope.pages[0].active = "True"
+#        $scope.pages[0].link = ""
+#        $scope.sorting_type = data.sorting_type
+#    .error ->
+#        console.error('An error occurred during submission')
 
     $scope.submit = ->
         $http.post($location.absUrl(), {'page': $scope.page_number, 'sorting_type': $scope.sorting_type}).success (data) ->
