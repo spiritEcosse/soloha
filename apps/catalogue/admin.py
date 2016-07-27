@@ -216,7 +216,7 @@ class ProductResource(resources.ModelResource):
 
 class ProductAdmin(ImportExportMixin, ImportExportActionModelAdmin, admin.ModelAdmin):
     date_hierarchy = 'date_created'
-    list_display = ('thumb', 'title', 'pk', 'enable', 'date_updated', 'slug', 'categories_to_str', 'get_product_class', 'structure',
+    list_display = ('title', 'thumb', 'pk', 'enable', 'date_updated', 'slug', 'categories_to_str', 'get_product_class', 'structure',
                     'partner', 'attribute_summary', )
     list_filter = ('enable', 'stockrecords__partner', 'categories', 'structure', 'is_discountable', )
     inlines = [StockRecordInline, ProductRecommendationInline, ProductImageInline]
