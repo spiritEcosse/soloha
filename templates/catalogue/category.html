@@ -125,12 +125,12 @@
         {% if page_obj %}
             {% for product in page_obj %}
                 {% if forloop.first %}
-                    <div class="col-sm-6 col-md-6" id="product" >
+                    <div class="col-sm-6 col-md-6">
                         {% include "catalogue/partials/product.html" %}
                     </div>
                 {% else %}
                     <span class="clear">
-                    <div class="col-sm-6 col-md-6" id="product">
+                    <div class="col-sm-6 col-md-6">
                         {% include "catalogue/partials/product.html" %}
                     </div>
                     </span>
