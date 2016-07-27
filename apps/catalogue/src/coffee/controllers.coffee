@@ -277,6 +277,7 @@ app.controller 'More_goods', ['$http', '$scope', '$window', '$document', '$locat
             return ''
         decodeURIComponent results[2].replace(/\+/g, ' ')
 
+
     $scope.sorting_type = '-views_count'
     if getParameterByName('sorting_type')
         $scope.sorting_type = getParameterByName('sorting_type')
