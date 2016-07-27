@@ -183,6 +183,8 @@ class ManyToManyWidget(import_export_widgets.ManyToManyWidget):
     def __init__(self, *args, **kwargs):
         self.fields_all = kwargs.pop('fields_all', False)
         self.model_related_fields = kwargs.pop('model_related_fields', ())
+        print kwargs
+        print args
         super(ManyToManyWidget, self).__init__(*args, **kwargs)
         self.model_fields = []
         self.resource_field = None
