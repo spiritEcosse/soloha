@@ -89,8 +89,12 @@ class Field(fields.Field):
             if self.is_m2m_with_intermediate_object(obj):
                 self.remove_old_intermediates(obj, data)
                 self.ensure_current_intermediates_created(obj, data)
+            elif getattr(self.widget, 'fields_all', False):
+                with transaction.atomic():
+                    self.widget.clean(data[self.column_name])
             else:
-                setattr(obj, self.attribute, self.clean(data))
+                with transaction.atomic():
+                    setattr(obj, self.attribute, self.clean(data))
 
     def export(self, obj):
         """

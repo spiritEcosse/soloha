@@ -182,28 +182,86 @@ class CharWidget(import_export_widgets.Widget):
 class ManyToManyWidget(import_export_widgets.ManyToManyWidget):
     def __init__(self, *args, **kwargs):
         self.fields_all = kwargs.pop('fields_all', False)
-        self.model_related_fields = kwargs.pop('model_related_fields', ())
-        print kwargs
-        print args
+        self.model_related_fields = kwargs.pop('model_related_fields', {})
         super(ManyToManyWidget, self).__init__(*args, **kwargs)
-        self.model_fields = []
         self.resource_field = None
+        self.model_resource = None
+        self.model_fields = []
+        self.manager = self.model.objects
+        self.obj = None
+        self.related_model_field = None
+        self.field_id = 'id'
 
+    def set_model_fields(self):
         if self.fields_all is True:
             for field in self.model._meta.fields:
-                if field is not self.model._meta.pk and not isinstance(field, fields.DateTimeField):
-                    #ToDo: add and field.related_model != model
-                    if isinstance(field, ForeignKey):
+                if not isinstance(field, fields.DateTimeField):
+                    if field.related_model is self.model_resource:
+                        self.related_model_field = field
                         continue
                     self.model_fields.append(field)
+
+    def set_model_resource(self, model_resource):
+        self.model_resource = model_resource
+        self.set_model_fields()
+
+    def save(self, value):
+        print value
+        self.clean_many_fields(value)
+
+    def clean_many_fields(self, value):
+        objects = []
+        items = json.loads(value)
+
+        for item in items:
+            for field in self.model_fields:
+                if isinstance(field, ForeignKey):
+                    field_value = item.copy()
+
+                    try:
+                        item[field.name] = field.rel.to.objects.get(
+                            **{self.model_related_fields[field.name]: item[field.name]}
+                        )
+                    except ObjectDoesNotExist as e:
+                        raise ValueError(u'{} {}: \'{}\'.'.format(e, field.rel.to._meta.object_name, field_value[field.name]))
+
+                if not item[field.name] and field is not self.model._meta.pk:
+                    print type(field)
+
+                if field.name == 'partner_sku':
+                    item[field.name] = ''
+
+            if not item[self.field_id]:
+                new_item = item.copy()
+                new_item[self.related_model_field.name] = self.obj
+                obj = self.manager.create(**new_item)
+            else:
+                obj = self.manager.get(**{self.field_id: item[self.field_id]})
+
+                for field in self.model_fields:
+                    if field.name != self.field_id:
+                        setattr(obj, field.name, item[field.name])
+                obj.save()
+            objects.append(obj)
+            self.delete_old_objects(objects)
+
+        return objects
+
+    def delete_old_objects(self, objects):
+        self.model.objects.filter(**{self.related_model_field.name: self.obj}).exclude(
+            **{'{}__in'.format(self.field_id): [getattr(obj, self.field_id) for obj in objects]}
+        ).delete()
 
     def clean(self, value):
         if not value:
             return self.model.objects.none()
-        ids = filter(None, value.split(self.separator))
-        objects = []
 
-        with transaction.atomic():
+        if self.model_fields:
+            objects = self.clean_many_fields(value)
+        else:
+            ids = filter(None, value.split(self.separator))
+            objects = []
+
             for id in ids:
                 try:
                     objects.append(self.model.objects.get(**{self.field: id}))
@@ -224,7 +282,10 @@ class ManyToManyWidget(import_export_widgets.ManyToManyWidget):
         result = {}
 
         for field in self.model_fields:
-            result[field.name] = field.default() if not isinstance(field.default(), fields.NOT_PROVIDED) else ''
+            result[field.name] = None
+
+            if not isinstance(field.default(), fields.NOT_PROVIDED):
+                result[field.name] = field.default()
         return result
 
     def object_representation(self, obj, related_obj):

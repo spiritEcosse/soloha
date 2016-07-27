@@ -33,6 +33,7 @@ try:
     from django.utils.encoding import force_text
 except ImportError:
     from django.utils.encoding import force_unicode as force_text
+from collections import OrderedDict
 
 Feature = get_model('catalogue', 'Feature')
 AttributeOption = get_model('catalogue', 'AttributeOption')
@@ -170,9 +171,20 @@ class ProductResource(resources.ModelResource):
                                                model=Product, field='slug',
                                            ))
     price = resources.Field(column_name='stockrecords', attribute='stockrecords', widget=widgets.ManyToManyWidget(
-        model=StockRecord, fields_all=True, model_related_fields=(('partner', 'code'), )
+        model=StockRecord, fields_all=True, model_related_fields={'partner': 'code'}
     ))
     delete = fields.Field(widget=import_export_widgets.BooleanWidget())
+
+    def __new__(cls, *args, **kwargs):
+        obj = super(ProductResource, cls).__new__(cls, *args, **kwargs)
+
+        for field in cls.fields.items():
+            dict_field = dict((field,))
+
+            if callable(getattr(dict_field[field[0]].widget, 'set_model_resource', None)):
+                dict_field[field[0]].widget.set_model_resource(obj._meta.model)
+
+        return obj
 
     class Meta:
         model = Product
@@ -197,7 +209,7 @@ class ProductResource(resources.ModelResource):
             for field in self.get_fields():
                 field.widget.obj = obj
 
-                if not isinstance(field.widget, import_export_widgets.ManyToManyWidget) \
+                if not isinstance(field.widget, widgets.ManyToManyWidget) \
                         and not isinstance(field.widget, widgets.ImageManyToManyWidget) \
                         and not isinstance(field.widget, widgets.IntermediateModelManyToManyWidget):
                     continue
