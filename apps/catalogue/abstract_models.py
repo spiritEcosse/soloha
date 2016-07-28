@@ -705,11 +705,10 @@ class CustomAbstractCategory(MPTTModel):
     created = models.DateTimeField(auto_now_add=True, db_index=True)
     link_banner = models.URLField(_('Link banner'), blank=True, null=True, max_length=555)
     description = RichTextUploadingField(_('Description'), blank=True)
-    # image_banner = models.ImageField(_('Image banner'), upload_to='categories/%Y/%m/%d/', blank=True, null=True, max_length=600)
-    # icon = models.ImageField(_('Icon'), upload_to='categories', blank=True, null=True, max_length=455)
-    # image = models.ImageField(_('Image'), upload_to='categories/%Y/%m/%d/', blank=True, null=True, max_length=500)
+    image_banner = FilerImageField(verbose_name=_('Image banner'), blank=True, null=True,
+                                   related_name='category_image_banner')
+    icon = FilerImageField(verbose_name=_('Icon'), blank=True, null=True, related_name='category_icon')
     image = FilerImageField(verbose_name=_('Image'), null=True, blank=True, related_name="category_image")
-    # category_image = FilerImageField(verbose_name=_('Image'), null=True, blank=True, related_name="category_image")
     _slug_separator = '/'
     _full_name_separator = ' > '
 
