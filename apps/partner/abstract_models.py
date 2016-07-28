@@ -77,7 +77,9 @@ class AbstractStockRecord(models.Model):
 
     def __str__(self):
         msg = u"Partner: %s, product: %s" % (
-            self.partner.display_name, self.product,)
+            getattr(self.partner, 'display_name', None),
+            getattr(self, 'product', None)
+        )
         if self.partner_sku:
             msg = u"%s (%s)" % (msg, self.partner_sku)
         return msg

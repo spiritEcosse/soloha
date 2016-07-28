@@ -17,6 +17,8 @@ import os
 import widgets
 import resources
 import logging  # isort:skip
+from django.utils.translation import ugettext_lazy as _, pgettext_lazy
+
 #Todo change list import module
 try:  # Python 2.7+
     from logging import NullHandler
@@ -47,6 +49,7 @@ ProductClass = get_model('catalogue', 'ProductClass')
 ProductImage = get_model('catalogue', 'ProductImage')
 ProductRecommendation = get_model('catalogue', 'ProductRecommendation')
 StockRecord = get_model('partner', 'StockRecord')
+Partner = get_model('partner', 'Partner')
 Info = get_model('sites', 'Info')
 
 
@@ -216,8 +219,8 @@ class ProductResource(resources.ModelResource):
 
 class ProductAdmin(ImportExportMixin, ImportExportActionModelAdmin, admin.ModelAdmin):
     date_hierarchy = 'date_created'
-    list_display = ('title', 'thumb', 'pk', 'enable', 'date_updated', 'slug', 'categories_to_str', 'get_product_class', 'structure',
-                    'partner', 'attribute_summary', )
+    list_display = ('title', 'thumb', 'pk', 'enable', 'date_updated', 'slug', 'categories_to_str', 'get_product_class',
+                    'structure', 'partner', 'attribute_summary', )
     list_filter = ('enable', 'stockrecords__partner', 'categories', 'structure', 'is_discountable', )
     inlines = [StockRecordInline, ProductRecommendationInline, ProductImageInline]
     prepopulated_fields = {"slug": ("title",)}
@@ -269,10 +272,14 @@ class ProductRecommendationResource(resources.ModelResource):
 
 
 class ProductRecommendationAdmin(ImportExportMixin, ImportExportActionModelAdmin):
-    list_display = ('primary', 'recommendation', 'ranking', )
+    list_display = ('primary', 'recommendation', 'ranking', 'primary_categories_to_str', )
     list_filter = ('primary__enable', 'ranking', 'primary__stockrecords__partner', 'primary__categories', )
-    search_fields = ('primary__title', 'primary__slug', )
+    search_fields = ('primary__title', 'primary__slug', 'primary__pk', )
     resource_class = ProductRecommendationResource
+
+    def primary_categories_to_str(self):
+        return self.separator.join([category.name for category in self.primary.get_categories().all()])
+    primary_categories_to_str.short_description = _("Categories")
 
 
 class ProductAttributeAdmin(admin.ModelAdmin):
