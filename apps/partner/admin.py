@@ -1,9 +1,7 @@
 from apps.catalogue import resources
 from import_export import fields, widgets as import_export_widgets
 from import_export.admin import ImportExportMixin, ImportExportActionModelAdmin
-from django.template import loader, Context
 from oscar.apps.partner.admin import *  # noqa
-from django.utils.translation import ugettext_lazy as _, pgettext_lazy
 
 Partner = get_model('partner', 'Partner')
 StockRecord = get_model('partner', 'StockRecord')
