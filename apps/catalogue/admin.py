@@ -173,10 +173,9 @@ class ProductResource(resources.ModelResource):
 
     class Meta:
         model = Product
-        #ToDo delete column to start list
-        fields = ('id', 'title', 'slug', 'enable', 'h1', 'meta_title', 'meta_description', 'meta_keywords',
+        fields = ('id', 'delete', 'title', 'slug', 'enable', 'h1', 'meta_title', 'meta_description', 'meta_keywords',
                   'description', 'categories_slug', 'filters_slug', 'characteristics_slug', 'product_class', 'images',
-                  'delete', 'recommended_products', )
+                  'recommended_products', )
         export_order = fields
 
     #ToDo @igor: user cannot delete if has permission
