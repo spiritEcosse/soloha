@@ -1,7 +1,9 @@
 from oscar.core.loading import is_model_registered
 from oscar.apps.catalogue.abstract_models import *  # noqa
+from django.utils.translation import ugettext_lazy as _
 from apps.catalogue.abstract_models import AbstractProduct, AbstractFeature, CustomAbstractCategory, \
-    AbstractProductVersion, AbstractVersionAttribute, AbstractProductFeature, AbstractProductOptions, AbstractProductImage
+    AbstractProductVersion, AbstractVersionAttribute, AbstractProductFeature, AbstractProductOptions, \
+    AbstractProductImage, CommonFeatureProduct
 
 __all__ = ['ProductAttributesContainer']
 
@@ -59,8 +61,21 @@ if not is_model_registered('catalogue', 'Product'):
 
 
 if not is_model_registered('catalogue', 'ProductRecommendation'):
-    class ProductRecommendation(AbstractProductRecommendation):
-        pass
+    class ProductRecommendation(AbstractProductRecommendation, CommonFeatureProduct):
+        def __init__(self, *args, **kwargs):
+            super(ProductRecommendation, self).__init__(*args, **kwargs)
+            self.product = getattr(self, 'primary', None)
+
+        def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
+            if self.ranking is None:
+                self.ranking = 0
+            super(ProductRecommendation, self).save(force_insert=force_insert, force_update=force_update, using=using,
+                                                    update_fields=update_fields)
+
+        def recommendation_thumb(self):
+            return self.recommendation.thumb()
+        recommendation_thumb.allow_tags = True
+        recommendation_thumb.short_description = _('Image of recommendation product.')
 
     __all__.append('ProductRecommendation')
 
@@ -108,7 +123,3 @@ if not is_model_registered('catalogue', 'ProductImage'):
 
 
 from oscar.apps.catalogue.models import *  # noqa
-
-
-
-

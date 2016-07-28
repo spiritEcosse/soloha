@@ -12,9 +12,52 @@ from django.core.exceptions import ValidationError
 from filer.fields.image import FilerImageField
 from ckeditor_uploader.fields import RichTextUploadingField
 from filer.fields.image import FilerImageField
+import logging
+from django.template import loader, Context
+
+logger = logging.getLogger(__name__)
 
 REGEXP_PHONE = r'/^((8|\+38)[\- ]?)?(\(?\d{3}\)?[\- ]?)?[\d\- ]{7,10}$/'
 REGEXP_EMAIL = r'/^[-\w.]+@([A-z0-9][-A-z0-9]+\.)+[A-z]{2,4}$/'
+
+
+def check_exist_image(image):
+    current_path = os.getcwd()
+    os.chdir(MEDIA_ROOT)
+
+    if not os.path.exists(os.path.abspath(image)) or not os.path.isfile(os.path.abspath(image)):
+        image = IMAGE_NOT_FOUND
+
+        if not os.path.exists(os.path.abspath(image)):
+            logger.error('image - {} not found!'.format(os.path.abspath(image)))
+
+    os.chdir(current_path)
+    return image
+
+
+class CommonFeatureProduct(object):
+    product = None
+
+    def product_enable(self):
+        return self.product.enable
+    product_enable.short_description = _('Enable product')
+
+    def product_categories_to_str(self):
+        return self.product.categories_to_str()
+    product_categories_to_str.short_description = _("Categories")
+
+    def product_partners_to_str(self):
+        return self.product.partners_to_str()
+    product_partners_to_str.short_description = _("Partners")
+
+    def thumb(self):
+        return self.product.thumb()
+    thumb.allow_tags = True
+    thumb.short_description = _('Image of product')
+
+    def product_date_updated(self):
+        return self.product.date_updated
+    product_date_updated.short_description = _("Product date updated")
 
 
 class EnableManagerProduct(models.Manager):
@@ -78,7 +121,7 @@ class AbstractProduct(models.Model):
     #: "Kind" of product, e.g. T-Shirt, Book, etc.
     #: None for child products, they inherit their parent's product class
     product_class = models.ForeignKey(
-        'catalogue.ProductClass', null=True, blank=True, on_delete=models.PROTECT,
+        'catalogue.ProductClass', on_delete=models.PROTECT,
         verbose_name=_('Product type'), related_name="products",
         help_text=_("Choose what type of product this is"))
     # attributes = models.ManyToManyField(
@@ -118,6 +161,7 @@ class AbstractProduct(models.Model):
     objects = ProductManager()
     objects_enable = EnableManagerProduct()
     browsable = BrowsableProductManager()
+    separator = ','
 
     class Meta:
         abstract = True
@@ -149,6 +193,25 @@ class AbstractProduct(models.Model):
             dict_values.update({'category_slug': self.categories.first().full_slug})
 
         return reverse('detail', kwargs=dict_values)
+
+    def thumb(self, original=None):
+        if original is not None:
+            image = original
+        else:
+            image = self.primary_image()
+
+        image = check_exist_image(image)
+        return loader.get_template('admin/catalogue/product/thumb.html').render(Context({'image': image}))
+    thumb.allow_tags = True
+    thumb.short_description = _('Image')
+
+    def categories_to_str(self):
+        return self.separator.join([category.name for category in self.get_categories().all()])
+    categories_to_str.short_description = _("Categories")
+
+    def partners_to_str(self):
+        return self.separator.join([stock.partner.name for stock in self.stockrecords.all()])
+    categories_to_str.short_description = _("Partners")
 
     def clean(self):
         """
@@ -427,26 +490,14 @@ class AbstractProduct(models.Model):
             # the ProductManager
             images = images.order_by('display_order')
         try:
-            image = images[0].original
+            image = images[0].original.file.name
         except IndexError:
             # We return a dict with fields that mirror the key properties of
             # the ProductImage class so this missing image can be used
             # interchangeably in templates.  Strategy pattern ftw!
             image = self.get_missing_image().name
 
-        if image is None:
-            image = IMAGE_NOT_FOUND
-
-            current_path = os.getcwd()
-            os.chdir(MEDIA_ROOT)
-
-            if not os.path.exists(os.path.abspath(image)):
-                try:
-                    raise Exception('image - {} not found!'.format(os.path.abspath(image)))
-                except Exception:
-                    raise
-                finally:
-                    os.chdir(current_path)
+        image = check_exist_image(image)
         return image
 
     # Updating methods
@@ -546,21 +597,31 @@ class AbstractFeature(MPTTModel):
     bottom_line = models.IntegerField(verbose_name=_('Bottom line size'), blank=True, null=True)
     top_line = models.IntegerField(verbose_name=_('Top line size'), blank=True, null=True)
 
+    class MPTTMeta:
+        order_insertion_by = ('sort', 'title', )
+
     class Meta:
         abstract = True
         unique_together = ('slug', 'parent', )
-        ordering = ('sort', 'title', 'id', )
+        ordering = ('sort', 'title', )
         verbose_name = _('Feature')
         verbose_name_plural = _('Features')
 
     def __str__(self):
         if self.parent:
-            return u'{}->{}'.format(self.parent, self.title)
+            return u'{} > {}'.format(self.parent, self.title)
         return self.title
 
     def save(self, *args, **kwargs):
-        if not self.slug:
-            self.slug = slugify(self.title)
+        if not self.sort:
+            self.sort = 0
+
+        if not self.slug and self.title:
+            self.slug = ''
+
+            if self.parent:
+                self.slug = self.parent.slug + '-'
+            self.slug += slugify(self.title)
 
         super(AbstractFeature, self).save(*args, **kwargs)
 
@@ -582,13 +643,12 @@ class AbstractFeature(MPTTModel):
 
 
 @python_2_unicode_compatible
-class AbstractProductImage(models.Model):
+class AbstractProductImage(models.Model, CommonFeatureProduct):
     """
     An image of a product
     """
     product = models.ForeignKey('catalogue.Product', related_name='images', verbose_name=_("Product"))
     original = FilerImageField(verbose_name=_("Original"), null=True, blank=True, related_name="original")
-    original_image = models.ImageField(_("Original"), upload_to=settings.OSCAR_IMAGE_FOLDER, max_length=255, blank=True, null=True)
     caption = models.CharField(_("Caption"), max_length=200, blank=True)
 
     #: Use display_order to determine which is the "primary" image
@@ -601,19 +661,24 @@ class AbstractProductImage(models.Model):
         app_label = 'catalogue'
         # Any custom models should ensure that this ordering is unchanged, or
         # your query count will explode. See AbstractProduct.primary_image.
-        ordering = ["display_order"]
+        ordering = ("product", "display_order", )
         unique_together = ("product", "display_order")
         verbose_name = _('Product image')
         verbose_name_plural = _('Product images')
 
     def __str__(self):
-        return u"Image of '%s'" % self.product
+        return u"Image of '%s'" % getattr(self, 'product', None)
 
     def is_primary(self):
         """
         Return bool if image display order is 0
         """
         return self.display_order == 0
+
+    def thumb(self):
+        return self.product.thumb(self.original.file.name)
+    thumb.allow_tags = True
+    thumb.short_description = _('Image')
 
     def delete(self, *args, **kwargs):
         """
@@ -630,37 +695,38 @@ class AbstractProductImage(models.Model):
 class CustomAbstractCategory(MPTTModel):
     name = models.CharField(_('Name'), max_length=300, db_index=True)
     slug = models.SlugField(verbose_name=_('Slug'), max_length=400, unique=True)
-    enable = models.BooleanField(verbose_name=_('Enable'), default=True)
-    parent = TreeForeignKey('self', verbose_name=_('Parent'), related_name='children', blank=True, null=True)
+    enable = models.BooleanField(verbose_name=_('Enable'), default=True, db_index=True)
+    parent = TreeForeignKey('self', verbose_name=_('Parent'), related_name='children', blank=True, null=True, db_index=True)
     meta_title = models.CharField(verbose_name=_('Meta tag: title'), blank=True, max_length=480)
     h1 = models.CharField(verbose_name=_('h1'), blank=True, max_length=310)
     meta_description = models.TextField(verbose_name=_('Meta tag: description'), blank=True)
     meta_keywords = models.TextField(verbose_name=_('Meta tag: keywords'), blank=True)
-    sort = models.IntegerField(blank=True, null=True, default=0)
-    icon = models.ImageField(_('Icon'), upload_to='categories', blank=True, null=True, max_length=455)
-    created = models.DateTimeField(auto_now_add=True)
-    image_banner = models.ImageField(_('Image banner'), upload_to='categories/%Y/%m/%d/', blank=True, null=True, max_length=600)
+    sort = models.IntegerField(blank=True, null=True, default=0, db_index=True)
+    created = models.DateTimeField(auto_now_add=True, db_index=True)
     link_banner = models.URLField(_('Link banner'), blank=True, null=True, max_length=555)
     description = RichTextUploadingField(_('Description'), blank=True)
-    image = models.ImageField(_('Image'), upload_to='categories/%Y/%m/%d/', blank=True, null=True, max_length=500)
-    # image = FilerImageField(verbose_name=_('Image'), null=True, blank=True, related_name="image")
-    category_image = FilerImageField(verbose_name=_('Image'), null=True, blank=True, related_name="category_image")
+    image_banner = FilerImageField(verbose_name=_('Image banner'), blank=True, null=True,
+                                   related_name='category_image_banner')
+    icon = FilerImageField(verbose_name=_('Icon'), blank=True, null=True, related_name='category_icon')
+    image = FilerImageField(verbose_name=_('Image'), null=True, blank=True, related_name="category_image")
     _slug_separator = '/'
     _full_name_separator = ' > '
 
     class MPTTMeta:
-        ordering = ['tree_id', 'lft']
+        order_insertion_by = ('sort', 'name', )
 
     class Meta:
         abstract = True
+        ordering = ('sort', 'name', )
+        #Todo add index_together like this
+        # index_together = (('name', 'slug', ), ('enable', 'created', 'sort', ), )
         unique_together = ('slug', 'parent')
         app_label = 'catalogue'
-        ordering = ('sort', 'name', 'id', )
         verbose_name = _('Category')
         verbose_name_plural = _('Categories')
 
     def __str__(self):
-        return u'{}'.format(self.name)
+        return self.full_name
 
     @property
     def full_name(self):
@@ -673,7 +739,7 @@ class CustomAbstractCategory(MPTTModel):
         sufficiently useful to keep around.
         """
         #Todo category.name to str
-        names = [category.name for category in self.get_ancestors_and_self()]
+        names = [unicode(category.name) for category in self.get_ancestors_and_self()]
         return self._full_name_separator.join(names)
 
     @property
@@ -950,7 +1016,7 @@ class AbstractVersionAttribute(models.Model):
 
 
 @python_2_unicode_compatible
-class AbstractProductFeature(models.Model):
+class AbstractProductFeature(models.Model, CommonFeatureProduct):
     sort = models.IntegerField(_('Sort'), blank=True, null=True, default=0)
     info = models.CharField(_('Block info'), max_length=255, blank=True)
     product = models.ForeignKey('catalogue.Product', verbose_name=_('Product'), related_name='product_features',
@@ -958,9 +1024,8 @@ class AbstractProductFeature(models.Model):
     feature = models.ForeignKey('catalogue.Feature', verbose_name=_('Feature'), related_name='product_features',
                                 on_delete=models.DO_NOTHING)
     non_standard = models.BooleanField(verbose_name=_('Available non standard size for this feature'), default=False)
-    image = models.ImageField(_('Image'), upload_to='products/feature/%Y/%m/%d/', blank=True, null=True,
-                              max_length=255)
-    product_with_images = models.ManyToManyField('catalogue.Product', verbose_name=_('Product'),
+    image = FilerImageField(verbose_name=_("Image"), null=True, blank=True, related_name="image")
+    product_with_images = models.ManyToManyField('catalogue.Product', verbose_name=_('Product with images.'),
                                                  related_name='product_feature', blank=True)
 
     class Meta:
