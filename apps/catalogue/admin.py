@@ -248,6 +248,33 @@ class ProductAdmin(ImportExportMixin, ImportExportActionModelAdmin, admin.ModelA
         )
 
 
+class ProductRecommendationResource(resources.ModelResource):
+    primary = fields.Field(column_name='primary', attribute='primary', widget=import_export_widgets.ForeignKeyWidget(
+        model=Product, field='slug',
+    ))
+    recommendation = fields.Field(column_name='recommendation', attribute='recommendation',
+                                  widget=import_export_widgets.ForeignKeyWidget(
+                                      model=Product, field='slug',
+                                  ))
+    delete = fields.Field(widget=import_export_widgets.BooleanWidget())
+
+    class Meta:
+        model = ProductRecommendation
+        fields = ('id', 'delete', 'primary', 'recommendation', 'ranking', )
+        export_order = fields
+
+    #ToDo @igor: user cannot delete if has permission
+    def for_delete(self, row, instance):
+        return self.fields['delete'].clean(row)
+
+
+class ProductRecommendationAdmin(ImportExportMixin, ImportExportActionModelAdmin):
+    list_display = ('primary', 'recommendation', 'ranking', )
+    list_filter = ('primary__enable', 'ranking', 'primary__stockrecords__partner', 'primary__categories', )
+    search_fields = ('primary__title', 'primary__slug', )
+    resource_class = ProductRecommendationResource
+
+
 class ProductAttributeAdmin(admin.ModelAdmin):
     list_display = ('name', 'code', 'product_class', 'type')
     prepopulated_fields = {"code": ("name", )}
@@ -319,6 +346,7 @@ admin.site.register(Option, OptionAdmin)
 admin.site.register(ProductImage, ProductImageAdmin)
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Feature, FeatureAdmin)
+admin.site.register(ProductRecommendation, ProductRecommendationAdmin)
 
 admin.site.unregister(Site)
 admin.site.register(Site, InfoAdmin)

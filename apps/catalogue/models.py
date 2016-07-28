@@ -60,7 +60,12 @@ if not is_model_registered('catalogue', 'Product'):
 
 if not is_model_registered('catalogue', 'ProductRecommendation'):
     class ProductRecommendation(AbstractProductRecommendation):
-        pass
+
+        def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
+            if self.ranking is None:
+                self.ranking = 0
+            super(ProductRecommendation, self).save(force_insert=force_insert, force_update=force_update, using=using,
+                                                    update_fields=update_fields)
 
     __all__.append('ProductRecommendation')
 
