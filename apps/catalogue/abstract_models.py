@@ -17,6 +17,31 @@ REGEXP_PHONE = r'/^((8|\+38)[\- ]?)?(\(?\d{3}\)?[\- ]?)?[\d\- ]{7,10}$/'
 REGEXP_EMAIL = r'/^[-\w.]+@([A-z0-9][-A-z0-9]+\.)+[A-z]{2,4}$/'
 
 
+class CommonFeatureProduct(object):
+    product = None
+
+    def product_enable(self):
+        return self.product.enable
+    product_enable.short_description = _('Enable product')
+
+    def product_categories_to_str(self):
+        return self.product.categories_to_str()
+    product_categories_to_str.short_description = _("Categories")
+
+    def product_partners_to_str(self):
+        return self.product.partners_to_str()
+    product_partners_to_str.short_description = _("Partners")
+
+    # def thumb(self):
+    #     return self.product.thumb(self.original.file.name)
+    # thumb.allow_tags = True
+    # thumb.short_description = _('Image')
+
+    def product_date_updated(self):
+        return self.product.date_updated
+    product_date_updated.short_description = _("Product date updated")
+
+
 class EnableManagerProduct(models.Manager):
     def get_queryset(self):
         return self.get_queryset().filter(enable=True)
@@ -953,7 +978,7 @@ class AbstractVersionAttribute(models.Model):
 
 
 @python_2_unicode_compatible
-class AbstractProductFeature(models.Model):
+class AbstractProductFeature(models.Model, CommonFeatureProduct):
     sort = models.IntegerField(_('Sort'), blank=True, null=True, default=0)
     info = models.CharField(_('Block info'), max_length=255, blank=True)
     product = models.ForeignKey('catalogue.Product', verbose_name=_('Product'), related_name='product_features',
@@ -962,7 +987,7 @@ class AbstractProductFeature(models.Model):
                                 on_delete=models.DO_NOTHING)
     non_standard = models.BooleanField(verbose_name=_('Available non standard size for this feature'), default=False)
     image = FilerImageField(verbose_name=_("Image"), null=True, blank=True, related_name="image")
-    product_with_images = models.ManyToManyField('catalogue.Product', verbose_name=_('Product'),
+    product_with_images = models.ManyToManyField('catalogue.Product', verbose_name=_('Product with images.'),
                                                  related_name='product_feature', blank=True)
 
     class Meta:

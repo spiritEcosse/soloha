@@ -55,3 +55,7 @@ class Command(BaseCommand):
 # alter table catalogue_productimage RENAME COLUMN original TO original_image;
 # alter table catalogue_productimage ALTER COLUMN "original_image" drop not null;
 # alter table "catalogue_productimage" ADD COLUMN "original_id" INTEGER REFERENCES "filer_image" ("file_ptr_id") DEFERRABLE INITIALLY DEFERRED;
+
+
+# alter table catalogue_productfeature ALTER COLUMN "image" drop not null;
+# alter table "catalogue_productfeature" ADD COLUMN "image_id" INTEGER REFERENCES "filer_image" ("file_ptr_id") DEFERRABLE INITIALLY DEFERRED;

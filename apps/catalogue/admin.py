@@ -132,7 +132,11 @@ class ProductImageInline(admin.TabularInline):
 
 
 class ProductFeatureAdmin(admin.ModelAdmin):
-    list_display = ()
+    list_display = ('pk', 'product', 'feature', 'product_date_updated', 'sort', 'info', 'product_enable',
+                    'product_categories_to_str', 'product_partners_to_str', )
+    list_filter = ('product__date_updated', 'product__enable', 'sort', 'product__stockrecords__partner',
+                   'product__categories', )
+    search_fields = ('product__title', 'product__slug', 'product__pk', )
 
 
 class StockRecordInline(admin.TabularInline):
@@ -313,6 +317,7 @@ admin.site.register(Option, OptionAdmin)
 admin.site.register(ProductImage, ProductImageAdmin)
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Feature, FeatureAdmin)
+admin.site.register(ProductFeature, ProductFeatureAdmin)
 
 admin.site.unregister(Site)
 admin.site.register(Site, InfoAdmin)
