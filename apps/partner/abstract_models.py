@@ -153,3 +153,16 @@ class AbstractStockRecord(models.Model):
         if self.low_stock_threshold is None:
             return False
         return self.net_stock_level < self.low_stock_threshold
+
+    def enable_product(self):
+        return self.product.enable
+    enable_product.short_description = _('Enable product')
+
+    def thumb(self):
+        return self.product.thumb()
+    thumb.allow_tags = True
+    thumb.short_description = _('Image of product')
+
+    def product_categories_to_str(self):
+        return self.product.categories_to_str()
+    product_categories_to_str.short_description = _("Categories")

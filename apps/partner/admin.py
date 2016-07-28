@@ -32,25 +32,16 @@ class StockRecordResource(resources.ModelResource):
 
 class StockRecordAdmin(ImportExportMixin, ImportExportActionModelAdmin):
     resource_class = StockRecordResource
-    list_display = ('product', 'thumb', 'enable_product', 'partner', 'price_currency', 'price_excl_tax',
-                    'price_retail', 'cost_price', 'num_in_stock', 'num_allocated', 'low_stock_threshold', )
+    list_display = ('pk', 'product', 'thumb', 'enable_product', 'partner', 'price_currency', 'price_excl_tax',
+                    'price_retail', 'cost_price', 'num_in_stock', 'num_allocated', 'low_stock_threshold',
+                    'product_categories_to_str', )
     search_fields = ('product__slug', 'product__title', 'product__pk', )
-    list_filter = ('product__enable', 'product__date_updated', 'product__categories', 'partner', )
-
-    def enable_product(self, obj):
-        return obj.product.enable
-    short_description = _('Enable product')
-
-    def thumb(self, obj):
-        return loader.get_template('admin/catalogue/product/thumb.html').render(Context({
-            'image': obj.product.primary_image()
-        }))
-    thumb.allow_tags = True
-    short_description = _('Image')
+    list_filter = ('date_created', 'date_updated', 'product__enable', 'product__date_updated', 'product__categories',
+                   'partner', )
 
 
 class PartnerdAdmin(admin.ModelAdmin):
-    list_display = ('name', 'code', )
+    list_display = ('pk', 'name', 'code', )
     search_fields = ('name', 'code',)
 
 

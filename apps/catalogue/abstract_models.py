@@ -13,11 +13,26 @@ from filer.fields.image import FilerImageField
 from ckeditor_uploader.fields import RichTextUploadingField
 from filer.fields.image import FilerImageField
 import logging
+from django.template import loader, Context
 
 logger = logging.getLogger(__name__)
 
 REGEXP_PHONE = r'/^((8|\+38)[\- ]?)?(\(?\d{3}\)?[\- ]?)?[\d\- ]{7,10}$/'
 REGEXP_EMAIL = r'/^[-\w.]+@([A-z0-9][-A-z0-9]+\.)+[A-z]{2,4}$/'
+
+
+def check_exist_image(image):
+    current_path = os.getcwd()
+    os.chdir(MEDIA_ROOT)
+
+    if not os.path.exists(os.path.abspath(image)) or not os.path.isfile(os.path.abspath(image)):
+        image = IMAGE_NOT_FOUND
+
+        if not os.path.exists(os.path.abspath(image)):
+            logger.error('image - {} not found!'.format(os.path.abspath(image)))
+
+    os.chdir(current_path)
+    return image
 
 
 class EnableManagerProduct(models.Manager):
@@ -154,12 +169,24 @@ class AbstractProduct(models.Model):
 
         return reverse('detail', kwargs=dict_values)
 
-    def partner(self):
-        return ','.join([stock.partner.code for stock in self.stockrecords.all()])
+    def thumb(self, original=None):
+        if original is not None:
+            image = original
+        else:
+            image = self.primary_image()
+
+        image = check_exist_image(image)
+        return loader.get_template('admin/catalogue/product/thumb.html').render(Context({'image': image}))
+    thumb.allow_tags = True
+    thumb.short_description = _('Image')
 
     def categories_to_str(self):
         return self.separator.join([category.name for category in self.get_categories().all()])
     categories_to_str.short_description = _("Categories")
+
+    def partners_to_str(self):
+        return self.separator.join([stock.partner.name for stock in self.stockrecords.all()])
+    categories_to_str.short_description = _("Partners")
 
     def clean(self):
         """
@@ -445,16 +472,7 @@ class AbstractProduct(models.Model):
             # interchangeably in templates.  Strategy pattern ftw!
             image = self.get_missing_image().name
 
-        current_path = os.getcwd()
-        os.chdir(MEDIA_ROOT)
-
-        if not os.path.exists(os.path.abspath(image)) or not os.path.isfile(os.path.abspath(image)):
-            image = IMAGE_NOT_FOUND
-
-            if not os.path.exists(os.path.abspath(image)):
-                logger.error('image - {} not found!'.format(os.path.abspath(image)))
-
-        os.chdir(current_path)
+        image = check_exist_image(image)
         return image
 
     # Updating methods
@@ -627,11 +645,32 @@ class AbstractProductImage(models.Model):
     def __str__(self):
         return u"Image of '%s'" % getattr(self, 'product', None)
 
+    def product_enable(self):
+        return self.product.enable
+    product_enable.short_description = _('Enable product')
+
     def is_primary(self):
         """
         Return bool if image display order is 0
         """
         return self.display_order == 0
+
+    def product_categories_to_str(self):
+        return self.product.categories_to_str()
+    product_categories_to_str.short_description = _("Categories")
+
+    def product_partners_to_str(self):
+        return self.product.partners_to_str()
+    product_partners_to_str.short_description = _("Partners")
+
+    def thumb(self):
+        return self.product.thumb(self.original.file.name)
+    thumb.allow_tags = True
+    thumb.short_description = _('Image')
+
+    def product_date_updated(self):
+        return self.product.date_updated
+    product_date_updated.short_description = _("Product date updated")
 
     def delete(self, *args, **kwargs):
         """

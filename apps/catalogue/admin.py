@@ -35,7 +35,7 @@ try:
     from django.utils.encoding import force_text
 except ImportError:
     from django.utils.encoding import force_unicode as force_text
-
+from apps.catalogue.abstract_models import check_exist_image
 
 Feature = get_model('catalogue', 'Feature')
 AttributeOption = get_model('catalogue', 'AttributeOption')
@@ -79,12 +79,11 @@ class ProductImageResource(import_export_resources.ModelResource):
 
 class ProductImageAdmin(ImportExportMixin, ImportExportActionModelAdmin):
     resource_class = ProductImageResource
-    list_display = ('thumb', 'product', )
-
-    def thumb(self, obj):
-        return loader.get_template('admin/catalogue/product/thumb.html').render(Context({'image': obj.original}))
-    thumb.allow_tags = True
-    short_description = 'Image'
+    list_display = ('pk', 'thumb', 'product', 'product_date_updated', 'display_order', 'caption', 'product_enable',
+                    'product_categories_to_str', 'product_partners_to_str', 'date_created', )
+    list_filter = ('product__date_updated', 'date_created', 'product__enable', 'display_order',
+                   'product__stockrecords__partner', 'product__categories', )
+    search_fields = ('product__title', 'product__slug', 'product__pk', )
 
 
 class FeatureResource(resources.ModelResource):
@@ -100,7 +99,7 @@ class FeatureResource(resources.ModelResource):
 
 
 class FeatureAdmin(ImportExportMixin, ImportExportActionModelAdmin, DraggableMPTTAdmin):
-    list_display = ('indented_title', 'slug', 'parent', )
+    list_display = ('pk', 'indented_title', 'slug', 'parent', )
     list_filter = ('created', )
     prepopulated_fields = {"slug": ("title",)}
     search_fields = ('title', 'slug', )
@@ -126,7 +125,7 @@ class ProductAttributeInline(admin.TabularInline):
 
 
 class ProductClassAdmin(admin.ModelAdmin):
-    list_display = ('name', 'requires_shipping', 'track_stock')
+    list_display = ('pk', 'name', 'requires_shipping', 'track_stock')
     inlines = [ProductAttributeInline]
 
 
@@ -219,19 +218,14 @@ class ProductResource(resources.ModelResource):
 
 class ProductAdmin(ImportExportMixin, ImportExportActionModelAdmin, admin.ModelAdmin):
     date_hierarchy = 'date_created'
-    list_display = ('title', 'thumb', 'pk', 'enable', 'date_updated', 'slug', 'categories_to_str', 'get_product_class',
-                    'structure', 'partner', 'attribute_summary', )
+    list_display = ('pk', 'title', 'thumb', 'enable', 'date_updated', 'slug', 'categories_to_str', 'get_product_class',
+                    'structure', 'partners_to_str', 'attribute_summary', )
     list_filter = ('enable', 'stockrecords__partner', 'categories', 'structure', 'is_discountable', )
     inlines = [StockRecordInline, ProductRecommendationInline, ProductImageInline]
     prepopulated_fields = {"slug": ("title",)}
     search_fields = ('upc', 'title', 'slug', )
     form = ProductForm
     resource_class = ProductResource
-
-    def thumb(self, obj):
-        return loader.get_template('admin/catalogue/product/thumb.html').render(Context({'image': obj.primary_image()}))
-    thumb.allow_tags = True
-    short_description = 'Image'
 
     def get_queryset(self, request):
         qs = super(ProductAdmin, self).get_queryset(request)
@@ -272,18 +266,16 @@ class ProductRecommendationResource(resources.ModelResource):
 
 
 class ProductRecommendationAdmin(ImportExportMixin, ImportExportActionModelAdmin):
-    list_display = ('primary', 'recommendation', 'ranking', 'primary_categories_to_str', )
-    list_filter = ('primary__enable', 'ranking', 'primary__stockrecords__partner', 'primary__categories', )
+    list_display = ('pk', 'primary', 'primary_enable', 'primary_thumb', 'primary_date_updated', 'recommendation',
+                    'recommendation_thumb', 'ranking', 'primary_categories_to_str', 'primary_partners_to_str', )
+    list_filter = ('primary__date_updated', 'primary__enable', 'ranking', 'primary__stockrecords__partner',
+                   'primary__categories', )
     search_fields = ('primary__title', 'primary__slug', 'primary__pk', )
     resource_class = ProductRecommendationResource
 
-    def primary_categories_to_str(self):
-        return self.separator.join([category.name for category in self.primary.get_categories().all()])
-    primary_categories_to_str.short_description = _("Categories")
-
 
 class ProductAttributeAdmin(admin.ModelAdmin):
-    list_display = ('name', 'code', 'product_class', 'type')
+    list_display = ('pk', 'name', 'code', 'product_class', 'type')
     prepopulated_fields = {"code": ("name", )}
 
 
@@ -292,7 +284,7 @@ class OptionAdmin(admin.ModelAdmin):
 
 
 class ProductAttributeValueAdmin(admin.ModelAdmin):
-    list_display = ('product', 'attribute', 'value')
+    list_display = ('pk', 'product', 'attribute', 'value')
 
 
 class AttributeOptionInline(admin.TabularInline):
@@ -300,7 +292,7 @@ class AttributeOptionInline(admin.TabularInline):
 
 
 class AttributeOptionGroupAdmin(admin.ModelAdmin):
-    list_display = ('name', 'option_summary')
+    list_display = ('pk', 'name', 'option_summary')
     inlines = [AttributeOptionInline, ]
 
 
@@ -323,7 +315,7 @@ class CategoryResource(resources.ModelResource):
 
 class CategoryAdmin(ImportExportMixin, ImportExportActionModelAdmin, DraggableMPTTAdmin):
     prepopulated_fields = {'slug': ("name", )}
-    list_display = ('indented_title', 'slug', 'parent', 'enable', 'sort', 'created')
+    list_display = ('pk', 'indented_title', 'slug', 'parent', 'enable', 'sort', 'created')
     list_filter = ('enable', 'created', 'sort', )
     formfield_overrides = {
         models.ManyToManyField: {'widget': MPTTFilteredSelectMultiple("", False, attrs={'rows': '10'})},
