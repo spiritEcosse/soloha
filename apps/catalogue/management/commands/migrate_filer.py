@@ -59,3 +59,5 @@ class Command(BaseCommand):
 
 # alter table catalogue_productfeature ALTER COLUMN "image" drop not null;
 # alter table "catalogue_productfeature" ADD COLUMN "image_id" INTEGER REFERENCES "filer_image" ("file_ptr_id") DEFERRABLE INITIALLY DEFERRED;
+
+# alter table "catalogue_category" ADD COLUMN "image_id" INTEGER REFERENCES "filer_image" ("file_ptr_id") DEFERRABLE INITIALLY DEFERRED;

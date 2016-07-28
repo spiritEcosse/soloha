@@ -649,7 +649,6 @@ class AbstractProductImage(models.Model, CommonFeatureProduct):
     """
     product = models.ForeignKey('catalogue.Product', related_name='images', verbose_name=_("Product"))
     original = FilerImageField(verbose_name=_("Original"), null=True, blank=True, related_name="original")
-    original_image = models.ImageField(_("Original"), upload_to=settings.OSCAR_IMAGE_FOLDER, max_length=255, blank=True, null=True)
     caption = models.CharField(_("Caption"), max_length=200, blank=True)
 
     #: Use display_order to determine which is the "primary" image
@@ -703,14 +702,14 @@ class CustomAbstractCategory(MPTTModel):
     meta_description = models.TextField(verbose_name=_('Meta tag: description'), blank=True)
     meta_keywords = models.TextField(verbose_name=_('Meta tag: keywords'), blank=True)
     sort = models.IntegerField(blank=True, null=True, default=0, db_index=True)
-    icon = models.ImageField(_('Icon'), upload_to='categories', blank=True, null=True, max_length=455)
     created = models.DateTimeField(auto_now_add=True, db_index=True)
-    image_banner = models.ImageField(_('Image banner'), upload_to='categories/%Y/%m/%d/', blank=True, null=True, max_length=600)
     link_banner = models.URLField(_('Link banner'), blank=True, null=True, max_length=555)
     description = RichTextUploadingField(_('Description'), blank=True)
-    image = models.ImageField(_('Image'), upload_to='categories/%Y/%m/%d/', blank=True, null=True, max_length=500)
-    # image = FilerImageField(verbose_name=_('Image'), null=True, blank=True, related_name="image")
-    category_image = FilerImageField(verbose_name=_('Image'), null=True, blank=True, related_name="category_image")
+    # image_banner = models.ImageField(_('Image banner'), upload_to='categories/%Y/%m/%d/', blank=True, null=True, max_length=600)
+    # icon = models.ImageField(_('Icon'), upload_to='categories', blank=True, null=True, max_length=455)
+    # image = models.ImageField(_('Image'), upload_to='categories/%Y/%m/%d/', blank=True, null=True, max_length=500)
+    image = FilerImageField(verbose_name=_('Image'), null=True, blank=True, related_name="category_image")
+    # category_image = FilerImageField(verbose_name=_('Image'), null=True, blank=True, related_name="category_image")
     _slug_separator = '/'
     _full_name_separator = ' > '
 
