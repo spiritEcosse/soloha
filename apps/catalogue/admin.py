@@ -176,15 +176,15 @@ class StockRecordInline(admin.TabularInline):
 
 class ProductForm(forms.ModelForm):
     filters = MPTTModelMultipleChoiceField(
-        Feature.objects.all(),
+        Feature.objects.all(), required=False,
         widget=MPTTFilteredSelectMultiple("Filters", False, attrs={'rows':'10'})
     )
     categories = MPTTModelMultipleChoiceField(
-        Category.objects.all(),
+        Category.objects.all(), required=False,
         widget=MPTTFilteredSelectMultiple("Categories", False, attrs={'rows':'10'})
     )
     characteristics = MPTTModelMultipleChoiceField(
-        Feature.objects.all(),
+        Feature.objects.all(), required=False,
         widget=MPTTFilteredSelectMultiple("Characteristics", False, attrs={'rows':'10'})
     )
 

@@ -64,7 +64,7 @@ if not is_model_registered('catalogue', 'ProductRecommendation'):
     class ProductRecommendation(AbstractProductRecommendation, CommonFeatureProduct):
         def __init__(self, *args, **kwargs):
             super(ProductRecommendation, self).__init__(*args, **kwargs)
-            self.product = self.primary
+            self.product = getattr(self, 'primary', None)
 
         def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
             if self.ranking is None:
