@@ -2,6 +2,8 @@ from oscar import app
 from django.conf.urls import include, url
 from oscar.core.loading import get_class, get_model
 from dal import autocomplete
+from apps.catalogue.admin import ProductAutocomplete, FeatureAutocomplete, CategoriesAutocomplete
+from apps.partner.admin import PartnerAutocomplete
 
 detail_view = get_class('catalogue.views', 'ProductDetailView')
 catalogue_view = get_class('catalogue.views', 'CatalogueView')
@@ -21,10 +23,10 @@ class Soloha(app.Shop):
             url(r'^contacts/', contacts_view.as_view()),
             url(r'^ckeditor/', include('ckeditor_uploader.urls')),
             url(r'^filer/', include('filer.urls')),
-            url('^admin/product-autocomplete/$', autocomplete.Select2QuerySetView.as_view(model=Product),
-                name='select2_fk'),
-            url('^admin/product-recommendation-autocomplete/$', autocomplete.Select2QuerySetView.as_view(model=ProductRecommendation),
-                name='product_recommendation_select2_fk'),
+            url(r'^admin/product-autocomplete/$', ProductAutocomplete.as_view(), name='product-autocomplete'),
+            url(r'^admin/partner-autocomplete/$', PartnerAutocomplete.as_view(), name='partner-autocomplete'),
+            url(r'^admin/feature-autocomplete/$', FeatureAutocomplete.as_view(), name='feature-autocomplete'),
+            url(r'^admin/categories-autocomplete/$', CategoriesAutocomplete.as_view(), name='categories-autocomplete'),
         ]
         urlpatterns += super(Soloha, self).get_urls()
         urlpatterns += [

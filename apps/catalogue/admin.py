@@ -18,6 +18,7 @@ import widgets
 import resources
 import logging  # isort:skip
 from django.utils.translation import ugettext_lazy as _, pgettext_lazy
+from django.contrib.auth.decorators import login_required
 
 #Todo change list import module
 try:  # Python 2.7+
@@ -30,6 +31,7 @@ import traceback
 from django.db.models.fields.related import ForeignKey
 
 logging.getLogger(__name__).addHandler(NullHandler())
+from django.db.models import Q
 
 try:
     from django.utils.encoding import force_text
@@ -37,6 +39,9 @@ except ImportError:
     from django.utils.encoding import force_unicode as force_text
 from apps.catalogue.abstract_models import check_exist_image
 from dal import autocomplete
+from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
+
 
 Feature = get_model('catalogue', 'Feature')
 AttributeOption = get_model('catalogue', 'AttributeOption')
@@ -79,6 +84,14 @@ class ProductImageResource(import_export_resources.ModelResource):
             return ''
 
 
+class ProductImageForm(forms.ModelForm):
+    class Meta:
+        fields = '__all__'
+        widgets = {
+            'product': autocomplete.ModelSelect2(url='product-autocomplete'),
+        }
+
+
 class ProductImageAdmin(ImportExportMixin, ImportExportActionModelAdmin):
     resource_class = ProductImageResource
     list_display = ('pk', 'thumb', 'product', 'product_date_updated', 'display_order', 'caption', 'product_enable',
@@ -86,6 +99,11 @@ class ProductImageAdmin(ImportExportMixin, ImportExportActionModelAdmin):
     list_filter = ('product__date_updated', 'date_created', 'product__enable', 'display_order',
                    'product__stockrecords__partner', 'product__categories', )
     search_fields = ('product__title', 'product__slug', 'product__pk', )
+    form = ProductImageForm
+
+    class Media:
+        js = ("https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css",
+              "https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js")
 
 
 class FeatureResource(resources.ModelResource):
@@ -100,16 +118,29 @@ class FeatureResource(resources.ModelResource):
         export_order = fields
 
 
+class FeatureForm(forms.ModelForm):
+    class Meta:
+        fields = '__all__'
+        widgets = {
+            'parent': autocomplete.ModelSelect2(url='feature-autocomplete'),
+        }
+
+
 class FeatureAdmin(ImportExportMixin, ImportExportActionModelAdmin, DraggableMPTTAdmin):
     list_display = ('pk', 'indented_title', 'slug', 'parent', )
     list_filter = ('created', )
     prepopulated_fields = {"slug": ("title",)}
     search_fields = ('title', 'slug', )
     resource_class = FeatureResource
+    form = FeatureForm
 
     #ToDo @igor: user cannot delete if has permission
     def for_delete(self, row, instance):
         return self.fields['delete'].clean(row)
+
+    class Media:
+        js = ("https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css",
+              "https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js")
 
 
 class AttributeInline(admin.TabularInline):
@@ -121,7 +152,8 @@ class ProductRecommendationForm(forms.ModelForm):
         model = ProductRecommendation
         fields = '__all__'
         widgets = {
-            'recommendation': autocomplete.ModelSelect2(url='product_recommendation_select2_fk')
+            'recommendation': autocomplete.ModelSelect2(url='product-autocomplete'),
+            'primary': autocomplete.ModelSelect2(url='product-autocomplete')
         }
 
 
@@ -172,6 +204,17 @@ class ProductFeatureResource(resources.ModelResource):
             return ''
 
 
+class ProductFeatureForm(forms.ModelForm):
+    class Meta:
+        fields = '__all__'
+        model = ProductFeature
+        widgets = {
+            'product': autocomplete.ModelSelect2(url='product-autocomplete'),
+            'feature': autocomplete.ModelSelect2(url='feature-autocomplete'),
+            'product_with_images': autocomplete.ModelSelect2Multiple(url='product-autocomplete'),
+        }
+
+
 class ProductFeatureAdmin(ImportExportMixin, ImportExportActionModelAdmin):
     list_display = ('pk', 'product', 'thumb', 'feature', 'product_date_updated', 'sort', 'info', 'product_enable',
                     'product_categories_to_str', 'product_partners_to_str', )
@@ -179,33 +222,77 @@ class ProductFeatureAdmin(ImportExportMixin, ImportExportActionModelAdmin):
                    'product__categories', )
     search_fields = ('product__title', 'product__slug', 'product__pk', )
     resource_class = ProductFeatureResource
+    form = ProductFeatureForm
+
+    class Media:
+        js = ("https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css",
+              "https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js")
+
+
+class StockRecordForm(forms.ModelForm):
+    class Meta:
+        model = StockRecord
+        fields = '__all__'
+        exclude = ('partner_sku', )
+        widgets = {
+            'partner': autocomplete.ModelSelect2(url='partner-autocomplete')
+        }
 
 
 class StockRecordInline(admin.TabularInline):
     model = StockRecord
+    form = StockRecordForm
 
 
 class ProductForm(forms.ModelForm):
-    filters = MPTTModelMultipleChoiceField(
-        Feature.objects.all(), required=False,
-        widget=MPTTFilteredSelectMultiple("Filters", False, attrs={'rows':'10'})
-    )
-    categories = MPTTModelMultipleChoiceField(
-        Category.objects.all(), required=False,
-        widget=MPTTFilteredSelectMultiple("Categories", False, attrs={'rows':'10'})
-    )
-    characteristics = MPTTModelMultipleChoiceField(
-        Feature.objects.all(), required=False,
-        widget=MPTTFilteredSelectMultiple("Characteristics", False, attrs={'rows':'10'})
-    )
-
     class Meta:
         model = Product
         fields = '__all__'
         widgets = {
-            'parent': autocomplete.ModelSelect2(url='select2_fk')
+            'parent': autocomplete.ModelSelect2(url='product-autocomplete'),
+            'filters': autocomplete.ModelSelect2Multiple(url='feature-autocomplete'),
+            'categories': autocomplete.ModelSelect2Multiple(url='categories-autocomplete'),
+            'characteristics': autocomplete.ModelSelect2Multiple(url='feature-autocomplete'),
         }
-        exclude = ('name', )
+
+
+class ProductAutocomplete(autocomplete.Select2QuerySetView):
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        return super(ProductAutocomplete, self).dispatch(*args, **kwargs)
+
+    def get_queryset(self):
+        qs = Product.objects.all().only('pk', 'title', 'slug', )
+
+        if self.q:
+            qs = qs.filter(Q(title__icontains=self.q) | Q(slug__icontains=self.q))
+        return qs
+
+
+class CategoriesAutocomplete(autocomplete.Select2QuerySetView):
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        return super(CategoriesAutocomplete, self).dispatch(*args, **kwargs)
+
+    def get_queryset(self):
+        qs = Category.objects.all().only('pk', 'name', 'slug', )
+
+        if self.q:
+            qs = qs.filter(Q(name__icontains=self.q) | Q(slug__icontains=self.q))
+        return qs
+
+
+class FeatureAutocomplete(autocomplete.Select2QuerySetView):
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        return super(FeatureAutocomplete, self).dispatch(*args, **kwargs)
+
+    def get_queryset(self):
+        qs = Feature.objects.all().only('pk', 'title', 'slug', )
+
+        if self.q:
+            qs = qs.filter(Q(title__icontains=self.q) | Q(slug__icontains=self.q))
+        return qs
 
 
 class ProductResource(resources.ModelResource):
@@ -267,7 +354,7 @@ class ProductResource(resources.ModelResource):
                         field.widget.intermediate_own_fields.append(rel_field)
 
 
-class ProductAdmin(ImportExportMixin, ImportExportActionModelAdmin, admin.ModelAdmin):
+class ProductAdmin(ImportExportMixin, ImportExportActionModelAdmin):
     date_hierarchy = 'date_created'
     list_display = ('pk', 'title', 'thumb', 'enable', 'date_updated', 'slug', 'categories_to_str', 'get_product_class',
                     'structure', 'partners_to_str', 'attribute_summary', )
@@ -277,6 +364,10 @@ class ProductAdmin(ImportExportMixin, ImportExportActionModelAdmin, admin.ModelA
     search_fields = ('upc', 'title', 'slug', )
     form = ProductForm
     resource_class = ProductResource
+
+    class Media:
+        js = ("https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css",
+              "https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js")
 
     def get_queryset(self, request):
         qs = super(ProductAdmin, self).get_queryset(request)
@@ -324,6 +415,11 @@ class ProductRecommendationAdmin(ImportExportMixin, ImportExportActionModelAdmin
                    'primary__categories', )
     search_fields = ('primary__title', 'primary__slug', 'primary__pk', )
     resource_class = ProductRecommendationResource
+    form = ProductRecommendationForm
+
+    class Media:
+        js = ("https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css",
+              "https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js")
 
 
 class ProductAttributeAdmin(admin.ModelAdmin):
@@ -365,17 +461,30 @@ class CategoryResource(resources.ModelResource):
         return self.fields['delete'].clean(row)
 
 
+class CategoryForm(forms.ModelForm):
+    class Meta:
+        fields = '__all__'
+        model = Category
+        widgets = {
+            'parent': autocomplete.ModelSelect2(url='categories-autocomplete'),
+        }
+
+
 class CategoryAdmin(ImportExportMixin, ImportExportActionModelAdmin, DraggableMPTTAdmin):
     prepopulated_fields = {'slug': ("name", )}
     list_display = ('pk', 'indented_title', 'slug', 'parent', 'enable', 'sort', 'created')
     list_filter = ('enable', 'created', 'sort', )
     formfield_overrides = {
-        models.ManyToManyField: {'widget': MPTTFilteredSelectMultiple("", False, attrs={'rows': '10'})},
-        models.TextField: {'widget': Textarea(attrs={'cols': 40, 'rows': 4})},
+        models.TextField: {'widget': Textarea()},
     }
     mptt_level_indent = 20
-    search_fields = ('name', 'slug', )
+    search_fields = ('name', 'slug', 'pk', )
     resource_class = CategoryResource
+    form = CategoryForm
+
+    class Media:
+        js = ("https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css",
+              "https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js")
 
 
 class InfoInline(admin.StackedInline):

@@ -2,6 +2,10 @@ from apps.catalogue import resources
 from import_export import fields, widgets as import_export_widgets
 from import_export.admin import ImportExportMixin, ImportExportActionModelAdmin
 from oscar.apps.partner.admin import *  # noqa
+from dal import autocomplete
+from django.db.models import Q
+from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
 
 Partner = get_model('partner', 'Partner')
 StockRecord = get_model('partner', 'StockRecord')
@@ -41,6 +45,20 @@ class StockRecordAdmin(ImportExportMixin, ImportExportActionModelAdmin):
 class PartnerdAdmin(admin.ModelAdmin):
     list_display = ('pk', 'name', 'code', )
     search_fields = ('name', 'code',)
+
+
+class PartnerAutocomplete(autocomplete.Select2QuerySetView):
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        return super(PartnerAutocomplete, self).dispatch(*args, **kwargs)
+
+    def get_queryset(self):
+        qs = Partner.objects.all().only('pk', 'name', 'code', )
+
+        if self.q:
+            qs = qs.filter(Q(name__icontains=self.q) | Q(code__icontains=self.q))
+
+        return qs
 
 
 admin.site.unregister(Partner)

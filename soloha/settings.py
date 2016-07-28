@@ -46,7 +46,7 @@ INSTALLED_APPS = \
         'dal_select2',
         'django.contrib.admin',
         'django.contrib.sitemaps',
-        'debug_toolbar',
+        # 'debug_toolbar',
          # 'django_select2',
          # 'bootstrap_pagination',
         'django.contrib.auth',
@@ -165,8 +165,7 @@ CKEDITOR_UPLOAD_PATH = 'images/'
 CKEDITOR_CONFIGS = {
     'default': {
         'toolbar': 'full',
-        'height': 300,
-        'width': 650,
+        'width': 'auto',
     },
 }
 
