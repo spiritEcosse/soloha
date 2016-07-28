@@ -46,7 +46,7 @@ INSTALLED_APPS = \
         'dal_select2',
         'django.contrib.admin',
         'django.contrib.sitemaps',
-        # 'debug_toolbar',
+        'debug_toolbar',
          # 'django_select2',
          # 'bootstrap_pagination',
         'django.contrib.auth',
