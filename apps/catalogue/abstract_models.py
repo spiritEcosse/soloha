@@ -961,8 +961,7 @@ class AbstractProductFeature(models.Model):
     feature = models.ForeignKey('catalogue.Feature', verbose_name=_('Feature'), related_name='product_features',
                                 on_delete=models.DO_NOTHING)
     non_standard = models.BooleanField(verbose_name=_('Available non standard size for this feature'), default=False)
-    image = models.ImageField(_('Image'), upload_to='products/feature/%Y/%m/%d/', blank=True, null=True,
-                              max_length=255)
+    image = FilerImageField(verbose_name=_("Image"), null=True, blank=True, related_name="image")
     product_with_images = models.ManyToManyField('catalogue.Product', verbose_name=_('Product'),
                                                  related_name='product_feature', blank=True)
 

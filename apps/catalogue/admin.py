@@ -45,6 +45,7 @@ ProductAttribute = get_model('catalogue', 'ProductAttribute')
 ProductAttributeValue = get_model('catalogue', 'ProductAttributeValue')
 ProductClass = get_model('catalogue', 'ProductClass')
 ProductImage = get_model('catalogue', 'ProductImage')
+ProductFeature = get_model('catalogue', 'ProductFeature')
 ProductRecommendation = get_model('catalogue', 'ProductRecommendation')
 StockRecord = get_model('partner', 'StockRecord')
 Info = get_model('sites', 'Info')
@@ -128,6 +129,10 @@ class ProductClassAdmin(admin.ModelAdmin):
 
 class ProductImageInline(admin.TabularInline):
     model = ProductImage
+
+
+class ProductFeatureAdmin(admin.ModelAdmin):
+    list_display = ()
 
 
 class StockRecordInline(admin.TabularInline):
