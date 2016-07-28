@@ -14,6 +14,12 @@ from import_export import resources, fields
 from django.db.models.fields.related import ForeignKey
 import functools
 import json
+try:
+    from django.utils.encoding import force_text
+except ImportError:
+    from django.utils.encoding import force_unicode as force_text
+from django.db.transaction import atomic, savepoint, savepoint_rollback, savepoint_commit  # noqa
+
 ProductImage = get_model('catalogue', 'ProductImage')
 
 
@@ -86,11 +92,10 @@ class MPTTFilteredSelectMultiple(widgets.FilteredSelectMultiple):
 
 class ImageForeignKeyWidget(import_export_widgets.ForeignKeyWidget):
     def clean(self, value):
-        val = super(import_export_widgets.ForeignKeyWidget, self).clean(value)
-        image = Image.objects.filter(file=val).first()
+        image = self.model.objects.filter(file=value).first()
 
         if image is None:
-            image = Image.objects.create(file=val, original_filename=val)
+            image = Image.objects.create(**{'file': value, self.field: value})
         return image
 
 
@@ -103,22 +108,32 @@ class ImageManyToManyWidget(import_export_widgets.ManyToManyWidget):
         product_images = []
 
         with transaction.atomic():
-            ProductImage.objects.filter(product=self.obj).delete()
-
             if value:
                 for display_order, val in enumerate(value.split(self.separator)):
-                    product_image = ProductImage.objects.filter(product=self.obj, original__file=val).first()
+                    product_image = ProductImage.objects.filter(
+                        product=self.obj, display_order=display_order
+                    ).first()
+
+                    image = Image.objects.filter(file=val).first()
+
+                    if image is None:
+                        image = Image.objects.create(file=val, original_filename=val)
 
                     if product_image is None:
-                        image = Image.objects.filter(file=val).first()
+                        product_image = ProductImage.objects.filter(product=self.obj, original__file=val).first()
 
-                        if image is None:
-                            image = Image.objects.create(file=val, original_filename=val)
-                        product_image = ProductImage.objects.create(product=self.obj, original=image, display_order=display_order)
+                        if product_image is None:
+                            product_image = ProductImage.objects.create(product=self.obj, original=image, display_order=display_order)
+                        else:
+                            product_image.display_order = display_order
+                            product_image.save()
+                        product_images.append(product_image)
                     else:
-                        product_image.display_order = display_order
+                        product_image.original = image
                         product_image.save()
-                    product_images.append(product_image)
+                        product_images.append(product_image)
+
+                ProductImage.objects.filter(product=self.obj).exclude(pk__in=[obj.pk for obj in product_images]).delete()
         return product_images
 
 
@@ -156,3 +171,33 @@ class IntermediateModelManyToManyWidget(import_export_widgets.ManyToManyWidget):
                 result[field.name] = getattr(intermediate_obj, field.name)
 
         return result
+
+
+class CharWidget(import_export_widgets.Widget):
+    """
+    Widget for converting text fields.
+    """
+
+    def render(self, value):
+        try:
+            featured_value = force_text(int(float(value)))
+        except ValueError:
+            featured_value = force_text(value)
+        return featured_value
+
+
+class ManyToManyWidget(import_export_widgets.ManyToManyWidget):
+    def clean(self, value):
+        if not value:
+            return self.model.objects.none()
+        ids = filter(None, value.split(self.separator))
+        objects = []
+        
+        with transaction.atomic():
+            for id in ids:
+                try:
+                    objects.append(self.model.objects.get(**{self.field: id}))
+                except ObjectDoesNotExist as e:
+                    raise ValueError('{} {}: \'{}\'.'.format(e, self.model._meta.object_name, id))
+
+        return objects

@@ -17,6 +17,8 @@ import os
 import widgets
 import resources
 import logging  # isort:skip
+from django.utils.translation import ugettext_lazy as _, pgettext_lazy
+
 #Todo change list import module
 try:  # Python 2.7+
     from logging import NullHandler
@@ -33,7 +35,7 @@ try:
     from django.utils.encoding import force_text
 except ImportError:
     from django.utils.encoding import force_unicode as force_text
-
+from apps.catalogue.abstract_models import check_exist_image
 
 Feature = get_model('catalogue', 'Feature')
 AttributeOption = get_model('catalogue', 'AttributeOption')
@@ -48,6 +50,7 @@ ProductImage = get_model('catalogue', 'ProductImage')
 ProductFeature = get_model('catalogue', 'ProductFeature')
 ProductRecommendation = get_model('catalogue', 'ProductRecommendation')
 StockRecord = get_model('partner', 'StockRecord')
+Partner = get_model('partner', 'Partner')
 Info = get_model('sites', 'Info')
 
 
@@ -77,15 +80,15 @@ class ProductImageResource(import_export_resources.ModelResource):
 
 class ProductImageAdmin(ImportExportMixin, ImportExportActionModelAdmin):
     resource_class = ProductImageResource
-    list_display = ('thumb', 'product', )
-
-    def thumb(self, obj):
-        return loader.get_template('admin/catalogue/product/thumb.html').render(Context({'image': obj.original}))
-    thumb.allow_tags = True
-    short_description = 'Image'
+    list_display = ('pk', 'thumb', 'product', 'product_date_updated', 'display_order', 'caption', 'product_enable',
+                    'product_categories_to_str', 'product_partners_to_str', 'date_created', )
+    list_filter = ('product__date_updated', 'date_created', 'product__enable', 'display_order',
+                   'product__stockrecords__partner', 'product__categories', )
+    search_fields = ('product__title', 'product__slug', 'product__pk', )
 
 
 class FeatureResource(resources.ModelResource):
+    title = fields.Field(column_name='title', attribute='title', widget=widgets.CharWidget())
     parent = fields.Field(attribute='parent', column_name='parent', widget=import_export_widgets.ForeignKeyWidget(
         model=Feature, field='slug'))
     delete = fields.Field(widget=import_export_widgets.BooleanWidget())
@@ -97,7 +100,7 @@ class FeatureResource(resources.ModelResource):
 
 
 class FeatureAdmin(ImportExportMixin, ImportExportActionModelAdmin, DraggableMPTTAdmin):
-    list_display = ('indented_title', 'slug', 'parent', )
+    list_display = ('pk', 'indented_title', 'slug', 'parent', )
     list_filter = ('created', )
     prepopulated_fields = {"slug": ("title",)}
     search_fields = ('title', 'slug', )
@@ -123,7 +126,7 @@ class ProductAttributeInline(admin.TabularInline):
 
 
 class ProductClassAdmin(admin.ModelAdmin):
-    list_display = ('name', 'requires_shipping', 'track_stock')
+    list_display = ('pk', 'name', 'requires_shipping', 'track_stock')
     inlines = [ProductAttributeInline]
 
 
@@ -131,12 +134,40 @@ class ProductImageInline(admin.TabularInline):
     model = ProductImage
 
 
-class ProductFeatureAdmin(admin.ModelAdmin):
-    list_display = ('pk', 'product', 'feature', 'product_date_updated', 'sort', 'info', 'product_enable',
+class ProductFeatureResource(resources.ModelResource):
+    product = fields.Field(column_name='product', attribute='product', widget=import_export_widgets.ForeignKeyWidget(
+        model=Product, field='slug'))
+    feature = fields.Field(column_name='feature', attribute='feature', widget=import_export_widgets.ForeignKeyWidget(
+        model=Feature, field='slug'))
+    image = fields.Field(column_name='image', attribute='image', widget=widgets.ImageForeignKeyWidget(
+        model=Image, field='original_filename'))
+    product_with_images = fields.Field(column_name='product_with_images', attribute='product_with_images',
+                                       widget=widgets.ManyToManyWidget(model=Product, field='slug'))
+    delete = fields.Field(widget=import_export_widgets.BooleanWidget())
+
+    class Meta:
+        model = ProductFeature
+        fields = ('id', 'delete', 'product', 'feature', 'sort', 'info', 'non_standard', 'image', 'product_with_images',)
+        export_order = fields
+
+    # ToDo @igor: user cannot delete if has permission
+    def for_delete(self, row, instance):
+        return self.fields['delete'].clean(row)
+
+    def dehydrate_image(self, obj):
+        if obj.image is not None:
+            return obj.image.file.name
+        else:
+            return ''
+
+
+class ProductFeatureAdmin(ImportExportMixin, ImportExportActionModelAdmin):
+    list_display = ('pk', 'product', 'thumb', 'feature', 'product_date_updated', 'sort', 'info', 'product_enable',
                     'product_categories_to_str', 'product_partners_to_str', )
     list_filter = ('product__date_updated', 'product__enable', 'sort', 'product__stockrecords__partner',
                    'product__categories', )
     search_fields = ('product__title', 'product__slug', 'product__pk', )
+    resource_class = ProductFeatureResource
 
 
 class StockRecordInline(admin.TabularInline):
@@ -164,11 +195,11 @@ class ProductForm(forms.ModelForm):
 
 class ProductResource(resources.ModelResource):
     categories_slug = fields.Field(column_name='categories', attribute='categories',
-                                   widget=import_export_widgets.ManyToManyWidget(model=Category, field='slug'))
+                                   widget=widgets.ManyToManyWidget(model=Category, field='slug'))
     filters_slug = fields.Field(column_name='filters', attribute='filters',
-                                widget=import_export_widgets.ManyToManyWidget(model=Feature, field='slug'))
+                                widget=widgets.ManyToManyWidget(model=Feature, field='slug'))
     characteristics_slug = fields.Field(column_name='characteristics', attribute='characteristics',
-                                        widget=import_export_widgets.ManyToManyWidget(model=Feature, field='slug'))
+                                        widget=widgets.ManyToManyWidget(model=Feature, field='slug'))
     images = fields.Field(column_name='images', attribute='images',
                           widget=widgets.ImageManyToManyWidget(model=ProductImage, field='original'))
     recommended_products = resources.Field(column_name='recommended_products', attribute='recommended_products',
@@ -179,10 +210,9 @@ class ProductResource(resources.ModelResource):
 
     class Meta:
         model = Product
-        #ToDo delete column to start list
-        fields = ('id', 'title', 'slug', 'enable', 'h1', 'meta_title', 'meta_description', 'meta_keywords',
+        fields = ('id', 'delete', 'title', 'slug', 'enable', 'h1', 'meta_title', 'meta_description', 'meta_keywords',
                   'description', 'categories_slug', 'filters_slug', 'characteristics_slug', 'product_class', 'images',
-                  'delete', 'recommended_products', )
+                  'recommended_products', )
         export_order = fields
 
     #ToDo @igor: user cannot delete if has permission
@@ -224,19 +254,14 @@ class ProductResource(resources.ModelResource):
 
 class ProductAdmin(ImportExportMixin, ImportExportActionModelAdmin, admin.ModelAdmin):
     date_hierarchy = 'date_created'
-    list_display = ('title', 'thumb', 'enable', 'date_updated', 'slug', 'get_product_class', 'structure', 'partner',
-                    'attribute_summary', 'pk', )
-    list_filter = ['enable', 'structure', 'is_discountable']
+    list_display = ('pk', 'title', 'thumb', 'enable', 'date_updated', 'slug', 'categories_to_str', 'get_product_class',
+                    'structure', 'partners_to_str', 'attribute_summary', )
+    list_filter = ('enable', 'stockrecords__partner', 'categories', 'structure', 'is_discountable', )
     inlines = [StockRecordInline, ProductRecommendationInline, ProductImageInline]
     prepopulated_fields = {"slug": ("title",)}
     search_fields = ('upc', 'title', 'slug', )
     form = ProductForm
     resource_class = ProductResource
-
-    def thumb(self, obj):
-        return loader.get_template('admin/catalogue/product/thumb.html').render(Context({'image': obj.primary_image()}))
-    thumb.allow_tags = True
-    short_description = 'Image'
 
     def get_queryset(self, request):
         qs = super(ProductAdmin, self).get_queryset(request)
@@ -256,8 +281,37 @@ class ProductAdmin(ImportExportMixin, ImportExportActionModelAdmin, admin.ModelA
         )
 
 
+class ProductRecommendationResource(resources.ModelResource):
+    primary = fields.Field(column_name='primary', attribute='primary', widget=import_export_widgets.ForeignKeyWidget(
+        model=Product, field='slug',
+    ))
+    recommendation = fields.Field(column_name='recommendation', attribute='recommendation',
+                                  widget=import_export_widgets.ForeignKeyWidget(
+                                      model=Product, field='slug',
+                                  ))
+    delete = fields.Field(widget=import_export_widgets.BooleanWidget())
+
+    class Meta:
+        model = ProductRecommendation
+        fields = ('id', 'delete', 'primary', 'recommendation', 'ranking', )
+        export_order = fields
+
+    #ToDo @igor: user cannot delete if has permission
+    def for_delete(self, row, instance):
+        return self.fields['delete'].clean(row)
+
+
+class ProductRecommendationAdmin(ImportExportMixin, ImportExportActionModelAdmin):
+    list_display = ('pk', 'primary', 'product_enable', 'thumb', 'product_date_updated', 'product_categories_to_str',
+                    'product_partners_to_str', 'recommendation', 'recommendation_thumb', 'ranking', )
+    list_filter = ('primary__date_updated', 'primary__enable', 'ranking', 'primary__stockrecords__partner',
+                   'primary__categories', )
+    search_fields = ('primary__title', 'primary__slug', 'primary__pk', )
+    resource_class = ProductRecommendationResource
+
+
 class ProductAttributeAdmin(admin.ModelAdmin):
-    list_display = ('name', 'code', 'product_class', 'type')
+    list_display = ('pk', 'name', 'code', 'product_class', 'type')
     prepopulated_fields = {"code": ("name", )}
 
 
@@ -266,7 +320,7 @@ class OptionAdmin(admin.ModelAdmin):
 
 
 class ProductAttributeValueAdmin(admin.ModelAdmin):
-    list_display = ('product', 'attribute', 'value')
+    list_display = ('pk', 'product', 'attribute', 'value')
 
 
 class AttributeOptionInline(admin.TabularInline):
@@ -274,28 +328,38 @@ class AttributeOptionInline(admin.TabularInline):
 
 
 class AttributeOptionGroupAdmin(admin.ModelAdmin):
-    list_display = ('name', 'option_summary')
+    list_display = ('pk', 'name', 'option_summary')
     inlines = [AttributeOptionInline, ]
 
 
-class CategoryResource(import_export_resources.ModelResource):
+class CategoryResource(resources.ModelResource):
+    parent = fields.Field(attribute='parent', column_name='parent', widget=import_export_widgets.ForeignKeyWidget(
+        model=Category, field='slug'))
+    delete = fields.Field(widget=import_export_widgets.BooleanWidget())
 
     class Meta:
         model = Category
-        exclude = ('lft', 'rght', 'tree_id', 'level', 'parent', )
+        #Todo add: 'icon', 'image_banner', 'image'
+        fields = ('id', 'delete', 'enable', 'name', 'slug', 'parent', 'sort', 'meta_title', 'h1', 'meta_description',
+                  'meta_keywords', 'link_banner', 'description', )
+        export_order = fields
+
+    #ToDo @igor: user cannot delete if has permission
+    def for_delete(self, row, instance):
+        return self.fields['delete'].clean(row)
 
 
 class CategoryAdmin(ImportExportMixin, ImportExportActionModelAdmin, DraggableMPTTAdmin):
     prepopulated_fields = {'slug': ("name", )}
-    empty_value_display = '-empty-'
-    list_display = ('indented_title', 'slug', 'parent', 'enable', 'sort', 'created')
+    list_display = ('pk', 'indented_title', 'slug', 'parent', 'enable', 'sort', 'created')
+    list_filter = ('enable', 'created', 'sort', )
     formfield_overrides = {
         models.ManyToManyField: {'widget': MPTTFilteredSelectMultiple("", False, attrs={'rows': '10'})},
         models.TextField: {'widget': Textarea(attrs={'cols': 40, 'rows': 4})},
     }
-    list_filter = ('name', 'slug', 'parent', 'enable', 'sort', 'created')
     mptt_level_indent = 20
     search_fields = ('name', 'slug', )
+    resource_class = CategoryResource
 
 
 class InfoInline(admin.StackedInline):
@@ -318,6 +382,7 @@ admin.site.register(ProductImage, ProductImageAdmin)
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Feature, FeatureAdmin)
 admin.site.register(ProductFeature, ProductFeatureAdmin)
+admin.site.register(ProductRecommendation, ProductRecommendationAdmin)
 
 admin.site.unregister(Site)
 admin.site.register(Site, InfoAdmin)

@@ -5,80 +5,78 @@
 {% load staticfiles %}
 {% load djangular_tags %}
 
-{% angularjs ng %}
-    {% block product %}
-        <div class="thumbnail text-center">
-            <div class="caption">
-                <div class="title">
-                    {% block product_title %}
-                        <a ng-attr-href="product.absolute_url" href="{{ product.get_absolute_url }}" {# ng-bind="product.title" #}
-                           title="{{ product.get_title }}">
-                            {{ product.get_title|truncatewords:7 }}
-                        </a>
-                    {% endblock %}
-                </div>
-                {% block product_image %}
-                    <div class="image_container">
-                        {% with image=product.primary_image %}
-                            {% thumbnail image 220x165 crop as thumb %}
-                            <a class="image" ng-attr-href="product.absolute_url" href="{{ product.get_absolute_url }}">
-                                <img src="{{ thumb.url }}" ng-bind="product.title" alt="{{ product.get_title }}" title="{{ product.get_title }}">
-                            </a>
-                        {% endwith %}
-                    </div>
-                {% endblock %}
-                <div {#  ng-bind="product.id"  #} class="model">{% trans 'Артикул' %}: {{ product.id }}</div>
-                <div class="price">
-                    {% block product_price %}
-                        <div class="product_price">
-                            {% if product.has_versions %}
-                                <strong>{% trans 'Price' %}:</strong>
-                                {{ product.price_from_version }}
-                            {% else %}
-                                {% if product.price_original.is_available_to_buy %}
-                                    <strong>{% trans 'Price' %}:</strong>
-                                    {{ product.price_original.price.incl_tax }}
-                                {% else %}
-                                    {% trans 'Unavailable' %}
-                                {% endif %}
-                            {% endif %}
-                        </div>
-                    {% endblock %}
-                </div>
-                {% if product.has_versions or product.price_original.is_available_to_buy %}
-                    <p><button class="btn btn-primary" role="button">{% trans 'Buy' %}</button></p>
-                {% endif %}
-            </div>
-            <div class="mask">
-                <div class="title">
-                    <a ng-attr-href="product.absolute_url" href="{{ product.get_absolute_url }}"
-                            {# ng-bind="product.title" #}>
+{% block product %}
+    <div class="thumbnail text-center">
+        <div class="caption">
+            <div class="title">
+                {% block product_title %}
+                    <a ng-attr-href="product.absolute_url" href="{{ product.get_absolute_url }}" {# ng-bind="product.title" #}
+                       title="{{ product.get_title }}">
                         {{ product.get_title|truncatewords:7 }}
                     </a>
-                </div>
-                <div class="filters">
-                    {% regroup product.characteristics.all by parent as characteristics %}
-
-                    {% for characteristic in characteristics %}
-                        <div class="rows">
-                            <div class="option_name">
-                                <span>{{ characteristic.grouper }}</span>
-                            </div>
-
-                            {% for value in characteristic.list %}
-                                <div class="option_value">
-                                    <span>{{ value.title }}</span>
-                                </div>
-                            {% endfor %}
-                        </div>
-                    {% endfor %}
-                </div>
-                {% if product.has_versions or product.price_original.is_available_to_buy %}
-                    <div class="btn-block">
-                        <button class="btn btn-primary" role="button">{% trans 'Buy' %}</button>
-                    </div>
-                {% endif %}
+                {% endblock %}
             </div>
+            {% block product_image %}
+                <div class="image_container">
+                    {% with image=product.primary_image %}
+                        {% thumbnail image 220x165 crop as thumb %}
+                        <a class="image" ng-attr-href="product.absolute_url" href="{{ product.get_absolute_url }}">
+                            <img src="{{ thumb.url }}" ng-bind="product.title" alt="{{ product.get_title }}" title="{{ product.get_title }}">
+                        </a>
+                    {% endwith %}
+                </div>
+            {% endblock %}
+            <div {#  ng-bind="product.id"  #} class="model">{% trans 'Артикул' %}: {{ product.id }}</div>
+            <div class="price">
+                {% block product_price %}
+                    <div class="product_price">
+                        {% if product.has_versions %}
+                            <strong>{% trans 'Price' %}:</strong>
+                            {{ product.price_from_version }}
+                        {% else %}
+                            {% if product.price_original.is_available_to_buy %}
+                                <strong>{% trans 'Price' %}:</strong>
+                                {{ product.price_original.price.incl_tax }}
+                            {% else %}
+                                {% trans 'Unavailable' %}
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                {% endblock %}
+            </div>
+            {% if product.has_versions or product.price_original.is_available_to_buy %}
+                <p><button class="btn btn-primary" role="button">{% trans 'Buy' %}</button></p>
+            {% endif %}
         </div>
-    {% endblock %}
-{% endangularjs %}
+        <div class="mask">
+            <div class="title">
+                <a ng-attr-href="product.absolute_url" href="{{ product.get_absolute_url }}"
+                        {# ng-bind="product.title" #}>
+                    {{ product.get_title|truncatewords:7 }}
+                </a>
+            </div>
+            <div class="filters">
+                {% regroup product.characteristics.all by parent as characteristics %}
+
+                {% for characteristic in characteristics %}
+                    <div class="rows">
+                        <div class="option_name">
+                            <span>{{ characteristic.grouper }}</span>
+                        </div>
+
+                        {% for value in characteristic.list %}
+                            <div class="option_value">
+                                <span>{{ value.title }}</span>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+            </div>
+            {% if product.has_versions or product.price_original.is_available_to_buy %}
+                <div class="btn-block">
+                    <button class="btn btn-primary" role="button">{% trans 'Buy' %}</button>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
