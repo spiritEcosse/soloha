@@ -125,6 +125,10 @@ USE_L10N = True
 
 USE_TZ = True
 
+# LANGUAGES = (
+#     ('ru', _('Russia')),
+# )
+
 LANGUAGES = (
     ('en', _('England')),
 )
@@ -288,4 +292,3 @@ TEST_INDEX = {
 }
 
 IMPORT_EXPORT_USE_TRANSACTIONS = True
-

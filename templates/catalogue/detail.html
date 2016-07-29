@@ -94,29 +94,29 @@
                                     {% include "catalogue/reviews/partials/review_stars.html" %}
                                 </p>
                             {% endiffeature %}
-                            <div class="social">Поделиться:</div>
+                            <div class="social">{% trans 'Share' %}:</div>
                         </div>
                         <div class="defer pull-right">
                             <a class="love" href="#">
-                                Отложить
+                                {% trans "Defer this product" %}
                             </a>
-                            <a class="compare" href="#">Сравнить</a>
+                            <a class="compare" href="#">{% trans 'Compare' %}</a>
                         </div>
                     </div>
                     <div class="row liner">
                         <div class="col-xs-22">
                             <ul class="nav nav-tabs nav-stacked">
-                                <li class="active"><a data-toggle="tab" href="#info">Общая информация</a></li>
+                                <li class="active"><a data-toggle="tab" href="#info">{% trans 'General information' %}</a></li>
                                 {% if object.options.exists %}
-                                    <li><a data-toggle="tab" href="#options">Выбрать дополнительные опции</a></li>
+                                    <li><a data-toggle="tab" href="#options">{% trans 'Select additional options' %}</a></li>
                                 {% endif %}
-                                <li><a data-toggle="tab" href="#characteristics">Характеристики</a></li>
+                                <li><a data-toggle="tab" href="#characteristics">{% trans 'Characteristics' %}</a></li>
 
                                 {% if product.description %}
-                                    <li><a data-toggle="tab" href="#description">Описание</a></li>
+                                    <li><a data-toggle="tab" href="#description">{% trans 'Description' %}</a></li>
                                 {% endif %}
-                                <li><a data-toggle="tab" href="#reviews">Отзывы</a></li>
-                                <li><a data-toggle="tab" href="#delivery">Доставка и оплата</a></li>
+                                <li><a data-toggle="tab" href="#reviews">{% trans 'Reviews' %}</a></li>
+                                <li><a data-toggle="tab" href="#delivery">{% trans 'Shipping and payment' %}</a></li>
                             </ul>
                         </div>
                     </div>
@@ -145,7 +145,7 @@
                     <div class="col-xs-24 tab-content-info">
                         <div class="panel panel-default info" id="options">
                             <div class="panel-heading text-center">
-                                Выбрать дополнительные опции:
+                                {% trans 'Select additional options' %}:
                             </div>
                             <div class="panel-body">
                                 <div class="col-xs-24">
@@ -169,11 +169,11 @@
                 {% endblock %}
 
                 <div class="panel panel-default reviews" id="reviews">
-                    <div class="panel-heading text-center">Отзывы:</div>
+                    <div class="panel-heading text-center">{% trans 'Reviews' %}:</div>
                     <div class="panel-body">
                         <div class="write">
                             <span class="glyphicon glyphicon-pencil"></span>
-                            Написать отзыв о товаре
+                            {% trans 'Write Review' %}
                         </div>
                         <div class="row list">
                             {% iffeature "reviews" %}
@@ -210,60 +210,18 @@
                                 {% endblock product_review %}
                             {% endiffeature %}
 
-                            <div class="col-xs-24 head">
-                                <div class="name pull-left">Валерий</div>
-                                <p class="star-rating Four pull-left">
-                                    <span class="glyphicon glyphicon-star"></span>
-                                    <span class="glyphicon glyphicon-star"></span>
-                                    <span class="glyphicon glyphicon-star"></span>
-                                    <span class="glyphicon glyphicon-star"></span>
-                                </p>
-                                <div class="date pull-left">
-                                    <time>04.01.2016</time>
-                                </div>
-                                <div class="clearfix"></div>
-                                <div class="full-text">
-                                    <span class="text">Комментарий:</span>
-                                    <p>
-                                        Очень довольны покупкой и работой компании. В ходе приёма заявки уделили
-                                        должное внимание все рассказали, показали. Сроки по изготовлению выдерживают.
-                                    </p>
-                                    <a href="#" class="answer pull-right">Ответить</a>
-                                </div>
-                            </div>
-                            <div class="col-xs-24 head">
-                                <div class="name pull-left">Валерий</div>
-                                <p class="star-rating Four pull-left">
-                                    <span class="glyphicon glyphicon-star"></span>
-                                    <span class="glyphicon glyphicon-star"></span>
-                                    <span class="glyphicon glyphicon-star"></span>
-                                    <span class="glyphicon glyphicon-star"></span>
-                                </p>
-                                <div class="date pull-left">
-                                    <time>04.01.2016</time>
-                                </div>
-                                <div class="clearfix"></div>
-                                <div class="full-text">
-                                    <span class="text">Комментарий:</span>
-                                    <p>
-                                        Очень довольны покупкой и работой компании. В ходе приёма заявки уделили
-                                        должное внимание все рассказали, показали. Сроки по изготовлению выдерживают.
-                                    </p>
-                                    <a href="#" class="answer pull-right">Ответить</a>
-                                </div>
-                            </div>
                             <div class="col-xs-24">
                                 <a class="pull-right more" href="#">Посмотреть все отзывы >> </a>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="panel panel-default reviews" id="delivery">
-                    <div class="panel-heading text-center">Доставка и оплата:</div>
-                    <div class="panel-body">
-                        Часть информации и ссылка на страницу с полной информацией
+                {% if delivery %}
+                    <div class="panel panel-default reviews" id="delivery">
+                        <div class="panel-heading text-center">{% trans 'Shipping and payment' %}:</div>
+                        <div class="panel-body"></div>
                     </div>
-                </div>
+                {% endif %}
             </div>
         </div>
         <div class="col-xs-24 items" id="items">

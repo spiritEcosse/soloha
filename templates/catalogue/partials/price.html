@@ -7,7 +7,7 @@
     <div class="panel panel-default">
         <div class="panel-heading">
             {% trans 'Vendor code' %}: {{ product.id }}
-            <div class="pull-right">Под заказ</div>
+            <div class="pull-right">{% trans 'By order' %}</div>
         </div>
         <div class="panel-body">
             {% with class_price="number" %}
