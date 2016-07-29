@@ -51,7 +51,7 @@
         <div class="mask">
             <div class="title">
                 <a ng-attr-href="product.absolute_url" href="{{ product.get_absolute_url }}"
-                        {# ng-bind="product.title" #}>
+                   ng-bind="product.title">
                     {{ product.get_title|truncatewords:7 }}
                 </a>
             </div>

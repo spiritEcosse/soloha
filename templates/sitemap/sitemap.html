@@ -1,0 +1,52 @@
+{% extends "layout.html" %}
+{% load mptt_tags %}
+
+{% load i18n %}
+
+{% block main %}
+    <div class="col-xs-24">
+        {% block breadcrumbs %}
+            <ul class="breadcrumb">
+                <li>
+                    <a href="{{ homepage_url }}">{% trans "Home" %}</a>
+                </li>
+                <li class="active">{% trans "Site map"%}</li>
+            </ul>
+        {% endblock breadcrumbs %}
+        <h2 class="heading-name">
+            <span>{% trans "Site map" %}</span>
+        </h2>
+        <div class="row">
+            <div class="col-xs-12">
+                <nav class="navbar">
+                    <div class="list-group panel">
+                        {% recursetree object_list %}
+                            {% with name=node.name|lower|capfirst|truncatechars:60 url=node.get_absolute_url %}
+                                {% if not node.is_leaf_node %}
+                                    <a href="{{ url }}" class="list-group-item {% ifequal category.slug node.slug %}list-group-item-default{% endifequal %}">
+                                        {{ name }} <i class="fa fa-caret-down"></i>
+                                    </a>
+                                    <div class="collapse list-group-submenu in">
+                                        {{ children }}
+                                    </div>
+                                {% else %}
+                                    <a href="{{ url }}" class="list-group-item {% ifequal category.slug node.slug %}list-group-item-default{% endifequal %}">
+                                        {{ name }}
+                                    </a>
+                                {% endif %}
+                            {% endwith %}
+                        {% endrecursetree %}
+                    </div>
+                </nav>
+            </div>
+            <div class="col-xs-12">
+                {% for page in info_page %}
+                    <a href="{{ page.get_absolute_url }}" class="list-group-item">
+                        {{ page.title }}
+                    </a>
+                {% endfor %}
+                <a href="{{ contacts.url }}" class="list-group-item"> {{ contacts.title }}</a>
+            </div>
+        </div>
+    </div>
+{% endblock %}

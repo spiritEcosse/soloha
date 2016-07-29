@@ -8,6 +8,12 @@
 
 {% block ngController %}ng-controller="Home"{% endblock ngController %}
 
+{% block extrascripts %}
+    {{ block.super }}
+    <script src="{% static 'src/js/custom.js' %}"></script>
+    <script src="{% static 'bower_components/lightslider/dist/js/lightslider.min.js' %}"></script>
+{% endblock extrascripts %}
+
 {% block main %}
     {% include "partials/alert_messages.html" %}
     <h1>

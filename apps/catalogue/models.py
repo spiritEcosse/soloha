@@ -1,9 +1,19 @@
 from oscar.core.loading import is_model_registered
 from oscar.apps.catalogue.abstract_models import *  # noqa
+<<<<<<< HEAD
 from django.utils.translation import ugettext_lazy as _
 from apps.catalogue.abstract_models import AbstractProduct, AbstractFeature, CustomAbstractCategory, \
     AbstractProductVersion, AbstractVersionAttribute, AbstractProductFeature, AbstractProductOptions, \
     AbstractProductImage, CommonFeatureProduct
+=======
+from apps.catalogue.abstract_models import CustomAbstractProduct, AbstractFeature, CustomAbstractCategory, \
+    AbstractProductVersion, AbstractVersionAttribute, AbstractProductFeature, AbstractProductOptions
+from django.contrib.sites.models import Site
+from django.contrib.postgres.fields import ArrayField
+from django.forms import TextInput
+from django.utils.translation import ugettext_lazy as _
+from django.contrib.flatpages.admin import FlatPageAdmin
+>>>>>>> master
 
 __all__ = ['ProductAttributesContainer']
 
@@ -122,4 +132,21 @@ if not is_model_registered('catalogue', 'ProductImage'):
     __all__.append('ProductImage')
 
 
+<<<<<<< HEAD
+=======
+class SiteInfo(Site):
+    work_time = models.CharField(max_length=1000)
+    address = models.CharField(max_length=1000)
+    phone_number = models.CharField(max_length=19, blank=True)
+    # phone_number = ArrayField(models.CharField(max_length=1000), blank=True)
+    email = models.EmailField(max_length=200, blank=True)
+    # formfield_overrides = {
+    #     models.CharField: {'widget': TextInput(attrs={'size': '80'})},
+    # }
+
+    class Meta:
+        app_label = 'sites'
+
+
+>>>>>>> master
 from oscar.apps.catalogue.models import *  # noqa

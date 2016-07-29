@@ -31,6 +31,9 @@ from apps.catalogue.views import NOT_SELECTED
 from soloha.settings import TEST_INDEX
 from django.test import TestCase, override_settings
 from django.core.management import call_command
+from django.contrib.auth.models import User
+from selenium.common.exceptions import NoSuchElementException
+from apps.flatpages.models import InfoPage
 import haystack
 from pyvirtualdisplay import Display
 
@@ -42,6 +45,7 @@ VersionAttribute = get_model('catalogue', 'VersionAttribute')
 ProductCategory = get_model('catalogue', 'ProductCategory')
 ProductVersion = get_model('catalogue', 'ProductVersion')
 Feature = get_model('catalogue', 'Feature')
+WishList = get_model('wishlists', 'WishList')
 test_catalogue = catalogue.Test()
 
 STATUS_CODE_200 = 200
@@ -59,7 +63,6 @@ class TestCatalog(LiveServerTestCase):
         self.display.start()
         self.firefox = webdriver.Firefox()
         self.firefox.maximize_window()
-        test_catalogue.create_site_info()
         super(TestCatalog, self).setUp()
 
     def tearDown(self):
@@ -70,17 +73,13 @@ class TestCatalog(LiveServerTestCase):
         time.sleep(2)
         super(TestCatalog, self).tearDown()
 
-    def create_products(self):
-        test_catalogue.create_product_bulk()
-        call_command('rebuild_index', interactive=False, verbosity=0)
-
     def test_page_product(self):
         """
         accessibility page product
         Returns:
             None
         """
-        self.create_products()
+        test_catalogue.create_product_bulk()
         product = Product.objects.get(title='Product 1')
         response = self.client.get(product.get_absolute_url())
         self.equal = self.assertEqual(response.status_code, STATUS_CODE_200)
@@ -207,7 +206,7 @@ class TestCatalog(LiveServerTestCase):
         return product_versions
 
     def test_product_post(self):
-        self.create_products()
+        test_catalogue.create_product_bulk()
         product = Product.objects.get(slug='product-1')
         self.assert_product_post(product=product)
 
@@ -319,7 +318,7 @@ class TestCatalog(LiveServerTestCase):
         test page product with attributes by selenium
         :return:
         """
-        self.create_products()
+        test_catalogue.create_product_bulk()
         product = factories.create_product(slug='product-attributes', title='Product attributes', price=5)
         test_catalogue.create_dynamic_attributes(product)
         attributes = list(self.get_product_attributes(product=product))
@@ -431,7 +430,7 @@ class TestCatalog(LiveServerTestCase):
         return price
 
     def test_get_product_attributes(self):
-        self.create_products()
+        test_catalogue.create_product_bulk()
         product = Product.objects.get(slug='product-1')
         response = self.client.get(product.get_absolute_url())
 
@@ -532,7 +531,7 @@ class TestCatalog(LiveServerTestCase):
         Returns:
             None
         """
-        self.create_products()
+        test_catalogue.create_product_bulk()
         # without products in this category has no descendants in the categories at the same time this very category and its children is not goods
         dict_values = {'page': 1, 'num_queries': 10}
         category = Category.objects.get(name='Category-2')
@@ -560,7 +559,7 @@ class TestCatalog(LiveServerTestCase):
         self.assertions_category(category=category, dict_values=dict_values)
 
     def test_page_category_paginator(self):
-        self.create_products()
+        test_catalogue.create_product_bulk()
 
         dict_values = {'page': 1, 'num_queries': 20}
         category = Category.objects.get(name='Category-12')
@@ -573,7 +572,7 @@ class TestCatalog(LiveServerTestCase):
         self.assertions_category(category=category, dict_values=dict_values)
 
     def test_page_category_sorting_with_filters(self):
-        self.create_products()
+        test_catalogue.create_product_bulk()
 
         category = Category.objects.get(name='Category-12')
         category_1 = Category.objects.get(name='Category-1')
@@ -610,7 +609,7 @@ class TestCatalog(LiveServerTestCase):
         # self.assertions_category(category=category_321, dict_values=dict_values)
 
     def test_page_category_sort(self):
-        self.create_products()
+        test_catalogue.create_product_bulk()
 
         category = Category.objects.get(name='Category-12')
 
@@ -735,7 +734,7 @@ class TestCatalog(LiveServerTestCase):
         self.assertDictEqual(expected, real_data)
 
     def test_page_category_sorting_buttons(self):
-        self.create_products()
+        test_catalogue.create_product_bulk()
 
         category = Category.objects.get(name='Category-12')
 
@@ -777,7 +776,7 @@ class TestCatalog(LiveServerTestCase):
                                         sorting_url, text), count=1, html=True)
 
     def test_filter_click(self):
-        self.create_products()
+        test_catalogue.create_product_bulk()
         category = Category.objects.get(name='Category-12')
         # category = Category.objects.get(name='Category-321')
 
@@ -827,7 +826,7 @@ class TestCatalog(LiveServerTestCase):
         </a>'''.format(filter_url, count_products), count=1, html=True)
 
     def test_filters_concatenation(self):
-        self.create_products()
+        test_catalogue.create_product_bulk()
         category = Category.objects.get(name='Category-12')
         filter = Feature.objects.get(slug='shirina_1000')
 
@@ -876,7 +875,7 @@ class TestCatalog(LiveServerTestCase):
         self.assertEqual(absolute_url, link_concatenate)
 
     def test_product_options(self):
-        self.create_products()
+        test_catalogue.create_product_bulk()
 
         product1 = Product.objects.get(slug='product-1')
         product2 = Product.objects.get(slug='product-2')
@@ -927,8 +926,12 @@ class TestCatalog(LiveServerTestCase):
         # options_on_page_level1 = self.firefox.find_element_by_xpath(".//*[@id='options']/div[2]/div[2]/div[2]/div/label/select/option[2]").text
 
     def test_product_search(self):
+<<<<<<< HEAD
         self.create_products()
         #ToDo add case with filters and (filters, page)
+=======
+        test_catalogue.create_product_bulk()
+>>>>>>> master
 
         # Searching products starting from Product 1
         dict_values = {'search_string': 'Product 1', 'page': 1}
@@ -948,7 +951,7 @@ class TestCatalog(LiveServerTestCase):
         self.assertions_product_search(dict_values=dict_values)
 
     def test_product_search_sorting_with_filters(self):
-        self.create_products()
+        test_catalogue.create_product_bulk()
 
         dict_values = {'search_string': 'product', 'page': 1, 'sorting_type': 'price_ascending', 'num_queries': 20,
                        'filters': 'shirina_1000/shirina_1200/dlina_1100/dlina_1000'}
@@ -971,7 +974,7 @@ class TestCatalog(LiveServerTestCase):
         dict_values = {'search_string': 'product', 'page': 1, 'sorting_type': 'popularity', 'num_queries': 20, 'filters': 'dlina_1100'}
         self.assertions_product_search(dict_values=dict_values)
 
-    def assertions_product_search(self, dict_values={}):
+    def assertions_product_search(self, dict_values=None):
         paginate_by = OSCAR_PRODUCTS_PER_PAGE
         dict_filter = dict()
 
@@ -985,7 +988,7 @@ class TestCatalog(LiveServerTestCase):
         response = self.client.get('/search/?q={}'.format(dict_values['search_string']))
         sqs_search = self.get_search_queryset(dict_values=dict_values)
 
-        searched_products = [{'id': obj.id,
+        searched_products = [{'id': obj.pk,
                               'title': obj.title,
                               'main_image': obj.object.get_values()['image'],
                               'href': obj.object.get_absolute_url(),
@@ -1019,7 +1022,6 @@ class TestCatalog(LiveServerTestCase):
                                     HTTP_X_REQUESTED_WITH='XMLHttpRequest')
 
         context = dict()
-        # context['page_number'] = dict_values.get('page', 1)
         sqs = self.get_search_queryset(dict_values=dict_values)
         context['searched_products'] = [{'id': int(obj.pk),
                               'title': obj.title,
@@ -1030,19 +1032,19 @@ class TestCatalog(LiveServerTestCase):
         self.assertListEqual(context['searched_products'], content['products'])
 
     @staticmethod
-    def get_search_queryset(dict_values={}):
+    def get_search_queryset(dict_values=None):
         sqs_search = []
         if dict_values['search_string']:
             sqs = SearchQuerySet()
             sqs_title = sqs.autocomplete(title_ngrams=dict_values['search_string'])
             sqs_slug = sqs.autocomplete(slug_ngrams=dict_values['search_string'])
-            sqs_id = sqs.autocomplete(id_ngrams=dict_values['search_string'])
-            sqs_search = (sqs_title | sqs_slug | sqs_id) #[:OSCAR_PRODUCTS_PER_PAGE]
+            sqs_id = sqs.autocomplete(product_id=dict_values['search_string'])
+            sqs_search = (sqs_title or sqs_slug or sqs_id) #[:OSCAR_PRODUCTS_PER_PAGE]
         return sqs_search
 
     # test input search field in all pages
     def test_product_search_input_selenium(self):
-        self.create_products()
+        test_catalogue.create_product_bulk()
 
         product1 = Product.objects.get(slug='product-1')
         category1 = Category.objects.get(name='Category-1')
@@ -1078,35 +1080,35 @@ class TestCatalog(LiveServerTestCase):
         list_elements_sqs = [product.title for product in sqs_search[:5]]
         first_product = sqs_search[0].title
 
-        input_field = self.firefox.find_element_by_xpath(".//*[@id='default']/div[1]/header/div[2]/div[2]/div/input")
+        input_field = self.firefox.find_element_by_css_selector(".form-control")
         input_field.send_keys(dict_values['search_string'])
-        time.sleep(10)
+        time.sleep(2)
 
-        popup_first_element = self.firefox.find_element_by_xpath(
-            ".//*[@id='default']/div[1]/header/div[2]/div[2]/div/div/div/div[1]/a/div[2]/div[1]").text
+        popup_first_element = self.firefox.find_element_by_css_selector(
+            ".search .dropdown-menu .item:nth-child(1) .title").text
         self.assertEqual(search_menu.is_displayed(), True)
         self.assertNotEqual(len(popup_first_element), 0)
         self.assertEqual(popup_first_element, first_product)
 
         list_elements_on_page = []
         for i in xrange(1, 6):
-            list_elements_on_page.append(self.firefox.find_element_by_xpath(
-                ".//*[@id='default']/div[1]/header/div[2]/div[2]/div/div/div/div[{}]/a/div[2]/div[1]".format(i)).text)
+            list_elements_on_page.append(self.firefox.find_element_by_css_selector(
+                ".search .dropdown-menu .item:nth-child({}) .title".format(i)).text)
         self.assertListEqual(list_elements_on_page, list_elements_sqs)
 
         input_field.clear()
         self.assertEqual(search_menu.is_displayed(), False)
 
         input_field.send_keys('product')
-        time.sleep(10)
+        time.sleep(2)
         self.assertEqual(search_menu.is_displayed(), True)
 
         input_field.send_keys('tt')
-        time.sleep(10)
+        time.sleep(2)
         self.assertEqual(search_menu.is_displayed(), False)
 
     def test_search_page_sorting_buttons(self):
-        self.create_products()
+        test_catalogue.create_product_bulk()
 
         dict_values = {'search_string': 'product', 'sorting_type': 'popularity',
                        'filter_slug': 'filter/dlina_1100/'}
@@ -1137,7 +1139,7 @@ class TestCatalog(LiveServerTestCase):
                                         sorting_url, text), count=1, html=True)
 
     def test_filter_click_search_page(self):
-        self.create_products()
+        test_catalogue.create_product_bulk()
 
         dict_values = {'search_string': 'product', 'filter_slug': 'filter/dlina_1100/'}
         self.assertions_filter_click_search_page(dict_values=dict_values)
@@ -1159,7 +1161,6 @@ class TestCatalog(LiveServerTestCase):
         response = self.client.get('/search/?q={0}&sorting_type={1}'.format(dict_values.get('search_string', ''),
                                                                             dict_values.get('sorting_type', '')))
 
-        # products_pk = [product.pk for product in self.get_search_queryset(dict_values=dict_values)]
         products_without_filters = Product.objects.all().distinct()
         queryset_filters = Feature.objects.filter(filter_products__in=products_without_filters).distinct().prefetch_related('filter_products')
         filters = Feature.objects.filter(level=0, children__in=queryset_filters).prefetch_related(
@@ -1204,7 +1205,7 @@ class TestCatalog(LiveServerTestCase):
         </a>'''.format(filter_url, dict_values.get('sorting_type', 'popularity'), count_products), count=1, html=True)
 
     def test_filter_checkbox_selenium(self):
-        self.create_products()
+        test_catalogue.create_product_bulk()
 
         category = Category.objects.get(name='Category-12')
 
@@ -1219,18 +1220,18 @@ class TestCatalog(LiveServerTestCase):
     def assertions_filter_checkbox_selenium(self, url):
         initial_url = url
         self.firefox.get(initial_url)
-        checkbox_unchecked = self.firefox.find_element_by_xpath(
-            ".//*[@id='default']/div[1]/div/div[1]/div/div/div[2]/div[1]/div[2]/ul/li[1]/label/a/input")
+        checkbox_unchecked = self.firefox.find_element_by_css_selector(
+            ".filter .items .values .list-group-item input")
         self.assertEqual(checkbox_unchecked.is_selected(), False)
         checkbox_unchecked.click()
-        time.sleep(10)
+        time.sleep(2)
         self.assertNotEqual(self.firefox.current_url, initial_url)
 
-        checkbox_checked = self.firefox.find_element_by_xpath(
-            ".//*[@id='default']/div[1]/div/div[1]/div/div/div[2]/div[1]/div[2]/ul/li[1]/label/a/input")
+        checkbox_checked = self.firefox.find_element_by_css_selector(
+            ".filter .items .values .list-group-item input")
         self.assertEqual(checkbox_checked.is_selected(), True)
         checkbox_checked.click()
-        time.sleep(10)
+        time.sleep(2)
         self.assertEqual(self.firefox.current_url, initial_url)
 
     def test_form_contacts(self):
@@ -1268,11 +1269,11 @@ class TestCatalog(LiveServerTestCase):
         input_comment = self.firefox.find_element_by_xpath(".//*[@id='id_comment']")
         input_email.send_keys(dict_values['email'])
         input_comment.send_keys(dict_values['comment'])
-        time.sleep(10)
+        time.sleep(2)
         self.assertTrue(submit_btn.is_enabled())
 
         submit_btn.click()
-        time.sleep(10)
+        time.sleep(2)
         alert_message = self.firefox.find_element_by_xpath(".// *[ @ id = 'alerts'] / alert").text
         self.assertEqual(alert_message, 'Your message sent!')
 
@@ -1282,10 +1283,10 @@ class TestCatalog(LiveServerTestCase):
         input_phone = self.firefox.find_element_by_xpath(".//*[@id='id_phone']")
         input_email.send_keys(dict_values['email'])
         input_phone.send_keys(dict_values['phone'])
-        time.sleep(10)
+        time.sleep(2)
 
-        email_error = self.firefox.find_element_by_xpath(".//*[@id='default']/div[1]/div/div/div/div[2]/div/div/div[1]/form/div[4]/ul[1]/li[2]").text
-        phone_error = self.firefox.find_element_by_xpath(".//*[@id='default']/div[1]/div/div/div/div[2]/div/div/div[1]/form/div[3]/ul[1]/li[1]").text
+        email_error = self.firefox.find_element_by_css_selector(".has-feedback:nth-child(5) .invalid:nth-child(2)").text
+        phone_error = self.firefox.find_element_by_css_selector(".has-feedback:nth-child(4) .invalid").text
         errors = {'email': 'Enter a valid email address.', 'phone': 'Enter a valid phone number'}
         self.assertEqual(email_error, errors['email'])
         self.assertEqual(phone_error, errors['phone'])
@@ -1294,7 +1295,7 @@ class TestCatalog(LiveServerTestCase):
         #ToDo taras: add test for scroll
 
     def test_show_more_goods_selenium_search_page(self):
-        self.create_products()
+        test_catalogue.create_product_bulk()
         dict_values = {'search_string': 'product'}
         initial_url = ('%s%s' % (self.live_server_url, '/search/?q={0}'.format(dict_values.get('search_string', ''))))
         self.assertions_show_more_goods_search_page_selenium(url=initial_url)
@@ -1302,51 +1303,50 @@ class TestCatalog(LiveServerTestCase):
     def assertions_show_more_goods_search_page_selenium(self, url):
         initial_url = url
         self.firefox.get(initial_url)
-        time.sleep(10)
+        time.sleep(3)
         more_goods_button = self.firefox.find_element_by_css_selector(".more_products")
         more_goods_button.click()
-        time.sleep(10)
+        time.sleep(2)
         self.assertEqual(self.firefox.current_url, initial_url)
         self.assertIn('Product 1', self.firefox.page_source)
         self.assertIn('Product 25', self.firefox.page_source)
         self.assertIn('Product 48', self.firefox.page_source)
         self.assertNotIn('Product 49', self.firefox.page_source)
 
-        paginator_one = self.firefox.find_element_by_xpath(".//*[@id='default']/div[1]/div/div[2]/div[2]/div[51]/div/nav/ul/li[1]/a")
+        paginator_one = self.firefox.find_element_by_css_selector(".pagination li:nth-child(1) a")
         paginator_one.click()
-        time.sleep(10)
+        time.sleep(2)
         self.assertEqual(self.firefox.current_url, initial_url)
 
-        paginator_two = self.firefox.find_element_by_xpath(".//*[@id='default']/div[1]/div/div[2]/div[2]/div[51]/div/nav/ul/li[2]/a")
+        paginator_two = self.firefox.find_element_by_css_selector(".pagination li:nth-child(2) a")
         paginator_two.click()
-        time.sleep(10)
+        time.sleep(2)
         self.assertEqual(self.firefox.current_url, initial_url)
 
-        paginator_three = self.firefox.find_element_by_xpath(".//*[@id='default']/div[1]/div/div[2]/div[2]/div[51]/div/nav/ul/li[3]/a")
+        paginator_three = self.firefox.find_element_by_css_selector(".pagination li:nth-child(3) a")
         paginator_three.click()
-        time.sleep(10)
+        time.sleep(2)
         self.assertNotEqual(self.firefox.current_url, initial_url)
 
         more_goods_button = self.firefox.find_element_by_css_selector(".more_products")
         more_goods_button.click()
-        time.sleep(10)
+        time.sleep(4)
         self.assertIn('Product 49', self.firefox.page_source)
-        self.assertIn('Product 96', self.firefox.page_source)
         self.assertNotIn('Product 97', self.firefox.page_source)
         self.assertIn(u'ПОКАЗАТЬ ЕЩЕ', self.firefox.page_source)
 
         more_goods_button = self.firefox.find_element_by_css_selector(".more_products")
         more_goods_button.click()
-        time.sleep(10)
+        time.sleep(2)
         self.assertIn('Product 118', self.firefox.page_source)
         self.assertIn('ng-hide="hide == true"', self.firefox.page_source)
 
         self.firefox.get(initial_url+"&page=5")
-        time.sleep(10)
+        time.sleep(2)
         self.assertNotIn(u'ПОКАЗАТЬ ЕЩЕ', self.firefox.page_source)
 
     def test_show_more_goods_category_page_selenium(self):
-        self.create_products()
+        test_catalogue.create_product_bulk()
         category = Category.objects.get(name='Category-12')
 
         initial_url = ('%s%s%s' % (self.live_server_url, category.get_absolute_url(), '?sorting_type=price_ascending'))
@@ -1355,40 +1355,176 @@ class TestCatalog(LiveServerTestCase):
     def assertions_show_more_goods_category_page_selenium(self, url):
         initial_url = url
         self.firefox.get(initial_url)
-        time.sleep(10)
+        time.sleep(3)
         more_goods_button = self.firefox.find_element_by_css_selector(".more_products")
         more_goods_button.click()
-        time.sleep(10)
+        time.sleep(2)
         self.assertEqual(self.firefox.current_url, initial_url)
         self.assertIn('Product 1', self.firefox.page_source)
         self.assertIn('Product 25', self.firefox.page_source)
         self.assertIn('Product 68', self.firefox.page_source)
         self.assertNotIn('Product 69', self.firefox.page_source)
 
-        paginator_one = self.firefox.find_element_by_xpath(".//*[@id='default']/div[1]/div/div[2]/div[3]/div[51]/div/nav/ul/li[1]/a")
+        paginator_one = self.firefox.find_element_by_css_selector(".pagination li:nth-child(1) a")
         paginator_one.click()
-        time.sleep(10)
+        time.sleep(2)
         self.assertEqual(self.firefox.current_url, initial_url)
 
-        paginator_two = self.firefox.find_element_by_xpath(".//*[@id='default']/div[1]/div/div[2]/div[3]/div[51]/div/nav/ul/li[2]/a")
+        paginator_two = self.firefox.find_element_by_css_selector(".pagination li:nth-child(2) a")
         paginator_two.click()
-        time.sleep(10)
+        time.sleep(2)
         self.assertEqual(self.firefox.current_url, initial_url)
 
-        paginator_three = self.firefox.find_element_by_xpath(".//*[@id='default']/div[1]/div/div[2]/div[3]/div[51]/div/nav/ul/li[3]/a")
+        paginator_three = self.firefox.find_element_by_css_selector(".pagination li:nth-child(3) a")
         paginator_three.click()
-        time.sleep(10)
+        time.sleep(2)
         self.assertNotEqual(self.firefox.current_url, initial_url)
         self.assertIn(u'ПОКАЗАТЬ ЕЩЕ', self.firefox.page_source)
 
         more_goods_button = self.firefox.find_element_by_css_selector(".more_products")
         more_goods_button.click()
-        time.sleep(10)
+        time.sleep(2)
         self.assertIn('Product 69', self.firefox.page_source)
         self.assertIn('Product 118', self.firefox.page_source)
         self.assertNotIn('Product 68', self.firefox.page_source)
         self.assertIn('ng-hide="hide == true"', self.firefox.page_source)
 
         self.firefox.get(initial_url+"&page=4")
+<<<<<<< HEAD
         time.sleep(10)
         # self.assertNotIn(u'ПОКАЗАТЬ ЕЩЕ', self.firefox.page_source)
+=======
+        time.sleep(2)
+        self.assertNotIn(u'ПОКАЗАТЬ ЕЩЕ', self.firefox.page_source)
+
+    def test_wish_list(self):
+        test_catalogue.create_product_bulk()
+        product_1 = Product.objects.get(slug='product-1')
+
+        # wish list needs loged in user
+        username = 'test'
+        email = 'test@test.com'
+        password = 'test'
+        test_user = User.objects.create_user(username, email, password)
+        login = self.client.login(username=username, password=password)
+        self.assertEqual(login, True)
+
+        WishList.objects.create(owner=test_user)
+        wish_list = self.get_wish_list(owner=test_user)
+        wish_list.add(product_1)
+        wish_list_url = wish_list.get_absolute_url()
+        active = self.check_active_product_in_wish_list(wish_list=wish_list, product_id=product_1.id)
+
+        response = self.client.post(product_1.get_absolute_url(), content_type='application/json', HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        context = json.loads(response.content)
+
+        self.assertEqual(wish_list_url, context['wish_list_url'])
+        self.assertEqual(active, context['active'])
+
+    @staticmethod
+    def get_wish_list(owner):
+        wish_list = WishList.objects.filter(owner=owner).first()
+        return wish_list
+
+    @staticmethod
+    def check_active_product_in_wish_list(wish_list, product_id):
+        product_in_wish_list = 'none'
+        if wish_list:
+            for line in wish_list.lines.all():
+                if product_id == line.product_id:
+                    product_in_wish_list = 'active'
+
+        return product_in_wish_list
+
+    def test_wish_list_selenium(self):
+        test_catalogue.create_product_bulk()
+        product_2 = Product.objects.get(slug='product-2')
+
+        # login user in selenium
+        username = 'test'
+        email = 'test@test.com'
+        password = 'test'
+        User.objects.create_superuser(username, email, password)
+        self.client.login(username=username, password=password)
+        cookie = self.client.cookies['sessionid']
+        self.firefox.get(self.live_server_url + '/admin/')
+        self.firefox.add_cookie({'name': 'sessionid', 'value': cookie.value, 'secure': False, 'path': '/'})
+        self.firefox.refresh()
+        self.firefox.get('%s%s' % (self.live_server_url, product_2.get_absolute_url()))
+
+        text_wish_list = self.firefox.find_element_by_css_selector(".glyphicon-class").text
+        self.assertEqual('Add to wish list', text_wish_list)
+
+        add_to_wish_list_button = self.firefox.find_element_by_css_selector(".glyphicon.glyphicon-heart")
+        add_to_wish_list_button.click()
+        time.sleep(3)
+
+        text_wish_list = self.firefox.find_element_by_css_selector(".glyphicon-class").text
+        self.assertEqual('Remove from wish list', text_wish_list)
+
+    def test_wish_list_selenium_no_login(self):
+        test_catalogue.create_product_bulk()
+        product_2 = Product.objects.get(slug='product-2')
+
+        self.firefox.get('%s%s' % (self.live_server_url, product_2.get_absolute_url()))
+        self.assertIn('Please login to add products to a wish list.', self.firefox.page_source)
+
+    def test_flatpages_selenium(self):
+        test_catalogue.create_product_bulk()
+        product_2 = Product.objects.get(slug='product-2')
+
+        self.firefox.get('%s%s' % (self.live_server_url, product_2.get_absolute_url()))
+
+        self.assertFalse(self.check_exists_element_on_page(".icon-car"))
+        self.assertFalse(self.check_exists_element_on_page(".icon-pay"))
+        self.assertFalse(self.check_exists_element_on_page(".icon-manager"))
+
+        test_catalogue.create_flatpages()
+
+        self.firefox.refresh()
+
+        self.assertTrue(self.check_exists_element_on_page(".icon-car"))
+        self.assertTrue(self.check_exists_element_on_page(".icon-pay"))
+        self.assertTrue(self.check_exists_element_on_page(".icon-manager"))
+
+    def check_exists_element_on_page(self, css):
+        try:
+            self.firefox.find_element_by_css_selector(css)
+        except NoSuchElementException:
+            return False
+        return True
+
+    def test_flatpages(self):
+        test_catalogue.create_product_bulk()
+        test_catalogue.create_flatpages()
+
+        product_2 = Product.objects.get(slug='product-2')
+
+        response = self.client.get(product_2.get_absolute_url())
+        self.assertEqual(response.status_code, STATUS_CODE_200)
+
+        context = dict()
+        context['flatpages'] = self.get_flatpages()
+        dict_values = {'url': 'delivery', 'context_test': context['flatpages'], 'response_context': response.context['flatpages']}
+        self.assertions_flatpages(dict_values=dict_values)
+
+        dict_values['url'] = 'payment'
+        self.assertions_flatpages(dict_values=dict_values)
+
+        dict_values['url'] = 'manager'
+        self.assertions_flatpages(dict_values=dict_values)
+
+    @staticmethod
+    def get_flatpages():
+        context = dict()
+        context['delivery'] = InfoPage.objects.filter(url='delivery').first()
+        context['payment'] = InfoPage.objects.filter(url='payment').first()
+        context['manager'] = InfoPage.objects.filter(url='manager').first()
+
+        return context
+
+    def assertions_flatpages(self, dict_values):
+        self.assertEqual(dict_values['context_test'], dict_values['response_context'])
+        self.assertEqual(dict_values['context_test'][dict_values['url']].title, dict_values['response_context'][dict_values['url']].title)
+        self.assertEqual(dict_values['context_test'][dict_values['url']].content, dict_values['response_context'][dict_values['url']].content)
+>>>>>>> master

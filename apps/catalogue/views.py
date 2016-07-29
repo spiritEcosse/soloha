@@ -27,8 +27,13 @@ from oscar.core.loading import get_class
 from django.db.models import Q
 from soloha import settings
 from django.db.models import Min, Sum
+<<<<<<< HEAD
 import operator
 import functools
+=======
+from apps.flatpages.models import InfoPage
+
+>>>>>>> master
 from haystack.query import SearchQuerySet
 from haystack.inputs import AutoQuery
 from django.template import defaultfilters
@@ -57,9 +62,14 @@ Category = get_model('catalogue', 'category')
 ProductVersion = get_model('catalogue', 'ProductVersion')
 Feature = get_model('catalogue', 'Feature')
 ProductOptions = get_model('catalogue', 'ProductOptions')
+<<<<<<< HEAD
 ProductFeature = get_model('catalogue', 'ProductFeature')
 SiteInfo = get_model('sites', 'Info')
 QuickOrder = get_model('order', 'QuickOrder')
+=======
+WishList = get_model('wishlists', 'WishList')
+
+>>>>>>> master
 NOT_SELECTED = str(_('Not selected'))
 ANSWER = str(_('Your message has been sent. We will contact you on the specified details.'))
 
@@ -167,7 +177,6 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
 
     def get_context_data(self, **kwargs):
         # Category.objects.filter(pk=self.object.pk).update(popular=F('popular') + 1)
-
         context = super(ProductCategoryView, self).get_context_data(**kwargs)
         queryset_filters = Feature.objects.filter(filter_products__in=self.products_without_filters).distinct().prefetch_related('filter_products')
         context['filters'] = Feature.objects.filter(level=0, children__in=queryset_filters).prefetch_related(
@@ -350,6 +359,21 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
                 })
 
             context['variant_attributes'][attribute.pk] = attributes
+<<<<<<< HEAD
+=======
+
+        product_versions_attributes = {}
+        product_versions = self.product_versions_queryset().first()
+
+        if product_versions:
+            for attr in product_versions.attributes.all():
+                product_versions_attributes[attr.parent.pk] = {'id': attr.pk, 'title': attr.title}
+        context['product_version_attributes'] = product_versions_attributes
+        context['product_id'] = self.object.id
+        if self.get_wish_list():
+            context['wish_list_url'] = self.get_wish_list().get_absolute_url()
+        context['active'] = self.check_active_product_in_wish_list(wish_list=self.get_wish_list(), product_id=self.object.id)
+>>>>>>> master
         return context
 
     def product_versions_queryset(self):
@@ -436,8 +460,12 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
         context['attributes'] = self.get_attributes()
         context['options'] = self.get_options()
         context['not_selected'] = NOT_SELECTED
+<<<<<<< HEAD
         context['form'] = QuickOrderForm(initial={'product': self.object.pk})
         context['answer'] = ANSWER
+=======
+        context['flatpages'] = self.get_flatpages()
+>>>>>>> master
         return context
 
     def get_price(self, context):
@@ -510,6 +538,7 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
     def get_options(self):
         return Feature.objects.filter(Q(level=0), Q(product_options__product=self.object) | Q(children__product_options__product=self.object)).distinct()
 
+<<<<<<< HEAD
 
 class ProductCalculatePrice(views.JSONRequestResponseMixin, views.AjaxResponseMixin, SingleObjectMixin, View):
     model = Product
@@ -651,3 +680,27 @@ class AttrProdImages(views.JSONRequestResponseMixin, views.AjaxResponseMixin, Si
             })
 
         return context
+=======
+    @staticmethod
+    def get_flatpages():
+        context = dict()
+        context['delivery'] = InfoPage.objects.filter(url='delivery').first()
+        context['payment'] = InfoPage.objects.filter(url='payment').first()
+        context['manager'] = InfoPage.objects.filter(url='manager').first()
+
+        return context
+
+    def get_wish_list(self):
+        wish_list = WishList.objects.filter(owner=self.request.user.id).first()
+        return wish_list
+
+    @staticmethod
+    def check_active_product_in_wish_list(wish_list, product_id):
+        product_in_wish_list = 'none'
+        if wish_list:
+            for line in wish_list.lines.all():
+                if product_id == line.product_id:
+                    product_in_wish_list = 'active'
+
+        return product_in_wish_list
+>>>>>>> master

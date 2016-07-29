@@ -12,6 +12,37 @@
         }
     }
 }
+.star-rating.One .glyphicon-star:first-child {
+  color: #f08825;
+}
+
+.star-rating.Two .glyphicon-star:first-child,
+.star-rating.Two .glyphicon-star:first-child + .glyphicon-star {
+  color: #f08825;
+}
+
+.star-rating.Three .glyphicon-star:first-child,
+.star-rating.Three .glyphicon-star:first-child + .glyphicon-star,
+.star-rating.Three .glyphicon-star:first-child + .glyphicon-star + .glyphicon-star {
+  color: #f08825;
+}
+
+.star-rating.Four .glyphicon-star:first-child,
+.star-rating.Four .glyphicon-star:first-child + .glyphicon-star,
+.star-rating.Four .glyphicon-star:first-child + .glyphicon-star + .glyphicon-star,
+.star-rating.Four .glyphicon-star:first-child + .glyphicon-star + .glyphicon-star + .glyphicon-star{
+  color: #f08825;
+}
+
+.star-rating.Five .glyphicon-star:first-child,
+.star-rating.Five .glyphicon-star:first-child + .glyphicon-star,
+.star-rating.Five .glyphicon-star:first-child + .glyphicon-star + .glyphicon-star,
+.star-rating.Five .glyphicon-star:first-child + .glyphicon-star + .glyphicon-star + .glyphicon-star,
+.star-rating.Five .glyphicon-star:first-child + .glyphicon-star + .glyphicon-star + .glyphicon-star + .glyphicon-star,
+.star-rating.Five .glyphicon-star:first-child + .glyphicon-star + .glyphicon-star + .glyphicon-star + .glyphicon-star + .glyphicon-star{
+  color: #f08825;
+}
+
 .line-bottom {
     background: url("../../image/product_line_bottom.png") bottom center repeat-x;
 }
@@ -356,10 +387,16 @@ header {
                         border: none;
                     }
 
+<<<<<<< HEAD
                     .glyphicon {
                         color: #6f6f6f;
                         font-weight: 400;
                     }
+=======
+
+  .bottom {
+    margin-top: @bottom_margin_top;
+>>>>>>> master
 
                     .title, .price {
                         color: #6f6f6f;
@@ -976,9 +1013,68 @@ header {
                         font-weight: 400;
                     }
 
+<<<<<<< HEAD
                     .tooltip-arrow {
                         border-top-color:transparent;
                     }
+=======
+    .glyphicon {
+      color: #cbcbcb;
+    }
+    .prevSlide, .nextSlide {
+      height:15px;
+      width:9px;
+      left:50%;
+      cursor: pointer;
+    }
+    .prevSlide {
+      background: url("../../image/product_slider_prev.png") no-repeat;
+      top:0;
+    }
+    .nextSlide {
+      background: url("../../image/product_slider_next.png") no-repeat;
+      bottom: 0;
+    }
+    .lightSlider {
+      margin-top: 20px;
+      margin-bottom: 20px;
+    }
+    .gallery {
+      margin-top: 20px;
+      margin-bottom: 30px;
+    }
+    .wrapper {
+      overflow: hidden;
+      color: #c2c2c2;
+      font-size: 12px;
+      font-weight: 400;
+      .defer {
+        margin-left: 20px;
+
+        .love, .compare {
+          float:left;
+          height:58px;
+          padding-top:40px;
+          color: #c2c2c2;
+          font-size: 12px;
+          font-weight: 400;
+        }
+        .love {
+          background: url("../../image/love-icon.png") top center no-repeat;
+        }
+
+        .active .love {
+          color: orange;
+        }
+
+        .compare {
+          background: url("../../image/compare-icon.png") top center no-repeat;
+          margin-left: 10px;
+        }
+      }
+      .reviews {
+        line-height: 21px;
+>>>>>>> master
 
                     .filter_price {
                         width: 48%;
@@ -1856,6 +1952,27 @@ header {
         }
     }
 }
+
+.glyphicon-heart:before {
+  font-size: 38px;
+}
+
+.active .glyphicon-heart:before {
+  color: #f08825;
+}
+
+.list-group-submenu {
+  margin-left: 25px;
+}
+
+.tab-content > .tab-pane, .pill-content > .pill-pane {
+    display: block;    /* undo display:none          */
+    height: 0;         /* height:0 is also invisible */
+    overflow: hidden;  /* no-overflow                */
+}
+.tab-content > .active, .pill-content > .active {
+    height: auto;      /* let the content decide it  */
+} /* bootstrap hack end */
 
 footer {
     margin-top: 30px;
