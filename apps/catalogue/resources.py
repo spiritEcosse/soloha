@@ -162,8 +162,8 @@ class ModelResource(resources.ModelResource):
 
     def copy_relation(self, obj):
         for field in self.get_fields():
-            if isinstance(field.widget, widgets.IntermediateModelManyToManyWidget)\
-                    or isinstance(field.widget, import_export_widgets.ManyToManyWidget)\
+            if isinstance(field.widget, widgets.IntermediateModelManyToManyWidget) \
+                    or isinstance(field.widget, import_export_widgets.ManyToManyWidget) \
                     or isinstance(field.widget, widgets.ImageManyToManyWidget):
                 setattr(obj, '{}{}'.format(self.prefix, field.column_name), self.export_field(field, obj))
 
@@ -248,6 +248,34 @@ class ModelResource(resources.ModelResource):
             data.append(html)
         return data
 
+    def save_m2m(self, obj, data, dry_run):
+        """
+        Saves m2m fields.
+
+        Model instance need to have a primary key value before
+        a many-to-many relationship can be used.
+        """
+        if not dry_run:
+            for field in self.get_fields():
+                field.widget.obj = obj
+
+                if not isinstance(field.widget, import_export_widgets.ManyToManyWidget) \
+                        and not isinstance(field.widget, widgets.ImageManyToManyWidget) \
+                        and not isinstance(field.widget, widgets.IntermediateModelManyToManyWidget):
+                    continue
+                self.import_field(field, obj, data)
+
+    def before_import(self, dataset, dry_run, **kwargs):
+        for field in self.get_fields():
+            if isinstance(field.widget, widgets.IntermediateModelManyToManyWidget):
+                field.widget.rel_field = self._meta.model._meta.get_field_by_name(field.attribute)[0]
+
+                field.widget.intermediate_own_fields = []
+
+                for rel_field in field.widget.rel_field.rel.through._meta.fields:
+                    if rel_field is not field.widget.rel_field.rel.through._meta.pk and not isinstance(rel_field, ForeignKey):
+                        field.widget.intermediate_own_fields.append(rel_field)
+
 
 class FeatureResource(ModelResource):
     title = fields.Field(column_name='title', attribute='title', widget=widgets.CharWidget())
@@ -264,12 +292,14 @@ class FeatureResource(ModelResource):
 class ProductVersionResource(ModelResource):
     product = fields.Field(column_name='product', attribute='product', widget=import_export_widgets.ForeignKeyWidget(
         model=Product, field='slug'))
-    attributes = fields.Field(column_name='attributes', attribute='attributes', widget=widgets.ManyToManyWidget(
-        model=Product, field='slug'
-    ))
+    attributes = Field(column_name='attributes', attribute='attributes',
+                       widget=widgets.IntermediateModelManyToManyWidget(
+                           model=Feature, field='slug'
+                       ))
+    delete = fields.Field(widget=import_export_widgets.BooleanWidget())
 
     class Meta:
-        fields = ('id', 'product', 'price_retail', 'cost_price', 'attributes', )
+        fields = ('id', 'delete', 'product', 'price_retail', 'cost_price', 'attributes', )
         export_order = fields
         model = ProductVersion
 
@@ -279,7 +309,7 @@ class ProductFeatureResource(ModelResource):
         model=Product, field='slug'))
     feature = fields.Field(column_name='feature', attribute='feature', widget=import_export_widgets.ForeignKeyWidget(
         model=Feature, field='slug'))
-    image = fields.Field(column_name='image', attribute='image', widget=widgets.ImageForeignKeyWidget(
+    image = fields.Field(column_name='image', attribute='image', widget=widgets.ImageManyToManyWidget(
         model=Image, field='original_filename'))
     product_with_images = fields.Field(column_name='product_with_images', attribute='product_with_images',
                                        widget=widgets.ManyToManyWidget(model=Product, field='slug'))
@@ -304,13 +334,18 @@ class ProductFeatureResource(ModelResource):
 class CategoryResource(ModelResource):
     parent = fields.Field(attribute='parent', column_name='parent', widget=import_export_widgets.ForeignKeyWidget(
         model=Category, field='slug'))
+    icon = fields.Field(column_name='icon', attribute='icon', widget=widgets.ImageManyToManyWidget(
+        model=Image, field='original_filename'))
+    image_banner = fields.Field(column_name='image_banner', attribute='image_banner', widget=widgets.ImageManyToManyWidget(
+        model=Image, field='original_filename'))
+    image = fields.Field(column_name='image', attribute='image', widget=widgets.ImageManyToManyWidget(
+        model=Image, field='original_filename'))
     delete = fields.Field(widget=import_export_widgets.BooleanWidget())
 
     class Meta:
         model = Category
-        #Todo add: 'icon', 'image_banner', 'image'
         fields = ('id', 'delete', 'enable', 'name', 'slug', 'parent', 'sort', 'meta_title', 'h1', 'meta_description',
-                  'meta_keywords', 'link_banner', 'description', )
+                  'meta_keywords', 'link_banner', 'description', 'image', 'image_banner', 'icon', )
         export_order = fields
 
     #ToDo @igor: user cannot delete if has permission
@@ -371,10 +406,10 @@ class ProductResource(ModelResource):
                                         widget=widgets.ManyToManyWidget(model=Feature, field='slug'))
     images = fields.Field(column_name='images', attribute='images',
                           widget=widgets.ImageManyToManyWidget(model=ProductImage, field='original'))
-    recommended_products = resources.Field(column_name='recommended_products', attribute='recommended_products',
-                                           widget=widgets.IntermediateModelManyToManyWidget(
-                                               model=Product, field='slug',
-                                           ))
+    recommended_products = Field(column_name='recommended_products', attribute='recommended_products',
+                                 widget=widgets.IntermediateModelManyToManyWidget(
+                                     model=Product, field='slug',
+                                 ))
     delete = fields.Field(widget=import_export_widgets.BooleanWidget())
 
     class Meta:
@@ -388,36 +423,6 @@ class ProductResource(ModelResource):
     def for_delete(self, row, instance):
         return self.fields['delete'].clean(row)
 
-    def save_m2m(self, obj, data, dry_run):
-        """
-        Saves m2m fields.
-
-        Model instance need to have a primary key value before
-        a many-to-many relationship can be used.
-        """
-        if not dry_run:
-            for field in self.get_fields():
-                field.widget.obj = obj
-
-                if not isinstance(field.widget, import_export_widgets.ManyToManyWidget) \
-                        and not isinstance(field.widget, widgets.ImageManyToManyWidget) \
-                        and not isinstance(field.widget, widgets.IntermediateModelManyToManyWidget):
-                    continue
-                self.import_field(field, obj, data)
-
     def dehydrate_images(self, obj):
         images = [prod_image.original.file.name for prod_image in obj.images.all() if prod_image.original]
         return ','.join(images)
-
-    def before_import(self, dataset, dry_run, **kwargs):
-        for field in self.get_fields():
-            if isinstance(field.widget, widgets.IntermediateModelManyToManyWidget):
-                field.widget.rel_field = self._meta.model._meta.get_field_by_name(field.attribute)[0]
-
-                field.widget.intermediate_own_fields = []
-
-                for rel_field in field.widget.rel_field.rel.through._meta.fields:
-                    if rel_field is not field.widget.rel_field.rel.through._meta.pk and not isinstance(rel_field, ForeignKey):
-                        field.widget.intermediate_own_fields.append(rel_field)
-
-

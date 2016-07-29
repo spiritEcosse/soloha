@@ -183,6 +183,10 @@ class ProductVersionAdmin(ImportExportMixin, ImportExportActionModelAdmin):
         js = ("https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css",
               "https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js")
 
+    # ToDo @igor: user cannot delete if has permission
+    def for_delete(self, row, instance):
+        return self.fields['delete'].clean(row)
+
 
 class ProductFeatureAdmin(ImportExportMixin, ImportExportActionModelAdmin):
     list_display = ('pk', 'product', 'thumb', 'feature', 'product_date_updated', 'sort', 'info', 'product_enable',
