@@ -171,11 +171,10 @@ class ModelResource(resources.ModelResource):
 
         FieldWidget = self.widget_from_django_field(django_field)
         widget_kwargs = self.widget_kwargs_for_field(field_name)
-        field = Field(attribute=field_name, column_name=field_name,
-                      widget=FieldWidget(**widget_kwargs), readonly=readonly)
+        field = Field(attribute=field_name, column_name=field_name, widget=FieldWidget(**widget_kwargs),
+                      readonly=readonly)
         return field
 
-    # ToDo @igor: user cannot delete if has permission
     def for_delete(self, row, instance):
         return self.fields['delete'].clean(row)
 

@@ -158,9 +158,6 @@ class IntermediateModelManyToManyWidget(import_export_widgets.ManyToManyWidget):
         if self.rel_field.rel.through._meta.auto_created:
             return result
 
-        for field in self.intermediate_own_fields:
-            result[field.name] = field.default if field.default else None
-
         intermediate_obj = self.rel_field.rel.through.objects.filter(**{
             self.rel_field.m2m_reverse_field_name(): related_obj,
             self.rel_field.m2m_field_name(): obj
@@ -168,7 +165,10 @@ class IntermediateModelManyToManyWidget(import_export_widgets.ManyToManyWidget):
 
         if intermediate_obj is not None:
             for field in self.intermediate_own_fields:
-                result[field.name] = getattr(intermediate_obj, field.name)
+                result[field.name] = force_text(getattr(intermediate_obj, field.name))
+        else:
+            for field in self.intermediate_own_fields:
+                result[field.name] = field.default if field.default else None
 
         return result
 
