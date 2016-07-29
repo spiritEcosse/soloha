@@ -53,6 +53,7 @@ ProductAttribute = get_model('catalogue', 'ProductAttribute')
 ProductAttributeValue = get_model('catalogue', 'ProductAttributeValue')
 ProductClass = get_model('catalogue', 'ProductClass')
 ProductImage = get_model('catalogue', 'ProductImage')
+ProductVersion = get_model('catalogue', 'ProductVersion')
 ProductFeature = get_model('catalogue', 'ProductFeature')
 ProductRecommendation = get_model('catalogue', 'ProductRecommendation')
 StockRecord = get_model('partner', 'StockRecord')
@@ -175,6 +176,15 @@ class ProductClassAdmin(admin.ModelAdmin):
 
 class ProductImageInline(admin.TabularInline):
     model = ProductImage
+
+
+class ProductVersionForm(forms.ModelForm):
+    class Meta:
+        fields = '__all__'
+        model = ProductVersion
+        widgets = {
+            'product': autocomplete.ModelSelect2(url='product-autocomplete')
+        }
 
 
 class ProductFeatureResource(resources.ModelResource):
