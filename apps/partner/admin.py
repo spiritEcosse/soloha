@@ -27,10 +27,6 @@ class StockRecordResource(resources.ModelResource):
                   'num_in_stock', 'num_allocated', 'low_stock_threshold', )
         export_order = fields
 
-    # ToDo @igor: user cannot delete if has permission
-    def for_delete(self, row, instance):
-        return self.fields['delete'].clean(row)
-
 
 class StockRecordAdmin(ImportExportMixin, ImportExportActionModelAdmin):
     resource_class = StockRecordResource
