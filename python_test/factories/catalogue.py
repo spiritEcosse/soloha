@@ -7,6 +7,7 @@ from oscar.core.loading import get_model
 from soloha.settings import OSCAR_MISSING_IMAGE_URL
 from soloha.settings import MAX_COUNT_PRODUCT, MAX_COUNT_CATEGORIES
 from django.test import TestCase
+from django.core.management import call_command
 from oscar.apps.partner import strategy, availability, prices
 from oscar.core.loading import get_class, get_model
 from decimal import Decimal as D
@@ -15,6 +16,8 @@ import random
 from oscar.apps.partner.strategy import Selector
 from django.conf import settings
 from apps.catalogue.models import SiteInfo
+from apps.flatpages.models import InfoPage
+
 
 Free = get_class('shipping.methods', 'Free')
 ProductCategory = get_model('catalogue', 'ProductCategory')
@@ -331,6 +334,8 @@ class Test(object):
                 product.filters.add(Feature.objects.get(title=u'длина_1100'))
                 product.filters.add(Feature.objects.get(title=u'ширина_1200'))
 
+        call_command('rebuild_index', interactive=False, verbosity=0)
+
     def create_product_bulk_recommend(self):
         """
         create product bulk with model ProductRecommendation
@@ -392,7 +397,13 @@ class Test(object):
         basket.set_as_submitted()
         return order
 
-    def create_site_info(self):
+    @staticmethod
+    def create_site_info():
         SiteInfo.objects.create(domain='example.com', work_time='9:00-19:00', address=('address'),
                                 phone_number='0959999999', email='test@gmail.com')
 
+    @staticmethod
+    def create_flatpages():
+        InfoPage.objects.create(url='delivery', title='Delivery', content='delivery content')
+        InfoPage.objects.create(url='payment', title='Payment', content='payment content')
+        InfoPage.objects.create(url='manager', title='Mobile manager', content='mobile manager content')

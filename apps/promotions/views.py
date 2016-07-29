@@ -1,3 +1,5 @@
+import json
+
 from oscar.apps.promotions.views import HomeView as CoreHomeView
 from braces import views
 from soloha.settings import MAX_COUNT_PRODUCT
@@ -5,6 +7,7 @@ from django.db.models.query import Prefetch
 from django.views.generic.list import MultipleObjectMixin
 from django.views.generic import View
 from oscar.core.loading import get_model
+
 
 Category = get_model('catalogue', 'category')
 Product = get_model('catalogue', 'product')
@@ -123,3 +126,4 @@ class CategoriesView(views.JSONResponseMixin, views.AjaxResponseMixin, View):
         super(CategoriesView, self).post_ajax(request, *args, **kwargs)
         categories = self.object_list
         return self.render_json_response(categories)
+

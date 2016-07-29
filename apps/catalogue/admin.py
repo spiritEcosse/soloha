@@ -7,6 +7,9 @@ from django.forms import Textarea
 from django import forms
 from django.contrib.admin import widgets
 from django.contrib.sites.models import Site
+from django.contrib.flatpages.admin import FlatPageAdmin
+from django.contrib.flatpages.models import FlatPage
+from apps.flatpages.models import InfoPage
 
 
 Feature = get_model('catalogue', 'Feature')
@@ -130,3 +133,6 @@ admin.site.register(Feature, FeatureAdmin)
 admin.site.register(SiteInfo)
 
 admin.site.unregister(Site)
+admin.site.unregister(FlatPage)
+
+admin.site.register(InfoPage)

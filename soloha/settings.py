@@ -63,6 +63,8 @@ INSTALLED_APPS = \
         'feincms',
         'easy_thumbnails',
         'apps.contacts',
+        'apps.sitemap',
+        'apps.subscribe',
         # 'smart_load_tag',
     ] + get_core_apps(['apps.catalogue', 'apps.promotions', 'apps.partner', 'apps.search', ])
 

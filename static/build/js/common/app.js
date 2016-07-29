@@ -81,15 +81,17 @@
         $scope.options_children = data.options_children;
         $scope.list_options = data.list_options;
         if (data.price) {
-          return $scope.new_price = data.price;
+          $scope.new_price = data.price;
         } else {
-          return $scope.product.product_not_availability = data.product_not_availability;
+          $scope.product.product_not_availability = data.product_not_availability;
         }
+        $scope.product_id = data.product_id;
+        $scope.active = data.active;
+        return $scope.wish_list_url = data.wish_list_url;
       }).error(function() {
         return console.error('An error occurred during submission');
       });
       $scope.change_price = function(option_id) {
-        console.log(option_id);
         if (Object.keys($scope.options_children).length !== 0) {
           $scope.option_id = Object.keys($scope.options_children[$scope.option_id]).filter(function(key) {
             return $scope.options_children[$scope.option_id][key] === $scope.option_model[$scope.option_id];
@@ -127,18 +129,12 @@
           el.remove();
           el = angular.element($('[ng-model="option_model[' + $scope.option_id + ']"'));
           el = angular.element($('[ng-model="confirmed"'));
-          console.log(el.find('div').remove());
           angular.element(document.getElementById('options-0')).append($compile('<div id="' + $scope.option_id + '"> <select class="form-control" ng-model="option_model[' + $scope.option_id + ']" ng-change="change_price()" ng-options="option for option in options_children[' + $scope.option_id + ']" ></select> </div>')($scope));
-          console.log(this.find('div'));
           el = angular.element($('[ng-model="' + $scope.option_id + '" '));
           model = el;
-          console.log(model);
-          console.log($scope.model);
           el = angular.element(document).find('#tests');
           $scope.test = 12;
-          console.log($scope.test);
           el.remove();
-          console.log($scope.test);
           return angular.element(document.getElementById('options-0')).append($compile('<select class="form-control" ng-model="option_model[' + $scope.option_id + ']" ng-change="change_price()" ng-options="option for option in options_children[' + $scope.option_id + ']" ></select>')($scope));
         });
       };
@@ -190,7 +186,7 @@
         }
         return exist_selected_attr;
       };
-      return $scope.update_price = function() {
+      $scope.update_price = function() {
         if (!set_price()) {
           angular.forEach(clone_data.variant_attributes[$scope.product.attributes[$scope.last_select_attr].id], function(attr) {
             $scope.product.values[attr.id] = attr.values;
@@ -216,6 +212,21 @@
         $scope.product.price = product_versions[selected_attributes.toString()];
         console.log(product_versions);
         return console.log(selected_attributes.toString());
+      };
+      return $scope.change_wishlist = function() {
+        if ($scope.active !== 'none') {
+          return $http.post($scope.wish_list_url + 'products/' + $scope.product_id + '/delete/').success(function(data) {
+            return $scope.active = 'none';
+          }).error(function() {
+            return console.error('An error occurred during submission');
+          });
+        } else {
+          return $http.post('/accounts/wishlists/add/' + $scope.product_id + '/').success(function(data) {
+            return $scope.active = 'active';
+          }).error(function() {
+            return console.error('An error occurred during submission');
+          });
+        }
       };
     }
   ]);
@@ -247,7 +258,6 @@
       if (getParameterByName('page')) {
         $scope.page_number = getParameterByName('page');
       }
-      console.log($scope.page_number);
       $http.post($location.absUrl(), {
         'page': $scope.page_number,
         'sorting_type': $scope.sorting_type
@@ -264,8 +274,7 @@
         $scope.pages = [data.pages[parseInt($scope.initial_page_number) - 1]];
         $scope.pages[0].active = "True";
         $scope.pages[0].link = "";
-        $scope.sorting_type = data.sorting_type;
-        return console.log(data);
+        return $scope.sorting_type = data.sorting_type;
       }).error(function() {
         return console.error('An error occurred during submission');
       });
@@ -359,20 +368,6 @@
 
   app = angular.module(app_name);
 
-  app.controller('Home', ['$http', '$scope', '$window', '$document', '$log', function($http, $scope, $window, $document, $log) {}]);
-
-}).call(this);
-
-(function() {
-  'use strict';
-
-  /* Controllers */
-  var app, app_name;
-
-  app_name = "soloha";
-
-  app = angular.module(app_name);
-
   app.config([
     '$httpProvider', function($httpProvider) {
       $httpProvider.defaults.xsrfCookieName = 'csrftoken';
@@ -398,8 +393,7 @@
         $scope.pages = [data.pages[parseInt($scope.initial_page_number) - 1]];
         $scope.pages[0].active = "True";
         $scope.pages[0].link = "";
-        $scope.sorting_type = data.sorting_type;
-        return console.log($scope.pages);
+        return $scope.sorting_type = data.sorting_type;
       }).error(function() {
         return console.error('An error occurred during submission');
       });
@@ -425,6 +419,42 @@
         }).error(function() {
           return console.error('An error occurred during submission');
         });
+      };
+    }
+  ]);
+
+}).call(this);
+
+(function() {
+  'use strict';
+
+  /* Controllers */
+  var app, app_name;
+
+  app_name = "soloha";
+
+  app = angular.module(app_name);
+
+  app.config([
+    '$httpProvider', function($httpProvider) {
+      $httpProvider.defaults.xsrfCookieName = 'csrftoken';
+      $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
+      return $httpProvider.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+    }
+  ]);
+
+  app.controller('Subscribe', [
+    '$http', '$scope', '$window', 'djangoForm', '$document', '$location', function($http, $scope, $window, djangoForm, $document, $location) {
+      return $scope.subscribe = function() {
+        if ($scope.subscribe_data) {
+          return $http.post('/subscribe/', $scope.subscribe_data).success(function(out_data) {
+            if (!djangoForm.setErrors($scope.subscribe_form, out_data.errors)) {
+              return $scope.send_form = true;
+            }
+          }).error(function() {
+            return console.error('An error occured during submission');
+          });
+        }
       };
     }
   ]);

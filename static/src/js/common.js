@@ -10,10 +10,10 @@ $(document).ready(function() {
     $('#categories a[role="tab"]').click(function (e) {
         e.preventDefault();
         $(this).tab('show')
-    })
-
-    $('.selectpicker').selectpicker({
-        style: 'btn-info',
-        size: 4
     });
+
+    // $('.selectpicker').selectpicker({
+    //     style: 'btn-info',
+    //     size: 4
+    // });
 });

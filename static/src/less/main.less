@@ -8,6 +8,37 @@
     }
   }
 }
+.star-rating.One .glyphicon-star:first-child {
+  color: #f08825;
+}
+
+.star-rating.Two .glyphicon-star:first-child,
+.star-rating.Two .glyphicon-star:first-child + .glyphicon-star {
+  color: #f08825;
+}
+
+.star-rating.Three .glyphicon-star:first-child,
+.star-rating.Three .glyphicon-star:first-child + .glyphicon-star,
+.star-rating.Three .glyphicon-star:first-child + .glyphicon-star + .glyphicon-star {
+  color: #f08825;
+}
+
+.star-rating.Four .glyphicon-star:first-child,
+.star-rating.Four .glyphicon-star:first-child + .glyphicon-star,
+.star-rating.Four .glyphicon-star:first-child + .glyphicon-star + .glyphicon-star,
+.star-rating.Four .glyphicon-star:first-child + .glyphicon-star + .glyphicon-star + .glyphicon-star{
+  color: #f08825;
+}
+
+.star-rating.Five .glyphicon-star:first-child,
+.star-rating.Five .glyphicon-star:first-child + .glyphicon-star,
+.star-rating.Five .glyphicon-star:first-child + .glyphicon-star + .glyphicon-star,
+.star-rating.Five .glyphicon-star:first-child + .glyphicon-star + .glyphicon-star + .glyphicon-star,
+.star-rating.Five .glyphicon-star:first-child + .glyphicon-star + .glyphicon-star + .glyphicon-star + .glyphicon-star,
+.star-rating.Five .glyphicon-star:first-child + .glyphicon-star + .glyphicon-star + .glyphicon-star + .glyphicon-star + .glyphicon-star{
+  color: #f08825;
+}
+
 .line-bottom {
   background: url("../../image/product_line_bottom.png") bottom center repeat-x;
 }
@@ -365,6 +396,7 @@ header {
       height:@center_height - @spruce_height;
     }
   }
+
 
   .bottom {
     margin-top: @bottom_margin_top;
@@ -1023,7 +1055,7 @@ header {
     position: relative;
 
     .glyphicon {
-      color: #f08825;
+      color: #cbcbcb;
     }
     .prevSlide, .nextSlide {
       height:15px;
@@ -1066,6 +1098,11 @@ header {
         .love {
           background: url("../../image/love-icon.png") top center no-repeat;
         }
+
+        .active .love {
+          color: orange;
+        }
+
         .compare {
           background: url("../../image/compare-icon.png") top center no-repeat;
           margin-left: 10px;
@@ -1758,6 +1795,27 @@ header {
     }
   }
 }
+
+.glyphicon-heart:before {
+  font-size: 38px;
+}
+
+.active .glyphicon-heart:before {
+  color: #f08825;
+}
+
+.list-group-submenu {
+  margin-left: 25px;
+}
+
+.tab-content > .tab-pane, .pill-content > .pill-pane {
+    display: block;    /* undo display:none          */
+    height: 0;         /* height:0 is also invisible */
+    overflow: hidden;  /* no-overflow                */
+}
+.tab-content > .active, .pill-content > .active {
+    height: auto;      /* let the content decide it  */
+} /* bootstrap hack end */
 
 footer {
   margin-top: 30px;

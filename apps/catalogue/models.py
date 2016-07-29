@@ -5,6 +5,8 @@ from apps.catalogue.abstract_models import CustomAbstractProduct, AbstractFeatur
 from django.contrib.sites.models import Site
 from django.contrib.postgres.fields import ArrayField
 from django.forms import TextInput
+from django.utils.translation import ugettext_lazy as _
+from django.contrib.flatpages.admin import FlatPageAdmin
 
 __all__ = ['ProductAttributesContainer']
 
@@ -110,7 +112,6 @@ if not is_model_registered('catalogue', 'ProductImage'):
     __all__.append('ProductImage')
 
 
-# if not is_model_registered('catalogue', 'SiteInfo'):
 class SiteInfo(Site):
     work_time = models.CharField(max_length=1000)
     address = models.CharField(max_length=1000)

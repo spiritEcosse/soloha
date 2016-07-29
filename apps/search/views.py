@@ -115,7 +115,7 @@ class FacetedSearchView(views.JSONResponseMixin, views.AjaxResponseMixin, CoreFa
     def get_products(self, **kwargs):
         sqs = self.get_search_queryset()[:5]
 
-        searched_products = [{'id': obj.id,
+        searched_products = [{'id': obj.pk,
                               'title': obj.title,
                               'main_image': obj.object.get_values()['image'],
                               'href': obj.object.get_absolute_url(),
@@ -129,8 +129,8 @@ class FacetedSearchView(views.JSONResponseMixin, views.AjaxResponseMixin, CoreFa
             sqs = SearchQuerySet()
             sqs_title = sqs.autocomplete(title_ngrams=self.kwargs['search_string'])
             sqs_slug = sqs.autocomplete(slug_ngrams=self.kwargs['search_string'])
-            sqs_id = sqs.autocomplete(id_ngrams=self.kwargs['search_string'])
-            sqs_search = sqs_title | sqs_slug | sqs_id
+            sqs_id = sqs.autocomplete(product_id=self.kwargs['search_string'])
+            sqs_search = sqs_title or sqs_slug or sqs_id
         return sqs_search
 
     def get_queryset(self):
