@@ -120,6 +120,21 @@ class Field(fields.Field):
 class ModelResource(resources.ModelResource):
     prefix = 'rel_'
 
+    def __new__(cls, *args, **kwargs):
+        obj = super(ModelResource, cls).__new__(cls, *args, **kwargs)
+
+        for field in obj.get_fields():
+            if isinstance(field.widget, widgets.IntermediateModelManyToManyWidget):
+                field.widget.rel_field = obj._meta.model._meta.get_field_by_name(field.attribute)[0]
+
+                field.widget.intermediate_own_fields = []
+
+                for rel_field in field.widget.rel_field.rel.through._meta.fields:
+                    if rel_field is not field.widget.rel_field.rel.through._meta.pk and not isinstance(rel_field, ForeignKey):
+                        field.widget.intermediate_own_fields.append(rel_field)
+
+        return obj
+
     @classmethod
     def widget_from_django_field(cls, f, default=import_export_widgets.Widget):
         """
@@ -159,6 +174,10 @@ class ModelResource(resources.ModelResource):
         field = Field(attribute=field_name, column_name=field_name,
                       widget=FieldWidget(**widget_kwargs), readonly=readonly)
         return field
+
+    # ToDo @igor: user cannot delete if has permission
+    def for_delete(self, row, instance):
+        return self.fields['delete'].clean(row)
 
     def copy_relation(self, obj):
         for field in self.get_fields():
@@ -265,17 +284,6 @@ class ModelResource(resources.ModelResource):
                     continue
                 self.import_field(field, obj, data)
 
-    def before_import(self, dataset, dry_run, **kwargs):
-        for field in self.get_fields():
-            if isinstance(field.widget, widgets.IntermediateModelManyToManyWidget):
-                field.widget.rel_field = self._meta.model._meta.get_field_by_name(field.attribute)[0]
-
-                field.widget.intermediate_own_fields = []
-
-                for rel_field in field.widget.rel_field.rel.through._meta.fields:
-                    if rel_field is not field.widget.rel_field.rel.through._meta.pk and not isinstance(rel_field, ForeignKey):
-                        field.widget.intermediate_own_fields.append(rel_field)
-
 
 class FeatureResource(ModelResource):
     title = fields.Field(column_name='title', attribute='title', widget=widgets.CharWidget())
@@ -320,10 +328,6 @@ class ProductFeatureResource(ModelResource):
         fields = ('id', 'delete', 'product', 'feature', 'sort', 'info', 'non_standard', 'image', 'product_with_images',)
         export_order = fields
 
-    # ToDo @igor: user cannot delete if has permission
-    def for_delete(self, row, instance):
-        return self.fields['delete'].clean(row)
-
     def dehydrate_image(self, obj):
         if obj.image is not None:
             return obj.image.file.name
@@ -348,10 +352,6 @@ class CategoryResource(ModelResource):
                   'meta_keywords', 'link_banner', 'description', 'image', 'image_banner', 'icon', )
         export_order = fields
 
-    #ToDo @igor: user cannot delete if has permission
-    def for_delete(self, row, instance):
-        return self.fields['delete'].clean(row)
-
 
 class ProductImageResource(ModelResource):
     original = fields.Field(column_name='original', attribute='original',
@@ -365,10 +365,6 @@ class ProductImageResource(ModelResource):
         #ToDo delete column to start list
         fields = ('id', 'product_slug', 'original', 'caption', 'display_order', 'delete', )
         export_order = fields
-
-    #ToDo @igor: user cannot delete if has permission
-    def for_delete(self, row, instance):
-        return self.fields['delete'].clean(row)
 
     def dehydrate_original(self, obj):
         if obj.original is not None:
@@ -392,10 +388,6 @@ class ProductRecommendationResource(ModelResource):
         fields = ('id', 'delete', 'primary', 'recommendation', 'ranking', )
         export_order = fields
 
-    #ToDo @igor: user cannot delete if has permission
-    def for_delete(self, row, instance):
-        return self.fields['delete'].clean(row)
-
 
 class ProductResource(ModelResource):
     categories_slug = fields.Field(column_name='categories', attribute='categories',
@@ -418,10 +410,6 @@ class ProductResource(ModelResource):
                   'description', 'categories_slug', 'filters_slug', 'characteristics_slug', 'product_class', 'images',
                   'recommended_products', )
         export_order = fields
-
-    #ToDo @igor: user cannot delete if has permission
-    def for_delete(self, row, instance):
-        return self.fields['delete'].clean(row)
 
     def dehydrate_images(self, obj):
         images = [prod_image.original.file.name for prod_image in obj.images.all() if prod_image.original]
