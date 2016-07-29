@@ -968,7 +968,7 @@ class CustomAbstractCategory(MPTTModel):
 
 
 @python_2_unicode_compatible
-class AbstractProductVersion(models.Model):
+class AbstractProductVersion(models.Model, CommonFeatureProduct):
     attributes = models.ManyToManyField('catalogue.Feature', through='catalogue.VersionAttribute',
                                         verbose_name=_('Attributes'), related_name='product_versions')
     product = models.ForeignKey('catalogue.Product', related_name='versions', on_delete=models.DO_NOTHING)

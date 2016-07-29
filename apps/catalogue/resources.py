@@ -23,8 +23,21 @@ except ImportError:
         def emit(self, record):
             pass
 import traceback
+from oscar.core.loading import get_model
+from filer.models.imagemodels import Image
 
 logging.getLogger(__name__).addHandler(NullHandler())
+
+Feature = get_model('catalogue', 'Feature')
+Category = get_model('catalogue', 'Category')
+Product = get_model('catalogue', 'Product')
+ProductAttribute = get_model('catalogue', 'ProductAttribute')
+ProductAttributeValue = get_model('catalogue', 'ProductAttributeValue')
+ProductImage = get_model('catalogue', 'ProductImage')
+ProductVersion = get_model('catalogue', 'ProductVersion')
+VersionAttribute = get_model('catalogue', 'VersionAttribute')
+ProductFeature = get_model('catalogue', 'ProductFeature')
+ProductRecommendation = get_model('catalogue', 'ProductRecommendation')
 
 
 class Field(fields.Field):
@@ -234,3 +247,177 @@ class ModelResource(resources.ModelResource):
             html = mark_safe(html)
             data.append(html)
         return data
+
+
+class FeatureResource(ModelResource):
+    title = fields.Field(column_name='title', attribute='title', widget=widgets.CharWidget())
+    parent = fields.Field(attribute='parent', column_name='parent', widget=import_export_widgets.ForeignKeyWidget(
+        model=Feature, field='slug'))
+    delete = fields.Field(widget=import_export_widgets.BooleanWidget())
+
+    class Meta:
+        model = Feature
+        fields = ('id', 'delete', 'title', 'slug', 'parent', 'sort', 'bottom_line', 'top_line',)
+        export_order = fields
+
+
+class ProductVersionResource(ModelResource):
+    product = fields.Field(column_name='product', attribute='product', widget=import_export_widgets.ForeignKeyWidget(
+        model=Product, field='slug'))
+    attributes = fields.Field(column_name='attributes', attribute='attributes', widget=widgets.ManyToManyWidget(
+        model=Product, field='slug'
+    ))
+
+    class Meta:
+        fields = ('id', 'product', 'price_retail', 'cost_price', 'attributes', )
+        export_order = fields
+        model = ProductVersion
+
+
+class ProductFeatureResource(ModelResource):
+    product = fields.Field(column_name='product', attribute='product', widget=import_export_widgets.ForeignKeyWidget(
+        model=Product, field='slug'))
+    feature = fields.Field(column_name='feature', attribute='feature', widget=import_export_widgets.ForeignKeyWidget(
+        model=Feature, field='slug'))
+    image = fields.Field(column_name='image', attribute='image', widget=widgets.ImageForeignKeyWidget(
+        model=Image, field='original_filename'))
+    product_with_images = fields.Field(column_name='product_with_images', attribute='product_with_images',
+                                       widget=widgets.ManyToManyWidget(model=Product, field='slug'))
+    delete = fields.Field(widget=import_export_widgets.BooleanWidget())
+
+    class Meta:
+        model = ProductFeature
+        fields = ('id', 'delete', 'product', 'feature', 'sort', 'info', 'non_standard', 'image', 'product_with_images',)
+        export_order = fields
+
+    # ToDo @igor: user cannot delete if has permission
+    def for_delete(self, row, instance):
+        return self.fields['delete'].clean(row)
+
+    def dehydrate_image(self, obj):
+        if obj.image is not None:
+            return obj.image.file.name
+        else:
+            return ''
+
+
+class CategoryResource(ModelResource):
+    parent = fields.Field(attribute='parent', column_name='parent', widget=import_export_widgets.ForeignKeyWidget(
+        model=Category, field='slug'))
+    delete = fields.Field(widget=import_export_widgets.BooleanWidget())
+
+    class Meta:
+        model = Category
+        #Todo add: 'icon', 'image_banner', 'image'
+        fields = ('id', 'delete', 'enable', 'name', 'slug', 'parent', 'sort', 'meta_title', 'h1', 'meta_description',
+                  'meta_keywords', 'link_banner', 'description', )
+        export_order = fields
+
+    #ToDo @igor: user cannot delete if has permission
+    def for_delete(self, row, instance):
+        return self.fields['delete'].clean(row)
+
+
+class ProductImageResource(ModelResource):
+    original = fields.Field(column_name='original', attribute='original',
+                            widget=widgets.ImageForeignKeyWidget(model=Image, field='original_filename'))
+    product_slug = fields.Field(column_name='product', attribute='product',
+                                widget=import_export_widgets.ForeignKeyWidget(model=Product, field='slug'))
+    delete = fields.Field(widget=import_export_widgets.BooleanWidget())
+
+    class Meta:
+        model = ProductImage
+        #ToDo delete column to start list
+        fields = ('id', 'product_slug', 'original', 'caption', 'display_order', 'delete', )
+        export_order = fields
+
+    #ToDo @igor: user cannot delete if has permission
+    def for_delete(self, row, instance):
+        return self.fields['delete'].clean(row)
+
+    def dehydrate_original(self, obj):
+        if obj.original is not None:
+            return obj.original.file.name
+        else:
+            return ''
+
+
+class ProductRecommendationResource(ModelResource):
+    primary = fields.Field(column_name='primary', attribute='primary', widget=import_export_widgets.ForeignKeyWidget(
+        model=Product, field='slug',
+    ))
+    recommendation = fields.Field(column_name='recommendation', attribute='recommendation',
+                                  widget=import_export_widgets.ForeignKeyWidget(
+                                      model=Product, field='slug',
+                                  ))
+    delete = fields.Field(widget=import_export_widgets.BooleanWidget())
+
+    class Meta:
+        model = ProductRecommendation
+        fields = ('id', 'delete', 'primary', 'recommendation', 'ranking', )
+        export_order = fields
+
+    #ToDo @igor: user cannot delete if has permission
+    def for_delete(self, row, instance):
+        return self.fields['delete'].clean(row)
+
+
+class ProductResource(ModelResource):
+    categories_slug = fields.Field(column_name='categories', attribute='categories',
+                                   widget=widgets.ManyToManyWidget(model=Category, field='slug'))
+    filters_slug = fields.Field(column_name='filters', attribute='filters',
+                                widget=widgets.ManyToManyWidget(model=Feature, field='slug'))
+    characteristics_slug = fields.Field(column_name='characteristics', attribute='characteristics',
+                                        widget=widgets.ManyToManyWidget(model=Feature, field='slug'))
+    images = fields.Field(column_name='images', attribute='images',
+                          widget=widgets.ImageManyToManyWidget(model=ProductImage, field='original'))
+    recommended_products = resources.Field(column_name='recommended_products', attribute='recommended_products',
+                                           widget=widgets.IntermediateModelManyToManyWidget(
+                                               model=Product, field='slug',
+                                           ))
+    delete = fields.Field(widget=import_export_widgets.BooleanWidget())
+
+    class Meta:
+        model = Product
+        fields = ('id', 'delete', 'title', 'slug', 'enable', 'h1', 'meta_title', 'meta_description', 'meta_keywords',
+                  'description', 'categories_slug', 'filters_slug', 'characteristics_slug', 'product_class', 'images',
+                  'recommended_products', )
+        export_order = fields
+
+    #ToDo @igor: user cannot delete if has permission
+    def for_delete(self, row, instance):
+        return self.fields['delete'].clean(row)
+
+    def save_m2m(self, obj, data, dry_run):
+        """
+        Saves m2m fields.
+
+        Model instance need to have a primary key value before
+        a many-to-many relationship can be used.
+        """
+        if not dry_run:
+            for field in self.get_fields():
+                field.widget.obj = obj
+
+                if not isinstance(field.widget, import_export_widgets.ManyToManyWidget) \
+                        and not isinstance(field.widget, widgets.ImageManyToManyWidget) \
+                        and not isinstance(field.widget, widgets.IntermediateModelManyToManyWidget):
+                    continue
+                self.import_field(field, obj, data)
+
+    def dehydrate_images(self, obj):
+        images = [prod_image.original.file.name for prod_image in obj.images.all() if prod_image.original]
+        return ','.join(images)
+
+    def before_import(self, dataset, dry_run, **kwargs):
+        for field in self.get_fields():
+            if isinstance(field.widget, widgets.IntermediateModelManyToManyWidget):
+                field.widget.rel_field = self._meta.model._meta.get_field_by_name(field.attribute)[0]
+
+                field.widget.intermediate_own_fields = []
+
+                for rel_field in field.widget.rel_field.rel.through._meta.fields:
+                    if rel_field is not field.widget.rel_field.rel.through._meta.pk and not isinstance(rel_field, ForeignKey):
+                        field.widget.intermediate_own_fields.append(rel_field)
+
+
