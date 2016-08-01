@@ -1,21 +1,23 @@
 {% load currency_filters %}
 {% load i18n %}
 
-<div class="basket-mini pull-right hidden-xs">
-    <strong>{% trans "Basket total:" %}</strong>
-    {% if request.basket.is_tax_known %}
-        {{ request.basket.total_incl_tax|currency:request.basket.currency }}
-    {% else %}
-        {{ request.basket.total_excl_tax|currency:request.basket.currency }}
-    {% endif %}
+<div class="col-xs-6 col-sm-8 col-md-6 cart">
+    <div class="dropdown">
+        <button class="btn btn-block btn-transparent dropdown-toggle" type="button" id="cart-show" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+            {% trans "Basket total" %}: 3(22 900.00грн)
 
-    <span class="btn-group">
-        <a class="btn btn-default" href="{% url 'basket:summary' %}">{% trans "View basket" %}</a>
-        <button class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+            {% if request.basket.is_tax_known %}
+                {{ request.basket.total_incl_tax|currency:request.basket.currency }}
+            {% else %}
+                {{ request.basket.total_excl_tax|currency:request.basket.currency }}
+            {% endif %}
+
             <span class="caret"></span>
         </button>
-        <ul class="dropdown-menu pull-right">
-            <li>{% include "basket/partials/basket_quick.html" %}</li>
-        </ul>
-    </span>
+
+        <div class="dropdown-menu dropdown-menu-right stop-propagation" aria-labelledby="cart-show">
+            {% include "basket/partials/basket_quick.html" %}
+        </div>
+    </div>
 </div>
+
