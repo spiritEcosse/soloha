@@ -926,12 +926,8 @@ class TestCatalog(LiveServerTestCase):
         # options_on_page_level1 = self.firefox.find_element_by_xpath(".//*[@id='options']/div[2]/div[2]/div[2]/div/label/select/option[2]").text
 
     def test_product_search(self):
-<<<<<<< HEAD
-        self.create_products()
         #ToDo add case with filters and (filters, page)
-=======
         test_catalogue.create_product_bulk()
->>>>>>> master
 
         # Searching products starting from Product 1
         dict_values = {'search_string': 'Product 1', 'page': 1}
@@ -1390,10 +1386,6 @@ class TestCatalog(LiveServerTestCase):
         self.assertIn('ng-hide="hide == true"', self.firefox.page_source)
 
         self.firefox.get(initial_url+"&page=4")
-<<<<<<< HEAD
-        time.sleep(10)
-        # self.assertNotIn(u'ПОКАЗАТЬ ЕЩЕ', self.firefox.page_source)
-=======
         time.sleep(2)
         self.assertNotIn(u'ПОКАЗАТЬ ЕЩЕ', self.firefox.page_source)
 
@@ -1527,4 +1519,3 @@ class TestCatalog(LiveServerTestCase):
         self.assertEqual(dict_values['context_test'], dict_values['response_context'])
         self.assertEqual(dict_values['context_test'][dict_values['url']].title, dict_values['response_context'][dict_values['url']].title)
         self.assertEqual(dict_values['context_test'][dict_values['url']].content, dict_values['response_context'][dict_values['url']].content)
->>>>>>> master

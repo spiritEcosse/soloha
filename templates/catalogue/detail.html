@@ -94,40 +94,6 @@
                                     {% include "catalogue/reviews/partials/review_stars.html" %}
                                 </p>
                             {% endiffeature %}
-<<<<<<< HEAD
-                            <div class="social">{% trans 'Share' %}:</div>
-                        </div>
-                        <div class="defer pull-right">
-                            <a class="love" href="#">
-                                {% trans "Defer this product" %}
-                            </a>
-                            <a class="compare" href="#">{% trans 'Compare' %}</a>
-                        </div>
-                    </div>
-                    <div class="row liner">
-                        <div class="col-xs-22">
-                            <ul class="nav nav-tabs nav-stacked">
-                                <li class="active"><a data-toggle="tab" href="#info">{% trans 'General information' %}</a></li>
-                                {% if object.options.exists %}
-                                    <li><a data-toggle="tab" href="#options">{% trans 'Select additional options' %}</a></li>
-                                {% endif %}
-                                <li><a data-toggle="tab" href="#characteristics">{% trans 'Characteristics' %}</a></li>
-
-                                {% if product.description %}
-                                    <li><a data-toggle="tab" href="#description">{% trans 'Description' %}</a></li>
-                                {% endif %}
-                                <li><a data-toggle="tab" href="#reviews">{% trans 'Reviews' %}</a></li>
-                                <li><a data-toggle="tab" href="#delivery">{% trans 'Shipping and payment' %}</a></li>
-                            </ul>
-                        </div>
-=======
-                        </a>
-                        {% iffeature "reviews" %}
-                            <br>
-                            <p class="star-rating Four pull-left">
-                                {% include "catalogue/reviews/partials/review_stars.html" %}
-                            </p>
-                        {% endiffeature %}
                         <div class="social">{% trans "Share:" %} </div>
                     </div>
                     <div class="defer pull-right">
@@ -137,23 +103,26 @@
                         <a class="compare" href="#">{% trans "compare" %}</a>
                     </div>
                 </div>
-                <div class="row liner" id="nav-fix">
+                <div class="row liner">
                     <div class="col-xs-22">
                         <ul class="nav nav-tabs nav-stacked">
-                            <li class="active"><a data-toggle="tab" href="#info">{% trans "general information" %}</a></li>
-                            <li><a data-toggle="tab" href="#options">{% trans "Select additional options" %}</a></li>
-                            <li><a data-toggle="tab" href="#characteristics">{% trans "Characteristics" %}</a></li>
-                            <li><a data-toggle="tab" href="#description">{% trans "Description" %}</a></li>
-                            <li><a data-toggle="tab" href="#reviews">{% trans "Reviews" %}</a></li>
-                            <li><a data-toggle="tab" href="#delivery">{% trans "Shipping and payment" %}</a></li>
+                            <li class="active"><a data-toggle="tab" href="#info">{% trans 'General information' %}</a></li>
+                            {% if object.options.exists %}
+                                <li><a data-toggle="tab" href="#options">{% trans 'Select additional options' %}</a></li>
+                            {% endif %}
+                            <li><a data-toggle="tab" href="#characteristics">{% trans 'Characteristics' %}</a></li>
+
+                            {% if product.description %}
+                                <li><a data-toggle="tab" href="#description">{% trans 'Description' %}</a></li>
+                            {% endif %}
+                            <li><a data-toggle="tab" href="#reviews">{% trans 'Reviews' %}</a></li>
+                            <li><a data-toggle="tab" href="#delivery">{% trans 'Shipping and payment' %}</a></li>
                         </ul>
->>>>>>> master
                     </div>
                 </div>
             </div>
             <div id="section3" class="col-xs-24 col-sm-11 col-md-15" >
                 <div class="row common" >
-<<<<<<< HEAD
                     {% include "catalogue/partials/price.html" %}
 
                     {% if attributes %}
@@ -166,135 +135,12 @@
                             </div>
                             <div class="list_attr" ng-if="attributes">
                                 {% include "catalogue/product/attributes/attributes.html" with ng=1 %}
-=======
-                    <div class="col-xs-24 col-sm-24 col-md-10 price">
-                        <div class="panel panel-default">
-                            <div class="panel-heading">
-                                {% trans "Vendor code:" %} {{ product.id }}
-                                <div class="pull-right">{% trans "Under the order" %}</div>
-                            </div>
-                            <div class="panel-body">
-                                {% with class_price="number" %}
-                                    {% if price %}
-                                        <div class="text-center wrapper-number">
-                                            {% trans "price:" %}
-                                            <span ng-bind="product.price" class="{{ class_price }}">{{ price }}</span>
-                                            <span>{{ currency }}</span>
-                                            {#                                    {% block product_stock_record %}#}
-                                            {#                                        {% include "catalogue/partials/stock_record.html" with verbose=1 %}#}
-                                            {#                                    {% endblock %}#}
-                                        </div>
-                                        <div class="row">
-                                            <div class="wrapper-btn-primary col-xs-12">
-                                                <button class="btn btn-block btn-primary">
-                                                    {% trans "Buy" %}
-                                                    {#                                            {% block product_basket_form %}#}
-                                                    {#                                                {% include "catalogue/partials/add_to_basket_form.html" %}#}
-                                                    {#                                            {% endblock %}#}
-                                                </button>
-                                            </div>
-                                            <div class="wrapper-btn-faster col-xs-12">
-                                                <button class="btn btn-block btn-faster btn-primary">{% trans "buy in one click" %}</button>
-                                            </div>
-                                        </div>
-                                    {% else %}
-                                        <div class="wrapper-number"><span class="{{ class_price }}" ng-bind="product.product_not_availability">{{ product_not_availability }}</span></div>
-                                    {% endif %}
-                                {% endwith %}
-                            </div>
-                            <div class="panel-footer">
-                                <div class="row text-center">
-                                    <div class="col-xs-8">
-                                        {% if flatpages.delivery %}
-                                            <div class="icon icon-car" title="{% trans 'Delivery' %}" data-toggle="modal" data-target="#DeliveryModal">
-                                                <span class="glyphicon glyphicon-info-sign btn-xs"></span>
-                                            </div>
-                                            <div class="modal fade" id="DeliveryModal" tabindex="-1" role="dialog" aria-labelledby="Delivery">
-                                                <div class="modal-dialog" role="document">
-                                                    <div class="modal-content">
-                                                        <div class="modal-header">
-                                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                                                            <h4 class="modal-title" id="DeliveryModal">{{ flatpages.delivery.title }}</h4>
-                                                        </div>
-                                                        <div class="modal-body">
-                                                            {{ flatpages.delivery.content|truncatewords:35|linebreaks }}
-                                                            <a href="{{ flatpages.delivery.get_absolute_url }}">{% trans 'view on page' %}</a>
-                                                        </div>
-                                                        <div class="modal-footer">
-                                                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        {% endif %}
-                                    </div>
-                                    <div class="col-xs-8">
-                                        {% if flatpages.payment %}
-                                            <div class="icon icon-pay" title="{% trans 'Payment' %}" data-toggle="modal" data-target="#PaymentModal">
-                                                <span class="glyphicon glyphicon-info-sign btn-xs"></span>
-                                            </div>
-                                            <div class="modal fade" id="PaymentModal" tabindex="-1" role="dialog" aria-labelledby="Payment">
-                                                <div class="modal-dialog" role="document">
-                                                    <div class="modal-content">
-                                                        <div class="modal-header">
-                                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                                                            <h4 class="modal-title" id="PaymentModal">{{ flatpages.payment.title }}</h4>
-                                                        </div>
-                                                        <div class="modal-body">
-                                                            {{ flatpages.payment.content|truncatewords:35|linebreaks }}
-                                                            <a href="{{ flatpages.payment.get_absolute_url }}">{% trans 'view on page' %}</a>
-                                                        </div>
-                                                        <div class="modal-footer">
-                                                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        {% endif %}
-                                    </div>
-                                    <div class="col-xs-8">
-                                        {% if flatpages.manager %}
-                                            <div class="icon icon-manager" title="{% trans 'Mobile manager' %}" data-toggle="modal" data-target="#ManagerModal">
-                                                <span class="glyphicon glyphicon-info-sign btn-xs"></span>
-                                            </div>
-                                            <div class="modal fade" id="ManagerModal" tabindex="-1" role="dialog" aria-labelledby="Manager">
-                                                <div class="modal-dialog" role="document">
-                                                    <div class="modal-content">
-                                                        <div class="modal-header">
-                                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                                                            <h4 class="modal-title" id="ManagerModal">{{ flatpages.manager.title }}</h4>
-                                                        </div>
-                                                        <div class="modal-body">
-                                                            {{ flatpages.manager.content|truncatewords:35|linebreaks }}
-                                                            <a href="{{ flatpages.manager.get_absolute_url }}">{% trans 'view on page' %}</a>
-                                                        </div>
-                                                        <div class="modal-footer">
-                                                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        {% endif %}
-                                    </div>
-                                    <div class="clearfix"></div>
-                                </div>
->>>>>>> master
                             </div>
                         </div>
                     {% endif %}
                 </div>
 
-<<<<<<< HEAD
                 {% if options %}
-                    <div class="col-xs-24 tab-content-info">
-                        <div class="panel panel-default info" id="options">
-                            <div class="panel-heading text-center">
-                                {% trans 'Select additional options' %}:
-                            </div>
-                            <div class="panel-body">
-                                <div class="col-xs-24">
-                                    <div class="row option form-inline"></div>
-=======
                     <div class="col-xs-24 col-sm-24 col-md-14 options">
                         <span class="relation">{% trans "* The price depends on the selected parameters:" %}</span>
                         <div class="list_attr">
@@ -336,57 +182,17 @@
                                 <div class="col-xs-24">
                                     <div class="row option form-inline">
                                         <label class="block" id="options-0">
-                                            <select class="form-control" ng-model="option_model[0]"
-                                                    ng-change="change_price(option_id)" ng-options="option for option in list_options" ></select>
+                                            <select class="form-control" ng-model="option_model[0]" ng-change="change_price(option_id)" ng-options="option for option in list_options" ></select>
                                         </label>
                                     </div>
->>>>>>> master
                                 </div>
                             </div>
                         </div>
                     </div>
-<<<<<<< HEAD
                 {% endif %}
 
                 {% include "catalogue/partials/characteristics.html" %}
-=======
-                </div>
-                <div class="panel panel-default characteristics" id="characteristics">
-                    <div class="panel-heading text-center">
-                        {% trans "Characteristics:" %}
-                    </div>
-                    <div class="panel-body">
-                        <div class="row option">
-                            <div class="col-xs-12">
-                                {% trans "Vendor code:" %}
-                            </div>
-                            <div class="col-xs-12 values">
-                                {{ product.id }}
-                            </div>
-                        </div>
-                        {% for av in product.attribute_values.all %}
-                            <div class="row option">
-                                <div class="col-xs-12">
-                                    {{ av.attribute.name }}
-                                </div>
-                                <div class="col-xs-12 values">
-                                    {{ av.value_as_html }}
-                                </div>
-                            </div>
-                        {% endfor %}
-                        {% iffeature "reviews" %}
-                            <div class="row option">
-                                <div class="col-xs-12">
-                                    {% trans "Number of reviews" %}
-                                </div>
-                                <div class="col-xs-12 values">
-                                    {{ product.num_approved_reviews }}
-                                </div>
-                            </div>
-                        {% endiffeature %}
-                    </div>
-                </div>
->>>>>>> master
+
                 {% block product_description %}
                     {% if product.description %}
                         <div class="panel panel-default" id="description">
@@ -399,13 +205,6 @@
                 {% endblock %}
 
                 <div class="panel panel-default reviews" id="reviews">
-<<<<<<< HEAD
-                    <div class="panel-heading text-center">{% trans 'Reviews' %}:</div>
-                    <div class="panel-body">
-                        <div class="write">
-                            <span class="glyphicon glyphicon-pencil"></span>
-                            {% trans 'Write Review' %}
-=======
                     <div class="panel-heading text-center">{% trans "Reviews:" %}</div>
                     <div class="panel-body">
                         <div class="write">
@@ -416,7 +215,6 @@
                                     Write Review
                                 </a>
                             {% endblocktrans %}
->>>>>>> master
                         </div>
                         <div class="row list">
                             {% iffeature "reviews" %}

@@ -2,17 +2,6 @@
  * Created by igor on 16.01.16.
  */
 
-<<<<<<< HEAD
-$(document).ready(function() {
-    slider = $('.lightSlider').lightSlider({
-        item:4,
-        loop:true,
-        slideMargin: 0
-    });
-=======
->>>>>>> master
-
-
 $(document).ready(function() {
      $('.lightSlider').lightSlider({
         item:4,

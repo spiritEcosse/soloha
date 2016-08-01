@@ -4,7 +4,6 @@ from oscar.core.loading import get_model
 from django.forms import Textarea
 from django import forms
 from django.contrib.sites.models import Site
-<<<<<<< HEAD
 from django.contrib.sites.admin import SiteAdmin as BaseSiteAdmin
 from mptt.admin import DraggableMPTTAdmin
 from import_export.admin import ImportExportMixin, ImportExportActionModelAdmin
@@ -30,12 +29,10 @@ try:
     from django.utils.encoding import force_text
 except ImportError:
     from django.utils.encoding import force_unicode as force_text
-=======
 from django.contrib.flatpages.admin import FlatPageAdmin
 from django.contrib.flatpages.models import FlatPage
 from apps.flatpages.models import InfoPage
 
->>>>>>> master
 
 Feature = get_model('catalogue', 'Feature')
 AttributeOption = get_model('catalogue', 'AttributeOption')
@@ -310,10 +307,6 @@ admin.site.register(ProductRecommendation, ProductRecommendationAdmin)
 admin.site.register(ProductVersion, ProductVersionAdmin)
 
 admin.site.unregister(Site)
-<<<<<<< HEAD
 admin.site.register(Site, InfoAdmin)
-=======
 admin.site.unregister(FlatPage)
-
 admin.site.register(InfoPage)
->>>>>>> master

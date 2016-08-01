@@ -65,14 +65,11 @@ INSTALLED_APPS = \
         'easy_thumbnails',
         'filer',
         'apps.contacts',
-<<<<<<< HEAD
         'apps.ex_sites',
         'import_export',
         'ckeditor',
-=======
         'apps.sitemap',
         'apps.subscribe',
->>>>>>> master
         # 'smart_load_tag',
     ] + get_core_apps(['apps.catalogue', 'apps.promotions', 'apps.partner', 'apps.search', 'apps.order', ])
 

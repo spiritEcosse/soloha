@@ -143,7 +143,7 @@
 
   app.controller('Product', [
     '$http', '$scope', '$window', '$document', '$location', '$compile', '$filter', 'djangoForm', '$rootScope', function($http, $scope, $window, $document, $location, $compile, $filter, djangoForm, $rootScope) {
-      var attributes, clone_attributes, clone_data, get_prod, set_price;
+      var attributes, clone_attributes, clone_data;
       $scope.product = [];
       $scope.product.values = [];
       $scope.product.attributes = [];
@@ -151,7 +151,6 @@
       attributes = [];
       clone_data = null;
       $scope.last_select_attr = null;
-<<<<<<< HEAD
       $scope.isOpen = [];
       $scope.product.custom_values = [];
       $scope.product.custom_value = [];
@@ -166,26 +165,8 @@
       $rootScope.keys = Object.keys;
       $scope.sent_signal = [];
       clone_attributes = [];
-=======
-      prefix = 'attribute-';
-      selector_el = '.dropdown-menu.inner';
-      $http.post($location.absUrl()).success(function(data) {
-        $scope.options = data.options;
-        $scope.options_children = data.options_children;
-        $scope.list_options = data.list_options;
-        if (data.price) {
-          $scope.new_price = data.price;
-        } else {
-          $scope.product.product_not_availability = data.product_not_availability;
-        }
-        $scope.product_id = data.product_id;
-        $scope.active = data.active;
-        return $scope.wish_list_url = data.wish_list_url;
-      }).error(function() {
-        return console.error('An error occurred during submission');
-      });
->>>>>>> master
-      $scope.change_price = function(option_id) {
+      return $scope.change_price = function(option_id) {
+        var get_prod, set_price;
         if (Object.keys($scope.options_children).length !== 0) {
           $scope.option_id = Object.keys($scope.options_children[$scope.option_id]).filter(function(key) {
             return $scope.options_children[$scope.option_id][key] === $scope.option_model[$scope.option_id];
@@ -200,221 +181,186 @@
         } else {
           $scope.parent = true;
         }
-        return $http.post($location.absUrl(), {
-          'option_id': $scope.option_id,
-          'parent': $scope.parent,
-          'list_options': $scope.list_options
-        }).success(function(data) {
+        $http.post($location.absUrl()).success(function(data) {
+          clone_data = data;
           $scope.options = data.options;
-          $scope.options_children[$scope.option_id] = data.options_children;
-          if (Object.keys($scope.options_children[$scope.option_id]).length !== 0) {
-            delete $scope.list_options[$scope.option_id];
-            return angular.element(document.getElementById('options-0')).append($compile('<span id="' + $scope.option_id + '"> <select class="form-control" ng-model="option_model[' + $scope.option_id + ']" ng-change="change_price(option_id)" ng-options="option for option in options_children[' + $scope.option_id + ']" ></select> </span>')($scope));
-          } else {
-            delete $scope.list_options[$scope.option_id];
-            return angular.element(document.getElementById('options-0')).append($compile('<div id="model[' + $scope.option_id + ']"> <select class="form-control" ng-model="option_model[' + $scope.option_id + ']" ng-change="change_price(option_id)" ng-options="option for option in list_options" ></select> </div>')($scope));
-          }
+          $scope.options_children = data.options_children;
+          $scope.list_options = data.list_options;
+          $scope.attributes = data.attributes;
+          angular.copy(data.attributes, clone_attributes);
+          $scope.product = data.product;
+          $scope.product.custom_values = $scope.isOpen = $scope.product.dict_attributes = $scope.product.custom_value = [];
+          return angular.forEach($scope.attributes, function(attr) {
+            attributes.push(attr.pk);
+            $scope.product.dict_attributes[attr.pk] = attr;
+            $scope.product.custom_value[attr.pk] = null;
+            $scope.isOpen[attr.pk] = false;
+            return $scope.product.custom_values[attr.pk] = [];
+          });
         }).error(function() {
-          var el, model;
-          console.error('An error occurred during submission');
-          angular.element(document.getElementById('options-0')).remove(ng - (model = "option_model[' + $scope.option_id + ']"));
-          angular.forEach(data.attributes, function(attr) {});
-          el = angular.element($('[ng-model="option_model[' + 69 + ']" '));
-          el.remove();
-          el = angular.element($('[ng-model="option_model[' + $scope.option_id + ']"'));
-          el = angular.element($('[ng-model="confirmed"'));
-          angular.element(document.getElementById('options-0')).append($compile('<div id="' + $scope.option_id + '"> <select class="form-control" ng-model="option_model[' + $scope.option_id + ']" ng-change="change_price()" ng-options="option for option in options_children[' + $scope.option_id + ']" ></select> </div>')($scope));
-          el = angular.element($('[ng-model="' + $scope.option_id + '" '));
-          model = el;
-          el = angular.element(document).find('#tests');
-          $scope.test = 12;
-          el.remove();
-          return angular.element(document.getElementById('options-0')).append($compile('<select class="form-control" ng-model="option_model[' + $scope.option_id + ']" ng-change="change_price()" ng-options="option for option in options_children[' + $scope.option_id + ']" ></select>')($scope));
+          return console.error('An error occurred during submission');
         });
-      };
-      $http.post($location.absUrl()).success(function(data) {
-        clone_data = data;
-        $scope.options = data.options;
-        $scope.options_children = data.options_children;
-        $scope.list_options = data.list_options;
-        $scope.attributes = data.attributes;
-        angular.copy(data.attributes, clone_attributes);
-        $scope.product = data.product;
-        $scope.product.custom_values = $scope.isOpen = $scope.product.dict_attributes = $scope.product.custom_value = [];
-        return angular.forEach($scope.attributes, function(attr) {
-          attributes.push(attr.pk);
-          $scope.product.dict_attributes[attr.pk] = attr;
-          $scope.product.custom_value[attr.pk] = null;
-          $scope.isOpen[attr.pk] = false;
-          return $scope.product.custom_values[attr.pk] = [];
-        });
-      }).error(function() {
-        return console.error('An error occurred during submission');
-      });
-      $scope.update_price_with_custom_val = function(attr_pk, value) {
-        var selected_attributes;
-        if (value != null) {
-          $scope.product.attributes[attr_pk] = value;
-        } else {
-          $scope.product.attributes[attr_pk] = $scope.product.custom_value[attr_pk];
-        }
-        selected_attributes = [];
-        angular.forEach(clone_data.attributes, function(attr) {
-          var non_standard;
-          non_standard = $scope.product.dict_attributes[attr.pk].non_standard;
-          if ($scope.product.attributes[attr.pk].pk !== 0 && non_standard === true) {
-            return selected_attributes.push($scope.product.attributes[attr.pk]);
+        $scope.update_price_with_custom_val = function(attr_pk, value) {
+          var selected_attributes;
+          if (value != null) {
+            $scope.product.attributes[attr_pk] = value;
+          } else {
+            $scope.product.attributes[attr_pk] = $scope.product.custom_value[attr_pk];
           }
-        });
-        if (selected_attributes.length) {
-          return $http.post('/catalogue/calculate/price/' + clone_data.product.pk, {
-            'selected_attributes': selected_attributes,
-            'current_attr': $scope.product.attributes[attr_pk]
-          }).success(function(data) {
-            var key, _ref, _results;
-            if (data.error == null) {
-              $scope.price = data.price;
-              if ($scope.product.custom_value[attr_pk] && !$filter('search_by_title')($scope.product.custom_values[attr_pk], $scope.product.custom_value[attr_pk].title)) {
-                return $scope.product.custom_values[attr_pk].push($scope.product.custom_value[attr_pk]);
-              }
-            } else {
-              _ref = data.error;
-              _results = [];
-              for (key in _ref) {
-                value = _ref[key];
-                _results.push($scope.product.attributes[key].error = value);
-              }
-              return _results;
+          selected_attributes = [];
+          angular.forEach(clone_data.attributes, function(attr) {
+            var non_standard;
+            non_standard = $scope.product.dict_attributes[attr.pk].non_standard;
+            if ($scope.product.attributes[attr.pk].pk !== 0 && non_standard === true) {
+              return selected_attributes.push($scope.product.attributes[attr.pk]);
             }
-          }).error(function() {
-            return console.error('An error occurred during submission');
           });
-        }
-      };
-      $scope.search = function(attr_pk) {
-        if (($scope.query_attr[attr_pk] != null) && $scope.query_attr[attr_pk] !== '' && !$filter('search_by_title')($scope.product.custom_values[attr_pk], $scope.query_attr[attr_pk])) {
-          return $scope.product.custom_value[attr_pk] = {
-            'pk': -1,
-            'title': $scope.query_attr[attr_pk],
-            'parent': attr_pk
-          };
-        } else {
-          return $scope.product.custom_value[attr_pk] = null;
-        }
-      };
-      $scope.click_dropdown = function(attr_id) {
-        return $scope.isOpen[attr_id] = $scope.isOpen[attr_id] === false ? true : false;
-      };
-      get_prod = function(selected_val) {
-        if ((selected_val.products != null) && !selected_val.products.length || (selected_val.products == null)) {
-          return $http.post('/catalogue/attr/' + selected_val.pk + '/product/' + clone_data.product.pk + '/').success(function(data) {
-            selected_val.products = data.products;
-            return selected_val.images = data.product_primary_images;
-          }).error(function() {
-            return console.error('An error occurred during submission');
-          });
-        }
-      };
-      $scope.attr_prod = function(value) {
-        return get_prod(value);
-      };
-      $scope.attr_prod_images = function(value, product) {
-        if ((product.images != null) && !product.images.length) {
-          product.sent_signal = true;
-          return $http.post('/catalogue/attr/product/' + product.pk + '/images/').success(function(data) {
-            var images;
-            product.sent_signal = false;
-            images = data.images;
-            if (!data.images.length) {
-              images = null;
-            }
-            return product.images = images;
-          }).error(function() {
-            return console.error('An error occurred during submission');
-          });
-        }
-      };
-      set_price = function() {
-        var exist_selected_attr, selected_attributes;
-        selected_attributes = [];
-        angular.forEach($scope.attributes, function(attribute) {
-          if (attribute.selected_val.pk !== 0) {
-            return selected_attributes.push(attribute.selected_val.pk);
+          if (selected_attributes.length) {
+            return $http.post('/catalogue/calculate/price/' + clone_data.product.pk, {
+              'selected_attributes': selected_attributes,
+              'current_attr': $scope.product.attributes[attr_pk]
+            }).success(function(data) {
+              var key, _ref, _results;
+              if (data.error == null) {
+                $scope.price = data.price;
+                if ($scope.product.custom_value[attr_pk] && !$filter('search_by_title')($scope.product.custom_values[attr_pk], $scope.product.custom_value[attr_pk].title)) {
+                  return $scope.product.custom_values[attr_pk].push($scope.product.custom_value[attr_pk]);
+                }
+              } else {
+                _ref = data.error;
+                _results = [];
+                for (key in _ref) {
+                  value = _ref[key];
+                  _results.push($scope.product.attributes[key].error = value);
+                }
+                return _results;
+              }
+            }).error(function() {
+              return console.error('An error occurred during submission');
+            });
           }
-        });
-        exist_selected_attr = clone_data.product_versions[selected_attributes.toString()];
-        if (exist_selected_attr) {
-          $scope.price = exist_selected_attr;
-        }
-        return exist_selected_attr;
-      };
-<<<<<<< HEAD
-      $scope.update_price = function(value, current_attribute) {
-        current_attribute.selected_val = value;
-        get_prod(value);
-        angular.forEach(clone_data.variant_attributes[value.pk], function(attr) {
-          var attribute;
-          attribute = $filter('filter')($scope.attributes, {
-            pk: attr.pk
-          })[0];
-          return attribute.values = attr.values;
-        });
-=======
-      $scope.update_price = function() {
->>>>>>> master
-        if (!set_price()) {
+        };
+        $scope.search = function(attr_pk) {
+          if (($scope.query_attr[attr_pk] != null) && $scope.query_attr[attr_pk] !== '' && !$filter('search_by_title')($scope.product.custom_values[attr_pk], $scope.query_attr[attr_pk])) {
+            return $scope.product.custom_value[attr_pk] = {
+              'pk': -1,
+              'title': $scope.query_attr[attr_pk],
+              'parent': attr_pk
+            };
+          } else {
+            return $scope.product.custom_value[attr_pk] = null;
+          }
+        };
+        $scope.click_dropdown = function(attr_id) {
+          return $scope.isOpen[attr_id] = $scope.isOpen[attr_id] === false ? true : false;
+        };
+        get_prod = function(selected_val) {
+          if ((selected_val.products != null) && !selected_val.products.length || (selected_val.products == null)) {
+            return $http.post('/catalogue/attr/' + selected_val.pk + '/product/' + clone_data.product.pk + '/').success(function(data) {
+              selected_val.products = data.products;
+              return selected_val.images = data.product_primary_images;
+            }).error(function() {
+              return console.error('An error occurred during submission');
+            });
+          }
+        };
+        $scope.attr_prod = function(value) {
+          return get_prod(value);
+        };
+        $scope.attr_prod_images = function(value, product) {
+          if ((product.images != null) && !product.images.length) {
+            product.sent_signal = true;
+            return $http.post('/catalogue/attr/product/' + product.pk + '/images/').success(function(data) {
+              var images;
+              product.sent_signal = false;
+              images = data.images;
+              if (!data.images.length) {
+                images = null;
+              }
+              return product.images = images;
+            }).error(function() {
+              return console.error('An error occurred during submission');
+            });
+          }
+        };
+        set_price = function() {
+          var exist_selected_attr, selected_attributes;
+          selected_attributes = [];
+          angular.forEach($scope.attributes, function(attribute) {
+            if (attribute.selected_val.pk !== 0) {
+              return selected_attributes.push(attribute.selected_val.pk);
+            }
+          });
+          exist_selected_attr = clone_data.product_versions[selected_attributes.toString()];
+          if (exist_selected_attr) {
+            $scope.price = exist_selected_attr;
+          }
+          return exist_selected_attr;
+        };
+        $scope.update_price = function(value, current_attribute) {
+          current_attribute.selected_val = value;
+          get_prod(value);
           angular.forEach(clone_data.variant_attributes[value.pk], function(attr) {
             var attribute;
             attribute = $filter('filter')($scope.attributes, {
               pk: attr.pk
             })[0];
-            attribute.values = attr.values;
-            if (attr.in_group[1] && attr.in_group[1].visible) {
-              attribute.selected_val = attr.in_group[1];
-            } else if (attribute.values) {
-              attribute.selected_val = attribute.values[0];
-            }
-            return get_prod(attribute.selected_val);
+            return attribute.values = attr.values;
           });
           if (!set_price()) {
-            $scope.price = $scope.price_start;
-            return angular.forEach($scope.attributes, function(attr) {
+            angular.forEach(clone_data.variant_attributes[value.pk], function(attr) {
               var attribute;
-              attribute = $filter('filter')(clone_attributes, {
+              attribute = $filter('filter')($scope.attributes, {
                 pk: attr.pk
               })[0];
-              attr.values = attribute.values;
-              attr.selected_val = attribute.selected_val;
+              attribute.values = attr.values;
+              if (attr.in_group[1] && attr.in_group[1].visible) {
+                attribute.selected_val = attr.in_group[1];
+              } else if (attribute.values) {
+                attribute.selected_val = attribute.values[0];
+              }
               return get_prod(attribute.selected_val);
             });
-          }
-        }
-      };
-      return $scope.quick_order = function() {
-        if ($scope.quick_order_data) {
-          return $http.post('/catalogue/quick/order/' + clone_data.product.pk, $scope.quick_order_data).success(function(out_data) {
-            if (!djangoForm.setErrors($scope.quick_order_form, out_data.errors)) {
-              return $scope.send_form = true;
+            if (!set_price()) {
+              $scope.price = $scope.price_start;
+              return angular.forEach($scope.attributes, function(attr) {
+                var attribute;
+                attribute = $filter('filter')(clone_attributes, {
+                  pk: attr.pk
+                })[0];
+                attr.values = attribute.values;
+                attr.selected_val = attribute.selected_val;
+                return get_prod(attribute.selected_val);
+              });
             }
-          }).error(function() {
-            return console.error('An error occured during submission');
-          });
-        }
-      };
-      return $scope.change_wishlist = function() {
-        if ($scope.active !== 'none') {
-          return $http.post($scope.wish_list_url + 'products/' + $scope.product_id + '/delete/').success(function(data) {
-            return $scope.active = 'none';
-          }).error(function() {
-            return console.error('An error occurred during submission');
-          });
-        } else {
-          return $http.post('/accounts/wishlists/add/' + $scope.product_id + '/').success(function(data) {
-            return $scope.active = 'active';
-          }).error(function() {
-            return console.error('An error occurred during submission');
-          });
-        }
+          }
+        };
+        $scope.quick_order = function() {
+          if ($scope.quick_order_data) {
+            return $http.post('/catalogue/quick/order/' + clone_data.product.pk, $scope.quick_order_data).success(function(out_data) {
+              if (!djangoForm.setErrors($scope.quick_order_form, out_data.errors)) {
+                return $scope.send_form = true;
+              }
+            }).error(function() {
+              return console.error('An error occured during submission');
+            });
+          }
+        };
+        return $scope.change_wishlist = function() {
+          if ($scope.active !== 'none') {
+            return $http.post($scope.wish_list_url + 'products/' + $scope.product_id + '/delete/').success(function(data) {
+              return $scope.active = 'none';
+            }).error(function() {
+              return console.error('An error occurred during submission');
+            });
+          } else {
+            return $http.post('/accounts/wishlists/add/' + $scope.product_id + '/').success(function(data) {
+              return $scope.active = "active";
+            }).error(function() {
+              return console.error('An error occurred during submission');
+            });
+          }
+        };
       };
     }
   ]);
@@ -446,10 +392,6 @@
       if (getParameterByName('page')) {
         $scope.page_number = getParameterByName('page');
       }
-<<<<<<< HEAD
-      console.log($scope.page_number);
-      $scope.submit = function() {
-=======
       $http.post($location.absUrl(), {
         'page': $scope.page_number,
         'sorting_type': $scope.sorting_type
@@ -471,7 +413,6 @@
         return console.error('An error occurred during submission');
       });
       return $scope.submit = function() {
->>>>>>> master
         return $http.post($location.absUrl(), {
           'page': $scope.page_number,
           'sorting_type': $scope.sorting_type
@@ -492,9 +433,6 @@
         }).error(function() {
           return console.error('An error occurred during submission');
         });
-      };
-      return $scope.click_test_option = function() {
-        return console.log('hello');
       };
     }
   ]);

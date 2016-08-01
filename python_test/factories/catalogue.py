@@ -1,27 +1,19 @@
 # -*- coding: utf-8 -*-
 
 import random
-
 from oscar.test import factories
 from oscar.core.loading import get_model
 from soloha.settings import OSCAR_MISSING_IMAGE_URL
 from soloha.settings import MAX_COUNT_PRODUCT, MAX_COUNT_CATEGORIES
-<<<<<<< HEAD
-=======
 from django.test import TestCase
 from django.core.management import call_command
->>>>>>> master
 from oscar.apps.partner import strategy, availability, prices
 from oscar.core.loading import get_class, get_model
 from decimal import Decimal as D
 from oscar.apps.partner.strategy import Selector
-<<<<<<< HEAD
-=======
 from django.conf import settings
 from apps.catalogue.models import SiteInfo
 from apps.flatpages.models import InfoPage
-
->>>>>>> master
 
 Free = get_class('shipping.methods', 'Free')
 Info = get_model('sites', 'Info')
@@ -405,14 +397,9 @@ class Test(object):
         basket.set_as_submitted()
         return order
 
-<<<<<<< HEAD
-    def create_site_info(self):
-        Info.objects.create(domain='example.com', work_time='9:00-19:00', address=('address'),
-=======
     @staticmethod
     def create_site_info():
         SiteInfo.objects.create(domain='example.com', work_time='9:00-19:00', address=('address'),
->>>>>>> master
                                 phone_number='0959999999', email='test@gmail.com')
 
     @staticmethod
