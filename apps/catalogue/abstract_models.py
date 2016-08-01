@@ -9,7 +9,6 @@ from mptt.models import MPTTModel, TreeForeignKey
 from oscar.apps.catalogue.abstract_models import *  # noqa
 from django.db import IntegrityError
 from django.core.exceptions import ValidationError
-from filer.fields.image import FilerImageField
 from ckeditor_uploader.fields import RichTextUploadingField
 from filer.fields.image import FilerImageField
 import logging

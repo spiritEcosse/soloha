@@ -451,7 +451,7 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
         context['not_selected'] = NOT_SELECTED
         context['form'] = QuickOrderForm(initial={'product': self.object.pk})
         context['answer'] = ANSWER
-        context['flatpages'] = self.get_flatpages()
+        context['flatpages'] = InfoPage.objects.filter(Q(url='delivery') | Q(url='payment') | Q(url='manager') & Q(enable=True))
         return context
 
     def get_price(self, context):
@@ -523,15 +523,6 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
 
     def get_options(self):
         return Feature.objects.filter(Q(level=0), Q(product_options__product=self.object) | Q(children__product_options__product=self.object)).distinct()
-
-    @staticmethod
-    def get_flatpages():
-        context = dict()
-        context['delivery'] = InfoPage.objects.filter(url='delivery').first()
-        context['payment'] = InfoPage.objects.filter(url='payment').first()
-        context['manager'] = InfoPage.objects.filter(url='manager').first()
-
-        return context
 
     def get_wish_list(self):
         wish_list = WishList.objects.filter(owner=self.request.user.id).first()
