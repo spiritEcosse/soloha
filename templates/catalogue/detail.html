@@ -117,7 +117,9 @@
                                     <li><a data-toggle="tab" href="#description">{% trans 'Description' %}</a></li>
                                 {% endif %}
                                 <li><a data-toggle="tab" href="#reviews">{% trans 'Reviews' %}</a></li>
-                                <li><a data-toggle="tab" href="#delivery">{% trans 'Shipping and payment' %}</a></li>
+                                {% if pages_delivery_and_pay %}
+                                    <li><a data-toggle="tab" href="#delivery">{% trans 'Shipping and payment' %}</a></li>
+                                {% endif %}
                             </ul>
                         </div>
                     </div>
@@ -222,15 +224,20 @@
                         </div>
                     </div>
                 </div>
-                {% if delivery %}
-                    <div class="panel panel-default reviews" id="delivery">
+                {% if pages_delivery_and_pay %}
+                    <div class="panel panel-default" id="delivery">
                         <div class="panel-heading text-center">{% trans 'Shipping and payment' %}:</div>
-                        <div class="panel-body"></div>
+                        <div class="panel-body">
+                            {% for page in pages_delivery_and_pay %}
+                                <h2>{{ page.title }}</h2>
+                                <p>{{ page.content }}</p>
+                            {% endfor %}
+                        </div>
                     </div>
                 {% endif %}
             </div>
         </div>
-        <div class="col-xs-24 items" id="items">
+        <div class="col-xs-24 items row" id="items">
             {% recommended_products product %}
             {% recently_viewed_products %}
         </div>

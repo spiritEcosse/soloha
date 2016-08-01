@@ -274,7 +274,7 @@ class AttributeOptionGroupAdmin(admin.ModelAdmin):
 
 class CategoryAdmin(ImportExportMixin, ImportExportActionModelAdmin, DraggableMPTTAdmin):
     prepopulated_fields = {'slug': ("name", )}
-    list_display = ('pk', 'indented_title', 'slug', 'parent', 'enable', 'sort', 'created')
+    list_display = ('id', 'indented_title', 'slug', 'parent', 'enable', 'sort', 'created')
     list_filter = ('enable', 'created', 'sort', )
     formfield_overrides = {
         models.TextField: {'widget': Textarea()},

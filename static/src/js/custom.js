@@ -4,8 +4,11 @@
 
 $(document).ready(function() {
      $('.lightSlider').lightSlider({
-        item:4,
-        auto: true
+         item:4,
+         loop:true,
+         slideMove:1,
+         slideMargin:0,
+         pager: false
     });
 
     // $('#link_news').click(function(){
