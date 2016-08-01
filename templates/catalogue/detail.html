@@ -94,30 +94,32 @@
                                     {% include "catalogue/reviews/partials/review_stars.html" %}
                                 </p>
                             {% endiffeature %}
-                        <div class="social">{% trans "Share:" %} </div>
-                    </div>
-                    <div class="defer pull-right">
-                        {% iffeature "wishlists" %}
-                            {% include "catalogue/partials/add_to_wishlist.html" %}
-                        {% endiffeature %}
-                        <a class="compare" href="#">{% trans "compare" %}</a>
-                    </div>
-                </div>
-                <div class="row liner">
-                    <div class="col-xs-22">
-                        <ul class="nav nav-tabs nav-stacked">
-                            <li class="active"><a data-toggle="tab" href="#info">{% trans 'General information' %}</a></li>
-                            {% if object.options.exists %}
-                                <li><a data-toggle="tab" href="#options">{% trans 'Select additional options' %}</a></li>
-                            {% endif %}
-                            <li><a data-toggle="tab" href="#characteristics">{% trans 'Characteristics' %}</a></li>
+                            <div class="social">{% trans 'Share' %}:</div>
+                        </div>
+                        <div class="defer pull-right">
+                            {% iffeature "wishlists" %}
+                                {% include "catalogue/partials/add_to_wishlist.html" %}
+                            {% endiffeature %}
 
-                            {% if product.description %}
-                                <li><a data-toggle="tab" href="#description">{% trans 'Description' %}</a></li>
-                            {% endif %}
-                            <li><a data-toggle="tab" href="#reviews">{% trans 'Reviews' %}</a></li>
-                            <li><a data-toggle="tab" href="#delivery">{% trans 'Shipping and payment' %}</a></li>
-                        </ul>
+                            <a class="compare" href="#">{% trans 'Compare' %}</a>
+                        </div>
+                    </div>
+                    <div class="row liner">
+                        <div class="col-xs-22">
+                            <ul class="nav nav-tabs nav-stacked">
+                                <li class="active"><a data-toggle="tab" href="#info">{% trans 'General information' %}</a></li>
+                                {% if object.options.exists %}
+                                    <li><a data-toggle="tab" href="#options">{% trans 'Select additional options' %}</a></li>
+                                {% endif %}
+                                <li><a data-toggle="tab" href="#characteristics">{% trans 'Characteristics' %}</a></li>
+
+                                {% if product.description %}
+                                    <li><a data-toggle="tab" href="#description">{% trans 'Description' %}</a></li>
+                                {% endif %}
+                                <li><a data-toggle="tab" href="#reviews">{% trans 'Reviews' %}</a></li>
+                                <li><a data-toggle="tab" href="#delivery">{% trans 'Shipping and payment' %}</a></li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -141,50 +143,14 @@
                 </div>
 
                 {% if options %}
-                    <div class="col-xs-24 col-sm-24 col-md-14 options">
-                        <span class="relation">{% trans "* The price depends on the selected parameters:" %}</span>
-                        <div class="list_attr">
-                            {% for attribute in attributes %}
-                                <div class="panel panel-default">
-                                    <div class="panel-heading">
-                                        <div class="row option">
-                                            <div class="col-xs-15 name">
-                                                {{ attribute.title }}
-                                            </div>
-                                            <div class="col-xs-11 pull-right values">
-                                                <select data-live-search="true" id="attribute-{{ attribute.pk }}" class="selectpicker" data-width="100%">
-                                                    {#                                                    <optgroup label="{% trans 'Группа 1' %}">#}
-                                                    {#                                                        <option value="volvo">Volvo</option>#}
-                                                    {#                                                        <option value="saab">Saab</option>#}
-                                                    {#                                                    </optgroup>#}
-                                                    <option value="0">{{ not_selected }}</option>
-                                                    {% with select='selected' %}
-                                                        {% for value in attribute.values %}
-                                                            <option {% if value.pk in product_version_attributes %}{{ select }}{% endif %}
-                                                                    value="{{ value.pk }}">{{ value.title }}
-                                                            </option>
-                                                        {% endfor %}
-                                                    {% endwith %}
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            {% endfor %}
-                        </div>
-                    </div>
                     <div class="col-xs-24 tab-content-info">
                         <div class="panel panel-default info" id="options">
                             <div class="panel-heading text-center">
-                                {% trans "Select additional options:" %}
+                                {% trans 'Select additional options' %}:
                             </div>
                             <div class="panel-body">
                                 <div class="col-xs-24">
-                                    <div class="row option form-inline">
-                                        <label class="block" id="options-0">
-                                            <select class="form-control" ng-model="option_model[0]" ng-change="change_price(option_id)" ng-options="option for option in list_options" ></select>
-                                        </label>
-                                    </div>
+                                    <div class="row option form-inline"></div>
                                 </div>
                             </div>
                         </div>
@@ -192,7 +158,6 @@
                 {% endif %}
 
                 {% include "catalogue/partials/characteristics.html" %}
-
                 {% block product_description %}
                     {% if product.description %}
                         <div class="panel panel-default" id="description">
@@ -271,7 +236,6 @@
         </div>
     </div>
 {% endblock main %}
-
 
 {% block before_end_body %}
     {{ block.super }}
