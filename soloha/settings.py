@@ -294,3 +294,9 @@ TEST_INDEX = {
 }
 
 IMPORT_EXPORT_USE_TRANSACTIONS = True
+
+THUMBNAIL_ALIASES = {
+    '': {
+        'category_icon': {'size': (50, 30), 'crop': True},
+    },
+}

@@ -192,9 +192,10 @@
                                     <ul class="nav navbar-nav">
                                         {% for category in categories %}
                                             <li class="dropdown">
-                                                <a role="button" class="dropdown-toggle" data-toggle="dropdown">
+                                                <a role="button" class="dropdown-toggle" data-toggle="dropdown"
+                                                   title="{{ category.name }}">
                                                     {% if category.icon %}
-                                                        <img src="{{ category.icon }}"
+                                                        <img src="{{ category.icon|thumbnail_url:'category_icon' }}"
                                                              alt="{{ category.name }}"
                                                              title="{{ category.name }}" class="img-responsive icon"/>
                                                     {% endif %}
