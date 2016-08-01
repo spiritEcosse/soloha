@@ -280,7 +280,7 @@ class CategoryAdmin(ImportExportMixin, ImportExportActionModelAdmin, DraggableMP
         models.TextField: {'widget': Textarea()},
     }
     mptt_level_indent = 20
-    search_fields = ('name', 'slug', 'pk', )
+    search_fields = ('name', 'slug', 'id', )
     resource_class = resources.CategoryResource
     form = forms.CategoryForm
 
