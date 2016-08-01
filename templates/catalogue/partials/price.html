@@ -69,8 +69,8 @@
                 <div class="row text-center">
                     {% for page in flatpages %}
                         <div class="col-xs-8">
-                            <div class="icon icon-{{ page.icon }}" title="{{ page.title }}" data-toggle="modal"
-                                 data-target="#{{ page.url }}Modal">
+                            <div class="icon icon-{{ page.icon }}" title="{% trans 'Click to open - ' %}{{ page.title }}"
+                                 data-toggle="modal" data-target="#{{ page.url }}Modal">
                                 <span class="glyphicon glyphicon-info-sign btn-xs"></span>
                             </div>
                             <div class="modal fade" id="{{ page.url }}Modal" tabindex="-1" role="dialog"
