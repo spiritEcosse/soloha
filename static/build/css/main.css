@@ -7397,9 +7397,6 @@ h2 {
   padding-right: 15px;
   margin-top: 0;
 }
-h1 {
-  padding-left: 15px;
-}
 a {
   cursor: pointer;
 }
@@ -7534,6 +7531,7 @@ div {
 }
 .page-header {
   margin-top: 0;
+  padding-left: 15px;
 }
 header .top {
   height: 40px;

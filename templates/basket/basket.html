@@ -24,7 +24,7 @@
 
 {% block content %}
     {# Use a partial template so that AJAX can be used to re-render basket #}
-    <div class="col-xs-24">{% include 'basket/partials/basket_content.html' %}</div>
+    {% include 'basket/partials/basket_content.html' %}
 {% endblock content %}
 
 {% block onbodyload %}

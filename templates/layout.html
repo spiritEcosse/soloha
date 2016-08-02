@@ -210,7 +210,6 @@
         <div class="row main" {% block ngController%}{% endblock ngController %}>
             <div class="col-xs-24">
                 {% block breadcrumbs %}{% endblock %}
-                {% include "partials/alert_messages.html" %}
 
                 {% block header %}
                     <div class="row page-header action">
@@ -219,10 +218,11 @@
                 {% endblock %}
 
                 {% block subheader %}{% endblock subheader %}
+                {% include "partials/alert_messages.html" %}
             </div>
 
             {# Div exists for AJAX updates to entire content section #}
-            {% block content %}{% endblock %}
+            <div id="content_inner">{% block content %}{% endblock %}</div>
         </div>
 
         {% block footer %}
@@ -342,4 +342,9 @@
             </footer>
         {% endblock %}
     </div>
+{% endblock %}
+
+{% block onbodyload %}
+    {{ block.super }}
+    oscar.init();
 {% endblock %}
