@@ -41,29 +41,29 @@
 {% endblock %}
 
 {% block breadcrumbs %}
-            <ul class="breadcrumb">
+    <ul class="breadcrumb">
+        <li>
+            <a href="{{ homepage_url }}">{% trans "Home" %}</a>
+        </li>
+        {% with category=product.categories.all.0 %}
+            {% for c in category.get_ancestors_and_self %}
                 <li>
-                    <a href="{{ homepage_url }}">{% trans "Home" %}</a>
+                    <a href="{{ c.get_absolute_url }}">{{ c.name }}</a>
                 </li>
-                {% with category=product.categories.all.0 %}
-                    {% for c in category.get_ancestors_and_self %}
-                        <li>
-                            <a href="{{ c.get_absolute_url }}">{{ c.name }}</a>
-                        </li>
-                    {% endfor %}
-                    <li class="active">{{ product.title }}</li>
+            {% endfor %}
+            <li class="active">{{ product.title }}</li>
 
-                    {% get_back_button as backbutton %}
-                    {% if backbutton %}
-                        <li class="pull-right">
-                            <a href="{{ backbutton.url }}">
-                                <i class="icon-arrow-left"></i> {{ backbutton.title }}
-                            </a>
-                        </li>
-                    {% endif %}
-                {% endwith %}
-            </ul>
-        {% endblock breadcrumbs %}
+            {% get_back_button as backbutton %}
+            {% if backbutton %}
+                <li class="pull-right">
+                    <a href="{{ backbutton.url }}">
+                        <i class="icon-arrow-left"></i> {{ backbutton.title }}
+                    </a>
+                </li>
+            {% endif %}
+        {% endwith %}
+    </ul>
+{% endblock breadcrumbs %}
 
 {% block headertext %}{{ product.get_title }}{% endblock %}
 
@@ -239,9 +239,11 @@
                 {% endif %}
             </div>
         </div>
-        <div class="col-xs-24 items row" id="items">
-            {% recommended_products product %}
-            {% recently_viewed_products %}
+        <div class="row">
+            <div class="col-xs-24 items" id="items">
+                {% recommended_products product %}
+                {% recently_viewed_products %}
+            </div>
         </div>
     </div>
 {% endblock %}

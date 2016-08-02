@@ -10,7 +10,7 @@
 
 {% with products_sliced=products|slice:":6" %}
     {% if products_sliced %}
-        <h2 class="line-bottom row">{% trans 'Products you recently viewed' %}</h2>
+        <h2 class="page-header row">{% trans 'Products you recently viewed' %}</h2>
 
         <div class="lightSlider">
             {% for product in products_sliced %}
