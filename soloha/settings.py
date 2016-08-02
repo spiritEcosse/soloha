@@ -1,3 +1,4 @@
+#  -*- coding: utf-8 -*-
 """
 Django settings for soloha project.
 
@@ -127,13 +128,13 @@ USE_L10N = True
 
 USE_TZ = True
 
-# LANGUAGES = (
-#     ('ru', _('Russia')),
-# )
-
 LANGUAGES = (
-    ('en', _('England')),
+    ('ru', _('Russia')),
 )
+
+# LANGUAGES = (
+#     ('en', _('England')),
+# )
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
@@ -234,6 +235,9 @@ OSCAR_ORDER_STATUS_PIPELINE = {
     'Being processed': ('Processed', 'Cancelled',),
     'Cancelled': (),
 }
+OSCAR_DEFAULT_CURRENCY = 'UAH'
+OSCAR_CURRENCY_FORMAT = u'#,##0.## грн.'
+OSCAR_PRODUCTS_PER_PAGE = 24
 
 THUMBNAIL_HIGH_RESOLUTION = True
 FILER_CANONICAL_URL = 'sharing/'
@@ -249,8 +253,6 @@ THUMBNAIL_PROCESSORS = (
 
 THUMBNAIL_DUMMY = True
 THUMBNAIL_FORCE_OVERWRITE = True
-OSCAR_DEFAULT_CURRENCY = 'UAH'
-OSCAR_PRODUCTS_PER_PAGE = 24
 # OSCAR_PRODUCT_SEARCH_HANDLER = ""
 #
 # USE_LESS = True
@@ -294,3 +296,10 @@ TEST_INDEX = {
 }
 
 IMPORT_EXPORT_USE_TRANSACTIONS = True
+
+THUMBNAIL_ALIASES = {
+    '': {
+        'basket_quick': {'size': (85, 50), 'crop': True},
+        'basket_content': {'size': (150, 150), 'crop': True},
+    },
+}

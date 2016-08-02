@@ -4,75 +4,57 @@
 {% load thumbnail %}
 {% load i18n %}
 {% load staticfiles %}
+{% load product %}
 
-{#<div class="col-xs-24 item">#}
-{#    <div class="col-xs-5 image">#}
-{#        <a href="product.html">#}
-{#            <img src="" alt="" title="" />#}
-{#        </a>#}
-{#    </div>#}
-{#    <div class="col-xs-14 col-xs-offset-5">#}
-{#        <div class="title">#}
-{#            <a href="{{ product.get_absolute_url }}" title="{{ product.title }}">{{ product.title }}</a>#}
-{#        </div>#}
-{#        <div class="short-desc">#}
-{#            {% regroup product.characteristics.all by parent as characteristics %}#}
-{##}
-{#            {% for characteristic in product.characteristics %}#}
-{#                <div class="col-xs-12 values">#}
-{#                    {{ characteristic.grouper }}#}
-{#                    {{ characteristic.list | join:', ' }}#}
-{#                </div>#}
-{#            {% endfor %}#}
-{#        </div>#}
-{#    </div>#}
-{#    <div class="col-xs-5 price">#}
-{#        9 144.00 <span class="currency">грн</span>#}
-{#        <span class="glyphicon glyphicon-remove"></span>#}
-{#    </div>#}
-{#</div>#}
-{#<div class="col-xs-24 total text-right">#}
-{#    <div class="amount">#}
-{#        <span class="all">Всего:</span> <span class="number"> 22 800.00</span> <span class="currency"> грн</span>#}
-{#    </div>#}
-{#    <a href="cart.html" class="btn btn-orange" role="button">Оформить заказ</a>#}
-{#</div>#}
-
-<ul class="basket-mini-item list-unstyled">
-    {% if request.basket.num_lines %}
-        {% for line in request.basket.all_lines %}
-            <li>
-                <div class="row">
-                    <div class="col-sm-3">
-                        <div class="image_container">
-                            {% with image=line.product.primary_image %}
-                                {% thumbnail image.original "100x100" upscale=False as thumb %}
-                                <a href="{{ line.product.get_absolute_url }}">
-                                    <img class="thumbnail" src="{{ thumb.url }}" alt="{{ line.product.get_title }}">
-                                </a>
-                            {% endwith %}
-                        </div>
-                    </div>
-                    <div class="col-sm-5">
-                        <p><strong><a href="{{ line.product.get_absolute_url }}">{{ line.description }}</a></strong></p>
-                    </div>
-                    <div class="col-sm-1 align-center"><strong>{% trans "Qty" %}</strong> {{ line.quantity }}</div>
-                    <div class="col-sm-3 price_color align-right">{{ line.unit_price_excl_tax|currency:request.basket.currency }}</div>
+{% if request.basket.num_lines %}
+    {% for line in request.basket.all_lines %}
+        <div class="col-xs-24 item">
+            <div class="col-xs-5">
+                <a href="{{ line.product.get_absolute_url }}" title="{{ line.product.title }}">
+                    <img src="{{ line.product.primary_image|thumbnail_url:'basket_quick' }}"
+                         alt="{{ line.product.title }}" title="{{ line.product.title }}" />
+                </a>
+            </div>
+            <div class="col-xs-13">
+                <div class="title">
+                    <a href="{{ line.product.get_absolute_url }}" title="{{ line.product.title }}">{{ line.product.title }}</a>
                 </div>
-            </li>
-        {% endfor %}
-        <li class="form-group form-actions">
+                <div class="short-desc">
+                    {% regroup line.product.characteristics.all by parent as characteristics %}
+
+                    <small>
+                        {% for characteristic in characteristics %}
+                            {{ characteristic.grouper }}:
+                            {{ characteristic.list | join:', ' }}
+                        {% endfor %}
+                    </small>
+                </div>
+            </div>
+            <div class="col-xs-5">
+                <div class="align-center"><strong>{% trans "Qty" %}:</strong> {{ line.quantity }}</div>
+                <div class="price_color align-right">
+                    <strong>{% trans 'Price' %}:</strong>
+                    {{ line.unit_price_excl_tax|currency:request.basket.currency }}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xs-24 total text-right">
             <p class="align-right">
                 {% if request.basket.is_tax_known %}
-                    <small>{% trans "Total:" %} {{ request.basket.total_incl_tax|currency:request.basket.currency }}</small>
+                    <strong>{% trans "Total" %}:</strong> {{ request.basket.total_incl_tax|currency:request.basket.currency }}
                 {% else %}
-                    <small>{% trans "Total:" %} {{ request.basket.total_excl_tax|currency:request.basket.currency }}</small>
+                    <strong>{% trans "Total" %}:</strong> {{ request.basket.total_excl_tax|currency:request.basket.currency }}
                 {% endif %}
             </p>
-            <a href="{% url 'basket:summary' %}" class="btn btn-info btn-sm">{% trans "View basket" %}</a>
-            <a href="{% url 'checkout:index' %}" class="btn btn-primary btn-sm pull-right"><i class="icon-shopping-cart"></i> {% trans "Checkout" %}</a>
-        </li>
-    {% else %}
-        <li><p>{% trans "Your basket is empty." %}</p></li>
-    {% endif %}
-</ul>
+
+            <a href="{% url 'basket:summary' %}" class="btn btn-danger btn-md">{% trans "View basket" %}</a>
+            <a href="{% url 'checkout:index' %}" class="btn btn-primary btn-md">
+                <i class="icon-shopping-cart"></i>
+                {% trans "Checkout" %}
+            </a>
+        </div>
+    {% endfor %}
+{% else %}
+    <div class="col-xs-24">{% trans "Your basket is empty." %}</div>
+{% endif %}

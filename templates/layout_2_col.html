@@ -11,12 +11,6 @@
     </div>
     {% block content_wrapper %}
         <div class="col-sm-18 col-xs-24 content">
-            {% block breadcrumbs %}
-                <ol class="breadcrumb">
-                    <li class="active"><a href="/">Интернет-магазин Soloha</a></li>
-                </ol>
-            {% endblock %}
-
             <h1>{% block headertext %}{% endblock %}</h1>
             {% block content %}{% endblock %}
         </div>

@@ -40,9 +40,7 @@
     {{ product.meta_keywords|default:""|striptags }}
 {% endblock %}
 
-{% block main %}
-    <div class="col-xs-24 content product" id="info">
-        {% block breadcrumbs %}
+{% block breadcrumbs %}
             <ul class="breadcrumb">
                 <li>
                     <a href="{{ homepage_url }}">{% trans "Home" %}</a>
@@ -66,7 +64,11 @@
                 {% endwith %}
             </ul>
         {% endblock breadcrumbs %}
-        <h1 class="line-bottom row">{{ product.get_title }}</h1>
+
+{% block headertext %}{{ product.get_title }}{% endblock %}
+
+{% block content %}
+    <div class="col-xs-24 content product" id="info">
         {% csrf_token %}
 
         {% if user.is_authenticated and user.is_staff %}
@@ -242,7 +244,7 @@
             {% recently_viewed_products %}
         </div>
     </div>
-{% endblock main %}
+{% endblock %}
 
 {% block before_end_body %}
     {{ block.super }}

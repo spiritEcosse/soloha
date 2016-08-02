@@ -3,8 +3,9 @@
 
 <div class="col-xs-6 col-sm-8 col-md-6 cart">
     <div class="dropdown">
-        <button class="btn btn-block btn-transparent dropdown-toggle" type="button" id="cart-show" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-            {% trans "Basket total" %}: 3(22 900.00грн)
+        <button class="btn btn-block btn-transparent dropdown-toggle text-white" type="button"
+                id="cart-show" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+            {% trans "Basket total" %}:
 
             {% if request.basket.is_tax_known %}
                 {{ request.basket.total_incl_tax|currency:request.basket.currency }}
