@@ -10,7 +10,7 @@ from django.core.mail import EmailMultiAlternatives
 from django.contrib.sites.shortcuts import get_current_site
 from django.template import loader, Context
 from django.core.urlresolvers import reverse_lazy
-from apps.catalogue.models import SiteInfo
+from apps.ex_sites.models import Info
 
 
 Subscribe = get_model('subscribe', 'Subscribe')
@@ -42,7 +42,7 @@ class SubscribeView(views.JSONResponseMixin, views.AjaxResponseMixin, FormView):
         return HttpResponse(json.dumps(response_data), content_type="application/json")
 
     def send_message(self):
-        current_site = SiteInfo.objects.get(domain=get_current_site(self.request).domain)
+        current_site = Info.objects.get(domain=get_current_site(self.request).domain)
         subject = str(_('Order online %s')) % current_site.domain
 
         from_email = current_site.email

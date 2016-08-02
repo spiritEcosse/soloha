@@ -7530,7 +7530,7 @@ div {
   height: auto;
 }
 .page-header {
-  margin-top: 0;
+  margin-top: 20px;
   padding-left: 15px;
 }
 header .top {
