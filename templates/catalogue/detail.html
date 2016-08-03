@@ -40,33 +40,35 @@
     {{ product.meta_keywords|default:""|striptags }}
 {% endblock %}
 
-{% block main %}
-    <div class="col-xs-24 content product" id="info">
-        {% block breadcrumbs %}
-            <ul class="breadcrumb">
+{% block breadcrumbs %}
+    <ul class="breadcrumb">
+        <li>
+            <a href="{{ homepage_url }}">{% trans "Home" %}</a>
+        </li>
+        {% with category=product.categories.all.0 %}
+            {% for c in category.get_ancestors_and_self %}
                 <li>
-                    <a href="{{ homepage_url }}">{% trans "Home" %}</a>
+                    <a href="{{ c.get_absolute_url }}">{{ c.name }}</a>
                 </li>
-                {% with category=product.categories.all.0 %}
-                    {% for c in category.get_ancestors_and_self %}
-                        <li>
-                            <a href="{{ c.get_absolute_url }}">{{ c.name }}</a>
-                        </li>
-                    {% endfor %}
-                    <li class="active">{{ product.title }}</li>
+            {% endfor %}
+            <li class="active">{{ product.title }}</li>
 
-                    {% get_back_button as backbutton %}
-                    {% if backbutton %}
-                        <li class="pull-right">
-                            <a href="{{ backbutton.url }}">
-                                <i class="icon-arrow-left"></i> {{ backbutton.title }}
-                            </a>
-                        </li>
-                    {% endif %}
-                {% endwith %}
-            </ul>
-        {% endblock breadcrumbs %}
-        <h1 class="line-bottom row">{{ product.get_title }}</h1>
+            {% get_back_button as backbutton %}
+            {% if backbutton %}
+                <li class="pull-right">
+                    <a href="{{ backbutton.url }}">
+                        <i class="icon-arrow-left"></i> {{ backbutton.title }}
+                    </a>
+                </li>
+            {% endif %}
+        {% endwith %}
+    </ul>
+{% endblock breadcrumbs %}
+
+{% block headertext %}{{ product.get_title }}{% endblock %}
+
+{% block content %}
+    <div class="col-xs-24 content product" id="info">
         {% csrf_token %}
 
         {% if user.is_authenticated and user.is_staff %}
@@ -237,12 +239,14 @@
                 {% endif %}
             </div>
         </div>
-        <div class="col-xs-24 items row" id="items">
-            {% recommended_products product %}
-            {% recently_viewed_products %}
+        <div class="row">
+            <div class="col-xs-24 items" id="items">
+                {% recommended_products product %}
+                {% recently_viewed_products %}
+            </div>
         </div>
     </div>
-{% endblock main %}
+{% endblock %}
 
 {% block before_end_body %}
     {{ block.super }}

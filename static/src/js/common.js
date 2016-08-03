@@ -16,6 +16,12 @@ $(document).ready(function() {
         $(this).tab('show')
     });
 
+    $('button[data-loading-text]')
+    .on('click', function () {
+        var btn = $(this);
+        btn.button('loading');
+    });
+
     // $('.selectpicker').selectpicker({
     //     style: 'btn-info',
     //     size: 4

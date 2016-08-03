@@ -127,18 +127,4 @@ if not is_model_registered('catalogue', 'ProductImage'):
     __all__.append('ProductImage')
 
 
-class SiteInfo(Site):
-    work_time = models.CharField(max_length=1000)
-    address = models.CharField(max_length=1000)
-    phone_number = models.CharField(max_length=19, blank=True)
-    # phone_number = ArrayField(models.CharField(max_length=1000), blank=True)
-    email = models.EmailField(max_length=200, blank=True)
-    # formfield_overrides = {
-    #     models.CharField: {'widget': TextInput(attrs={'size': '80'})},
-    # }
-
-    class Meta:
-        app_label = 'sites'
-
-
 from oscar.apps.catalogue.models import *  # noqa

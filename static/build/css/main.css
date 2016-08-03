@@ -7357,8 +7357,6 @@ button.close {
   background-image: url('../../image/controls.png');
 }
 .navbar-primary .navbar-toggle {
-  background-image: linear-gradient(to top, #ffae42 0%, #f08825 44%, #ffae42 100%);
-  border: 0.275025px solid #6f6f6e;
   color: white;
   font-size: 17px;
 }
@@ -7396,8 +7394,8 @@ button.close {
 }
 h1,
 h2 {
-  padding-left: 15px;
   padding-right: 15px;
+  margin-top: 0;
 }
 a {
   cursor: pointer;
@@ -7422,10 +7420,11 @@ div {
   font-size-adjust: 0.45;
 }
 .btn-orange {
-  background-image: linear-gradient(to top, #ffae42 0%, #f08825 44%, #ffae42 100%);
-  border: 0.275025px solid #6f6f6e;
   color: white;
   font-size: 17px;
+}
+.text-white {
+  color: white;
 }
 .btn-transparent {
   background: transparent;
@@ -7530,6 +7529,10 @@ div {
 .pill-content > .active {
   height: auto;
 }
+.page-header {
+  margin-top: 20px;
+  padding-left: 15px;
+}
 header .top {
   height: 40px;
   background-color: #f08825;
@@ -7548,10 +7551,8 @@ header .top .phones {
 header .top .phones span {
   font-size-adjust: 0.38;
 }
-header .top .cart:hover,
-header .top .cart:focus {
-  background-color: #6f6f6f;
-  color: white;
+header .top .cart {
+  padding-right: 0;
 }
 header .top .cart .dropdown {
   background: url("../../image/cart.png") left center no-repeat;
@@ -7566,6 +7567,10 @@ header .top .cart .dropdown .dropdown-menu {
 }
 header .top .cart .dropdown > .btn {
   padding: 11px 0 9px 12px;
+}
+header .top .cart .dropdown > .btn:hover,
+header .top .cart .dropdown > .btn:focus {
+  color: white;
 }
 header .top .cart .dropdown .text {
   float: left;
@@ -7584,7 +7589,6 @@ header .top .cart .dropdown .arrow {
 header .top .cart .dropdown .item {
   padding-bottom: 10px;
   margin-bottom: 10px;
-  position: relative;
   border-bottom: 1px solid #c2c2c2;
 }
 header .top .cart .dropdown .item .image {
@@ -7665,8 +7669,6 @@ header .center .search input {
   font-size: 20px;
 }
 header .center .search button {
-  background-image: linear-gradient(to top, #ffae42 0%, #f08825 44%, #ffae42 100%);
-  border: 0.275025px solid #6f6f6e;
   color: white;
   text-transform: uppercase;
   height: 40px;

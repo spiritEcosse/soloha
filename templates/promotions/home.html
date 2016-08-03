@@ -14,19 +14,21 @@
     <script src="{% static 'bower_components/lightslider/dist/js/lightslider.min.js' %}"></script>
 {% endblock extrascripts %}
 
-{% block main %}
-    {% include "partials/alert_messages.html" %}
-    <h1>
-        {% block headertext %}{{ current_site.name }}
-            {% if current_site.info.shop_short_desc %}
-                - {{ current_site.info.shop_short_desc }}
-            {% endif %}
-        {% endblock %}
-    </h1>
+{% block headertext %}
+    {{ current_site.name }}
+    {% if current_site.info.shop_short_desc %}
+        - {{ current_site.info.shop_short_desc }}
+    {% endif %}
+{% endblock %}
 
-    {% for promotion in promotions_0 %}
-        {% include "promotions/multiimage.html" %}
-    {% endfor %}
+{% block content %}
+    <div class="row">
+        <div class="col-xs-24">
+            {% for promotion in promotions_0 %}
+                {% include "promotions/multiimage.html" %}
+            {% endfor %}
+        </div>
+    </div>
 
     <div class="col-xs-24 items">
         <ul class="nav nav-tabs nav-justified" id="home_tabs" role="tablist">
@@ -91,4 +93,4 @@
             {% endif %}
         </div>
     </div>
-{% endblock main %}
+{% endblock content %}

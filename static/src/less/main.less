@@ -47,8 +47,8 @@
     background: url("../../image/product_line_bottom.png") bottom center repeat-x;
 }
 h1, h2 {
-    padding-left: 15px;
     padding-right: 15px;
+    margin-top: 0;
 }
 a {
     cursor:pointer;
@@ -79,10 +79,11 @@ a, span, div {
     //font-weight: 400;
 }
 .btn-orange {
-    background-image: linear-gradient(to top, #ffae42 0%, #f08825 44%, #ffae42 100%);
-    border: 0.275025px solid #6f6f6e;
     color: white;
     font-size: 17px
+}
+.text-white {
+    color: white;
 }
 .btn-transparent {
     background:transparent;
@@ -192,6 +193,10 @@ a, span, div {
 .tab-content > .active, .pill-content > .active {
     height: auto;
 }
+.page-header{
+    margin-top: 20px;
+    padding-left: 15px;
+}
 
 header {
     .top {
@@ -215,10 +220,7 @@ header {
         }
 
         .cart {
-            &:hover, &:focus {
-                background-color: #6f6f6f;
-                color: white;
-            }
+            padding-right: 0;
 
             .dropdown {
                 background: url("../../image/cart.png") left center no-repeat;
@@ -237,6 +239,10 @@ header {
 
                 > .btn {
                     padding: 11px 0 9px 12px;
+
+                    &:hover, &:focus {
+                        color: white;
+                    }
                 }
 
                 .text {
@@ -258,7 +264,6 @@ header {
                 .item {
                     padding-bottom: 10px;
                     margin-bottom: 10px;
-                    position: relative;
                     border-bottom: 1px solid #c2c2c2;
 
                     .image {

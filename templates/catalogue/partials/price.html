@@ -20,9 +20,10 @@
                         <span>{{ currency }}</span>
                     </div>
                     <div class="row">
-                        <div class="wrapper-btn-primary col-xs-12">
-                            <button type="button" ng-click="add_to_basket()" class="btn btn-block btn-md btn-success">{% trans 'Buy' %}</button>
-                        </div>
+                        {% block product_basket_form %}
+                            {% include "catalogue/partials/add_to_basket_form.html" %}
+                        {% endblock %}
+
                         <div class="wrapper-btn-faster col-xs-12">
                             <button type="button" data-toggle="modal" data-target="#quick_order" class="btn btn-block btn-md btn-default">{% trans 'Quick order' %}</button>
                             <div class="modal fade" id="quick_order" tabindex="-1" role="dialog" aria-labelledby="quick order">
