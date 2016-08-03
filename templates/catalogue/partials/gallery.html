@@ -2,18 +2,16 @@
 {% load i18n %}
 {% load staticfiles %}
 
-{% with all_images=product.images.all %}
+{% with all_images=product.images_all %}
     {# use length rather then count as the images get queried anyways #}
     {# {% if all_images|length > 1 %} #}
 
     <div class="gallery">
         <ul id="lightSlider_product">
             {% for image in all_images %}
-                {% thumbnail image.original 349x251 crop as thumb %}
+                {% thumbnail image 349x251 crop as thumb %}
                     <li data-thumb="{{ thumb.url }}">
-                        <img src="{{ thumb.url }}"
-                             alt="{{ product.get_title }}"
-                             title="{{ product.get_title }}"
+                        <img src="{{ thumb.url }}" alt="{{ product.get_title }}" title="{{ product.get_title }}"
                              class="img-responsive img-thumbnail"/>
                     </li>
             {% endfor %}

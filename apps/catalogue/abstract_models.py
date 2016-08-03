@@ -23,15 +23,17 @@ REGEXP_EMAIL = r'/^[-\w.]+@([A-z0-9][-A-z0-9]+\.)+[A-z]{2,4}$/'
 def check_exist_image(image):
     current_path = os.getcwd()
     os.chdir(MEDIA_ROOT)
+    image_not_found = True
 
     if not os.path.exists(os.path.abspath(image)) or not os.path.isfile(os.path.abspath(image)):
         image = IMAGE_NOT_FOUND
+        image_not_found = False
 
         if not os.path.exists(os.path.abspath(image)):
             logger.error('image - {} not found!'.format(os.path.abspath(image)))
 
     os.chdir(current_path)
-    return image
+    return image, image_not_found
 
 
 class CommonFeatureProduct(object):
@@ -193,13 +195,27 @@ class AbstractProduct(models.Model):
 
         return reverse('detail', kwargs=dict_values)
 
+    def images_all(self):
+        images = []
+
+        for image in self.images.all():
+            image, exist_image = check_exist_image(image.original.file.name)
+
+            if exist_image:
+                images.append(image)
+
+        if not images:
+            images.append(self.primary_image())
+
+        return images
+
     def thumb(self, original=None):
         if original is not None:
             image = original
         else:
             image = self.primary_image()
 
-        image = check_exist_image(image)
+        image, exist_image = check_exist_image(image)
         return loader.get_template('admin/catalogue/product/thumb.html').render(Context({'image': image}))
     thumb.allow_tags = True
     thumb.short_description = _('Image')
@@ -496,7 +512,7 @@ class AbstractProduct(models.Model):
             # interchangeably in templates.  Strategy pattern ftw!
             image = self.get_missing_image().name
 
-        image = check_exist_image(image)
+        image, exist_image = check_exist_image(image)
         return image
 
     # Updating methods
