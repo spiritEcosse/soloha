@@ -68,6 +68,10 @@ class Command(BaseCommand):
                 for row in namedtuplefetchall(cursor):
                     slug = slugify(row.name)
                     feature, create = Feature.objects.get_or_create(slug=slug)
+
+                    if not feature.title:
+                        feature.title = row.name
+                        feature.save()
                     print feature, create
 
                     cursor.execute("SELECT * from `category_option_value_description` as covd where covd.option_id={}".format(row.option_id))
@@ -75,6 +79,11 @@ class Command(BaseCommand):
                     for row_value in namedtuplefetchall(cursor):
                         slug_value = slug + '-' + slugify(row_value.name)
                         feature_value, create = Feature.objects.get_or_create(slug=slug_value, parent=feature)
+
+                        if not feature_value.title:
+                            feature_value.title = row_value.name
+                            feature_value.save()
+
                         print feature_value, create
                         cursor.execute("SELECT * from `product_to_value` as ptv where ptv.value_id={}".format(row_value.value_id))
 
