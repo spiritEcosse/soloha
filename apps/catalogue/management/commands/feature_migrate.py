@@ -19,7 +19,7 @@ import random
 from django.db import IntegrityError
 from django.utils.text import capfirst
 import logging
-
+from oscar.core.utils import slugify
 logger = logging.getLogger(__name__)
 
 Category = get_model('catalogue', 'category')
@@ -66,12 +66,16 @@ class Command(BaseCommand):
                 cursor.execute("SELECT * from `category_option_description` as cod where cod.name='{}'".format(option))
 
                 for row in namedtuplefetchall(cursor):
-                    feature, create = Feature.objects.get_or_create(title=capfirst(row.name.lower()))
+                    slug = slugify(row.name)
+                    feature, create = Feature.objects.get_or_create(slug=slug)
+                    print feature, create
 
                     cursor.execute("SELECT * from `category_option_value_description` as covd where covd.option_id={}".format(row.option_id))
 
                     for row_value in namedtuplefetchall(cursor):
-                        feature_value, create = Feature.objects.get_or_create(title=capfirst(row_value.name.lower()), parent=feature)
+                        slug_value = slug + '-' + slugify(row_value.name)
+                        feature_value, create = Feature.objects.get_or_create(slug=slug_value, parent=feature)
+                        print feature_value, create
                         cursor.execute("SELECT * from `product_to_value` as ptv where ptv.value_id={}".format(row_value.value_id))
 
                         for row_product_value in namedtuplefetchall(cursor):
