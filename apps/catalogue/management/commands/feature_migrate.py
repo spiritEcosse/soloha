@@ -81,7 +81,7 @@ class Command(BaseCommand):
                                 try:
                                     product = Product.objects.get(slug=row_product.keyword)
                                 except Product.DoesNotExist:
-                                    logger.error('Product with slug - {} DoesNotExist'.format(row_product.keyword))
+                                    logger.error(u'Product with slug - {} DoesNotExist'.format(row_product.keyword))
                                 else:
                                     product.filters.add(feature_value)
 
