@@ -83,6 +83,7 @@ class Command(BaseCommand):
                                 except Product.DoesNotExist:
                                     logger.error(u'Product with slug - {} DoesNotExist'.format(row_product.keyword))
                                 else:
+                                    print product
                                     product.filters.add(feature_value)
 
         create_feature()
