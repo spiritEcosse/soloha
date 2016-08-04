@@ -4,27 +4,26 @@
 {% load purchase_info_tags %}
 {% load widget_tweaks %}
 
-{% if basket_warnings %}
-    <h5>{% trans "Important messages about items in your basket" %}</h5>
-    {% for warning in basket_warnings %}
-        <div class="alert">{{ warning }}</div>
-    {% endfor %}
-{% endif %}
-
-{% if upsell_messages %}
-    <div class="well">
-        <h3>{% trans "You could be missing out on offers!" %}</h3>
-        {% for upsell in upsell_messages %}
-            {% blocktrans with message=upsell.message url=upsell.offer.get_absolute_url offer_name=upsell.offer.name %}
-                <div class="warning">{{ message }} to qualify for the <a href="{{ url }}">{{ offer_name }}</a> special offer</div>
-            {% endblocktrans %}
+<div class="col-xs-24 basket">
+    {% if basket_warnings %}
+        <h5>{% trans "Important messages about items in your basket" %}</h5>
+        {% for warning in basket_warnings %}
+            <div class="alert">{{ warning }}</div>
         {% endfor %}
-    </div>
-{% endif %}
+    {% endif %}
 
-{% if not basket.is_empty %}
-    <div class="col-xs-24">
+    {% if upsell_messages %}
+        <div class="well">
+            <h3>{% trans "You could be missing out on offers!" %}</h3>
+            {% for upsell in upsell_messages %}
+                {% blocktrans with message=upsell.message url=upsell.offer.get_absolute_url offer_name=upsell.offer.name %}
+                    <div class="warning">{{ message }} to qualify for the <a href="{{ url }}">{{ offer_name }}</a> special offer</div>
+                {% endblocktrans %}
+            {% endfor %}
+        </div>
+    {% endif %}
 
+    {% if not basket.is_empty %}
         {% block basket_form_headers %}
             <div class="basket-title hidden-xs">
                 <div class="row">
@@ -60,10 +59,10 @@
                                 <div class="col-sm-6">
                                     <div class="checkout-quantity">
                                         <div class="input-group  {% if form.errors %}error{% endif %}">
-                                            {% render_field form.quantity class+="form-control" ng-model="quantity" %}
+                                            <input class="form-control" id="id_form-{{ forloop.counter0 }}-quantity" min="0" name="form-{{ forloop.counter0 }}-quantity" ng-model="quantity_{{ line.id }}" type="number" value="{{ form.quantity.value }}">
                                             <span class="input-group-btn">
-                                        <button class="btn btn-default" type="submit" data-loading-text="{% trans 'Updating...' %}">{% trans "Update" %}</button>
-                                    </span>
+                                                <button class="btn btn-default" type="submit" data-loading-text="{% trans 'Updating...' %}">{% trans "Update" %}</button>
+                                            </span>
                                         </div>
                                     </div>
                                     <div>
@@ -72,12 +71,16 @@
                                             | <a href="#" data-id="{{ forloop.counter0 }}" data-behaviours="save" class="inline">{% trans "Save for later" %}</a>
                                         {% endif %}
                                         <div style="display:none">
-                                            {% render_field form.save_for_later ng-model="save_for_later" %}
-                                            {% render_field form.DELETE ng-model="delete" %}
+                                            <input id="id_form-{{ forloop.counter0 }}-save_for_later" name="form-{{ forloop.counter0 }}-save_for_later" ng-model="save_for_later_{{ line.id }}" type="checkbox">
+                                            <input id="id_form-{{ forloop.counter0 }}-DELETE" name="form-{{ forloop.counter0 }}-DELETE" ng-model="delete_{{ line.id }}" type="checkbox">
                                         </div>
                                         {% for field_errors in form.errors.values %}
                                             {% for error in field_errors %}
-                                                <span class="error-block"><i class="icon-exclamation-sign"></i> {{ error }}</span>
+                                                <div class="alert alert-danger" role="alert">
+                                                    <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                                                    <span class="sr-only">{% trans 'Error' %}:</span>
+                                                    {{ error }}
+                                                </div>
                                             {% endfor %}
                                         {% endfor %}
                                     </div>
@@ -148,69 +151,68 @@
                 </div>
             </div>
         {% endblock formactions %}
-    </div>
-{% else %}
-    {% block emptybasket %}
-        <div class="col-xs-24">
+    {% else %}
+        {% block emptybasket %}
             {% trans "Your basket is empty." %}
             <a href="{{ homepage_url }}" class="btn btn-danger" role="link">{% trans "Continue shopping" %}</a>
-        </div>
-    {% endblock %}
-{% endif %}
+        {% endblock %}
+    {% endif %}
 
-{% block savedbasket %}
-    {% if user.is_authenticated and saved_formset %}
-        <div class="well">
-            <div class="sub-header">
-                <h2>{% trans "Items to buy later" %}</h2>
-            </div>
-            <div class="row basket-title hidden-xs">
-                <p class="col-sm-8 h4">{% trans "Items" %}</p>
-                <p class="col-sm-2 h4 align-center">{% trans "Price" %}</p>
-                <div class="col-sm-2">&nbsp;</div>
-            </div>
-            <form action="{% url 'basket:saved' %}" method="post" class="form-stacked later_summary" id="saved_basket_formset">
-                {% csrf_token %}
-                {{ saved_formset.management_form }}
-                {% for form in saved_formset %}
-                    {% purchase_info_for_product request form.instance.product as session %}
-                    <div class="basket-items">
-                        <div class="row">
-                            <div class="col-sm-2">
-                                {{ form.id }}
-                                <a href="{{ form.instance.product.get_absolute_url }}">
-                                    <img class="thumbnail"
-                                         src="{{ form.instance.product.primary_image|thumbnail_url:'basket_content' }}"
-                                         alt="{{ form.instance.product.get_title }}"
-                                         title="{{ form.instance.product.get_title }}">
-                                </a>
-                            </div>
-                            <div class="col-sm-12">
-                                <h3><a href="{{ form.instance.product.get_absolute_url }}">{{ form.instance.description }}</a></h3>
-                                <p class="availability {{ session.availability.code }}">{{ session.availability.message }}</p>
-                                <a href="#" data-id="{{ forloop.counter0 }}" data-behaviours="remove">{% trans "Remove" %}</a>
-                                <div style="display:none">
-                                    {{ form.move_to_basket }}
-                                    {{ form.DELETE }}
+    {% block savedbasket %}
+        {% if user.is_authenticated and saved_formset %}
+            <div class="panel panel-default">
+                <div class="panel-heading">{% trans "Items to buy later" %}</div>
+                <div class="panel-body">
+                    <div class="row basket-title hidden-xs">
+                        <div class="col-sm-16 h4">{% trans "Items" %}</div>
+                        <div class="col-sm-4 h4 align-center">{% trans "Price" %}</div>
+                        <div class="col-sm-4">&nbsp;</div>
+                    </div>
+
+                    <form action="{% url 'basket:saved' %}" method="post" class="form-stacked later_summary" id="saved_basket_formset">
+                        {% csrf_token %}
+                        {{ saved_formset.management_form }}
+                        {% for form in saved_formset %}
+                            {% purchase_info_for_product request form.instance.product as session %}
+                            <div class="basket-items">
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        {{ form.id }}
+                                        <a href="{{ form.instance.product.get_absolute_url }}">
+                                            <img class="thumbnail"
+                                                 src="{{ form.instance.product.primary_image|thumbnail_url:'basket_content' }}"
+                                                 alt="{{ form.instance.product.get_title }}"
+                                                 title="{{ form.instance.product.get_title }}">
+                                        </a>
+                                    </div>
+                                    <div class="col-sm-12">
+                                        <h3><a href="{{ form.instance.product.get_absolute_url }}">{{ form.instance.description }}</a></h3>
+                                        <p class="availability {{ session.availability.code }}">{{ session.availability.message }}</p>
+                                        <a href="#" data-id="{{ forloop.counter0 }}" data-behaviours="remove">{% trans "Remove" %}</a>
+                                        <div style="display:none">
+                                            {{ form.move_to_basket }}
+                                            {{ form.DELETE }}
+                                        </div>
+                                    </div>
+                                    {% purchase_info_for_product request form.instance.product as saved %}
+                                    <div class="col-sm-4 align-center">
+                                        <p class="price_color">
+                                            {% if saved.price.is_tax_known %}
+                                                {{ saved.price.incl_tax|currency:saved.price.currency }}
+                                            {% else %}
+                                                {{ saved.price.excl_tax|currency:saved.price.currency }}
+                                            {% endif %}
+                                        </p>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <a href="#" data-id="{{ forloop.counter0 }}" class="btn pull-right btn-block" data-behaviours="move">{% trans "Move to basket" %}</a>
+                                    </div>
                                 </div>
                             </div>
-                            {% purchase_info_for_product request form.instance.product as saved %}
-                            <div class="col-sm-2 align-center">
-                                <p class="price_color">
-                                    {% if saved.price.is_tax_known %}
-                                        {{ saved.price.incl_tax|currency:saved.price.currency }}
-                                    {% else %}
-                                        {{ saved.price.excl_tax|currency:saved.price.currency }}
-                                    {% endif %}
-                                </p>
-                            </div>
-                            <div class="col-sm-2">
-                                <a href="#" data-id="{{ forloop.counter0 }}" class="btn pull-right btn-block" data-behaviours="move">{% trans "Move to basket" %}</a>
-                            </div>
-                        </div>
-                    </div>
-                {% endfor %}
-            </form>
-        </div>
-    {% endif %}
-{% endblock %}
+                        {% endfor %}
+                    </form>
+                </div>
+            </div>
+        {% endif %}
+    {% endblock %}
+</div>

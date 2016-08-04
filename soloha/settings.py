@@ -72,7 +72,8 @@ INSTALLED_APPS = \
         'apps.sitemap',
         'apps.subscribe',
         # 'smart_load_tag',
-    ] + get_core_apps(['apps.catalogue', 'apps.promotions', 'apps.partner', 'apps.search', 'apps.order', ])
+    ] + get_core_apps(['apps.catalogue', 'apps.promotions', 'apps.partner', 'apps.search', 'apps.order',
+                       'apps.basket'])
 
 SITE_ID = 1
 
