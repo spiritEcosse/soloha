@@ -208,6 +208,7 @@ class Command(BaseCommand):
             slugify_option = feature.slug
 
         try:
+            print value, feature
             feature_value = Feature.objects.get(title=value, parent=feature)
         except Feature.DoesNotExist:
             slugify_value = u'{}-{}'.format(feature.slug, slugify(value))
