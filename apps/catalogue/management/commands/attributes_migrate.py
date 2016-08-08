@@ -225,7 +225,7 @@ class Command(BaseCommand):
                 else:
                     feature_value = Feature.objects.get(slug=raw_input('Enter valid slug: '))
 
-                new_dict_feature['value'][value] = feature_value
+                new_dict_feature['value'][slugify_value] = feature_value
 
                 create_auto = ''
 
@@ -235,7 +235,7 @@ class Command(BaseCommand):
                 if int(create_auto):
                     auto_created[slugify_option] = True
             else:
-                feature_value = Feature.objects.get(slug=new_dict_feature['value'][value])
+                feature_value = Feature.objects.get(slug=new_dict_feature['value'][slugify_value])
 
         return feature_value
 
