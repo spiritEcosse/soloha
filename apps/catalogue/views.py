@@ -306,7 +306,7 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
             selected_val.update({'images': images, 'parent': attr.pk})
 
             if hasattr(attr, 'selected_val'):
-                if attr.selected_val.features_by_product:
+                if hasattr(attr.selected_val, 'features_by_product') and attr.selected_val.features_by_product:
                     for product in attr.selected_val.features_by_product[0].product_with_images.all()[:5]:
                         images.append({
                             'title': product.get_title(),

@@ -199,7 +199,10 @@ class AbstractProduct(models.Model):
         images = []
 
         for image in self.images.all():
-            image, exist_image = check_exist_image(image.original.file.name)
+            exist_image = False
+
+            if image.original is not None:
+                image, exist_image = check_exist_image(image.original.file.name)
 
             if exist_image:
                 images.append(image)
@@ -504,13 +507,19 @@ class AbstractProduct(models.Model):
             # ordering. Applying order_by() busts the prefetch cache of
             # the ProductManager
             images = images.order_by('display_order')
+
         try:
-            image = images[0].original.file.name
+            image = images[0].original
         except IndexError:
             # We return a dict with fields that mirror the key properties of
             # the ProductImage class so this missing image can be used
             # interchangeably in templates.  Strategy pattern ftw!
             image = self.get_missing_image().name
+        else:
+            if image is None:
+                image = self.get_missing_image().name
+            else:
+                image = image.file.name
 
         image, exist_image = check_exist_image(image)
         return image
