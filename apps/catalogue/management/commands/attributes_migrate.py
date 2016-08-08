@@ -186,7 +186,7 @@ class Command(BaseCommand):
         try:
             feature = Feature.objects.get(title=option)
         except Feature.DoesNotExist:
-            create = int(raw_input(u'Create this feature "{}" ? (1/0)'.format(option)))
+            create = int(raw_input(u'Create this feature "{}" ? (1/0)'.format(slugify(option))))
 
             if create:
                 feature = Feature.objects.create(title=option)
@@ -196,7 +196,7 @@ class Command(BaseCommand):
         try:
             feature_value = Feature.objects.get(title=value, parent=feature)
         except Feature.DoesNotExist:
-            create = int(raw_input(u'Create this feature "{}" of parent - {}? (1/0)'.format(value, feature)))
+            create = int(raw_input(u'Create this feature "{}" of parent - {}? (1/0)'.format(slugify(value), slugify(feature))))
 
             if create:
                 feature_value = Feature.objects.create(title=value, parent=feature)
