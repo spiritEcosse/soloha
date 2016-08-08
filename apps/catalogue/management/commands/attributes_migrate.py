@@ -20,7 +20,6 @@ from django.db import IntegrityError
 from django.utils.text import capfirst
 import logging
 from oscar.core.utils import slugify
-import texttable
 from django.utils.text import force_text
 from unidecode import unidecode
 from collections import OrderedDict
