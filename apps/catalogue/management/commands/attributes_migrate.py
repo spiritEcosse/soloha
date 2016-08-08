@@ -185,11 +185,11 @@ class Command(BaseCommand):
                                         key_value = 0
 
     def get_feature(self, option, value, new_dict_feature, auto_created):
-        try:
-            feature = Feature.objects.get(title=option)
-        except Feature.DoesNotExist:
-            slugify_option = slugify(option)
+        slugify_option = slugify(option)
 
+        try:
+            feature = Feature.objects.get(slug=slugify_option)
+        except Feature.DoesNotExist:
             if slugify_option not in new_dict_feature['option']:
                 create = ''
 
@@ -207,12 +207,12 @@ class Command(BaseCommand):
         else:
             slugify_option = feature.slug
 
+        slugify_value = u'{}-{}'.format(feature.slug, slugify(value))
+
         try:
             print value, feature
-            feature_value = Feature.objects.get(title=value, parent=feature)
+            feature_value = Feature.objects.get(slug=slugify_value)
         except Feature.DoesNotExist:
-            slugify_value = u'{}-{}'.format(feature.slug, slugify(value))
-
             if slugify_option in auto_created:
                 feature_value = Feature.objects.create(title=value, parent=feature)
             elif slugify_value not in new_dict_feature['value']:
