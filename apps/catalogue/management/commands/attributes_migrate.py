@@ -72,6 +72,8 @@ class Command(BaseCommand):
         # cursor.execute("SELECT product_id from `product` WHERE product_id={}".format(68))
         cursor.execute("SELECT product_id from `product`")
         products_rows = namedtuplefetchall(cursor)
+        new_dict_feature = {'option': {}, 'value': {}}
+        auto_created = {}
 
         for key_product, row_product in enumerate(products_rows):
             print 'left product - {}'.format(len(products_rows) - key_product + 1)
@@ -154,10 +156,10 @@ class Command(BaseCommand):
                                     version = ProductVersion.objects.create(product=product, price_retail=option.price, cost_price=option.price)
 
                                     if option.name_option_1 is not None and option.name_value_1 is not None:
-                                        feature = self.get_feature(option=option.name_option_1, value=option.name_value_1)
+                                        feature = self.get_feature(option=option.name_option_1, value=option.name_value_1, new_dict_feature=new_dict_feature, auto_created=auto_created)
                                         VersionAttribute.objects.create(version=version, attribute=feature)
 
-                                    feature = self.get_feature(option=option.name_option, value=option.name_value)
+                                    feature = self.get_feature(option=option.name_option, value=option.name_value, new_dict_feature=new_dict_feature, auto_created=auto_created)
                                     VersionAttribute.objects.create(version=version, attribute=feature)
 
                                     if products:
@@ -174,7 +176,7 @@ class Command(BaseCommand):
                                         except IndexError:
                                             pass
                                         else:
-                                            feature = self.get_feature(option=temp_value.name, value=temp_value.ovd_name)
+                                            feature = self.get_feature(option=temp_value.name, value=temp_value.ovd_name, new_dict_feature=new_dict_feature, auto_created=auto_created)
                                             VersionAttribute.objects.create(version=version, attribute=feature)
 
                                     key_value += 1
@@ -182,26 +184,58 @@ class Command(BaseCommand):
                                     if key_value == count_option_value:
                                         key_value = 0
 
-    def get_feature(self, option, value):
+    def get_feature(self, option, value, new_dict_feature, auto_created):
         try:
             feature = Feature.objects.get(title=option)
         except Feature.DoesNotExist:
-            create = int(raw_input(u'Create this feature "{}" ? (1/0)'.format(slugify(option))))
+            slugify_option = slugify(option)
 
-            if create:
-                feature = Feature.objects.create(title=option)
+            if slugify_option not in new_dict_feature['option']:
+                create = ''
+
+                while create != '1' and create != '0':
+                    create = raw_input('Create this feature "{}" ? (1/0)'.format(slugify_option))
+
+                if int(create):
+                    feature = Feature.objects.create(title=option)
+                else:
+                    feature = Feature.objects.get(slug=raw_input('Enter valid slug: '))
+
+                new_dict_feature['option'][slugify_option] = feature
             else:
-                feature = Feature.objects.get(slug=raw_input('Enter valid slug: '))
+                feature = Feature.objects.get(slug=new_dict_feature['option'][slugify_option])
+        else:
+            slugify_option = feature.slug
 
         try:
             feature_value = Feature.objects.get(title=value, parent=feature)
         except Feature.DoesNotExist:
-            create = int(raw_input(u'Create this feature "{}" of parent - {}? (1/0)'.format(slugify(value), slugify(feature))))
+            slugify_value = slugify('{}-{}'.format(feature, value))
 
-            if create:
+            if slugify_option in auto_created:
                 feature_value = Feature.objects.create(title=value, parent=feature)
+            elif slugify_value not in new_dict_feature['value']:
+                create = ''
+
+                while create != '1' and create != '0':
+                    create = raw_input('Create this feature "{}" of parent - {}? (1/0)'.format(slugify_value, slugify_option))
+
+                if int(create):
+                    feature_value = Feature.objects.create(title=value, parent=feature)
+                else:
+                    feature_value = Feature.objects.get(slug=raw_input('Enter valid slug: '))
+
+                new_dict_feature['value'][value] = feature_value
+
+                create_auto = ''
+
+                while create_auto != '1' and create_auto != '0':
+                    create_auto = raw_input(raw_input('Auto create children for this feature in future "{}" ? (1/0)'.format(slugify_option)))
+
+                if int(create_auto):
+                    auto_created[slugify_option] = True
             else:
-                feature_value = Feature.objects.get(slug=raw_input('Enter valid slug: '))
+                feature_value = Feature.objects.get(slug=new_dict_feature['value'][value])
 
         return feature_value
 
