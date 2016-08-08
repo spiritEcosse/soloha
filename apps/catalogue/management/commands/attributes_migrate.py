@@ -210,7 +210,7 @@ class Command(BaseCommand):
         try:
             feature_value = Feature.objects.get(title=value, parent=feature)
         except Feature.DoesNotExist:
-            slugify_value = slugify(u'{}-{}'.format(feature, value))
+            slugify_value = u'{}-{}'.format(feature.slug, slugify(value))
 
             if slugify_option in auto_created:
                 feature_value = Feature.objects.create(title=value, parent=feature)
@@ -225,7 +225,7 @@ class Command(BaseCommand):
                 else:
                     feature_value = Feature.objects.get(slug=raw_input('Enter valid slug: '))
 
-                new_dict_feature['value'][slugify_value] = feature_value
+                new_dict_feature['value'][slugify_value] = feature_value.slug
 
                 create_auto = ''
 
