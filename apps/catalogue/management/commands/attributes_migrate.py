@@ -160,7 +160,11 @@ class Command(BaseCommand):
                                         VersionAttribute.objects.create(version=version, attribute=feature)
 
                                     feature = self.get_feature(option=option.name_option, value=option.name_value, new_dict_feature=new_dict_feature, auto_created=auto_created)
-                                    VersionAttribute.objects.create(version=version, attribute=feature)
+
+                                    try:
+                                        VersionAttribute.objects.create(version=version, attribute=feature)
+                                    except VersionAttribute.IntegrityError:
+                                        pass
 
                                     if products:
                                         try:
