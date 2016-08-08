@@ -230,7 +230,7 @@ class Command(BaseCommand):
                 create_auto = ''
 
                 while create_auto != '1' and create_auto != '0':
-                    create_auto = raw_input(raw_input('Auto create children for this feature in future "{}" ? (1/0)'.format(slugify_option)))
+                    create_auto = raw_input('Auto create children for this feature in future "{}" ? (1/0)'.format(slugify_option))
 
                 if int(create_auto):
                     auto_created[slugify_option] = True
