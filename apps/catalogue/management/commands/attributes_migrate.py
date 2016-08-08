@@ -210,7 +210,7 @@ class Command(BaseCommand):
         try:
             feature_value = Feature.objects.get(title=value, parent=feature)
         except Feature.DoesNotExist:
-            slugify_value = slugify('{}-{}'.format(feature, value))
+            slugify_value = slugify(u'{}-{}'.format(feature, value))
 
             if slugify_option in auto_created:
                 feature_value = Feature.objects.create(title=value, parent=feature)
