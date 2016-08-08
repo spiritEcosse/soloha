@@ -201,7 +201,7 @@ class Command(BaseCommand):
                 else:
                     feature = Feature.objects.get(slug=raw_input('Enter valid slug: '))
 
-                new_dict_feature['option'][slugify_option] = feature
+                new_dict_feature['option'][slugify_option] = feature.slug
             else:
                 feature = Feature.objects.get(slug=new_dict_feature['option'][slugify_option])
         else:
