@@ -7,6 +7,10 @@ $(document).ready(function() {
         event.stopPropagation();
     });
 
+    $('.stop-change-url').click(function(event){
+        event.preventDefault();
+    });
+
     $('.dropdown-menu li a').click(function (e) {
         e.stopPropagation();
     });
