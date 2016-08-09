@@ -84,6 +84,10 @@ a, span, div {
 }
 .text-white {
     color: white;
+
+    &:focus, &:hover {
+        color: white;
+    }
 }
 .btn-transparent {
     background:transparent;
@@ -212,7 +216,6 @@ header {
             text-align: center;
             border-right: 1px solid #ffae42;
             border-left: 1px solid #ffae42;
-            overflow: hidden;
 
             span {
                 font-size-adjust: 0.38;
@@ -326,22 +329,27 @@ header {
     }
 
     .center {
-        background: url("../../image/spruce.png") top center repeat-x;
-        background-size: @spruce_height + 200;
-        padding-top: @spruce_height;
+        clear: both;
+        //background: url("../../image/spruce.png") top center repeat-x;
+        //background-size: @spruce_height + 200;
+        //padding-top: @spruce_height;
 
         .logo {
             background: url("../../image/logo.png") center center no-repeat;
             background-size: @logo_width @logo_height;
             width: @logo_width;
             height: @logo_height;
-            float: left;
+            display: block;
         }
 
         .navbar {
             margin-bottom: 0;
 
-            a {
+            .pages {
+                .container-fluid {
+                    padding-left: 0;
+
+                    a {
                 color: #050505;
                 font-size: @navbar_header_font_size;
                 font-weight: 400;
@@ -352,7 +360,10 @@ header {
                     text-decoration: underline;
                 }
             }
+                }
+            }
         }
+
         .search {
             input {
                 height:@search_input_height;
@@ -423,6 +434,7 @@ header {
                 }
             }
         }
+
         .call {
             background: url("../../image/button_call.png") center center no-repeat;
             background-size: @button_call_width @button_call_height;

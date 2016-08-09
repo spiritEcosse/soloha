@@ -7426,6 +7426,10 @@ div {
 .text-white {
   color: white;
 }
+.text-white:focus,
+.text-white:hover {
+  color: white;
+}
 .btn-transparent {
   background: transparent;
   border: none;
@@ -7546,7 +7550,6 @@ header .top .phones {
   text-align: center;
   border-right: 1px solid #ffae42;
   border-left: 1px solid #ffae42;
-  overflow: hidden;
 }
 header .top .phones span {
   font-size-adjust: 0.38;
@@ -7639,28 +7642,29 @@ header .top .cart .dropdown .total .number {
   font-size: 18px;
 }
 header .center {
-  background: url("../../image/spruce.png") top center repeat-x;
-  background-size: 254px;
-  padding-top: 54px;
+  clear: both;
 }
 header .center .logo {
   background: url("../../image/logo.png") center center no-repeat;
   background-size: 201px 115px;
   width: 201px;
   height: 115px;
-  float: left;
+  display: block;
 }
 header .center .navbar {
   margin-bottom: 0;
 }
-header .center .navbar a {
+header .center .navbar .pages .container-fluid {
+  padding-left: 0;
+}
+header .center .navbar .pages .container-fluid a {
   color: #050505;
   font-size: 17px;
   font-weight: 400;
   background-color: transparent;
 }
-header .center .navbar a:hover,
-header .center .navbar a:focus {
+header .center .navbar .pages .container-fluid a:hover,
+header .center .navbar .pages .container-fluid a:focus {
   background-color: transparent;
   text-decoration: underline;
 }

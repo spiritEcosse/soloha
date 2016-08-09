@@ -306,3 +306,6 @@ THUMBNAIL_ALIASES = {
         'home_thumb_slide': {'size': (1170, 392), 'crop': True},
     },
 }
+
+
+OSCAR_SHOP_NAME = 'soloha'
