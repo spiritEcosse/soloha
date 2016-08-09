@@ -7555,26 +7555,8 @@ header .top .phones {
 header .top .phones span {
   font-size-adjust: 0.38;
 }
-header .top .cart {
-  padding-right: 0;
-}
-header .top .cart .dropdown {
-  background: url("../../image/cart.png") left center no-repeat;
-  background-size: 33px 32px;
-  height: inherit;
-}
-header .top .cart .dropdown:hover .text {
-  color: #fffefe;
-}
-header .top .cart .dropdown .dropdown-menu {
+header .top .cart .dropdown .dropdown-menu.full-width {
   width: 600px;
-}
-header .top .cart .dropdown > .btn {
-  padding: 11px 0 9px 12px;
-}
-header .top .cart .dropdown > .btn:hover,
-header .top .cart .dropdown > .btn:focus {
-  color: white;
 }
 header .top .cart .dropdown .text {
   float: left;
