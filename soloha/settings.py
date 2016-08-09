@@ -48,8 +48,8 @@ INSTALLED_APPS = \
         'django.contrib.admin',
         'django.contrib.sitemaps',
         'debug_toolbar',
-         # 'django_select2',
-         # 'bootstrap_pagination',
+        # 'django_select2',
+        # 'bootstrap_pagination',
         'django.contrib.auth',
         'django.contrib.contenttypes',
         'django.contrib.sessions',
@@ -82,6 +82,7 @@ ROOT_URLCONF = 'soloha.urls'
 
 DJANGO_LIVE_TEST_SERVER_ADDRESS = "localhost:8000-8010,8080,9200-9300"
 
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -89,8 +90,14 @@ TEMPLATES = [
             os.path.join(BASE_DIR, 'templates'),
             OSCAR_MAIN_TEMPLATE_DIR
         ],
-        'APP_DIRS': True,
         'OPTIONS': {
+            'loaders': [
+                ('django.template.loaders.cached.Loader', [
+                    'django.template.loaders.filesystem.Loader',
+                    'django.template.loaders.app_directories.Loader',
+                    'django.template.loaders.eggs.Loader',
+                ]),
+            ],
             'context_processors': [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
@@ -139,12 +146,6 @@ LANGUAGES = (
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
-
-TEMPLATE_LOADERS = (
-    'django.template.loaders.filesystem.Loader',
-    'django.template.loaders.app_directories.Loader',
-    'django.template.loaders.eggs.Loader',
-)
 
 import os
 location = lambda x: os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', x)
