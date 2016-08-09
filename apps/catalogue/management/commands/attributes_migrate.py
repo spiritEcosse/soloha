@@ -163,7 +163,7 @@ class Command(BaseCommand):
 
                                     try:
                                         VersionAttribute.objects.create(version=version, attribute=feature)
-                                    except VersionAttribute.IntegrityError:
+                                    except IntegrityError:
                                         pass
 
                                     if products:
