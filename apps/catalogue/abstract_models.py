@@ -709,8 +709,12 @@ class AbstractProductImage(models.Model, CommonFeatureProduct):
         Always keep the display_order as consecutive integers. This avoids
         issue #855.
         """
+
+        images = self.product.images.all().exclude(pk=self.pk)
+
         super(AbstractProductImage, self).delete(*args, **kwargs)
-        for idx, image in enumerate(self.product.images.all()):
+
+        for idx, image in enumerate(images):
             image.display_order = idx
             image.save()
 
