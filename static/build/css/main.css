@@ -7426,6 +7426,10 @@ div {
 .text-white {
   color: white;
 }
+.text-white:focus,
+.text-white:hover {
+  color: white;
+}
 .btn-transparent {
   background: transparent;
   border: none;
@@ -7538,6 +7542,7 @@ header .top {
   background-color: #f08825;
   line-height: 40px;
   white-space: nowrap;
+  margin-bottom: 20px;
 }
 header .top .phones {
   color: #fdfcfb;
@@ -7546,31 +7551,12 @@ header .top .phones {
   text-align: center;
   border-right: 1px solid #ffae42;
   border-left: 1px solid #ffae42;
-  overflow: hidden;
 }
 header .top .phones span {
   font-size-adjust: 0.38;
 }
-header .top .cart {
-  padding-right: 0;
-}
-header .top .cart .dropdown {
-  background: url("../../image/cart.png") left center no-repeat;
-  background-size: 33px 32px;
-  height: inherit;
-}
-header .top .cart .dropdown:hover .text {
-  color: #fffefe;
-}
-header .top .cart .dropdown .dropdown-menu {
+header .top .cart .dropdown .dropdown-menu.full-width {
   width: 600px;
-}
-header .top .cart .dropdown > .btn {
-  padding: 11px 0 9px 12px;
-}
-header .top .cart .dropdown > .btn:hover,
-header .top .cart .dropdown > .btn:focus {
-  color: white;
 }
 header .top .cart .dropdown .text {
   float: left;
@@ -7639,43 +7625,32 @@ header .top .cart .dropdown .total .number {
   font-size: 18px;
 }
 header .center {
-  background: url("../../image/spruce.png") top center repeat-x;
-  background-size: 254px;
-  padding-top: 54px;
+  margin-bottom: 20px;
+  clear: both;
 }
 header .center .logo {
   background: url("../../image/logo.png") center center no-repeat;
   background-size: 201px 115px;
   width: 201px;
   height: 115px;
-  float: left;
+  display: block;
 }
-header .center .navbar {
+header .center .pages .navbar {
   margin-bottom: 0;
 }
-header .center .navbar a {
+header .center .pages .navbar .container-fluid {
+  padding-left: 0;
+}
+header .center .pages .navbar .container-fluid a {
   color: #050505;
   font-size: 17px;
   font-weight: 400;
   background-color: transparent;
 }
-header .center .navbar a:hover,
-header .center .navbar a:focus {
+header .center .pages .navbar .container-fluid a:hover,
+header .center .pages .navbar .container-fluid a:focus {
   background-color: transparent;
   text-decoration: underline;
-}
-header .center .search input {
-  height: 40px;
-  font-size: 20px;
-}
-header .center .search button {
-  color: white;
-  text-transform: uppercase;
-  height: 40px;
-  font-size: 17px;
-}
-header .center .search .input-group-btn {
-  position: static;
 }
 header .center .search .dropdown-menu {
   padding: 0;
@@ -7724,9 +7699,6 @@ header .center .call {
   background: url("../../image/button_call.png") center center no-repeat;
   background-size: 93px 94px;
   height: 118px;
-}
-header .bottom {
-  margin-top: 20px;
 }
 header .bottom .yamm .yamm-content {
   padding: 15px 10px;
