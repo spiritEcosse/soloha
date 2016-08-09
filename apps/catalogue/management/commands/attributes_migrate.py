@@ -76,125 +76,128 @@ class Command(BaseCommand):
         auto_created = {}
 
         for key_product, row_product in enumerate(products_rows):
-            print '\n\n left product - {} \n\n'.format(len(products_rows) - key_product + 1)
+            left_product = len(products_rows) - key_product + 1
+            print '\n\n left product - {} \n\n'.format()
 
-            cursor.execute("SELECT * from `url_alias` "
-                           "WHERE query=CONCAT('product_id=', {})".format(row_product.product_id))
+            if left_product <= 2163:
+                cursor.execute("SELECT * from `url_alias` "
+                               "WHERE query=CONCAT('product_id=', {})".format(row_product.product_id))
 
-            product_mysql = namedtuplefetchone(cursor)
+                product_mysql = namedtuplefetchone(cursor)
 
-            if product_mysql is not None:
-                try:
-                    product = Product.objects.get(slug=product_mysql.keyword)
-                    print product.slug, row_product.product_id
-                except Product.DoesNotExist:
-                    logger.error(u'Product with slug - {} DoesNotExist'.format(product_mysql.keyword))
-                else:
-                    product.versions.all().delete()
-                    product.product_features.all().delete()
-                    VersionAttribute.objects.filter(version__product=product).delete()
+                if product_mysql is not None:
+                    try:
+                        product = Product.objects.get(slug=product_mysql.keyword)
+                        print product.slug, row_product.product_id
+                    except Product.DoesNotExist:
+                        logger.error(u'Product with slug - {} DoesNotExist'.format(product_mysql.keyword))
+                    else:
+                        product.versions.all().delete()
+                        product.product_features.all().delete()
+                        VersionAttribute.objects.filter(version__product=product).delete()
 
-                    cursor.execute("SELECT * from `product_table` "
-                                   "WHERE product_id={} and type_table=0".format(row_product.product_id))
-                    rows_tables = namedtuplefetchall(cursor)
+                        cursor.execute("SELECT * from `product_table` "
+                                       "WHERE product_id={} and type_table=0".format(row_product.product_id))
+                        rows_tables = namedtuplefetchall(cursor)
 
-                    for row_product_table in rows_tables:
-                        cursor.execute("SELECT * from product_table_option where vertical = 0 AND product_table_id={}".
-                                       format(row_product_table.product_table_id))
-
-                        if namedtuplefetchall(cursor):
-                            cursor.execute("SELECT * from product_table_option where option_id = 48 And product_table_id={}".
+                        for row_product_table in rows_tables:
+                            cursor.execute("SELECT * from product_table_option where vertical = 0 AND product_table_id={}".
                                            format(row_product_table.product_table_id))
 
-                            if not namedtuplefetchall(cursor):
-                                cursor.execute("SELECT ptovp.price, od.name as name_option, ovd.name as name_value,  "
-                                               "od_1.name as name_option_1, ovd_1.name as name_value_1, ovd_1.option_value_id as option_1_value_id, "
-                                               "od.option_id, ovd.option_value_id "
-                                               "from `product_table_option_value_price` ptovp "
-                                               "LEFT JOIN `option_value_description` as ovd ON (ptovp.option_value_horizont=ovd.option_value_id) "
-                                               "LEFT JOIN `option_description` as od ON (od.option_id=ovd.option_id) "
-                                               "LEFT JOIN `option_value_description` as ovd_1 ON (ptovp.option_value_vertical=ovd_1.option_value_id) "
-                                               "LEFT JOIN `option_description` as od_1 ON (od_1.option_id=ovd_1.option_id) "
-                                               "WHERE ptovp.product_table_id={} AND ptovp.price != 0.0000".
+                            if namedtuplefetchall(cursor):
+                                cursor.execute("SELECT * from product_table_option where option_id = 48 And product_table_id={}".
                                                format(row_product_table.product_table_id))
 
-                                options = namedtuplefetchall(cursor)
-                                data_values, count_option_value = self.get_values(cursor, options, row_product_table.product_table_id)
-                                key_value = 0
+                                if not namedtuplefetchall(cursor):
+                                    cursor.execute("SELECT ptovp.price, od.name as name_option, ovd.name as name_value,  "
+                                                   "od_1.name as name_option_1, ovd_1.name as name_value_1, ovd_1.option_value_id as option_1_value_id, "
+                                                   "od.option_id, ovd.option_value_id "
+                                                   "from `product_table_option_value_price` ptovp "
+                                                   "LEFT JOIN `option_value_description` as ovd ON (ptovp.option_value_horizont=ovd.option_value_id) "
+                                                   "LEFT JOIN `option_description` as od ON (od.option_id=ovd.option_id) "
+                                                   "LEFT JOIN `option_value_description` as ovd_1 ON (ptovp.option_value_vertical=ovd_1.option_value_id) "
+                                                   "LEFT JOIN `option_description` as od_1 ON (od_1.option_id=ovd_1.option_id) "
+                                                   "WHERE ptovp.product_table_id={} AND ptovp.price != 0.0000".
+                                                   format(row_product_table.product_table_id))
 
-                                for key, option in enumerate(options):
-                                    print row_product.product_id, option.option_id, option.option_value_id, option.price
+                                    options = namedtuplefetchall(cursor)
+                                    data_values, count_option_value = self.get_values(cursor, options, row_product_table.product_table_id)
+                                    key_value = 0
 
-                                    cursor.execute("SELECT t3.product_id "
-                                                   "FROM product_fabric_option as t1 "
-                                                   "NATURAL JOIN product_fabric_option_value as t2 "
-                                                   "JOIN product_fabric_option_value_product as t3 "
-                                                   "NATURAL JOIN product_description AS t4 "
-                                                   "NATURAL JOIN product AS t5 ON (t2.product_fabric_option_value_id = t3.product_fabric_option_value_id) "
-                                                   "JOIN manufacturer AS t6 ON(t5.manufacturer_id=t6.manufacturer_id) "
-                                                   "WHERE t1.product_id = {} AND t1.option_id = {} AND t2.option_value_id = {}".format(
-                                        row_product.product_id, option.option_id, option.option_value_id
-                                    ))
+                                    for key, option in enumerate(options):
+                                        print row_product.product_id, option.option_id, option.option_value_id, option.price
 
-                                    products = []
+                                        if option.option_id is not None and option.option_value_id is not None:
+                                            cursor.execute("SELECT t3.product_id "
+                                                           "FROM product_fabric_option as t1 "
+                                                           "NATURAL JOIN product_fabric_option_value as t2 "
+                                                           "JOIN product_fabric_option_value_product as t3 "
+                                                           "NATURAL JOIN product_description AS t4 "
+                                                           "NATURAL JOIN product AS t5 ON (t2.product_fabric_option_value_id = t3.product_fabric_option_value_id) "
+                                                           "JOIN manufacturer AS t6 ON(t5.manufacturer_id=t6.manufacturer_id) "
+                                                           "WHERE t1.product_id = {} AND t1.option_id = {} AND t2.option_value_id = {}".format(
+                                                row_product.product_id, option.option_id, option.option_value_id
+                                            ))
 
-                                    for row_product_fabric in namedtuplefetchall(cursor):
-                                        cursor.execute("SELECT * from `url_alias` "
-                                                       "WHERE query=CONCAT('product_id=', {})".format(row_product_fabric.product_id))
+                                            products = []
 
-                                        product_mysql_fabric = namedtuplefetchone(cursor)
+                                            for row_product_fabric in namedtuplefetchall(cursor):
+                                                cursor.execute("SELECT * from `url_alias` "
+                                                               "WHERE query=CONCAT('product_id=', {})".format(row_product_fabric.product_id))
 
-                                        if product_mysql_fabric is not None:
-                                            try:
-                                                product_for_feature = Product.objects.get(slug=product_mysql_fabric.keyword)
-                                            except Product.DoesNotExist:
-                                                logger.error(u'Product with slug (product_with_images) - {} DoesNotExist'.
-                                                             format(product_mysql_fabric.keyword))
-                                            else:
-                                                products.append(product_for_feature)
+                                                product_mysql_fabric = namedtuplefetchone(cursor)
 
-                                    version = ProductVersion.objects.create(product=product, price_retail=option.price, cost_price=option.price)
+                                                if product_mysql_fabric is not None:
+                                                    try:
+                                                        product_for_feature = Product.objects.get(slug=product_mysql_fabric.keyword)
+                                                    except Product.DoesNotExist:
+                                                        logger.error(u'Product with slug (product_with_images) - {} DoesNotExist'.
+                                                                     format(product_mysql_fabric.keyword))
+                                                    else:
+                                                        products.append(product_for_feature)
 
-                                    if option.name_option_1 is not None and option.name_value_1 is not None:
-                                        feature = self.get_feature(option=option.name_option_1, value=option.name_value_1, new_dict_feature=new_dict_feature, auto_created=auto_created)
+                                            version = ProductVersion.objects.create(product=product, price_retail=option.price, cost_price=option.price)
 
-                                        try:
-                                            VersionAttribute.objects.create(version=version, attribute=feature)
-                                        except IntegrityError:
-                                            pass
+                                            if option.name_option_1 is not None and option.name_value_1 is not None:
+                                                feature = self.get_feature(option=option.name_option_1, value=option.name_value_1, new_dict_feature=new_dict_feature, auto_created=auto_created)
 
-                                    feature = self.get_feature(option=option.name_option, value=option.name_value, new_dict_feature=new_dict_feature, auto_created=auto_created)
+                                                try:
+                                                    VersionAttribute.objects.create(version=version, attribute=feature)
+                                                except IntegrityError:
+                                                    pass
 
-                                    try:
-                                        VersionAttribute.objects.create(version=version, attribute=feature)
-                                    except IntegrityError:
-                                        pass
-
-                                    if products:
-                                        try:
-                                            ProductFeature.objects.get(product=product, feature=feature)
-                                        except ProductFeature.DoesNotExist:
-                                            product_feature = ProductFeature.objects.create(product=product,
-                                                                                            feature=feature)
-                                            product_feature.product_with_images.add(*products)
-
-                                    for value in data_values.values():
-                                        try:
-                                            temp_value = value[key_value]
-                                        except IndexError:
-                                            pass
-                                        else:
-                                            feature = self.get_feature(option=temp_value.name, value=temp_value.ovd_name, new_dict_feature=new_dict_feature, auto_created=auto_created)
+                                            feature = self.get_feature(option=option.name_option, value=option.name_value, new_dict_feature=new_dict_feature, auto_created=auto_created)
 
                                             try:
                                                 VersionAttribute.objects.create(version=version, attribute=feature)
                                             except IntegrityError:
                                                 pass
 
-                                    key_value += 1
+                                            if products:
+                                                try:
+                                                    ProductFeature.objects.get(product=product, feature=feature)
+                                                except ProductFeature.DoesNotExist:
+                                                    product_feature = ProductFeature.objects.create(product=product,
+                                                                                                    feature=feature)
+                                                    product_feature.product_with_images.add(*products)
 
-                                    if key_value == count_option_value:
-                                        key_value = 0
+                                            for value in data_values.values():
+                                                try:
+                                                    temp_value = value[key_value]
+                                                except IndexError:
+                                                    pass
+                                                else:
+                                                    feature = self.get_feature(option=temp_value.name, value=temp_value.ovd_name, new_dict_feature=new_dict_feature, auto_created=auto_created)
+
+                                                    try:
+                                                        VersionAttribute.objects.create(version=version, attribute=feature)
+                                                    except IntegrityError:
+                                                        pass
+
+                                            key_value += 1
+
+                                            if key_value == count_option_value:
+                                                key_value = 0
 
     def get_feature(self, option, value, new_dict_feature, auto_created):
         slugify_option = slugify(option)
