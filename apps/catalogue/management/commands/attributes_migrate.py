@@ -76,7 +76,7 @@ class Command(BaseCommand):
         auto_created = {}
 
         for key_product, row_product in enumerate(products_rows):
-            print 'left product - {}'.format(len(products_rows) - key_product + 1)
+            print '\n\n left product - {} \n\n'.format(len(products_rows) - key_product + 1)
 
             cursor.execute("SELECT * from `url_alias` "
                            "WHERE query=CONCAT('product_id=', {})".format(row_product.product_id))
@@ -157,7 +157,11 @@ class Command(BaseCommand):
 
                                     if option.name_option_1 is not None and option.name_value_1 is not None:
                                         feature = self.get_feature(option=option.name_option_1, value=option.name_value_1, new_dict_feature=new_dict_feature, auto_created=auto_created)
-                                        VersionAttribute.objects.create(version=version, attribute=feature)
+
+                                        try:
+                                            VersionAttribute.objects.create(version=version, attribute=feature)
+                                        except IntegrityError:
+                                            pass
 
                                     feature = self.get_feature(option=option.name_option, value=option.name_value, new_dict_feature=new_dict_feature, auto_created=auto_created)
 
@@ -181,7 +185,11 @@ class Command(BaseCommand):
                                             pass
                                         else:
                                             feature = self.get_feature(option=temp_value.name, value=temp_value.ovd_name, new_dict_feature=new_dict_feature, auto_created=auto_created)
-                                            VersionAttribute.objects.create(version=version, attribute=feature)
+
+                                            try:
+                                                VersionAttribute.objects.create(version=version, attribute=feature)
+                                            except IntegrityError:
+                                                pass
 
                                     key_value += 1
 
