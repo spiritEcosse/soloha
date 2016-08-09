@@ -77,7 +77,7 @@ class Command(BaseCommand):
 
         for key_product, row_product in enumerate(products_rows):
             left_product = len(products_rows) - key_product + 1
-            print '\n\n left product - {} \n\n'.format()
+            print '\n\n left product - {} \n\n'.format(left_product)
 
             if left_product <= 2163:
                 cursor.execute("SELECT * from `url_alias` "
