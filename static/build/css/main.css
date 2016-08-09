@@ -7542,6 +7542,7 @@ header .top {
   background-color: #f08825;
   line-height: 40px;
   white-space: nowrap;
+  margin-bottom: 20px;
 }
 header .top .phones {
   color: #fdfcfb;
@@ -7642,6 +7643,7 @@ header .top .cart .dropdown .total .number {
   font-size: 18px;
 }
 header .center {
+  margin-bottom: 20px;
   clear: both;
 }
 header .center .logo {
@@ -7651,35 +7653,22 @@ header .center .logo {
   height: 115px;
   display: block;
 }
-header .center .navbar {
+header .center .pages .navbar {
   margin-bottom: 0;
 }
-header .center .navbar .pages .container-fluid {
+header .center .pages .navbar .container-fluid {
   padding-left: 0;
 }
-header .center .navbar .pages .container-fluid a {
+header .center .pages .navbar .container-fluid a {
   color: #050505;
   font-size: 17px;
   font-weight: 400;
   background-color: transparent;
 }
-header .center .navbar .pages .container-fluid a:hover,
-header .center .navbar .pages .container-fluid a:focus {
+header .center .pages .navbar .container-fluid a:hover,
+header .center .pages .navbar .container-fluid a:focus {
   background-color: transparent;
   text-decoration: underline;
-}
-header .center .search input {
-  height: 40px;
-  font-size: 20px;
-}
-header .center .search button {
-  color: white;
-  text-transform: uppercase;
-  height: 40px;
-  font-size: 17px;
-}
-header .center .search .input-group-btn {
-  position: static;
 }
 header .center .search .dropdown-menu {
   padding: 0;
@@ -7728,9 +7717,6 @@ header .center .call {
   background: url("../../image/button_call.png") center center no-repeat;
   background-size: 93px 94px;
   height: 118px;
-}
-header .bottom {
-  margin-top: 20px;
 }
 header .bottom .yamm .yamm-content {
   padding: 15px 10px;

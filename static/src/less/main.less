@@ -208,6 +208,7 @@ header {
         background-color: #f08825;
         line-height: @header_top;
         white-space: nowrap;
+        margin-bottom: @header_margin_bottom;
 
         .phones {
             color: #fdfcfb;
@@ -329,6 +330,7 @@ header {
     }
 
     .center {
+        margin-bottom: @header_margin_bottom;
         clear: both;
         //background: url("../../image/spruce.png") top center repeat-x;
         //background-size: @spruce_height + 200;
@@ -342,44 +344,29 @@ header {
             display: block;
         }
 
-        .navbar {
-            margin-bottom: 0;
+        .pages {
+            .navbar {
+                margin-bottom: 0;
 
-            .pages {
                 .container-fluid {
                     padding-left: 0;
 
                     a {
-                color: #050505;
-                font-size: @navbar_header_font_size;
-                font-weight: 400;
-                background-color: transparent;
+                        color: #050505;
+                        font-size: @navbar_header_font_size;
+                        font-weight: 400;
+                        background-color: transparent;
 
-                &:hover, &:focus {
-                    background-color: transparent;
-                    text-decoration: underline;
-                }
-            }
+                        &:hover, &:focus {
+                            background-color: transparent;
+                            text-decoration: underline;
+                        }
+                    }
                 }
             }
         }
 
         .search {
-            input {
-                height:@search_input_height;
-                font-size: 20px;
-            }
-            button {
-                .btn-orange();
-                text-transform: uppercase;
-                height:@search_input_height;
-                font-size: 17px;
-            }
-
-            .input-group-btn {
-                position: static;
-            }
-
             .dropdown-menu {
                 padding: 0;
                 width: 100%;
@@ -443,8 +430,6 @@ header {
     }
 
     .bottom {
-        margin-top: @bottom_margin_top;
-
         .yamm {
             .yamm-content  {
                 padding: 15px 10px;
@@ -1816,42 +1801,42 @@ header {
     }
 
     .basket {
-            .basket-items {
-                border-bottom: 1px solid #c4c4c4;
-                padding: 10px;
-                margin-bottom: 20px;
-            }
-            .basket-items:nth-child(even) {
-                background: #f9f9f9;
-            }
-            .basket-items img {
-                margin-left: auto;
-                margin-right: auto;
-            }
-            .basket-items .price_color {
-                font-family: inherit;
-                font-weight: 500;
-                line-height: 1.1;
-                color: inherit;
-                margin-top: 10px;
-                margin-bottom: 10px;
-                font-size: 18px;
-                font-size: 16.1px;
-                line-height: 1.4;
-                color: #5cb85c;
-                font-weight: bold;
-            }
-            .basket-items .price_color small,
-            .basket-items .price_color .small {
-                font-weight: normal;
-                line-height: 1;
-                color: #777777;
-            }
-            .basket-items .price_color small,
-            .basket-items .price_color .small {
-                font-size: 75%;
-            }
+        .basket-items {
+            border-bottom: 1px solid #c4c4c4;
+            padding: 10px;
+            margin-bottom: 20px;
         }
+        .basket-items:nth-child(even) {
+            background: #f9f9f9;
+        }
+        .basket-items img {
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .basket-items .price_color {
+            font-family: inherit;
+            font-weight: 500;
+            line-height: 1.1;
+            color: inherit;
+            margin-top: 10px;
+            margin-bottom: 10px;
+            font-size: 18px;
+            font-size: 16.1px;
+            line-height: 1.4;
+            color: #5cb85c;
+            font-weight: bold;
+        }
+        .basket-items .price_color small,
+        .basket-items .price_color .small {
+            font-weight: normal;
+            line-height: 1;
+            color: #777777;
+        }
+        .basket-items .price_color small,
+        .basket-items .price_color .small {
+            font-size: 75%;
+        }
+    }
 
     .not-found {
         h1 {
