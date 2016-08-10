@@ -217,6 +217,8 @@
             </div>
 
             {% block content_wrapper %}
+                {% block checkout_nav %}{% endblock %}
+
                 <div class="col-xs-24">
                     {% block header %}
                         <div class="row page-header action">
@@ -227,9 +229,13 @@
                     {% block subheader %}{% endblock subheader %}
                     {% include "partials/alert_messages.html" %}
                 </div>
+                {% block modal %}{% endblock %}
 
                 {# Div exists for AJAX updates to entire content section #}
                 <div id="content_inner">{% block content %}{% endblock %}</div>
+
+                {% block promotions %}{% endblock %}
+                {% block footer_checkout %}{% endblock %}
             {% endblock content_wrapper %}
         </div>
 
