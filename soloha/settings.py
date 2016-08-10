@@ -74,7 +74,7 @@ INSTALLED_APPS = \
         'bootstrap_pagination',
         # 'smart_load_tag',
     ] + get_core_apps(['apps.catalogue', 'apps.promotions', 'apps.partner', 'apps.search', 'apps.order',
-                       'apps.basket'])
+                       'apps.basket', 'apps.checkout'])
 
 SITE_ID = 1
 
