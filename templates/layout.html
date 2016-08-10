@@ -343,8 +343,14 @@
                     </div>
                 </div>
                 <div class="row bottom">
-                    <div class="col-xs-24 text-center">
-                        Copyright Soloha. {% trans "Online shop of furniture and furniture fabrics." %} © 2012 - 2016
+                    <div class="col-xs-24 text-center text-white">
+                        <strong>
+                            Copyright {{ current_site.name }}
+                            {% if current_site.info.shop_short_desc %}
+                                - {{ current_site.info.shop_short_desc }}
+                            {% endif %}
+                            © 2012 - {% now "Y" %}
+                        </strong>
                     </div>
                 </div>
             </footer>

@@ -13,25 +13,25 @@
     }
 }
 .star-rating.One .glyphicon-star:first-child {
-    color: #f08825;
+    color: @brand-primary;
 }
 
 .star-rating.Two .glyphicon-star:first-child,
 .star-rating.Two .glyphicon-star:first-child + .glyphicon-star {
-    color: #f08825;
+    color: @brand-primary;
 }
 
 .star-rating.Three .glyphicon-star:first-child,
 .star-rating.Three .glyphicon-star:first-child + .glyphicon-star,
 .star-rating.Three .glyphicon-star:first-child + .glyphicon-star + .glyphicon-star {
-    color: #f08825;
+    color: @brand-primary;
 }
 
 .star-rating.Four .glyphicon-star:first-child,
 .star-rating.Four .glyphicon-star:first-child + .glyphicon-star,
 .star-rating.Four .glyphicon-star:first-child + .glyphicon-star + .glyphicon-star,
 .star-rating.Four .glyphicon-star:first-child + .glyphicon-star + .glyphicon-star + .glyphicon-star{
-    color: #f08825;
+    color: @brand-primary;
 }
 
 .star-rating.Five .glyphicon-star:first-child,
@@ -40,7 +40,7 @@
 .star-rating.Five .glyphicon-star:first-child + .glyphicon-star + .glyphicon-star + .glyphicon-star,
 .star-rating.Five .glyphicon-star:first-child + .glyphicon-star + .glyphicon-star + .glyphicon-star + .glyphicon-star,
 .star-rating.Five .glyphicon-star:first-child + .glyphicon-star + .glyphicon-star + .glyphicon-star + .glyphicon-star + .glyphicon-star{
-    color: #f08825;
+    color: @brand-primary;
 }
 
 .line-bottom {
@@ -148,7 +148,7 @@ a, span, div {
     }
 }
 .list-group-item.active, .list-group-item.active:hover, .list-group-item.active:focus {
-    background: linear-gradient(to top, #ffae42 0%, #f08825 44%, #ffae42 100%);
+    background: linear-gradient(to top, #ffae42 0%, @brand-primary 44%, #ffae42 100%);
     border-color: #6f6f6f;
 }
 
@@ -205,7 +205,7 @@ a, span, div {
 header {
     .top {
         height: @header_top;
-        background-color: #f08825;
+        background-color: @brand-primary;
         line-height: @header_top;
         white-space: nowrap;
         margin-bottom: @header_margin_bottom;
@@ -282,7 +282,7 @@ header {
                         a {
                             font-size: 14px;
                             font-weight: 400;
-                            color: #f08825;
+                            color: @brand-primary;
                             text-decoration: underline;
                         }
                     }
@@ -298,7 +298,7 @@ header {
 
                         .glyphicon-remove {
                             cursor: pointer;
-                            color: #f08825;
+                            color: @brand-primary;
                         }
                         .currency {
                             font-size: 14px;
@@ -382,7 +382,7 @@ header {
                         background-color: #e6e6e6;
 
                         .title {
-                            color: #f08825;
+                            color: @brand-primary;
                             text-decoration: underline;
                         }
                     }
@@ -445,7 +445,7 @@ header {
 
         .navbar {
             margin-bottom: 0;
-            background-image: linear-gradient(to top, #ffae42 0%, #f08825 48%, #ffae42 100%);
+            background-image: linear-gradient(to top, #ffae42 0%, @brand-primary 48%, #ffae42 100%);
 
             .navbar-brand:hover, .navbar-brand:focus, .navbar-brand.active, .navbar-nav > li:hover, .navbar-nav > li:focus,
             .navbar-nav > .open, .navbar-nav > li.active {
@@ -601,7 +601,7 @@ header {
                             .list-group-item:focus,
                             .list-group-item.active:hover,
                             .list-group-item.active:focus {
-                                background: linear-gradient(to top, #ffae42 0%, #f08825 44%, #ffae42 100%);
+                                background: linear-gradient(to top, #ffae42 0%, @brand-primary 44%, #ffae42 100%);
                                 border-color: #ddd;
 
                                 a {
@@ -615,7 +615,7 @@ header {
                             border: none;
 
                             .panel-heading {
-                                color: #f08825;
+                                color: @brand-primary;
                                 padding: 5px 10px;
                                 font-size: 14px;
                                 font-weight: 400;
@@ -624,7 +624,7 @@ header {
                                 border:none;
 
                                 a {
-                                    color: #f08825;
+                                    color: @brand-primary;
                                     font-size: 14px;
                                     font-weight: 400;
                                     text-transform: uppercase;
@@ -679,7 +679,7 @@ header {
                                 background-image: linear-gradient(to top, white 0%, #e6e6e6 50%, #e6e6e6 50%, white 100%);
                                 border: 0.299809px solid #6f6f6f;
                                 border-radius: 5px;
-                                color: #f08825;
+                                color: @brand-primary;
                                 font-size: 30px;
                                 font-weight: 400;
                                 text-transform: uppercase;
@@ -805,7 +805,7 @@ header {
         }
         .nav-tabs {
             li.active > a {
-                color: #f08825;
+                color: @brand-primary;
                 border: none;
             }
 
@@ -955,7 +955,7 @@ header {
 
                 .name {
                     text-transform: uppercase;
-                    color: #f08825;
+                    color: @brand-primary;
                     font-size: 14px;
                     font-weight: 400;
                 }
@@ -1166,7 +1166,7 @@ header {
 
         .icon {
             .glyphicon {
-                color: #f08825;
+                color: @brand-primary;
             }
         }
         .prevSlide, .nextSlide {
@@ -1288,7 +1288,7 @@ header {
                 }
 
                 > li.active > a, .nav-tabs > li.active > a:hover, .nav-tabs > li.active > a:focus, > li a:hover {
-                    background-image: linear-gradient(to top, #ffae42 0%, #f08825 42%, #ffae42 100%);
+                    background-image: linear-gradient(to top, #ffae42 0%, @brand-primary 42%, #ffae42 100%);
                     color: white;
                     font-size: 17px;
                     font-weight: 400;
@@ -1301,7 +1301,7 @@ header {
                         right: -9px;
                         top: 7px;
                         transform: rotate(134deg) skewX(-10deg) skewY(-10deg);
-                        background: linear-gradient(45deg, #ffae42 0%, #f08825 57%, #ffae42 100%);
+                        background: linear-gradient(45deg, #ffae42 0%, @brand-primary 57%, #ffae42 100%);
                         content: '';
                     }
                 }
@@ -1386,7 +1386,7 @@ header {
                     a {
                         font-size: 13px;
                         font-weight: 400;
-                        color: #f08825;
+                        color: @brand-primary;
                         text-decoration: underline;
                     }
                 }
@@ -1415,7 +1415,7 @@ header {
             }
 
             .relation {
-                color: #f08825;
+                color: @brand-primary;
                 font-size: 14px;
                 font-weight: 400;
             }
@@ -1582,14 +1582,14 @@ header {
                         font-size: 16px;
                         font-weight: 700;
                         text-decoration: underline;
-                        color: #f08825;
+                        color: @brand-primary;
                     }
 
                     .list {
                         margin-top: 10px;
 
                         .more {
-                            color: #f08825;
+                            color: @brand-primary;
                             font-size: 16px;
                             font-weight: 700;
                             text-decoration: underline;
@@ -1604,7 +1604,7 @@ header {
                         }
 
                         .answer {
-                            color: #f08825;
+                            color: @brand-primary;
                             font-size: 15px;
                             font-weight: 400;
                             text-decoration: underline;
@@ -1625,7 +1625,7 @@ header {
                                 color: #6f6f6f;
                             }
                             .text {
-                                color: #f08825;
+                                color: @brand-primary;
                             }
                         }
                     }
@@ -1732,7 +1732,7 @@ header {
                 line-height: 18px;
 
                 a {
-                    color: #f08825;
+                    color: @brand-primary;
                     font-size: 16px;
                     line-height: 24px;
                     text-decoration: underline;
@@ -1750,7 +1750,7 @@ header {
 
                 .glyphicon-remove {
                     cursor: pointer;
-                    color: #f08825;
+                    color: @brand-primary;
                 }
                 .currency {
                     font-size: 14px;
@@ -1897,7 +1897,7 @@ header {
                 text-decoration: underline;
 
                 &:hover {
-                    color: #f08825;
+                    color: @brand-primary;
                     font-size: 18px;
                     font-weight: 400;
                     text-decoration: underline;
@@ -1979,7 +1979,7 @@ header {
 
         .social {
             .text {
-                color: #f08825;
+                color: @brand-primary;
                 font-size: 22px;
                 font-weight: 400;
             }
@@ -1992,7 +1992,7 @@ header {
 }
 
 .active .glyphicon-heart:before {
-    color: #f08825;
+    color: @brand-primary;
 }
 
 .list-group-submenu {
@@ -2012,7 +2012,7 @@ footer {
     margin-top: 30px;
 
     .top {
-        background: #f08825;
+        background: @brand-primary;
         height: 5px;
     }
 
@@ -2051,7 +2051,7 @@ footer {
         }
 
         .title {
-            color: #f08825;
+            color: @brand-primary;
             font-size: 22px;
             padding-top: 10px;
             padding-bottom: 10px;
@@ -2071,12 +2071,12 @@ footer {
             }
 
             .special {
-                color: #f08825;
+                color: @brand-primary;
                 padding-top: 5px;
                 padding-bottom: 5px;
 
                 a {
-                    color: #f08825;
+                    color: @brand-primary;
                     font-size: 17px;
                     font-weight: 700;
                 }
@@ -2106,7 +2106,7 @@ footer {
 
         .social {
             .title {
-                color: #f08825;
+                color: @brand-primary;
                 font-size: 17px;
                 font-weight: 700;
                 line-height: 41px;
@@ -2115,7 +2115,7 @@ footer {
     }
 
     .bottom {
-        background-color: #f08825;
+        background-color: @brand-primary;
         height: auto;
         min-height: 39px;
         color: black;
