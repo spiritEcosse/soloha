@@ -78,7 +78,6 @@ class AbstractProduct(models.Model):
     meta_keywords = models.TextField(verbose_name=_('Meta tag: keywords'), blank=True)
     description = RichTextUploadingField(_('Description'), blank=True)
     views_count = models.IntegerField(verbose_name='views count', editable=False, default=0)
-    partner = models.ForeignKey('partner.Partner', verbose_name=_('Partner'), blank=True)
 
     STANDALONE, PARENT, CHILD = 'standalone', 'parent', 'child'
     STRUCTURE_CHOICES = (
