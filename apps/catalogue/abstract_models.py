@@ -700,7 +700,7 @@ class AbstractProductImage(models.Model, CommonFeatureProduct):
         return self.display_order == 0
 
     def thumb(self):
-        return self.product.thumb(self.original.file.name)
+        return self.product.thumb(self.original)
     thumb.allow_tags = True
     thumb.short_description = _('Image')
 
