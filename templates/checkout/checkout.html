@@ -23,7 +23,7 @@
 
         <div class="row shipping-payment">
             {% block shipping_address %}
-                <div class="col-sm-6">
+                <div class="col-sm-12">
                     <div class="sub-header">
                         <h2>{% trans "Shipping" %}</h2>
                     </div>
@@ -79,7 +79,7 @@
 
             {# You will almost certainly want to override this block to provide a payment summary #}
             {% block payment_method %}
-                <div class="col-sm-6">
+                <div class="col-sm-12">
                     <div class="sub-header">
                         <h2>{% trans "Payment" %}</h2>
                     </div>
@@ -106,34 +106,32 @@
             </div>
             <div class="basket-title">
                 <div class="row">
-                    <p class="col-sm-9 h4">{% trans "Item" %}</p>
-                    <p class="col-sm-1 h4 align-center">{% trans "Quantity" %}</p>
-                    <p class="col-sm-2 h4 align-right">{% trans "Total" %}</p>
+                    <p class="col-sm-16 h4">{% trans "Item" %}</p>
+                    <p class="col-sm-4 h4 text-center">{% trans "Quantity" %}</p>
+                    <p class="col-sm-4 h4 text-right">{% trans "Total" %}</p>
                 </div>
             </div>
             {% for line in basket.all_lines %}
                 {% purchase_info_for_line request line as session %}
                 <div class="basket-items">
                     <div class="row">
-                        <div class="col-sm-2">
+                        <div class="col-sm-4">
                             <div class="image_container">
-                                {% with image=line.product.primary_image %}
-                                    <a href="{{ form.instance.product.get_absolute_url }}">
-                                        <img class="img-responsive thumbnail"
-                                             src="{{ image.original|thumbnail_url:'checkout' }}"
-                                             alt="{{ product.get_title }}">
-                                    </a>
-                                {% endwith %}
+                                <a href="{{ form.instance.product.get_absolute_url }}">
+                                    <img class="img-responsive thumbnail"
+                                         src="{{ line.product.primary_image|thumbnail_url:'checkout' }}"
+                                         alt="{{ product.get_title }}">
+                                </a>
                             </div>
                         </div>
-                        <div class="col-sm-7">
+                        <div class="col-sm-12">
                             <h3><a href="{{ line.product.get_absolute_url }}">{{ line.description }}</a></h3>
                             <span class="availability {{ session.availability.code }}">{{ session.availability.message }}</span>
                         </div>
-                        <div class="col-sm-1 align-center">
+                        <div class="col-sm-4 text-center">
                             {{ line.quantity }}
                         </div>
-                        <div class="col-sm-2 align-right">
+                        <div class="col-sm-4 text-right">
                             <p class="price_color">
                                 {% if not show_tax_separately and line.is_tax_known %}
                                     {{ line.line_price_incl_tax|currency:basket.currency }}
@@ -147,8 +145,8 @@
             {% endfor %}
 
             <div class="row">
-                <div class="col-sm-6">&nbsp;</div>
-                <div class="col-sm-6">
+                <div class="col-sm-12">&nbsp;</div>
+                <div class="col-sm-12">
                     <div class="sub-header">
                         <h2>{% trans 'Totals' %}</h2>
                     </div>

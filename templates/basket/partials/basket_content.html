@@ -48,7 +48,7 @@
                                 <div class="col-sm-4">
                                     {{ form.id }}
                                     <a href="{{ product.get_absolute_url }}">
-                                        <img class="thumbnail" src="{{ product.primary_image|thumbnail_url:'basket_content' }}"
+                                        <img class="thumbnail img-responsive" src="{{ product.primary_image|thumbnail_url:'basket_content' }}"
                                              alt="{{ product.get_title }}" title="{{ product.get_title }}" />
                                     </a>
                                 </div>
@@ -146,7 +146,7 @@
             <div class="form-group clearfix">
                 <div class="row">
                     <div class="col-sm-6 pull-right">
-                        <a href="{% url 'checkout:index' %}" class="btn btn-lg btn-primary btn-block">{% trans "Proceed to checkout" %}</a>
+                        <a href="{% url 'checkout:index' %}" class="btn btn-lg btn-success btn-block">{% trans "Proceed to checkout" %}</a>
                     </div>
                 </div>
             </div>
