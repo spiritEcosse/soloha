@@ -25,7 +25,7 @@ def check_exist_image(image):
     os.chdir(MEDIA_ROOT)
     image_not_found = True
 
-    if image is not None or not os.path.exists(os.path.abspath(image)) or not os.path.isfile(os.path.abspath(image)):
+    if not os.path.exists(os.path.abspath(image)) or not os.path.isfile(os.path.abspath(image)):
         image = IMAGE_NOT_FOUND
         image_not_found = False
 
@@ -700,8 +700,7 @@ class AbstractProductImage(models.Model, CommonFeatureProduct):
         return self.display_order == 0
 
     def thumb(self):
-        image = self.original.file.name if self.original is not None else None
-        image, exist_image = check_exist_image(image)
+        image = self.original.file.name if self.original is not None else IMAGE_NOT_FOUND
         return loader.get_template('admin/catalogue/product/thumb.html').render(Context({'image': image}))
     thumb.allow_tags = True
     thumb.short_description = _('Image')
