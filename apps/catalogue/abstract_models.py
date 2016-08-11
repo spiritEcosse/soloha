@@ -701,6 +701,7 @@ class AbstractProductImage(models.Model, CommonFeatureProduct):
 
     def thumb(self):
         image = self.original.file.name if self.original is not None else IMAGE_NOT_FOUND
+        image, exist_image = check_exist_image(image)
         return loader.get_template('admin/catalogue/product/thumb.html').render(Context({'image': image}))
     thumb.allow_tags = True
     thumb.short_description = _('Image')
