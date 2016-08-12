@@ -82,7 +82,7 @@ class Command(BaseCommand):
 
             product = self.get_product(cursor, row_product.product_id)
 
-            if product is not None and left_product < 1706:
+            if product is not None:
                 print product.slug, row_product.price
 
                 partner_name = row_product.manufacturer_name
