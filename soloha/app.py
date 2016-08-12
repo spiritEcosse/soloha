@@ -37,13 +37,6 @@ class Soloha(app.Shop):
             url(r'^pages/(?P<url>[\w-]+)/$', views.flatpage, name='pages'),
         ]
         urlpatterns += super(Soloha, self).get_urls()
-        urlpatterns += [
-            # Fallback URL if a not use category slug of the URL
-            url(r'^(?P<category_slug>[\w-]+(/(?!filter)[\w-]+(?!filter))*)(?:/filter/(?P<filter_slug>[\w-]+(/[\w-]+)*))*/$', category_view.as_view(), name='category'),
-            url(r'^(?P<slug>[\w-]+)$', detail_view.as_view(), name='detail'),
-            url(r'^(?P<category_slug>[\w-]+(/[\w-]+)*)/(?P<slug>[\w-]+)$', detail_view.as_view(), name='detail'),
-            # url(r'^(?P<category_slug>[\w-]+(/[\w-]+)*)/$', category_view.as_view(), name='category'),
-        ]
         return urlpatterns
 
 application = Soloha()

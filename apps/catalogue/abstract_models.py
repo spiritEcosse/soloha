@@ -110,7 +110,7 @@ class AbstractProduct(models.Model):
     date_updated = models.DateTimeField(
         _("Date updated"), auto_now=True, db_index=True)
 
-    categories = models.ManyToManyField('catalogue.Category', related_name="products", verbose_name=_("Categories"), blank=True)
+    categories = models.ManyToManyField('catalogue.Category', related_name="products", verbose_name=_("Categories"))
     filters = models.ManyToManyField('catalogue.Feature', related_name="filter_products", verbose_name=_('Filters of product'), blank=True, null=True)
     attributes = models.ManyToManyField('catalogue.Feature', through='ProductFeature', verbose_name=_('Attribute of product'), related_name="attr_products", blank=True)
     characteristics = models.ManyToManyField('catalogue.Feature', verbose_name='Characteristics', related_name='characteristic_products', blank=True)
@@ -188,12 +188,12 @@ class AbstractProduct(models.Model):
         """
         Return a product's absolute url
         """
-        dict_values = {'slug': self.slug}
+        dict_values = {'product_slug': self.slug}
 
         if self.categories.exists():
             dict_values.update({'category_slug': self.categories.first().full_slug})
 
-        return reverse('detail', kwargs=dict_values)
+        return reverse('catalogue:detail', kwargs=dict_values)
 
     def images_all(self):
         images = []
@@ -904,7 +904,7 @@ class CustomAbstractCategory(MPTTModel):
         if values.get('filter_slug'):
             dict_values.update({'filter_slug': values.get('filter_slug')})
 
-        return reverse('category', kwargs=dict_values)
+        return reverse('catalogue:category', kwargs=dict_values)
 
     @classmethod
     def get_annotated_list_qs_depth(cls, parent=None, max_depth=None):

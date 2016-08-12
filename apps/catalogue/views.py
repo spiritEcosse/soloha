@@ -275,6 +275,10 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
     start_option = [{'pk': 0, 'title': NOT_SELECTED}]
     only = ['title', 'pk']
 
+    def get(self, request, *args, **kwargs):
+        self.kwargs['slug'] = self.kwargs['product_slug']
+        return super(ProductDetailView, self).get(request=request, **kwargs)
+
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
         if self.request.body:
