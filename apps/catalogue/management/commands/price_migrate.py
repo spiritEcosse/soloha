@@ -70,36 +70,27 @@ class Command(BaseCommand):
 
     def create_feature(self, cursor):
         # cursor.execute("SELECT product_id from `product` WHERE product_id={}".format(68))
-        cursor.execute("SELECT product_id, price, product.manufacturer_id as product_manufacturer_id from `product` "
-                       "INNER JOIN manufacturer man ON(man.manufacturer_id=product.manufacturer_id) "
-                       "Where product.product_id=57076 LIMIT 10")
+        cursor.execute("SELECT product_id, price, man.name as manufacturer_name from `product` "
+                       "INNER JOIN manufacturer man ON(man.manufacturer_id=product.manufacturer_id) ")
 
         products_rows = namedtuplefetchall(cursor)
         len_products = len(products_rows)
 
         for key_product, row_product in enumerate(products_rows):
-            left_product = len_products - key_product + 1
-            print '\n\n left product - {} \n\n'.format(left_product)
+            left_product = len_products - key_product
+            print '\n left product - {} \n'.format(left_product)
 
             product = self.get_product(cursor, row_product.product_id)
-            print row_product.price
 
-            # product.partner =
-            # partner_name = row_product.manufacturer_name
-            # partner_sku = ''
-            #
-            # partner, _ = Partner.objects.get_or_create(name=partner_name)
-            # try:
-            #     stock = StockRecord.objects.get(partner_sku=partner_sku)
-            # except StockRecord.DoesNotExist:
-            #     stock = StockRecord()
-            #
-            # stock.product = product
-            # stock.partner = partner
-            # stock.partner_sku = partner_sku
-            # stock.price_excl_tax = Decimal(row_product.price)
-            # stock.num_in_stock = 0
-            # stock.save()
+            if product is not None and left_product < 1706:
+                print product.slug, row_product.price
+
+                partner_name = row_product.manufacturer_name
+
+                partner, _ = Partner.objects.get_or_create(name=partner_name)
+                price = Decimal(row_product.price)
+                stock = StockRecord.objects.create(product=product, partner=partner, price_excl_tax=price,
+                                                   price_retail=price, cost_price=price)
 
     def get_product(self, cursor, product_id):
         cursor.execute("SELECT * from `url_alias` "
@@ -110,6 +101,7 @@ class Command(BaseCommand):
         if product_mysql is not None:
             try:
                 product = Product.objects.get(slug=product_mysql.keyword)
-                print product.slug, product_id
             except Product.DoesNotExist:
                 logger.error(u'Product with slug - {} DoesNotExist'.format(product_mysql.keyword))
+            else:
+                return product
