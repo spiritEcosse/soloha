@@ -71,7 +71,7 @@ class Command(BaseCommand):
 
     def create_feature(self, cursor):
         # cursor.execute("SELECT product_id from `product` WHERE product_id={}".format(68))
-        cursor.execute("SELECT product_id from `product` LIMIT 10, 21  ")
+        cursor.execute("SELECT product_id from `product`")
 
         products_rows = namedtuplefetchall(cursor)
         len_products = len(products_rows)
