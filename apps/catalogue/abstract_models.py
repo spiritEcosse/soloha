@@ -591,7 +591,6 @@ class AbstractProductImage(models.Model):
     """
     product = models.ForeignKey('catalogue.Product', related_name='images', verbose_name=_("Product"))
     original = FilerImageField(verbose_name=_("Original"), null=True, blank=True, related_name="original")
-    original_image = models.ImageField(_("Original"), upload_to=settings.OSCAR_IMAGE_FOLDER, max_length=255, blank=True, null=True)
     caption = models.CharField(_("Caption"), max_length=200, blank=True)
 
     #: Use display_order to determine which is the "primary" image

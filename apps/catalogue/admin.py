@@ -2,7 +2,6 @@ from django.contrib import admin
 from apps.catalogue.widgets import MPTTFilteredSelectMultiple, MPTTModelMultipleChoiceField
 from django.db import models
 from oscar.core.loading import get_model
-from feincms.admin import tree_editor
 from django.forms import Textarea
 from django import forms
 from django.contrib.sites.models import Site
@@ -13,8 +12,8 @@ from import_export.admin import ImportExportMixin, ImportExportModelAdmin, Impor
 from django.template import loader, Context
 from import_export import fields, widgets
 from filer.models.imagemodels import Image
-import os
 from widgets import ImageForeignKeyWidget, ImageManyToManyWidget
+from soloha.settings import IMAGE_NOT_FOUND
 
 
 Feature = get_model('catalogue', 'Feature')
@@ -180,23 +179,32 @@ class ProductAdmin(ImportExportMixin, ImportExportActionModelAdmin, admin.ModelA
     form = ProductForm
     list_select_related = ('product_class', 'parent', )
     resource_class = ProductResource
+    list_attr = ('pk', 'title', 'enable', 'date_updated', 'slug', 'structure', 'product_class', )
 
     def thumb(self, obj):
-        return loader.get_template('admin/catalogue/product/thumb.html').render(Context({'image': obj.primary_image()}))
+        image = IMAGE_NOT_FOUND
+
+        if obj.images.exists():
+            original = obj.images.all()[0].original
+
+            if original is not None:
+                image = original
+
+        return loader.get_template('admin/catalogue/product/thumb.html').render(Context({'image': image}))
     thumb.allow_tags = True
     short_description = 'Image'
 
     def get_queryset(self, request):
         qs = super(ProductAdmin, self).get_queryset(request)
-        return (
-            qs.prefetch_related(
-                # 'images',
-                'attribute_values',
-                # 'categories__parent__parent',
-                'stockrecords__partner',
-                'filters',
-                'characteristics',
-            )
+        return qs.only(*self.list_attr).order_by('-date_updated', 'title').select_related(
+            'product_class'
+        ).prefetch_related(
+            'images__original',
+            'attribute_values',
+            'categories__parent__parent',
+            'stockrecords__partner',
+            'filters',
+            'characteristics',
         )
 
 
