@@ -14,6 +14,9 @@ from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 import forms
 from django.db.models import Q
+from django.contrib.flatpages.models import FlatPage
+from apps.flatpages.models import InfoPage
+from django.db.models.query import Prefetch
 
 #Todo change list import module
 try:  # Python 2.7+
@@ -29,9 +32,6 @@ try:
     from django.utils.encoding import force_text
 except ImportError:
     from django.utils.encoding import force_unicode as force_text
-from django.contrib.flatpages.admin import FlatPageAdmin
-from django.contrib.flatpages.models import FlatPage
-from apps.flatpages.models import InfoPage
 
 
 Feature = get_model('catalogue', 'Feature')
@@ -216,6 +216,8 @@ class ProductAdmin(ImportExportMixin, ImportExportActionModelAdmin):
     search_fields = ('upc', 'title', 'slug', )
     form = forms.ProductForm
     resource_class = resources.ProductResource
+    list_select_related = ('product_class', )
+    list_attr = ('pk', 'title', 'enable', 'date_updated', 'slug', 'structure', 'product_class__name', )
 
     class Media:
         js = ("https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css",
@@ -223,20 +225,14 @@ class ProductAdmin(ImportExportMixin, ImportExportActionModelAdmin):
 
     def get_queryset(self, request):
         qs = super(ProductAdmin, self).get_queryset(request)
-        return (
-            qs.select_related(
-                'product_class', 'parent'
-            ).prefetch_related(
-                'images',
-                'attributes',
-                'product_class__options',
-                'categories__parent__parent__parent__parent',
-                'stockrecords',
-                'filters',
-                'attributes',
-                'characteristics',
-                'recommended_products',
-            )
+        return qs.only(*self.list_attr).order_by('-date_updated', 'title').prefetch_related(
+            Prefetch('images', queryset=ProductImage.objects.only('original', 'product')),
+            Prefetch('images__original'),
+            Prefetch('attribute_values'),
+            Prefetch('categories__parent__parent'),
+            Prefetch('stockrecords__partner'),
+            Prefetch('filters'),
+            Prefetch('characteristics'),
         )
 
 

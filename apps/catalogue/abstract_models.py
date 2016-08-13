@@ -500,26 +500,13 @@ class AbstractProduct(models.Model):
         Returns the primary image for a product. Usually used when one can
         only display one product image, e.g. in a list of products.
         """
-        images = self.images.all()
-        ordering = self.images.model.Meta.ordering
-        if not ordering or ordering[0] != 'display_order':
-            # Only apply order_by() if a custom model doesn't use default
-            # ordering. Applying order_by() busts the prefetch cache of
-            # the ProductManager
-            images = images.order_by('display_order')
+        image = self.get_missing_image().name
 
-        try:
-            image = images[0].original
-        except IndexError:
-            # We return a dict with fields that mirror the key properties of
-            # the ProductImage class so this missing image can be used
-            # interchangeably in templates.  Strategy pattern ftw!
-            image = self.get_missing_image().name
-        else:
-            if image is None:
-                image = self.get_missing_image().name
-            else:
-                image = image.file.name
+        if self.images.exists():
+            original = self.images.all()[0].original
+
+            if original is not None:
+                image = original.file.name
 
         image, exist_image = check_exist_image(image)
         return image
