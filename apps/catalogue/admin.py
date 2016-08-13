@@ -13,7 +13,7 @@ from django.template import loader, Context
 from import_export import fields, widgets
 from filer.models.imagemodels import Image
 from widgets import ImageForeignKeyWidget, ImageManyToManyWidget
-from soloha.settings import IMAGE_NOT_FOUND
+from django.db.models.query import Prefetch
 
 
 Feature = get_model('catalogue', 'Feature')
@@ -182,29 +182,21 @@ class ProductAdmin(ImportExportMixin, ImportExportActionModelAdmin, admin.ModelA
     list_attr = ('pk', 'title', 'enable', 'date_updated', 'slug', 'structure', 'product_class', )
 
     def thumb(self, obj):
-        image = IMAGE_NOT_FOUND
-
-        if obj.images.exists():
-            original = obj.images.all()[0].original
-
-            if original is not None:
-                image = original
-
-        return loader.get_template('admin/catalogue/product/thumb.html').render(Context({'image': image}))
+        return loader.get_template('admin/catalogue/product/thumb.html').render(Context({'image': obj.primary_image()}))
     thumb.allow_tags = True
     short_description = 'Image'
 
     def get_queryset(self, request):
         qs = super(ProductAdmin, self).get_queryset(request)
-        return qs.only(*self.list_attr).order_by('-date_updated', 'title').select_related(
+        return qs.only(*self.list_attr).select_related(
             'product_class'
         ).prefetch_related(
-            'images__original',
-            'attribute_values',
-            'categories__parent__parent',
-            'stockrecords__partner',
-            'filters',
-            'characteristics',
+            Prefetch('images', queryset=ProductImage.objects.order_by('display_order')),
+            Prefetch('attribute_values'),
+            Prefetch('categories__parent__parent'),
+            Prefetch('stockrecords__partner'),
+            Prefetch('filters'),
+            Prefetch('characteristics'),
         )
 
 
