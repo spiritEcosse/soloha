@@ -179,7 +179,7 @@ class ProductAdmin(ImportExportMixin, ImportExportActionModelAdmin, admin.ModelA
     form = ProductForm
     list_select_related = ('product_class', 'parent', )
     resource_class = ProductResource
-    list_attr = ('pk', 'title', 'enable', 'date_updated', 'slug', 'structure', 'product_class', )
+    list_attr = ('pk', 'title', 'enable', 'date_updated', 'slug', 'structure', 'product_class__name', )
 
     def thumb(self, obj):
         return loader.get_template('admin/catalogue/product/thumb.html').render(Context({'image': obj.primary_image()}))
@@ -188,10 +188,11 @@ class ProductAdmin(ImportExportMixin, ImportExportActionModelAdmin, admin.ModelA
 
     def get_queryset(self, request):
         qs = super(ProductAdmin, self).get_queryset(request)
-        return qs.only(*self.list_attr).select_related(
+        return qs.only(*self.list_attr).order_by('-date_updated', 'title').select_related(
             'product_class'
         ).prefetch_related(
-            Prefetch('images', queryset=ProductImage.objects.order_by('display_order')),
+            Prefetch('images', queryset=ProductImage.objects.only('original', 'product')),
+            Prefetch('images__original'),
             Prefetch('attribute_values'),
             Prefetch('categories__parent__parent'),
             Prefetch('stockrecords__partner'),
