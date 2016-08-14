@@ -888,8 +888,12 @@ class CustomAbstractCategory(MPTTModel):
         approach.
         """
         dict_values = {'category_slug': self.full_slug}
+
         if values.get('filter_slug'):
             dict_values.update({'filter_slug': values.get('filter_slug')})
+
+        if values.get('page'):
+            dict_values.update({'page': values.get('page')})
 
         return reverse('catalogue:category', kwargs=dict_values)
 

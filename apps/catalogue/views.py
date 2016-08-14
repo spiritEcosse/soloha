@@ -89,6 +89,8 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
         return context
 
     def get(self, request, *args, **kwargs):
+        print 'get -- {}'.format(self.kwargs)
+
         self.object = self.get_category()
         potential_redirect = self.redirect_if_necessary(
             request.path, self.object)
@@ -176,6 +178,14 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
             sorting_url = '{}?sorting_type={}'.format(self.request.path, link)
             sort_link = 'sorting_type={}'.format(link)
             context['sort_types'].append((sorting_url, text, is_active, sort_link))
+
+        url_extra_kwargs = dict()
+        url_extra_kwargs['category_slug'] = self.kwargs.get('category_slug')
+
+        if self.kwargs.get('filter_slug') is not None:
+            url_extra_kwargs.update({'filter_slug': self.kwargs.get('filter_slug')})
+
+        context['url_extra_kwargs'] = url_extra_kwargs
         return context
 
     def get_page_link(self, page_numbers, **kwargs):

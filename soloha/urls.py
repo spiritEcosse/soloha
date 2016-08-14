@@ -28,9 +28,8 @@ sitemaps = {
     'info_page': InfoPageSitemap
 }
 
-
 urlpatterns = [
-                  url(r'^sitemap\.xml$', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
                   url(r'^spirit/', include(admin.site.urls)),
                   url(r'', include(application.urls)),
+                  url(r'^sitemap\.xml$', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
               ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
