@@ -15,6 +15,7 @@ class Command(BaseCommand):
         :return:
         """
         current_site = Site.objects.get(pk=1)
+        Redirect.objects.all().delete()
 
         for category in Category.objects.all():
             old_path = u'/{}/'.format(category.full_slug)
@@ -46,8 +47,17 @@ class Command(BaseCommand):
                 print new_path
                 Redirect.objects.create(site=current_site, old_path=old_path, new_path=new_path)
 
-        Redirect.objects.all().update(new_path=F(slugify('new_path')))
-        Category.objects.all().update(slug=F(slugify('slug')))
-        Product.objects.all().update(slug=F(slugify('slug')))
+            product.slug = slugify(product.slug)
+            product.save()
+
+        for redirect in Redirect.objects.all():
+            list_slugs_old = redirect.new_path.split('/')
+            list_slugs_new = map(slugify, list_slugs_old)
+            redirect.new_path = '/'.join(list_slugs_new)
+            redirect.save()
+
+        for category in Category.objects.all():
+            category.slug = slugify(category.slug)
+            category.save()
 
         self.stdout.write('Successfully write redirects.')
