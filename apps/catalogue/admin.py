@@ -207,10 +207,10 @@ class ProductFeatureAdmin(ImportExportMixin, ImportExportActionModelAdmin):
 
 
 class ProductAdmin(ImportExportMixin, ImportExportActionModelAdmin):
-    date_hierarchy = 'date_created'
+    # date_hierarchy = 'date_created'
     list_display = ('pk', 'title', 'thumb', 'enable', 'date_updated', 'slug', 'categories_to_str', 'get_product_class',
                     'structure', 'partners_to_str', 'attribute_summary', )
-    list_filter = ('enable', 'stockrecords__partner', 'categories', 'structure', 'is_discountable', )
+    list_filter = ('enable', 'stockrecords__partner', 'categories__name', 'structure', 'is_discountable', )
     inlines = (StockRecordInline, ProductRecommendationInline, ProductImageInline, ProductFeatureInline, )
     prepopulated_fields = {"slug": ("title",)}
     search_fields = ('upc', 'title', 'slug', )
@@ -229,6 +229,7 @@ class ProductAdmin(ImportExportMixin, ImportExportActionModelAdmin):
             Prefetch('images', queryset=ProductImage.objects.only('original', 'product')),
             Prefetch('images__original'),
             Prefetch('attribute_values'),
+            Prefetch('attributes'),
             Prefetch('categories__parent__parent'),
             Prefetch('stockrecords__partner'),
             Prefetch('filters'),
