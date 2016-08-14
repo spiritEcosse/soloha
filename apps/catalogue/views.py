@@ -1,53 +1,37 @@
-from oscar.apps.catalogue.views import ProductCategoryView as CoreProductCategoryView
 from oscar.apps.catalogue.views import ProductDetailView as CoreProductDetailView
 from oscar.apps.partner.strategy import Selector
 from django.utils.translation import ugettext_lazy as _
 from django.views import generic
-from django.shortcuts import render_to_response
 from django.views.generic import View
 from oscar.core.loading import get_model
 from braces import views
-from django.views.generic.list import MultipleObjectMixin
 from django.views.generic.detail import SingleObjectMixin
 from django.db.models.query import Prefetch
 from django.db.models import Count
 from django.http import HttpResponsePermanentRedirect, Http404
-from django.shortcuts import get_object_or_404
 from django.utils.http import urlquote
 from soloha.settings import OSCAR_PRODUCTS_PER_PAGE
-from django.shortcuts import get_object_or_404, redirect
-from django.http import HttpResponseRedirect
+from django.shortcuts import get_object_or_404
 from django.db.models import F
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger, InvalidPage
 import json
 import warnings
-from django.core import serializers
-from djangular.views.crud import NgCRUDView
-from oscar.core.loading import get_class
 from django.db.models import Q
 from soloha import settings
 from django.db.models import Min, Sum
 import operator
 import functools
 from apps.flatpages.models import InfoPage
-from haystack.query import SearchQuerySet
-from haystack.inputs import AutoQuery
-from django.template import defaultfilters
 from django.http import HttpResponse
 import logging
 from collections import namedtuple
 from decimal import Decimal as D
 from decimal import ROUND_DOWN
 from forms import QuickOrderForm
-from django.views.generic.edit import FormMixin
 from django.core.urlresolvers import reverse_lazy
-from django.utils.encoding import force_text
 from django.views.generic.edit import FormView
-from django.template.loader import get_template
 from django.core.mail import EmailMultiAlternatives
 from django.contrib.sites.shortcuts import get_current_site
 from django.template import loader, Context
-from django.core.mail import send_mail
 from easy_thumbnails.files import get_thumbnailer
 from django.core.exceptions import ObjectDoesNotExist
 
@@ -276,7 +260,9 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
     only = ['title', 'pk']
 
     def get(self, request, *args, **kwargs):
-        self.kwargs['slug'] = self.kwargs['product_slug']
+        if 'product_slug' in kwargs:
+            self.kwargs['slug'] = self.kwargs['product_slug']
+
         return super(ProductDetailView, self).get(request=request, **kwargs)
 
     def post(self, request, *args, **kwargs):
