@@ -4,6 +4,7 @@ from django.contrib.redirects.models import Redirect
 from django.contrib.sites.models import Site
 from oscar.core.utils import slugify
 from django.db.models import F
+from django.core.urlresolvers import NoReverseMatch
 
 
 class Command(BaseCommand):
@@ -31,7 +32,14 @@ class Command(BaseCommand):
             print 'left products - {}'.format(count_products - key)
 
             old_path = u'/{}/{}'.format(product.categories.first().full_slug, product.slug)
-            new_path = product.get_absolute_url()
+
+            try:
+                new_path = product.get_absolute_url()
+            except NoReverseMatch:
+                product.slug = slugify(product.slug)
+                product.save()
+                new_path = product.get_absolute_url()
+
             print old_path
             print new_path
             Redirect.objects.create(site=current_site, old_path=old_path, new_path=new_path)
