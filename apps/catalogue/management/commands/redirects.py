@@ -14,9 +14,10 @@ class Command(BaseCommand):
         :return:
         """
         current_site = Site.objects.get(pk=1)
+        Redirect.objects.all().delete()
 
         for category in Category.objects.all():
-            old_path = '/{}/'.format(category.full_slug)
+            old_path = u'/{}/'.format(category.full_slug)
             new_path = category.get_absolute_url()
             print old_path
             print new_path
@@ -24,12 +25,19 @@ class Command(BaseCommand):
 
         print '\n end categories \n '
 
-        for product in Product.objects.all():
-            old_path = '/{}/{}'.format(product.categories.first().full_slug, product.slug)
+        count_products = Product.objects.count()
+
+        for key, product in enumerate(Product.objects.all()):
+            print 'left products - {}'.format(count_products - key)
+
+            old_path = u'/{}/{}'.format(product.categories.first().full_slug, product.slug)
             new_path = product.get_absolute_url()
             print old_path
             print new_path
             Redirect.objects.create(site=current_site, old_path=old_path, new_path=new_path)
 
-        # Redirect.objects.all().update(new_path=F(slugify('new_path')))
+        Redirect.objects.all().update(new_path=F(slugify('new_path')))
+        Category.objects.all().update(slug=F(slugify('slug')))
+        Product.objects.all().update(slug=F(slugify('slug')))
+
         self.stdout.write('Successfully write redirects.')
