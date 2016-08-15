@@ -34,6 +34,7 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.template import loader, Context
 from easy_thumbnails.files import get_thumbnailer
 from django.core.exceptions import ObjectDoesNotExist
+from collections import namedtuple
 
 logger = logging.getLogger(__name__)
 
@@ -50,11 +51,20 @@ NOT_SELECTED = str(_('Not selected'))
 ANSWER = str(_('Your message has been sent. We will contact you on the specified details.'))
 
 
+Order = namedtuple('Order', ['title', 'column', 'argument'])
+
+
 class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, SingleObjectMixin, generic.ListView):
     template_name = 'catalogue/category.html'
     enforce_paths = True
     model = Product
     paginate_by = OSCAR_PRODUCTS_PER_PAGE
+    orders = (
+        Order(title='By popularity', column='-views_count', argument='popularity'),
+        Order(title='By price ascending', column='stockrecords__price_excl_tax', argument='price_ascending'),
+        Order(title='By price descending', column='-stockrecords__price_excl_tax', argument='price_descending'),
+    )
+    use_keys = ('sort', 'filter_slug', )
 
     def post(self, request, *args, **kwargs):
         if self.request.is_ajax():
@@ -158,33 +168,12 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
         context['filters'] = Feature.objects.filter(level=0, children__in=queryset_filters).prefetch_related(
             Prefetch('children', queryset=queryset_filters.annotate(num_prod=Count('filter_products')),
                      to_attr='children_in_products'),).order_by('sort', 'title').distinct()
-        context['filter_slug'] = self.kwargs.get('filter_slug', '')
-        # this for more goods
-        self.kwargs['url'] = self.request.path
-        context['pages'] = self.get_page_link(context['paginator'].page_range)
-        for page in context['pages']:
-            if page['page_number'] == context['page_obj'].number:
-                page['active'] = 'True'
-        context['sort_types'] = []
-        sort_types = [('-views_count', _('By popularity'), 'popularity'),
-                      ('-stockrecords__price_excl_tax', _('By price descending'), 'price_descending'),
-                      ('stockrecords__price_excl_tax', _('By price ascending'), 'price_ascending')]
-        for type, text, link in sort_types:
-            is_active = False
-            if self.kwargs.get('sorting_type', '') == type:
-                is_active = True
-            sorting_url = '{}?sorting_type={}'.format(self.request.path, link)
-            sort_link = 'sorting_type={}'.format(link)
-            context['sort_types'].append((sorting_url, text, is_active, sort_link))
 
-        url_extra_kwargs = dict()
-        url_extra_kwargs['category_slug'] = self.kwargs.get('category_slug')
-
-        if self.kwargs.get('filter_slug') is not None:
-            url_extra_kwargs.update({'filter_slug': self.kwargs.get('filter_slug')})
-
-        context['url_extra_kwargs'] = url_extra_kwargs
+        context['url_extra_kwargs'] = {key: value for key, value in self.kwargs.items()
+                                       if key in self.use_keys and value is not None}
+        context['url_extra_kwargs'].update({'category_slug': self.kwargs.get('category_slug')})
         context['page'] = self.kwargs.get('page', None)
+        context['orders'] = self.orders
         return context
 
     def get_page_link(self, page_numbers, **kwargs):
