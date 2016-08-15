@@ -89,11 +89,9 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
         return context
 
     def get(self, request, *args, **kwargs):
-        print 'get -- {}'.format(self.kwargs)
-
         self.object = self.get_category()
-        potential_redirect = self.redirect_if_necessary(
-            request.path, self.object)
+        potential_redirect = self.redirect_if_necessary(request.path, self.object)
+
         if potential_redirect is not None:
             return potential_redirect
 

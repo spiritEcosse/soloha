@@ -892,7 +892,7 @@ class CustomAbstractCategory(MPTTModel):
         if values.get('filter_slug'):
             dict_values.update({'filter_slug': values.get('filter_slug')})
 
-        if values.get('page'):
+        if values.get('page') and int(values.get('page')) != 1:
             dict_values.update({'page': values.get('page')})
 
         return reverse('catalogue:category', kwargs=dict_values)
