@@ -7,6 +7,12 @@
 {% load staticfiles %}
 {% load i18n %}
 
+{% block meta %}
+    {% if page %}
+        <meta name="robots" content="nofollow" />
+    {% endif %}
+{% endblock %}
+
 {#{% block ngController %}ng-controller="" {% endblock ngController %}#}
 {% block ngController%}ng-controller="More_goods"{% endblock ngController %}
 
@@ -25,6 +31,7 @@
 {% endblock %}
 
 {% block left-bar %}
+    {{ page }}
     {% if filters %}
         <div class="heading">Подбор по параметрам</div>
         <div class="filter">

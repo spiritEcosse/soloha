@@ -186,6 +186,7 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
             url_extra_kwargs.update({'filter_slug': self.kwargs.get('filter_slug')})
 
         context['url_extra_kwargs'] = url_extra_kwargs
+        context['page'] = self.kwargs.get('page', None)
         return context
 
     def get_page_link(self, page_numbers, **kwargs):
