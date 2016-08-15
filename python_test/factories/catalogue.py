@@ -12,7 +12,6 @@ from oscar.core.loading import get_class, get_model
 from decimal import Decimal as D
 from oscar.apps.partner.strategy import Selector
 from django.conf import settings
-from apps.catalogue.models import SiteInfo
 from apps.flatpages.models import InfoPage
 
 Free = get_class('shipping.methods', 'Free')
