@@ -34,38 +34,67 @@
 
 {% block left-bar %}
     {% if filters %}
+        {% regroup selected_filters by parent as group_filters %}
+
+        <div class="heading">{% trans 'Selected' %}</div>
+        <div class="filter">
+            {% for filter in group_filters %}
+                <div class="items">
+                    <div class="name">{{ filter.grouper.title }}</div>
+                    <div class="values">
+                        <ul class="list-group">
+                            {% for value in filter.list %}
+                                <li class="list-group-item checkbox">
+                                    {% assign clear_filter selected_filters|remove:value %}
+
+                                    <a class="btn btn-default btn-block"
+                                       href="{% reverse_url 'catalogue:category' url_extra_kwargs filter_slug=clear_filter|join_slug:"/" %}"
+                                       title='{% trans 'Clean' %}' aria-label="{% trans 'Clean' %}">
+                                        {{ value.title }}
+                                        <span class="glyphicon glyphicon-remove pull-right" aria-hidden="true"></span>
+                                    </a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
         <div class="heading">{% trans 'Selection of parameters' %}</div>
         <div class="filter">
-            {% with url_extra_kwargs.filter_slug|split:'/' as select_filter %}
-                {% regroup filters by parent as filters %}
+            {% regroup filters by parent as filters %}
 
-                {% for filter in filters %}
-                    <div class="items">
-                        <div class="name" >{{ filter.grouper.title }}</div>
-                        <div class="values">
-                            <ul class="list-group">
-                                {% for value in filter.list %}
-                                    <li class="list-group-item checkbox">
-                                        <label>
-                                            {% if value.slug|in_list:select_filter %}
-                                                {% assign clear_filter select_filter|remove:value.slug %}
-                                            {% else %}
-                                                {% assign clear_filter select_filter|append:value.slug %}
-                                            {% endif %}
+            {% for filter in filters %}
+                <div class="items">
+                    <div class="name" >{{ filter.grouper.title }}</div>
+                    <div class="values">
+                        <ul class="list-group">
+                            {% for value in filter.list %}
+                                <li class="list-group-item checkbox">
+                                    {% if value|in_list:selected_filters %}
+                                        {% assign clear_filter selected_filters|remove:value %}
+                                        {% trans 'Clear' as title %}
+                                    {% else %}
+                                        {% assign clear_filter selected_filters|append:value %}
+                                        {% trans 'Choose' as title %}
+                                    {% endif %}
 
-                                            <a href="{% reverse_url 'catalogue:category' url_extra_kwargs filter_slug=clear_filter|join_list:"/"|default:None %}">
-                                                <input type="checkbox" {% if value.slug|in_list:select_filter %} checked{% endif %} />
-                                                {{ value.title }}
-                                                <span class="count">({{ value.count_products }})</span>
-                                            </a>
-                                        </label>
-                                    </li>
-                                {% endfor %}
-                            </ul>
-                        </div>
+                                    <a href="{% reverse_url 'catalogue:category' url_extra_kwargs filter_slug=clear_filter|join_slug:"/"|default:None %}"
+                                       class="btn btn-default btn-block {% if value|in_list:selected_filters %} active{% endif %}"
+                                       title={{ title }} aria-label={{ title }}>
+                                        {{ value.title }}
+                                        {% if value|in_list:selected_filters %}
+                                            <span class="glyphicon glyphicon-remove pull-right" aria-hidden="true"></span>
+                                        {% endif %}
+                                        <span class="count">({{ value.count_products }})</span>
+                                    </a>
+                                </li>
+                            {% endfor %}
+                        </ul>
                     </div>
-                {% endfor %}
-            {% endwith %}
+                </div>
+            {% endfor %}
         </div>
     {% endif %}
 {% endblock left-bar %}
@@ -97,8 +126,8 @@
                             {% for children in category.children.all %}
                                 <div class="col-xs-12 col-sm-4 item text-center">
                                     <a href="{{ children.get_absolute_url }}">
-                                        <img src="/media/images/make_up/almeriya1-200x100-.png" class="img-responsive"/>
-                                        <div class="title">{{ children }}</div>
+                                        <img src="" class="img-responsive"/>
+                                        <div class="title"></div>
                                     </a>
                                 </div>
                             {% endfor %}
@@ -138,7 +167,7 @@
     </div>
 
     <div class="row items">
-        {% if page_obj %}
+        {% if page_obj.paginator.num_pages %}
             {% for product in page_obj %}
                 <div class="col-sm-6 col-md-6">
                     {% include "catalogue/partials/product.html" %}

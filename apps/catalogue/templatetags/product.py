@@ -28,6 +28,11 @@ def join_list(list, separator):
 
 
 @register.filter
+def join_slug(list, separator):
+    return separator.join([item.slug for item in list])
+
+
+@register.filter
 def split(str, splitter):
     if str:
         return str.split(splitter)

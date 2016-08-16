@@ -58,6 +58,7 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
     template_name = 'catalogue/category.html'
     enforce_paths = True
     model = Product
+    model_single_object = Category
     paginate_by = OSCAR_PRODUCTS_PER_PAGE
     orders = (
         Order(title='By popularity', column='-views_count', argument='popularity'),
@@ -81,7 +82,7 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
 
     def get_context_data_more_goods_json(self, **kwargs):
         context = dict()
-        self.object = self.get_category()
+        self.object = self.object()
         self.products_on_page = self.get_queryset()
 
         self.paginator = self.get_paginator(self.products_on_page, OSCAR_PRODUCTS_PER_PAGE)
@@ -99,35 +100,18 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
         return context
 
     def get(self, request, *args, **kwargs):
-        self.object = self.get_category()
+        self.object = self.get_object(queryset=self.model_single_object.objects.filter(enable=True))
         potential_redirect = self.redirect_if_necessary(request.path, self.object)
 
         if potential_redirect is not None:
             return potential_redirect
 
+        self.filter_slug = self.kwargs.get('filter_slug').split('/') if self.kwargs.get('filter_slug') else None
         return super(ProductCategoryView, self).get(request, *args, **kwargs)
 
-    def get_category(self):
-        if 'pk' in self.kwargs:
-            return get_object_or_404(Category, pk=self.kwargs['pk'])
-        elif 'category_slug' in self.kwargs:
-            concatenated_slugs = self.kwargs['category_slug']
-            slugs = concatenated_slugs.split(Category._slug_separator)
-            try:
-                last_slug = slugs[-1]
-            except IndexError:
-                raise Http404
-            else:
-                for category in Category.objects.filter(slug=last_slug):
-                    if category.full_slug == concatenated_slugs:
-                        message = (
-                            "Accessing categories without a primary key"
-                            " is deprecated will be removed in Oscar 1.2.")
-                        warnings.warn(message, DeprecationWarning)
-
-                        return category
-
-        raise Http404
+    def get_object(self, queryset=None):
+        self.kwargs['slug'] = self.kwargs['category_slug'].split(Category._slug_separator)[-1]
+        return super(ProductCategoryView, self).get_object(queryset=queryset)
 
     def redirect_if_necessary(self, current_path, category):
         if self.enforce_paths:
@@ -137,21 +121,19 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
                 return HttpResponsePermanentRedirect(expected_path)
 
     def get_queryset(self):
-        dict_filter = {'enable': True, 'categories__in': self.object.get_descendants(include_self=True)}
-        only = ['title', 'slug', 'structure', 'product_class', 'categories']
-
-        sort_argument = self.orders[0].argument if self.kwargs.get('sort') is None else self.kwargs.get('sort')
+        sort_argument = self.kwargs.get('sort') or self.orders[0].argument
         sort = filter(lambda order: order.argument == sort_argument, self.orders)[0]
 
-        self.products_without_filters = Product.objects.only('id').filter(
-            **dict_filter
-        ).distinct().order_by(sort.column)
+        kwargs = {'enable': True, 'categories': self.object.get_descendants(include_self=True),
+                  'categories__enable': True}
 
-        if self.kwargs.get('filter_slug'):
-            dict_filter['filters__slug__in'] = self.kwargs.get('filter_slug').split('/')
+        if self.filter_slug:
+            kwargs.update({'filters__slug__in': self.filter_slug})
 
         queryset = super(ProductCategoryView, self).get_queryset()
-        queryset = queryset.only(*only).filter(**dict_filter).distinct().select_related('product_class').prefetch_related(
+        queryset = queryset.only(
+            'title', 'slug', 'structure', 'product_class', 'categories'
+        ).filter(**kwargs).select_related('product_class').prefetch_related(
             Prefetch('images'),
             Prefetch('product_class__options'),
             Prefetch('stockrecords'),
@@ -161,11 +143,18 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
 
     def get_context_data(self, **kwargs):
         context = super(ProductCategoryView, self).get_context_data(**kwargs)
+        only = ('title', 'slug', 'parent', )
+        orders = ('parent__sort', 'parent__title', )
 
-        context['filters'] = Feature.objects.filter(
+        if self.filter_slug:
+            context['selected_filters'] = Feature.objects.only(*only).filter(
+                slug__in=self.filter_slug, level=1
+            ).order_by(*orders)
+
+        context['filters'] = Feature.objects.only(*only).filter(
             level=1, filter_products__categories=self.object.get_descendants(include_self=True),
             filter_products__enable=True, filter_products__categories__enable=True
-        ).order_by('parent__sort', 'parent__title').distinct().select_related('parent').annotate(
+        ).order_by(*orders).distinct().select_related('parent').annotate(
             count_products=Count('filter_products')
         )
 
