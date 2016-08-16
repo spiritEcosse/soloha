@@ -34,6 +34,7 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.template import loader, Context
 from easy_thumbnails.files import get_thumbnailer
 from django.core.exceptions import ObjectDoesNotExist
+from collections import namedtuple
 
 logger = logging.getLogger(__name__)
 
@@ -50,11 +51,20 @@ NOT_SELECTED = str(_('Not selected'))
 ANSWER = str(_('Your message has been sent. We will contact you on the specified details.'))
 
 
+Order = namedtuple('Order', ['title', 'column', 'argument'])
+
+
 class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, SingleObjectMixin, generic.ListView):
     template_name = 'catalogue/category.html'
     enforce_paths = True
     model = Product
     paginate_by = OSCAR_PRODUCTS_PER_PAGE
+    orders = (
+        Order(title='By popularity', column='-views_count', argument='popularity'),
+        Order(title='By price ascending', column='stockrecords__price_excl_tax', argument='price_ascending'),
+        Order(title='By price descending', column='-stockrecords__price_excl_tax', argument='price_descending'),
+    )
+    use_keys = ('sort', 'filter_slug', )
 
     def post(self, request, *args, **kwargs):
         if self.request.is_ajax():
@@ -95,9 +105,6 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
         if potential_redirect is not None:
             return potential_redirect
 
-        dict_new_sorting_types = {'popularity': '-views_count', 'price_ascending': 'stockrecords__price_excl_tax',
-                                  'price_descending': '-stockrecords__price_excl_tax'}
-        self.kwargs['sorting_type'] = dict_new_sorting_types.get(self.request.GET.get('sorting_type'), '-views_count')
         return super(ProductCategoryView, self).get(request, *args, **kwargs)
 
     def get_category(self):
@@ -133,11 +140,16 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
         dict_filter = {'enable': True, 'categories__in': self.object.get_descendants(include_self=True)}
         only = ['title', 'slug', 'structure', 'product_class', 'categories']
 
-        dict_new_sorting_types = {'popularity': '-views_count', 'price_ascending': 'stockrecords__price_excl_tax',
-                                  'price_descending': '-stockrecords__price_excl_tax'}
-        self.kwargs['sorting_type'] = dict_new_sorting_types.get(self.kwargs.get('sorting_type'), self.kwargs.get('sorting_type', '-views_count'))
+        sort_argument = self.orders[0].argument
 
-        self.products_without_filters = Product.objects.only('id').filter(**dict_filter).distinct().order_by(self.kwargs.get('sorting_type'))
+        if self.kwargs.get('sort') is not None:
+            sort_argument = self.kwargs.get('sort')
+
+        sort = filter(lambda order: order.argument == sort_argument, self.orders)[0]
+
+        self.products_without_filters = Product.objects.only('id').filter(
+            **dict_filter
+        ).distinct().order_by(sort.column)
 
         if self.kwargs.get('filter_slug'):
             dict_filter['filters__slug__in'] = self.kwargs.get('filter_slug').split('/')
@@ -148,43 +160,21 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
             Prefetch('product_class__options'),
             Prefetch('stockrecords'),
             Prefetch('categories__parent__parent')
-        ).distinct().order_by(self.kwargs['sorting_type'])
+        ).distinct().order_by(sort.column)
         return queryset
 
     def get_context_data(self, **kwargs):
-        # Category.objects.filter(pk=self.object.pk).update(popular=F('popular') + 1)
         context = super(ProductCategoryView, self).get_context_data(**kwargs)
         queryset_filters = Feature.objects.filter(filter_products__in=self.products_without_filters).distinct().prefetch_related('filter_products')
         context['filters'] = Feature.objects.filter(level=0, children__in=queryset_filters).prefetch_related(
             Prefetch('children', queryset=queryset_filters.annotate(num_prod=Count('filter_products')),
                      to_attr='children_in_products'),).order_by('sort', 'title').distinct()
-        context['filter_slug'] = self.kwargs.get('filter_slug', '')
-        # this for more goods
-        self.kwargs['url'] = self.request.path
-        context['pages'] = self.get_page_link(context['paginator'].page_range)
-        for page in context['pages']:
-            if page['page_number'] == context['page_obj'].number:
-                page['active'] = 'True'
-        context['sort_types'] = []
-        sort_types = [('-views_count', _('By popularity'), 'popularity'),
-                      ('-stockrecords__price_excl_tax', _('By price descending'), 'price_descending'),
-                      ('stockrecords__price_excl_tax', _('By price ascending'), 'price_ascending')]
-        for type, text, link in sort_types:
-            is_active = False
-            if self.kwargs.get('sorting_type', '') == type:
-                is_active = True
-            sorting_url = '{}?sorting_type={}'.format(self.request.path, link)
-            sort_link = 'sorting_type={}'.format(link)
-            context['sort_types'].append((sorting_url, text, is_active, sort_link))
 
-        url_extra_kwargs = dict()
-        url_extra_kwargs['category_slug'] = self.kwargs.get('category_slug')
-
-        if self.kwargs.get('filter_slug') is not None:
-            url_extra_kwargs.update({'filter_slug': self.kwargs.get('filter_slug')})
-
-        context['url_extra_kwargs'] = url_extra_kwargs
+        context['url_extra_kwargs'] = {key: value for key, value in self.kwargs.items()
+                                       if key in self.use_keys and value is not None}
+        context['url_extra_kwargs'].update({'category_slug': self.kwargs.get('category_slug')})
         context['page'] = self.kwargs.get('page', None)
+        context['orders'] = self.orders
         return context
 
     def get_page_link(self, page_numbers, **kwargs):

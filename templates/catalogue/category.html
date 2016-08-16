@@ -4,6 +4,7 @@
 {% load promotion_tags %}
 {% load category_tags %}
 {% load product_tags %}
+{% load catalogue %}
 {% load staticfiles %}
 {% load i18n %}
 
@@ -116,13 +117,20 @@
         <div class="col-xs-16">
             <span class="text">Сортировать:</span>
             <div class="btn-group btn-group-md" role="group" aria-label="Sort">
-                {% for sorting_url, name, is_active in sort_types %}
-                    {% if is_active %}
-                        <a href="{{ sorting_url }}" type="button" class="btn btn-default btn-danger">{{ name }}</a>
-                    {% else %}
-                        <a href="{{ sorting_url }}" type="button" class="btn btn-default"> {{ name }}</a>
-                    {% endif %}
-                {% endfor %}
+                {% with url_extra_kwargs.sort|default:orders.0.argument as select_order %}
+                    {% for order in orders %}
+                        {% if forloop.first %}
+                            {% assign sort None %}
+                        {% else %}
+                            {% assign sort order.argument %}
+                        {% endif %}
+                        <a href="{% reverse_url 'catalogue:category' url_extra_kwargs sort=sort %}"
+                           class="btn {% if select_order == order.argument %} btn-danger disabled{% else %} btn-default{% endif %}"
+                           title="{{ order.title }}">
+                            {{ order.title }}
+                        </a>
+                    {% endfor %}
+                {% endwith %}
             </div>
         </div>
     </div>
@@ -135,14 +143,14 @@
                 </div>
             {% endfor %}
             <div class="clearfix"></div>
-                <div name="more_products" class="col-xs-6 col-xs-offset-8 wrapper" action=".">
-                    {% csrf_token %}
-                    {% if page_obj.number != paginator.num_pages %}
+            <div name="more_products" class="col-xs-6 col-xs-offset-8 wrapper" action=".">
+                {% csrf_token %}
+                {% if page_obj.number != paginator.num_pages %}
                     <a href="#" class="more_products" ng-click="submit()" ng-hide="hide == true"> {#  onclick="location.href='/test/'" #}
                         ПОКАЗАТЬ ЕЩЕ
                     </a>
-                        {% endif %}
-                </div>
+                {% endif %}
+            </div>
             <div>
                 {% include "catalogue/partials/pagination.html" %}
             </div>
