@@ -162,11 +162,12 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
     def get_context_data(self, **kwargs):
         context = super(ProductCategoryView, self).get_context_data(**kwargs)
 
-        #  Todo add sort on Feature queryset -> .order_by('sort', 'title')
         context['filters'] = Feature.objects.filter(
             level=1, filter_products__categories=self.object.get_descendants(include_self=True),
             filter_products__enable=True, filter_products__categories__enable=True
-        ).distinct().select_related('parent').annotate(count_products=Count('filter_products'))
+        ).order_by('parent__sort', 'parent__title').distinct().select_related('parent').annotate(
+            count_products=Count('filter_products')
+        )
 
         context['url_extra_kwargs'] = {key: value for key, value in self.kwargs.items()
                                        if key in self.use_keys and value is not None}

@@ -123,8 +123,6 @@ def remove(list, needle):
 
 @register.filter
 def append(list, needle):
-    print '-{}----'.format(list)
-    # if type(list) is not list
     copy = list[:]
     copy.append(needle)
     return copy
