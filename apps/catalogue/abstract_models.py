@@ -1003,7 +1003,7 @@ class AbstractProductVersion(models.Model, CommonFeatureProduct):
         verbose_name_plural = _('Product versions')
 
     def __str__(self):
-        return u'{}, Version of product - {}'.format(self.pk, self.product.title)
+        return u'{}, Version of product - {}'.format(self.pk, getattr(self, 'product', None))
 
 
 @python_2_unicode_compatible
