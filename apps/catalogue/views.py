@@ -105,9 +105,6 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
         if potential_redirect is not None:
             return potential_redirect
 
-        dict_new_sorting_types = {'popularity': '-views_count', 'price_ascending': 'stockrecords__price_excl_tax',
-                                  'price_descending': '-stockrecords__price_excl_tax'}
-        self.kwargs['sorting_type'] = dict_new_sorting_types.get(self.request.GET.get('sorting_type'), '-views_count')
         return super(ProductCategoryView, self).get(request, *args, **kwargs)
 
     def get_category(self):
@@ -143,11 +140,16 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
         dict_filter = {'enable': True, 'categories__in': self.object.get_descendants(include_self=True)}
         only = ['title', 'slug', 'structure', 'product_class', 'categories']
 
-        dict_new_sorting_types = {'popularity': '-views_count', 'price_ascending': 'stockrecords__price_excl_tax',
-                                  'price_descending': '-stockrecords__price_excl_tax'}
-        self.kwargs['sorting_type'] = dict_new_sorting_types.get(self.kwargs.get('sorting_type'), self.kwargs.get('sorting_type', '-views_count'))
+        sort_argument = self.orders[0].argument
 
-        self.products_without_filters = Product.objects.only('id').filter(**dict_filter).distinct().order_by(self.kwargs.get('sorting_type'))
+        if self.kwargs.get('sort') is not None:
+            sort_argument = self.kwargs.get('sort')
+
+        sort = filter(lambda order: order.argument == sort_argument, self.orders)[0]
+
+        self.products_without_filters = Product.objects.only('id').filter(
+            **dict_filter
+        ).distinct().order_by(sort.column)
 
         if self.kwargs.get('filter_slug'):
             dict_filter['filters__slug__in'] = self.kwargs.get('filter_slug').split('/')
@@ -158,7 +160,7 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
             Prefetch('product_class__options'),
             Prefetch('stockrecords'),
             Prefetch('categories__parent__parent')
-        ).distinct().order_by(self.kwargs['sorting_type'])
+        ).distinct().order_by(sort.column)
         return queryset
 
     def get_context_data(self, **kwargs):
