@@ -16,6 +16,19 @@ def recommended_products(product):
     """
     return {'recommended_products': product.recommended_products.all()[:settings.RECOMMENDED_PRODUCTS]}
 
+
 @register.filter
 def join(list, separator):
     return separator.join([item.title for item in list])
+
+
+@register.filter
+def join_list(list, separator):
+    return separator.join(list)
+
+
+@register.filter
+def split(str, splitter):
+    if str:
+        return str.split(splitter)
+    return []

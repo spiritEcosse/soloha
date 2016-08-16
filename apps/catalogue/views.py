@@ -140,11 +140,7 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
         dict_filter = {'enable': True, 'categories__in': self.object.get_descendants(include_self=True)}
         only = ['title', 'slug', 'structure', 'product_class', 'categories']
 
-        sort_argument = self.orders[0].argument
-
-        if self.kwargs.get('sort') is not None:
-            sort_argument = self.kwargs.get('sort')
-
+        sort_argument = self.orders[0].argument if self.kwargs.get('sort') is None else self.kwargs.get('sort')
         sort = filter(lambda order: order.argument == sort_argument, self.orders)[0]
 
         self.products_without_filters = Product.objects.only('id').filter(
@@ -165,10 +161,12 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
 
     def get_context_data(self, **kwargs):
         context = super(ProductCategoryView, self).get_context_data(**kwargs)
-        queryset_filters = Feature.objects.filter(filter_products__in=self.products_without_filters).distinct().prefetch_related('filter_products')
-        context['filters'] = Feature.objects.filter(level=0, children__in=queryset_filters).prefetch_related(
-            Prefetch('children', queryset=queryset_filters.annotate(num_prod=Count('filter_products')),
-                     to_attr='children_in_products'),).order_by('sort', 'title').distinct()
+
+        #  Todo add sort on Feature queryset -> .order_by('sort', 'title')
+        context['filters'] = Feature.objects.filter(
+            level=1, filter_products__categories=self.object.get_descendants(include_self=True),
+            filter_products__enable=True, filter_products__categories__enable=True
+        ).distinct().select_related('parent').annotate(count_products=Count('filter_products'))
 
         context['url_extra_kwargs'] = {key: value for key, value in self.kwargs.items()
                                        if key in self.use_keys and value is not None}

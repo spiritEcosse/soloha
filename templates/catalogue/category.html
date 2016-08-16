@@ -5,6 +5,7 @@
 {% load category_tags %}
 {% load product_tags %}
 {% load catalogue %}
+{% load product %}
 {% load staticfiles %}
 {% load i18n %}
 
@@ -33,37 +34,38 @@
 
 {% block left-bar %}
     {% if filters %}
-        <div class="heading">Подбор по параметрам</div>
+        <div class="heading">{% trans 'Selection of parameters' %}</div>
         <div class="filter">
-            {% for filter in filters %}
-                <div class="items">
-                    <div class="name" >{{ filter }}</div>
-                    <div class="values">
-                        <ul class="list-group">
-                            {% for filter_value in filter.children_in_products %}
-                                <li class="list-group-item checkbox">
-                                    <label>
-                                        {# ToDo open tag a once #}
-                                        {% for sorting_url, text, is_active, link in sort_types %}
-                                            {% if is_active %}
-                                                <a href="{% concatenate category filter_slug filter_value %}?{{ link }}">
-                                                {% if filter_value.get_absolute_url in filter_slug %}
-                                                    <input type="checkbox" checked onclick="location.href='{% concatenate category filter_slug filter_value %}?{{ link }}'"/>
-                                                {% else %}
-                                                    <input type="checkbox" onclick="location.href='{% concatenate category filter_slug filter_value %}?{{ link }}'"/>
-                                                {% endif %}
+            {% with url_extra_kwargs.filter_slug|split:'/' as select_filter %}
+                {% regroup filters by parent as filters %}
+
+                {% for filter in filters %}
+                    <div class="items">
+                        <div class="name" >{{ filter.grouper.title }}</div>
+                        <div class="values">
+                            <ul class="list-group">
+                                {% for value in filter.list %}
+                                    <li class="list-group-item checkbox">
+                                        <label>
+                                            {% if value.slug|in_list:select_filter %}
+                                                {% assign clear_filter select_filter|remove:value.slug %}
+                                            {% else %}
+                                                {% assign clear_filter select_filter|append:value.slug %}
                                             {% endif %}
-                                        {% endfor %}
-                                        {{ filter_value.title }}
-                                        <span class="count">({{ filter_value.num_prod }})</span>
-                                        </a>
-                                    </label>
-                                </li>
-                            {% endfor %}
-                        </ul>
+
+                                            <a href="{% reverse_url 'catalogue:category' url_extra_kwargs filter_slug=clear_filter|join_list:"/"|default:None %}">
+                                                <input type="checkbox" {% if value.slug|in_list:select_filter %} checked{% endif %} />
+                                                {{ value.title }}
+                                                <span class="count">({{ value.count_products }})</span>
+                                            </a>
+                                        </label>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
                     </div>
-                </div>
-            {% endfor %}
+                {% endfor %}
+            {% endwith %}
         </div>
     {% endif %}
 {% endblock left-bar %}
