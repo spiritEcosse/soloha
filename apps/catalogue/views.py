@@ -162,7 +162,6 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
         return queryset
 
     def get_context_data(self, **kwargs):
-        # Category.objects.filter(pk=self.object.pk).update(popular=F('popular') + 1)
         context = super(ProductCategoryView, self).get_context_data(**kwargs)
         queryset_filters = Feature.objects.filter(filter_products__in=self.products_without_filters).distinct().prefetch_related('filter_products')
         context['filters'] = Feature.objects.filter(level=0, children__in=queryset_filters).prefetch_related(
