@@ -34,32 +34,34 @@
 
 {% block left-bar %}
     {% if filters %}
-        {% regroup selected_filters by parent as group_filters %}
+        {% if selected_filters %}
+            {% regroup selected_filters by parent as group_filters %}
 
-        <div class="heading">{% trans 'Selected' %}</div>
-        <div class="filter">
-            {% for filter in group_filters %}
-                <div class="items">
-                    <div class="name">{{ filter.grouper.title }}</div>
-                    <div class="values">
-                        <ul class="list-group">
-                            {% for value in filter.list %}
-                                <li class="list-group-item checkbox">
-                                    {% assign clear_filter selected_filters|remove:value %}
+            <div class="heading">{% trans 'Selected' %}</div>
+            <div class="filter">
+                {% for filter in group_filters %}
+                    <div class="items">
+                        <div class="name">{{ filter.grouper.title }}</div>
+                        <div class="values">
+                            <ul class="list-group">
+                                {% for value in filter.list %}
+                                    <li class="list-group-item checkbox">
+                                        {% assign clear_filter selected_filters|remove:value %}
 
-                                    <a class="btn btn-default btn-block"
-                                       href="{% reverse_url 'catalogue:category' url_extra_kwargs filter_slug=clear_filter|join_slug:"/" %}"
-                                       title='{% trans 'Clean' %}' aria-label="{% trans 'Clean' %}">
-                                        {{ value.title }}
-                                        <span class="glyphicon glyphicon-remove pull-right" aria-hidden="true"></span>
-                                    </a>
-                                </li>
-                            {% endfor %}
-                        </ul>
+                                        <a class="btn btn-default btn-block active"
+                                           href="{% reverse_url 'catalogue:category' url_extra_kwargs filter_slug=clear_filter|join_slug:"/"|default:None %}"
+                                           title='{% trans 'Clean' %}' aria-label="{% trans 'Clean' %}">
+                                            {{ value.title }}
+                                            <span class="glyphicon glyphicon-remove pull-right" aria-hidden="true"></span>
+                                        </a>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
                     </div>
-                </div>
-            {% endfor %}
-        </div>
+                {% endfor %}
+            </div>
+        {% endif %}
 
         <div class="heading">{% trans 'Selection of parameters' %}</div>
         <div class="filter">
@@ -86,8 +88,9 @@
                                         {{ value.title }}
                                         {% if value|in_list:selected_filters %}
                                             <span class="glyphicon glyphicon-remove pull-right" aria-hidden="true"></span>
+                                        {% else %}
+                                            <span class="count">({{ value.count_products }})</span>
                                         {% endif %}
-                                        <span class="count">({{ value.count_products }})</span>
                                     </a>
                                 </li>
                             {% endfor %}
@@ -167,7 +170,7 @@
     </div>
 
     <div class="row items">
-        {% if page_obj.paginator.num_pages %}
+        {% if page_obj|length %}
             {% for product in page_obj %}
                 <div class="col-sm-6 col-md-6">
                     {% include "catalogue/partials/product.html" %}
@@ -186,7 +189,12 @@
                 {% include "catalogue/partials/pagination.html" %}
             </div>
         {% else %}
-            <div class="nonefound col-xs-24">{% trans "No products found." %}</div>
+            <div class="col-xs-24">
+                <div class="alert alert-info">
+                    <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                    {% trans "No products found." %}
+                </div>
+            </div>
         {% endif %}
     </div>
 {% endblock %}

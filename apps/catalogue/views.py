@@ -23,7 +23,6 @@ import functools
 from apps.flatpages.models import InfoPage
 from django.http import HttpResponse
 import logging
-from collections import namedtuple
 from decimal import Decimal as D
 from decimal import ROUND_DOWN
 from forms import QuickOrderForm
@@ -35,6 +34,8 @@ from django.template import loader, Context
 from easy_thumbnails.files import get_thumbnailer
 from django.core.exceptions import ObjectDoesNotExist
 from collections import namedtuple
+from operator import itemgetter
+from itertools import groupby
 
 logger = logging.getLogger(__name__)
 
@@ -66,6 +67,8 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
         Order(title='By price descending', column='-stockrecords__price_excl_tax', argument='price_descending'),
     )
     use_keys = ('sort', 'filter_slug', )
+    feature_only = ('title', 'slug', 'parent',)
+    feature_orders = ('parent__sort', 'parent__title',)
 
     def post(self, request, *args, **kwargs):
         if self.request.is_ajax():
@@ -106,12 +109,17 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
         if potential_redirect is not None:
             return potential_redirect
 
-        self.filter_slug = self.kwargs.get('filter_slug').split('/') if self.kwargs.get('filter_slug') else None
         return super(ProductCategoryView, self).get(request, *args, **kwargs)
 
     def get_object(self, queryset=None):
         self.kwargs['slug'] = self.kwargs['category_slug'].split(Category._slug_separator)[-1]
-        return super(ProductCategoryView, self).get_object(queryset=queryset)
+        obj = super(ProductCategoryView, self).get_object(queryset=queryset)
+        self.filter_slug = self.kwargs.get('filter_slug').split('/') if self.kwargs.get('filter_slug') else []
+        self.selected_filters = Feature.objects.only(*self.feature_only).filter(
+            slug__in=self.filter_slug, level=1
+        ).order_by(*self.feature_orders)
+
+        return obj
 
     def redirect_if_necessary(self, current_path, category):
         if self.enforce_paths:
@@ -124,37 +132,33 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
         sort_argument = self.kwargs.get('sort') or self.orders[0].argument
         sort = filter(lambda order: order.argument == sort_argument, self.orders)[0]
 
-        kwargs = {'enable': True, 'categories': self.object.get_descendants(include_self=True),
-                  'categories__enable': True}
-
-        if self.filter_slug:
-            kwargs.update({'filters__slug__in': self.filter_slug})
-
         queryset = super(ProductCategoryView, self).get_queryset()
         queryset = queryset.only(
             'title', 'slug', 'structure', 'product_class', 'categories'
-        ).filter(**kwargs).select_related('product_class').prefetch_related(
+        ).filter(enable=True, categories=self.object.get_descendants(include_self=True), categories__enable=True)
+
+        key = lambda feature: feature.parent.pk
+        filters = groupby(sorted(self.selected_filters, key=key), key=key)
+
+        for parent, values in filters:
+            features = [value for value in values]
+            queryset = queryset.filter(filters__in=features)
+
+        queryset = queryset.distinct().select_related('product_class').prefetch_related(
             Prefetch('images'),
             Prefetch('product_class__options'),
             Prefetch('stockrecords'),
             Prefetch('categories__parent__parent')
-        ).distinct().order_by(sort.column)
+        ).order_by(sort.column)
         return queryset
 
     def get_context_data(self, **kwargs):
         context = super(ProductCategoryView, self).get_context_data(**kwargs)
-        only = ('title', 'slug', 'parent', )
-        orders = ('parent__sort', 'parent__title', )
 
-        if self.filter_slug:
-            context['selected_filters'] = Feature.objects.only(*only).filter(
-                slug__in=self.filter_slug, level=1
-            ).order_by(*orders)
-
-        context['filters'] = Feature.objects.only(*only).filter(
+        context['filters'] = Feature.objects.only(*self.feature_only).filter(
             level=1, filter_products__categories=self.object.get_descendants(include_self=True),
             filter_products__enable=True, filter_products__categories__enable=True
-        ).order_by(*orders).distinct().select_related('parent').annotate(
+        ).order_by(*self.feature_orders).distinct().select_related('parent').annotate(
             count_products=Count('filter_products')
         )
 
@@ -163,6 +167,7 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
         context['url_extra_kwargs'].update({'category_slug': self.kwargs.get('category_slug')})
         context['page'] = self.kwargs.get('page', None)
         context['orders'] = self.orders
+        context['selected_filters'] = self.selected_filters
         return context
 
     def get_page_link(self, page_numbers, **kwargs):
