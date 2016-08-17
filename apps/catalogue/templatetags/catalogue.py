@@ -126,3 +126,13 @@ def append(list, needle):
     copy = list[:]
     copy.append(needle)
     return copy
+
+
+@register.filter
+def fetch_from_list(source, needle):
+    return [value for dictionary in source for key, value in dictionary.items() if key == needle]
+
+
+@register.filter
+def subtract(value, arg):
+    return value - arg

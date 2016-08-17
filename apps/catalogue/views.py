@@ -159,7 +159,9 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
             level=1, filter_products__categories=self.object.get_descendants(include_self=True),
             filter_products__enable=True, filter_products__categories__enable=True
         ).order_by(*self.feature_orders).distinct().select_related('parent').annotate(
-            count_products=Count('filter_products')
+            count_products=Count('filter_products', distinct=True)
+        ).prefetch_related(
+            Prefetch('filter_products', queryset=self.get_queryset().count(), to_attr='count_filter_products')
         )
 
         context['url_extra_kwargs'] = {key: value for key, value in self.kwargs.items()

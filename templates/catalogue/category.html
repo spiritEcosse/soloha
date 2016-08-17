@@ -33,8 +33,8 @@
 {% endblock %}
 
 {% block left-bar %}
-    {% if filters %}
-        {% if selected_filters %}
+    {% if filters.exists %}
+        {% if selected_filters.exists %}
             {% regroup selected_filters by parent as group_filters %}
 
             <div class="heading">{% trans 'Selected' %}</div>
@@ -65,9 +65,16 @@
 
         <div class="heading">{% trans 'Selection of parameters' %}</div>
         <div class="filter">
+            {% assign filter_parents group_filters|fetch_from_list:'grouper' %}
             {% regroup filters by parent as filters %}
 
             {% for filter in filters %}
+                {% assign add '' %}
+
+                {% if filter.grouper|in_list:filter_parents %}
+                    {% assign add '+' %}
+                {% endif %}
+
                 <div class="items">
                     <div class="name" >{{ filter.grouper.title }}</div>
                     <div class="values">
@@ -89,7 +96,7 @@
                                         {% if value|in_list:selected_filters %}
                                             <span class="glyphicon glyphicon-remove pull-right" aria-hidden="true"></span>
                                         {% else %}
-                                            <span class="count">({{ value.count_products }})</span>
+                                            <span class="count">({{ add }}{{ value.count_products|subtract:value.count_filter_products }})</span>
                                         {% endif %}
                                     </a>
                                 </li>
@@ -176,16 +183,7 @@
                     {% include "catalogue/partials/product.html" %}
                 </div>
             {% endfor %}
-            <div class="clearfix"></div>
-            <div name="more_products" class="col-xs-6 col-xs-offset-8 wrapper" action=".">
-                {% csrf_token %}
-                {% if page_obj.number != paginator.num_pages %}
-                    <a href="#" class="more_products" ng-click="submit()" ng-hide="hide == true"> {#  onclick="location.href='/test/'" #}
-                        ПОКАЗАТЬ ЕЩЕ
-                    </a>
-                {% endif %}
-            </div>
-            <div>
+            <div class="col-xs-24 text-right">
                 {% include "catalogue/partials/pagination.html" %}
             </div>
         {% else %}
