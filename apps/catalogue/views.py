@@ -34,8 +34,8 @@ from django.template import loader, Context
 from easy_thumbnails.files import get_thumbnailer
 from django.core.exceptions import ObjectDoesNotExist
 from collections import namedtuple
-from operator import itemgetter
 from itertools import groupby
+from django.db.models import Count, Case, When, IntegerField
 
 logger = logging.getLogger(__name__)
 
@@ -67,7 +67,7 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
         Order(title='By price descending', column='-stockrecords__price_excl_tax', argument='price_descending'),
     )
     use_keys = ('sort', 'filter_slug', )
-    feature_only = ('title', 'slug', 'parent',)
+    feature_only = ('title', 'slug', 'parent__id', 'parent__title', )
     feature_orders = ('parent__sort', 'parent__title',)
 
     def post(self, request, *args, **kwargs):
@@ -85,7 +85,7 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
 
     def get_context_data_more_goods_json(self, **kwargs):
         context = dict()
-        self.object = self.object()
+        self.object = self.get_object()
         self.products_on_page = self.get_queryset()
 
         self.paginator = self.get_paginator(self.products_on_page, OSCAR_PRODUCTS_PER_PAGE)
@@ -114,11 +114,10 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
     def get_object(self, queryset=None):
         self.kwargs['slug'] = self.kwargs['category_slug'].split(Category._slug_separator)[-1]
         obj = super(ProductCategoryView, self).get_object(queryset=queryset)
-        self.filter_slug = self.kwargs.get('filter_slug').split('/') if self.kwargs.get('filter_slug') else []
-        self.selected_filters = Feature.objects.only(*self.feature_only).filter(
-            slug__in=self.filter_slug, level=1
+        filter_slug = self.kwargs.get('filter_slug').split('/') if self.kwargs.get('filter_slug') else []
+        self.selected_filters = Feature.objects.only(*self.feature_only).select_related('parent').filter(
+            slug__in=filter_slug, level=1
         ).order_by(*self.feature_orders)
-
         return obj
 
     def redirect_if_necessary(self, current_path, category):
@@ -128,28 +127,49 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
             if expected_path != urlquote(current_path):
                 return HttpResponsePermanentRedirect(expected_path)
 
-    def get_queryset(self):
+    def get_queryset(self, **kwargs):
         sort_argument = self.kwargs.get('sort') or self.orders[0].argument
         sort = filter(lambda order: order.argument == sort_argument, self.orders)[0]
 
         queryset = super(ProductCategoryView, self).get_queryset()
-        queryset = queryset.only(
-            'title', 'slug', 'structure', 'product_class', 'categories'
-        ).filter(enable=True, categories=self.object.get_descendants(include_self=True), categories__enable=True)
+        queryset = queryset.filter(enable=True, categories=self.object.get_descendants(include_self=True), categories__enable=True)
+
+        selected_filters = list(self.selected_filters)[:]
+
+        if kwargs.get('potential_filter', None):
+            selected_filters.append(kwargs.get('potential_filter'))
 
         key = lambda feature: feature.parent.pk
-        filters = groupby(sorted(self.selected_filters, key=key), key=key)
+        iter = groupby(sorted(selected_filters, key=key), key=key)
 
-        for parent, values in filters:
-            features = [value for value in values]
-            queryset = queryset.filter(filters__in=features)
+        for parent, values in iter:
+            queryset = queryset.filter(filters__in=map(lambda obj: obj, values))
 
         queryset = queryset.distinct().select_related('product_class').prefetch_related(
             Prefetch('images'),
+            Prefetch('characteristics'),
             Prefetch('product_class__options'),
             Prefetch('stockrecords'),
-            Prefetch('categories__parent__parent')
+            Prefetch('categories__parent__parent'),
         ).order_by(sort.column)
+        return queryset
+
+    def get_products(self, **kwargs):
+        queryset = Product.objects.filter(
+            enable=True, categories=self.object.get_descendants(include_self=True), categories__enable=True
+        )
+
+        selected_filters = list(self.selected_filters)[:]
+
+        if kwargs.get('potential_filter', None):
+            selected_filters.append(kwargs.get('potential_filter'))
+
+        key = lambda feature: feature.parent.pk
+        iter = groupby(sorted(selected_filters, key=key), key=key)
+
+        for parent, values in iter:
+            queryset = queryset.filter(filters__in=map(lambda obj: obj, values))
+
         return queryset
 
     def get_context_data(self, **kwargs):
@@ -158,11 +178,24 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
         context['filters'] = Feature.objects.only(*self.feature_only).filter(
             level=1, filter_products__categories=self.object.get_descendants(include_self=True),
             filter_products__enable=True, filter_products__categories__enable=True
-        ).order_by(*self.feature_orders).distinct().select_related('parent').annotate(
-            count_products=Count('filter_products', distinct=True)
-        ).prefetch_related(
-            Prefetch('filter_products', queryset=self.get_queryset().count(), to_attr='count_filter_products')
-        )
+        ).order_by(*self.feature_orders).select_related('parent').prefetch_related(
+            Prefetch('filter_products')
+        ).distinct()
+
+        products = lambda **kwargs: map(lambda obj: obj.id, self.get_products(**kwargs))
+        key = lambda feature: feature.parent.pk
+        iter = groupby(sorted(self.selected_filters, key=key), key=key)
+        filters_parent = map(lambda obj: obj[0], iter)
+
+        for feature in context['filters']:
+            feature.potential_products_count = feature.filter_products.filter(
+                id__in=products(potential_filter=feature)
+            )
+
+            if feature.parent.pk in filters_parent:
+                feature.potential_products_count = feature.potential_products_count.exclude(id__in=products)
+
+            feature.potential_products_count = feature.potential_products_count.count()
 
         context['url_extra_kwargs'] = {key: value for key, value in self.kwargs.items()
                                        if key in self.use_keys and value is not None}

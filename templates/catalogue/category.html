@@ -36,6 +36,7 @@
     {% if filters.exists %}
         {% if selected_filters.exists %}
             {% regroup selected_filters by parent as group_filters %}
+            {% assign filter_parents group_filters|fetch_from_list:'grouper' %}
 
             <div class="heading">{% trans 'Selected' %}</div>
             <div class="filter">
@@ -65,14 +66,11 @@
 
         <div class="heading">{% trans 'Selection of parameters' %}</div>
         <div class="filter">
-            {% assign filter_parents group_filters|fetch_from_list:'grouper' %}
             {% regroup filters by parent as filters %}
 
             {% for filter in filters %}
-                {% assign add '' %}
-
-                {% if filter.grouper|in_list:filter_parents %}
-                    {% assign add '+' %}
+                {% if filter_parents %}
+                    {% assign filter_in_parents filter.grouper|in_list:filter_parents %}
                 {% endif %}
 
                 <div class="items">
@@ -80,6 +78,12 @@
                     <div class="values">
                         <ul class="list-group">
                             {% for value in filter.list %}
+                                {% assign add '' %}
+
+                                {% if filter_in_parents and value.potential_products_count %}
+                                    {% assign add '+' %}
+                                {% endif %}
+
                                 <li class="list-group-item checkbox">
                                     {% if value|in_list:selected_filters %}
                                         {% assign clear_filter selected_filters|remove:value %}
@@ -90,13 +94,15 @@
                                     {% endif %}
 
                                     <a href="{% reverse_url 'catalogue:category' url_extra_kwargs filter_slug=clear_filter|join_slug:"/"|default:None %}"
-                                       class="btn btn-default btn-block {% if value|in_list:selected_filters %} active{% endif %}"
+                                       class="btn btn-default btn-block
+                                       {% if value|in_list:selected_filters %}active
+                                       {% elif not value.potential_products_count %} disabled{% endif %}"
                                        title={{ title }} aria-label={{ title }}>
                                         {{ value.title }}
                                         {% if value|in_list:selected_filters %}
                                             <span class="glyphicon glyphicon-remove pull-right" aria-hidden="true"></span>
                                         {% else %}
-                                            <span class="count">({{ add }}{{ value.count_products|subtract:value.count_filter_products }})</span>
+                                            <span class="count">({{ add }}{{ value.potential_products_count }})</span>
                                         {% endif %}
                                     </a>
                                 </li>
