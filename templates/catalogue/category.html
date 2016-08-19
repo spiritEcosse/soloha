@@ -101,7 +101,7 @@
                                        {% if value|in_list:selected_filters %}active
                                        {% elif not value.potential_products_count %} disabled{% endif %}"
                                        title="{{ title }} {{ value.title|lower }}" aria-label="{{ title }} {{ value.title|lower }}">
-                                        {{ value.title|truncatechars:30 }}
+                                        {{ value.title|truncatechars:26 }}
                                         {% if value|in_list:selected_filters %}
                                             <span class="glyphicon glyphicon-remove pull-right" aria-hidden="true"></span>
                                         {% else %}
