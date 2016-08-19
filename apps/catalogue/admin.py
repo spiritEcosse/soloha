@@ -207,13 +207,12 @@ class ProductFeatureAdmin(ImportExportMixin, ImportExportActionModelAdmin):
 
 
 class ProductAdmin(ImportExportMixin, ImportExportActionModelAdmin):
-    # date_hierarchy = 'date_created'
     list_display = ('pk', 'title', 'thumb', 'enable', 'date_updated', 'slug', 'categories_to_str', 'get_product_class',
                     'structure', 'partners_to_str', 'attribute_summary', )
-    list_filter = ('enable', 'stockrecords__partner', 'categories__name', 'structure', 'is_discountable', )
+    list_filter = ('enable', 'date_updated', 'stockrecords__partner', 'categories__name', 'structure', 'is_discountable', )
     inlines = (StockRecordInline, ProductRecommendationInline, ProductImageInline, ProductFeatureInline, )
     prepopulated_fields = {"slug": ("title",)}
-    search_fields = ('upc', 'title', 'slug', )
+    search_fields = ('upc', 'title', 'slug', 'id', )
     form = forms.ProductForm
     resource_class = resources.ProductResource
     list_select_related = ('product_class', )
