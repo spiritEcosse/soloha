@@ -139,9 +139,3 @@ def fetch_from_list(source, needle):
 def subtract(value, arg):
     return value - arg
 
-
-@register.simple_tag
-def declension_of_words(prefix, value, number):
-    morph = pymorphy2.MorphAnalyzer()
-    value_word = morph.parse(value)[0]
-    return u'{} {} {}'.format(prefix, number, value_word.make_agree_with_number(number).word)
