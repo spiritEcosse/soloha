@@ -42,17 +42,20 @@
             <div class="filter">
                 {% for filter in group_filters %}
                     <div class="items">
-                        <div class="name">{{ filter.grouper.title }}</div>
+                        <div class="name" title="{{ filter.grouper.title }}">
+                            {{ filter.grouper.title|truncatechars:32 }}
+                        </div>
                         <div class="values">
                             <ul class="list-group">
                                 {% for value in filter.list %}
                                     <li class="list-group-item checkbox">
                                         {% assign clear_filter selected_filters|remove:value %}
+                                        {% trans 'Clear' as title %}
 
                                         <a class="btn btn-default btn-block active"
                                            href="{% reverse_url 'catalogue:category' url_extra_kwargs filter_slug=clear_filter|join_slug:"/"|default:None %}"
-                                           title='{% trans 'Clean' %}' aria-label="{% trans 'Clean' %}">
-                                            {{ value.title }}
+                                           title="{{ title }} {{ value.title|lower }}" aria-label="{{ title }} {{ value.title|lower }}">
+                                            {{ value.title|truncatechars:30 }}
                                             <span class="glyphicon glyphicon-remove pull-right" aria-hidden="true"></span>
                                         </a>
                                     </li>
@@ -97,8 +100,8 @@
                                        class="btn btn-default btn-block
                                        {% if value|in_list:selected_filters %}active
                                        {% elif not value.potential_products_count %} disabled{% endif %}"
-                                       title={{ title }} aria-label={{ title }}>
-                                        {{ value.title }}
+                                       title="{{ title }} {{ value.title|lower }}" aria-label="{{ title }} {{ value.title|lower }}">
+                                        {{ value.title|truncatechars:30 }}
                                         {% if value|in_list:selected_filters %}
                                             <span class="glyphicon glyphicon-remove pull-right" aria-hidden="true"></span>
                                         {% else %}
