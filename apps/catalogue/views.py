@@ -81,7 +81,7 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
     def post_ajax(self, request, *args, **kwargs):
         super(ProductCategoryView, self).post_ajax(request, *args, **kwargs)
         if self.request.is_ajax():
-            return self.render_json_response(self.get_context_data_more_goods_json())
+            return self.render_json_response({})
 
     def get_context_data_more_goods_json(self, **kwargs):
         context = dict()

@@ -29,26 +29,6 @@
         <link rel="shortcut icon" href="{% static "oscar/favicon.ico" %}" />
     {% endblock %}
 
-    {% block mainstyles %}
-        {% comment %}
-            We use an inner block to work-around the fact that django-compressor doesn't work with
-            template inheritance.  Ie, we can't just wrap the {% block mainstyles %} with compress tags and
-            expect it to compress CSS files added in child templates.
-            {% endcomment %}
-        {% block styles %}
-            <link rel="stylesheet" type="text/css" href="{% static 'bower_components/lightslider/dist/css/lightslider.css' %}">
-            <link rel="stylesheet" type="text/css" href="{% static "bower_components/yamm/assets/css/yamm.css" %}">
-            <link rel="stylesheet" type="text/css" href="{% static "djangular/css/bootstrap3.css" %}">
-            <link rel="stylesheet" type="text/css" href="{% static "djangular/css/styles.css" %}">
-            <link rel="stylesheet" type="text/css" href="{% static "bower_components/bootstrap-select/dist/css/bootstrap-select.min.css" %}">
-            <link rel="stylesheet" type="text/css" href="{% static 'oscar/css/styles.css' %}">
-            <link rel="stylesheet" type="text/css" href="{% static 'build/css/main.css' %}">
-        {% endblock %}
-    {% endblock %}
-
-    {# Additional CSS - specific to certain pages #}
-    {% block extrastyles %}{% endblock %}
-
     {% block extrahead %}{% endblock %}
 
     {% block tracking %}
@@ -62,6 +42,26 @@
 {% block layout %}{% endblock %}
 
 {% block before_end_body %}{% endblock %}
+
+{% block mainstyles %}
+    {% comment %}
+        We use an inner block to work-around the fact that django-compressor doesn't work with
+        template inheritance.  Ie, we can't just wrap the {% block mainstyles %} with compress tags and
+        expect it to compress CSS files added in child templates.
+        {% endcomment %}
+    {% block styles %}
+        <link rel="stylesheet" type="text/css" href="{% static 'bower_components/lightslider/dist/css/lightslider.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static "bower_components/yamm/assets/css/yamm.css" %}">
+        <link rel="stylesheet" type="text/css" href="{% static "djangular/css/bootstrap3.css" %}">
+        <link rel="stylesheet" type="text/css" href="{% static "djangular/css/styles.css" %}">
+        <link rel="stylesheet" type="text/css" href="{% static "bower_components/bootstrap-select/dist/css/bootstrap-select.min.css" %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'oscar/css/styles.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'build/css/main.css' %}">
+    {% endblock %}
+{% endblock %}
+
+{# Additional CSS - specific to certain pages #}
+{% block extrastyles %}{% endblock %}
 
 {% comment %}
         Scripts loaded from a CDN.  These can't be wrapped by the 'compress' tag and so we
