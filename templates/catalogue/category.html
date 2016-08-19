@@ -104,7 +104,8 @@
                                        class="btn btn-default btn-block
                                        {% if value|in_list:selected_filters %}active
                                        {% elif not value.potential_products_count %} disabled{% endif %}"
-                                       title="{{ title }} {{ value.title|lower }}" aria-label="{{ title }} {{ value.title|lower }}">
+                                       title="{% declension_of_words title value.title|lower value.potential_products_count %}"
+                                       aria-label="{{ title }} {{ value.title|lower }}">
                                         {{ value.title|truncatechars:trancate_filter_value }}
                                         {% if value|in_list:selected_filters %}
                                             <span class="glyphicon glyphicon-remove pull-right" aria-hidden="true"></span>

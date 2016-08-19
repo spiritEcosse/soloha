@@ -1,6 +1,8 @@
 from django.core.urlresolvers import reverse
 from django import template
 from django.template import Node, Library, TemplateSyntaxError, VariableDoesNotExist, NodeList, resolve_variable
+import pymorphy2
+
 register = Library()
 
 
@@ -136,3 +138,10 @@ def fetch_from_list(source, needle):
 @register.filter
 def subtract(value, arg):
     return value - arg
+
+
+@register.simple_tag
+def declension_of_words(prefix, value, number):
+    morph = pymorphy2.MorphAnalyzer()
+    value_word = morph.parse(value)[0]
+    return u'{} {} {}'.format(prefix, number, value_word.make_agree_with_number(number).word)
