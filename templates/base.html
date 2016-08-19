@@ -55,7 +55,7 @@
 {% endblock %}
 
 
-{% if not debug %}
+{% if debug %}
     {% block mainstyles %}
         {% comment %}
             We use an inner block to work-around the fact that django-compressor doesn't work with
