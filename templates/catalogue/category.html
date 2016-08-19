@@ -35,7 +35,7 @@
 {% block left-bar %}
     {% if filters.exists %}
         {% assign trancate_filter 32 %}
-        {% assign trancate_filter_value 26 %}
+        {% assign trancate_filter_value 23 %}
         {% if selected_filters.exists %}
             {% regroup selected_filters by parent as group_filters %}
             {% assign filter_parents group_filters|fetch_from_list:'grouper' %}
