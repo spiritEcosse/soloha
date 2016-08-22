@@ -5,13 +5,18 @@
   "main": "index.js",
   "dependencies": {
     "blueimp-gallery": "^2.21.3",
-    "grunt-contrib-less": "^1.3.0"
+    "grunt-contrib-cssmin": "^1.0.1",
+    "grunt-contrib-less": "^1.3.0",
+    "grunt-contrib-uglify": "^2.0.0",
+    "maxmin": "^2.1.0"
   },
   "devDependencies": {
     "grunt": "^0.4.5",
     "grunt-coffee-build": "^1.4.12",
     "grunt-contrib": "^0.11.0",
     "grunt-contrib-coffee": "^0.10.0",
+    "grunt-contrib-cssmin": "^1.0.1",
+    "grunt-contrib-imagemin": "^1.0.1",
     "grunt-contrib-less": "^0.11.0",
     "grunt-contrib-uglify": "^2.0.0",
     "grunt-yui-compressor": "^0.4.0",

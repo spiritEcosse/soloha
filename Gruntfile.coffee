@@ -14,18 +14,23 @@ module.exports = (grunt) ->
                 files: "static/src/css/main.css": "static/src/less/main.less",
         cssmin:
             dist:
-                src: ['static/bower_components/lightslider/dist/css/lightslider.css',
-                    'static/bower_components/yamm/assets/css/yamm.css',
-                    "static/djangular/css/bootstrap3.css",
-                    "static/djangular/css/styles.css",
-                    "static/bower_components/bootstrap-select/dist/css/bootstrap-select.min.css",
-                    'static/oscar/css/styles.css',
-                    'static/src/css/**/*.css',
-                ],
-                dest: 'static/build/css/style.min.css'
-        min:
-            dist:
-                src: ["static/bower_components/jquery/dist/jquery.min.js",
+                files:
+                    'static/build/css/style.css': ['static/bower_components/lightslider/dist/css/lightslider.css',
+                        'static/bower_components/yamm/assets/css/yamm.css',
+                        "static/djangular/css/bootstrap3.css",
+                        "static/djangular/css/styles.css",
+                        "static/bower_components/bootstrap-select/dist/css/bootstrap-select.min.css",
+                        'static/oscar/css/styles.css',
+                        'static/src/css/**/*.css',
+                    ],
+        uglify:
+            my_target:
+                options:
+                    sourceMap : true,
+                    sourceMapName : 'sourceMap.map'
+                    report: 'gzip'
+                files:
+                    'static/build/js/script.min.js': ["static/bower_components/jquery/dist/jquery.min.js",
                     'static/bower_components/bootstrap/dist/js/bootstrap.min.js',
                     'static/bower_components/angular/angular.js',
                     'static/djangular/js/django-angular.js',
@@ -38,13 +43,21 @@ module.exports = (grunt) ->
                     "static/bower_components/angular-scroll/angular-scroll.min.js",
                     "static/src/js/**/*.js",
                     "static/bower_components/blueimp-bootstrap-image-gallery/js/bootstrap-image-gallery.min.js",
-                ],
-                dest: 'static/build/js/script.min.js'
+                    ],
+        imagemin:
+            dynamic:
+                files:
+                    expand: true,
+                    cwd: 'static/',
+                    src: ['**/*.{png,jpg,gif}'],
+                    dest: 'static/'
     )
 
 
     grunt.loadNpmTasks 'grunt-contrib-coffee'
     grunt.loadNpmTasks 'grunt-contrib-less'
-    grunt.loadNpmTasks 'grunt-yui-compressor'
-    #  grunt.loadNpmTasks('grunt-contrib-imagemin')
-    grunt.registerTask('default', ['coffee', 'less', 'cssmin', 'min'])
+    grunt.loadNpmTasks 'grunt-contrib-uglify'
+    grunt.loadNpmTasks 'grunt-contrib-cssmin'
+    grunt.loadNpmTasks 'grunt-contrib-imagemin'
+    grunt.registerTask 'default', ['uglify', 'cssmin', 'coffee', 'less', 'imagemin']
+

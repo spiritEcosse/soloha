@@ -2,6 +2,7 @@ from oscar.apps.catalogue.app import CatalogueApplication as CoreCatalogueApplic
 from django.views.generic.list import MultipleObjectMixin
 from django.conf.urls import url
 from oscar.core.loading import get_class, get_model
+from django.views.decorators.cache import cache_page
 
 
 class CatalogueApplication(CoreCatalogueApplication):
