@@ -36,6 +36,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from collections import namedtuple
 from itertools import groupby
 from django.db.models import Count, Case, When, IntegerField
+from memoize import memoize, delete_memoized, delete_memoized_verhash
+from soloha import settings
 
 logger = logging.getLogger(__name__)
 
@@ -102,6 +104,7 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
         context['sorting_type'] = self.kwargs['sorting_type']
         return context
 
+    @memoize(timeout=settings.CACHE_MIDDLEWARE_SECONDS)
     def get(self, request, *args, **kwargs):
         self.object = self.get_object(queryset=self.model_single_object.objects.filter(enable=True))
         potential_redirect = self.redirect_if_necessary(request.path, self.object)
