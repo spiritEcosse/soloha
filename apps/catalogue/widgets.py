@@ -108,16 +108,17 @@ class MPTTFilteredSelectMultiple(widgets.FilteredSelectMultiple):
 
 class ImageForeignKeyWidget(import_export_widgets.ForeignKeyWidget):
     def clean(self, value):
-        if not os.path.dirname(value):
-            folder = os.path.join(settings.MEDIA_ROOT, filer_settings.DEFAULT_FILER_STORAGES['public']['main']['UPLOAD_TO_PREFIX'])
-            image = search_file(value, folder)
-            value = '/'.join(os.path.relpath(image).split('/')[1:])
+        if value:
+            if not os.path.dirname(value):
+                folder = os.path.join(settings.MEDIA_ROOT, filer_settings.DEFAULT_FILER_STORAGES['public']['main']['UPLOAD_TO_PREFIX'])
+                image = search_file(value, folder)
+                value = '/'.join(os.path.relpath(image).split('/')[1:])
 
-        image = self.model.objects.filter(file=value).first()
+            image = self.model.objects.filter(file=value).first()
 
-        if image is None:
-            image = Image.objects.create(**{'file': value, self.field: value})
-        return image
+            if image is None:
+                image = Image.objects.create(**{'file': value, self.field: value})
+            return image
 
 
 class ImageManyToManyWidget(import_export_widgets.ManyToManyWidget):
