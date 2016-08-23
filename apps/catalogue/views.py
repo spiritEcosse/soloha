@@ -176,40 +176,36 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
         return queryset
 
     def get_context_data(self, **kwargs):
-        context = cache.get('get_context_data')
+        context = super(ProductCategoryView, self).get_context_data(**kwargs)
 
-        if context is None:
-            context = super(ProductCategoryView, self).get_context_data(**kwargs)
+        context['filters'] = Feature.objects.only(*self.feature_only).filter(
+            level=1, filter_products__categories=self.object.get_descendants(include_self=True),
+            filter_products__enable=True, filter_products__categories__enable=True
+        ).order_by(*self.feature_orders).select_related('parent').prefetch_related(
+            Prefetch('filter_products')
+        ).distinct()
 
-            context['filters'] = Feature.objects.only(*self.feature_only).filter(
-                level=1, filter_products__categories=self.object.get_descendants(include_self=True),
-                filter_products__enable=True, filter_products__categories__enable=True
-            ).order_by(*self.feature_orders).select_related('parent').prefetch_related(
-                Prefetch('filter_products')
-            ).distinct()
+        products = lambda **kwargs: map(lambda obj: obj.id, self.get_products(**kwargs))
+        key = lambda feature: feature.parent.pk
+        iter = groupby(sorted(self.selected_filters, key=key), key=key)
+        filters_parent = map(lambda obj: obj[0], iter)
 
-            products = lambda **kwargs: map(lambda obj: obj.id, self.get_products(**kwargs))
-            key = lambda feature: feature.parent.pk
-            iter = groupby(sorted(self.selected_filters, key=key), key=key)
-            filters_parent = map(lambda obj: obj[0], iter)
+        for feature in context['filters']:
+            feature.potential_products_count = feature.filter_products.filter(
+                id__in=products(potential_filter=feature)
+            )
 
-            for feature in context['filters']:
-                feature.potential_products_count = feature.filter_products.filter(
-                    id__in=products(potential_filter=feature)
-                )
+            if feature.parent.pk in filters_parent:
+                feature.potential_products_count = feature.potential_products_count.exclude(id__in=products)
 
-                if feature.parent.pk in filters_parent:
-                    feature.potential_products_count = feature.potential_products_count.exclude(id__in=products)
+            feature.potential_products_count = feature.potential_products_count.count()
 
-                feature.potential_products_count = feature.potential_products_count.count()
-
-            context['url_extra_kwargs'] = {key: value for key, value in self.kwargs.items()
-                                           if key in self.use_keys and value is not None}
-            context['url_extra_kwargs'].update({'category_slug': self.kwargs.get('category_slug')})
-            context['page'] = self.kwargs.get('page', None)
-            context['orders'] = self.orders
-            context['selected_filters'] = self.selected_filters
-            cache.set('get_context_data', context)
+        context['url_extra_kwargs'] = {key: value for key, value in self.kwargs.items()
+                                       if key in self.use_keys and value is not None}
+        context['url_extra_kwargs'].update({'category_slug': self.kwargs.get('category_slug')})
+        context['page'] = self.kwargs.get('page', None)
+        context['orders'] = self.orders
+        context['selected_filters'] = self.selected_filters
         return context
 
     def get_page_link(self, page_numbers, **kwargs):
@@ -473,7 +469,7 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
         context['not_selected'] = NOT_SELECTED
         context['form'] = QuickOrderForm(initial={'product': self.object.pk})
         context['answer'] = ANSWER
-        context['flatpages'] = InfoPage.objects.filter(Q(url='delivery') | Q(url='payment') | Q(url='manager')).\
+        context['flatpages'] = InfoPage.objects.filter(Q(url='delivery') | Q(url='payment') | Q(url='manager')). \
             filter(enable=True)
         context['pages_delivery_and_pay'] = context['flatpages'].exclude(url='manager')
         return context
