@@ -316,7 +316,7 @@ class ProductFeatureResource(ModelResource):
         model=Product, field='slug'))
     feature = fields.Field(column_name='feature', attribute='feature', widget=import_export_widgets.ForeignKeyWidget(
         model=Feature, field='slug'))
-    image = fields.Field(column_name='image', attribute='image', widget=widgets.ImageManyToManyWidget(
+    image = fields.Field(column_name='image', attribute='image', widget=widgets.ImageForeignKeyWidget(
         model=Image, field='original_filename'))
     product_with_images = fields.Field(column_name='product_with_images', attribute='product_with_images',
                                        widget=widgets.ManyToManyWidget(model=Product, field='slug'))
@@ -337,11 +337,11 @@ class ProductFeatureResource(ModelResource):
 class CategoryResource(ModelResource):
     parent = fields.Field(attribute='parent', column_name='parent', widget=import_export_widgets.ForeignKeyWidget(
         model=Category, field='slug'))
-    icon = fields.Field(column_name='icon', attribute='icon', widget=widgets.ImageManyToManyWidget(
+    icon = fields.Field(column_name='icon', attribute='icon', widget=widgets.ImageForeignKeyWidget(
         model=Image, field='original_filename'))
-    image_banner = fields.Field(column_name='image_banner', attribute='image_banner', widget=widgets.ImageManyToManyWidget(
+    image_banner = fields.Field(column_name='image_banner', attribute='image_banner', widget=widgets.ImageForeignKeyWidget(
         model=Image, field='original_filename'))
-    image = fields.Field(column_name='image', attribute='image', widget=widgets.ImageManyToManyWidget(
+    image = fields.Field(column_name='image', attribute='image', widget=widgets.ImageForeignKeyWidget(
         model=Image, field='original_filename'))
     delete = fields.Field(widget=import_export_widgets.BooleanWidget())
 
