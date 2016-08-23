@@ -130,7 +130,6 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
             if expected_path != urlquote(current_path):
                 return HttpResponsePermanentRedirect(expected_path)
 
-    @memoize(timeout=settings.CACHE_MIDDLEWARE_SECONDS)
     def get_queryset(self, **kwargs):
         sort_argument = self.kwargs.get('sort') or self.orders[0].argument
         sort = filter(lambda order: order.argument == sort_argument, self.orders)[0]
@@ -176,7 +175,6 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
 
         return queryset
 
-    @memoize(timeout=settings.CACHE_MIDDLEWARE_SECONDS)
     def get_context_data(self, **kwargs):
         context = cache.get('get_context_data')
 
