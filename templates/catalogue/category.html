@@ -34,7 +34,7 @@
 
 {% load cache %}
 
-{% cache 500 sidebar %}
+{% cache 86400 sidebar %}
     {% block left-bar %}
     {% if filters.exists %}
         {% assign trancate_filter 32 %}
