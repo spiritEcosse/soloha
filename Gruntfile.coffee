@@ -24,7 +24,7 @@ module.exports = (grunt) ->
                         'static/src/css/**/*.css',
                     ],
         uglify:
-            my_target:
+            all_src:
                 options:
                     sourceMap : true,
                     sourceMapName : 'sourceMap.map'
@@ -43,21 +43,21 @@ module.exports = (grunt) ->
                     "static/bower_components/angular-scroll/angular-scroll.min.js",
                     "static/src/js/**/*.js",
                     "static/bower_components/blueimp-bootstrap-image-gallery/js/bootstrap-image-gallery.min.js",
-                    ],
+                    ]
         imagemin:
-            dynamic:
-                files:
+            dist:
+                files: [{
                     expand: true,
                     cwd: 'static/',
                     src: ['**/*.{png,jpg,gif}'],
                     dest: 'static/'
+                }]
     )
-
 
     grunt.loadNpmTasks 'grunt-contrib-coffee'
     grunt.loadNpmTasks 'grunt-contrib-less'
     grunt.loadNpmTasks 'grunt-contrib-uglify'
     grunt.loadNpmTasks 'grunt-contrib-cssmin'
     grunt.loadNpmTasks 'grunt-contrib-imagemin'
-    grunt.registerTask 'default', ['uglify', 'cssmin', 'coffee', 'less', 'imagemin']
+    grunt.registerTask 'default', ['uglify', 'imagemin', 'cssmin', 'coffee', 'less']
 
