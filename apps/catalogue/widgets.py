@@ -162,6 +162,8 @@ class ImageManyToManyWidget(import_export_widgets.ManyToManyWidget):
                         product_images.append(product_image)
 
                 ProductImage.objects.filter(product=self.obj).exclude(pk__in=[obj.pk for obj in product_images]).delete()
+            else:
+                ProductImage.objects.filter(product=self.obj).delete()
         return product_images
 
 
