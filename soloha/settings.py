@@ -313,3 +313,5 @@ THUMBNAIL_ALIASES = {
 
 
 OSCAR_SHOP_NAME = 'soloha'
+SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
+USE_ETAGS = True
