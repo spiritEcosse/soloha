@@ -131,7 +131,9 @@ class ImageManyToManyWidget(import_export_widgets.ManyToManyWidget):
 
         with transaction.atomic():
             if value:
-                for display_order, val in enumerate(value.split(self.separator)):
+                images = filter(None, value.split(self.separator))
+
+                for display_order, val in enumerate(images):
                     product_image = ProductImage.objects.filter(
                         product=self.obj, display_order=display_order
                     ).first()
