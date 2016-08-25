@@ -315,3 +315,7 @@ THUMBNAIL_ALIASES = {
 OSCAR_SHOP_NAME = 'soloha'
 SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
 USE_ETAGS = True
+
+HTML_MINIFY = True
+KEEP_COMMENTS_ON_MINIFYING = False
+EXCLUDE_FROM_MINIFYING = ('^spirit/', )
