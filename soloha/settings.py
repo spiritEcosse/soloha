@@ -183,6 +183,7 @@ CKEDITOR_CONFIGS = {
 CACHES = settings_local.CACHES
 CACHE_MIDDLEWARE_SECONDS = settings_local.CACHE_MIDDLEWARE_SECONDS
 CACHE_MIDDLEWARE_KEY_PREFIX = settings_local.CACHE_MIDDLEWARE_KEY_PREFIX
+CACHE_MIDDLEWARE_ALIAS = settings_local.CACHE_MIDDLEWARE_ALIAS
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
@@ -313,3 +314,5 @@ THUMBNAIL_ALIASES = {
 
 
 OSCAR_SHOP_NAME = 'soloha'
+SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
+USE_ETAGS = True
