@@ -129,43 +129,55 @@ class ImageManyToManyWidget(import_export_widgets.ManyToManyWidget):
     def clean(self, value):
         product_images = []
 
-        with transaction.atomic():
-            if value:
-                images = filter(None, value.split(self.separator))
+        if value:
+            images = filter(None, value.split(self.separator))
 
-                for display_order, val in enumerate(images):
-                    product_image = ProductImage.objects.filter(
-                        product=self.obj, display_order=display_order
-                    ).first()
+            for display_order, val in enumerate(images):
+                product_image = ProductImage.objects.filter(
+                    product=self.obj, display_order=display_order
+                ).first()
 
-                    if not os.path.dirname(val):
-                        folder = os.path.join(settings.MEDIA_ROOT, filer_settings.
-                                              DEFAULT_FILER_STORAGES['public']['main']['UPLOAD_TO_PREFIX'])
-                        image = search_file(val, folder)
+                if not os.path.dirname(val):
+                    folder = os.path.join(settings.MEDIA_ROOT, filer_settings.
+                                          DEFAULT_FILER_STORAGES['public']['main']['UPLOAD_TO_PREFIX'])
+                    image = search_file(val, folder)
+
+                    if image is not None:
                         val = '/'.join(os.path.relpath(image).split('/')[1:])
 
-                    image = Image.objects.filter(file=val).first()
+                current_path = os.getcwd()
+                os.chdir(settings.MEDIA_ROOT)
 
-                    if image is None:
-                        image = Image.objects.create(file=val, original_filename=val)
+                if not os.path.exists(os.path.abspath(val)):
+                    raise ValueError('File "{}" does not exist.'.format(val))
+
+                if not os.path.isfile(os.path.abspath(val)):
+                    raise ValueError('Is not file - "{}" '.format(val))
+
+                os.chdir(current_path)
+
+                image = Image.objects.filter(file=val).first()
+
+                if image is None:
+                    image = Image.objects.create(file=val, original_filename=val)
+
+                if product_image is None:
+                    product_image = ProductImage.objects.filter(product=self.obj, original__file=val).first()
 
                     if product_image is None:
-                        product_image = ProductImage.objects.filter(product=self.obj, original__file=val).first()
-
-                        if product_image is None:
-                            product_image = ProductImage.objects.create(product=self.obj, original=image, display_order=display_order)
-                        else:
-                            product_image.display_order = display_order
-                            product_image.save()
-                        product_images.append(product_image)
+                        product_image = ProductImage.objects.create(product=self.obj, original=image, display_order=display_order)
                     else:
-                        product_image.original = image
+                        product_image.display_order = display_order
                         product_image.save()
-                        product_images.append(product_image)
+                    product_images.append(product_image)
+                else:
+                    product_image.original = image
+                    product_image.save()
+                    product_images.append(product_image)
 
-                ProductImage.objects.filter(product=self.obj).exclude(pk__in=[obj.pk for obj in product_images]).delete()
-            else:
-                ProductImage.objects.filter(product=self.obj).delete()
+            ProductImage.objects.filter(product=self.obj).exclude(pk__in=[obj.pk for obj in product_images]).delete()
+        else:
+            ProductImage.objects.filter(product=self.obj).delete()
         return product_images
 
 
@@ -224,7 +236,7 @@ class ManyToManyWidget(import_export_widgets.ManyToManyWidget):
             return self.model.objects.none()
         ids = filter(None, value.split(self.separator))
         objects = []
-        
+
         with transaction.atomic():
             for id in ids:
                 try:
