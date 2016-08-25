@@ -395,8 +395,8 @@ class ProductResource(ModelResource):
                                 widget=widgets.ManyToManyWidget(model=Feature, field='slug'))
     characteristics_slug = fields.Field(column_name='characteristics', attribute='characteristics',
                                         widget=widgets.ManyToManyWidget(model=Feature, field='slug'))
-    images = fields.Field(column_name='images', attribute='images',
-                          widget=widgets.ImageManyToManyWidget(model=ProductImage, field='original'))
+    images = Field(column_name='images', attribute='images',
+                   widget=widgets.ImageManyToManyWidget(model=ProductImage, field='original'))
     recommended_products = Field(column_name='recommended_products', attribute='recommended_products',
                                  widget=widgets.IntermediateModelManyToManyWidget(
                                      model=Product, field='slug',
