@@ -131,6 +131,7 @@ class ImageManyToManyWidget(import_export_widgets.ManyToManyWidget):
 
         if value:
             images = filter(None, value.split(self.separator))
+            upload_to = filer_settings.DEFAULT_FILER_STORAGES['public']['main']['UPLOAD_TO_PREFIX']
 
             for display_order, val in enumerate(images):
                 product_image = ProductImage.objects.filter(
@@ -141,8 +142,7 @@ class ImageManyToManyWidget(import_export_widgets.ManyToManyWidget):
                 os.chdir(settings.MEDIA_ROOT)
 
                 if not os.path.dirname(val):
-                    folder = os.path.join(settings.MEDIA_ROOT, filer_settings.
-                                          DEFAULT_FILER_STORAGES['public']['main']['UPLOAD_TO_PREFIX'])
+                    folder = os.path.join(settings.MEDIA_ROOT, upload_to)
                     image = search_file(val, folder)
 
                     if image is not None:
