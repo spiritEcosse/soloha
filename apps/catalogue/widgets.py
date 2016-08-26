@@ -146,13 +146,13 @@ class ImageManyToManyWidget(import_export_widgets.ManyToManyWidget):
                     image = search_file(val, folder)
 
                     if image is not None:
-                        val = '/'.join(os.path.relpath(image, start=settings.MEDIA_ROOT).split('/'))
+                        val = os.path.relpath(image, start=settings.MEDIA_ROOT)
+                else:
+                    if not os.path.exists(os.path.abspath(val)):
+                        raise ValueError('File "{}" does not exist.'.format(val))
 
-                if not os.path.exists(os.path.abspath(val)):
-                    raise ValueError('File "{}" does not exist.'.format(val))
-
-                if not os.path.isfile(os.path.abspath(val)):
-                    raise ValueError('Is not file - "{}" '.format(val))
+                    if not os.path.isfile(os.path.abspath(val)):
+                        raise ValueError('Is not file - "{}" '.format(val))
 
                 os.chdir(current_path)
 
