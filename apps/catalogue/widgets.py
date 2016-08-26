@@ -137,16 +137,16 @@ class ImageManyToManyWidget(import_export_widgets.ManyToManyWidget):
                     product=self.obj, display_order=display_order
                 ).first()
 
+                current_path = os.getcwd()
+                os.chdir(settings.MEDIA_ROOT)
+
                 if not os.path.dirname(val):
                     folder = os.path.join(settings.MEDIA_ROOT, filer_settings.
                                           DEFAULT_FILER_STORAGES['public']['main']['UPLOAD_TO_PREFIX'])
                     image = search_file(val, folder)
 
                     if image is not None:
-                        val = '/'.join(os.path.relpath(image).split('/')[1:])
-
-                current_path = os.getcwd()
-                os.chdir(settings.MEDIA_ROOT)
+                        val = '/'.join(os.path.relpath(image).split('/'))
 
                 if not os.path.exists(os.path.abspath(val)):
                     raise ValueError('File "{}" does not exist.'.format(val))
