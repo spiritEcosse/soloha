@@ -147,9 +147,7 @@ class ImageManyToManyWidget(import_export_widgets.ManyToManyWidget):
 
                     if image is not None:
                         val = '/'.join(os.path.relpath(image).split('/'))
-                        print 'not os.path.dirname(val) and image is not None - {}'.format(val)
-
-                print val
+                        raise ValueError('not os.path.dirname(val) and image is not None - {}'.format(val))
 
                 if not os.path.exists(os.path.abspath(val)):
                     raise ValueError('File "{}" does not exist.'.format(val))
