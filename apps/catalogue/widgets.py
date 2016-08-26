@@ -104,6 +104,7 @@ class ImageManyToManyWidget(import_export_widgets.ManyToManyWidget):
         super(ImageManyToManyWidget, self).__init__(model, separator=separator, field=field, *args, **kwargs)
         self.obj = None
 
+
     def clean(self, value):
         product_images = []
 
