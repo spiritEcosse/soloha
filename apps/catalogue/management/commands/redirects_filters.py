@@ -41,7 +41,8 @@ class Command(BaseCommand):
                 for category_filter_a in category_page_soup.find_all('a'):
                     relative_path_filter_a = category_filter_a.attrs['href'][21:]
                     print relative_path_filter_a, category_filter_a.text
-                    print category_filter_a.parent.parent.parent.find('span', 'class="option_name"').text
+                    # print category_filter_a.parent.parent.parent.find('span', 'class="option_name"').text
+                    print category_filter_a.parent.parent.parent.name.('div').text
 
             raise Exception('dfdf')
 
