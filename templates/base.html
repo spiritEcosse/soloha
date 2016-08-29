@@ -91,7 +91,7 @@
     {% block extrascripts %}{% endblock %}
 {% else %}
     <link rel="stylesheet" type="text/css" href="{% static "build/css/style.min.css" %}">
-    <script src="{% static 'build/js/script.min.js' %}"></script>
+    <script async src="{% static 'build/js/script.min.js' %}"></script>
 {% endif %}
 
 {# Block for body onload functions #}
