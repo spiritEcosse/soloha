@@ -21,32 +21,32 @@ class HomeView(CoreHomeView):
         context = super(HomeView, self).get_context_data(**kwargs)
         only = ['title', 'slug', 'structure', 'product_class', 'categories']
 
-        context['products_new'] = Product.objects.only(*only).select_related('product_class').prefetch_related(
-            Prefetch('images'),
-            Prefetch('product_class__options'),
-            Prefetch('stockrecords'),
-            Prefetch('categories__parent__parent')
-        ).order_by('-date_created')[:MAX_COUNT_PRODUCT]
-
-        context['products_recommend'] = Product.objects.filter(
-            productrecommendation__isnull=False
-        ).only(*only).select_related('product_class').prefetch_related(
-            Prefetch('images'),
-            Prefetch('product_class__options'),
-            Prefetch('stockrecords'),
-            Prefetch('categories__parent__parent')
-        ).order_by('-date_created')[:MAX_COUNT_PRODUCT]
-
-        context['products_order'] = Product.objects.filter(
-            line__isnull=False
-        ).only(*only).select_related('product_class').prefetch_related(
-            Prefetch('images'),
-            Prefetch('stockrecords'),
-            Prefetch('product_class__options'),
-            Prefetch('categories__parent__parent'),
-        ).order_by('-date_created')[:MAX_COUNT_PRODUCT]
-
-        context['products_special'] = []
+        # context['products_new'] = Product.objects.only(*only).select_related('product_class').prefetch_related(
+        #     Prefetch('images'),
+        #     Prefetch('product_class__options'),
+        #     Prefetch('stockrecords'),
+        #     Prefetch('categories__parent__parent')
+        # ).order_by('-date_created')[:MAX_COUNT_PRODUCT]
+        #
+        # context['products_recommend'] = Product.objects.filter(
+        #     productrecommendation__isnull=False
+        # ).only(*only).select_related('product_class').prefetch_related(
+        #     Prefetch('images'),
+        #     Prefetch('product_class__options'),
+        #     Prefetch('stockrecords'),
+        #     Prefetch('categories__parent__parent')
+        # ).order_by('-date_created')[:MAX_COUNT_PRODUCT]
+        #
+        # context['products_order'] = Product.objects.filter(
+        #     line__isnull=False
+        # ).only(*only).select_related('product_class').prefetch_related(
+        #     Prefetch('images'),
+        #     Prefetch('stockrecords'),
+        #     Prefetch('product_class__options'),
+        #     Prefetch('categories__parent__parent'),
+        # ).order_by('-date_created')[:MAX_COUNT_PRODUCT]
+        #
+        # context['products_special'] = []
         return context
 
 queryset_product = Product.objects.only('title')
