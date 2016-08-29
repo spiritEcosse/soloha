@@ -67,6 +67,7 @@ INSTALLED_APPS = \
         'filer',
         'apps.contacts',
         'apps.ex_sites',
+        'apps.ex_redirects',
         'import_export',
         'ckeditor',
         'apps.sitemap',
@@ -312,3 +313,4 @@ THUMBNAIL_ALIASES = {
 
 
 OSCAR_SHOP_NAME = 'soloha'
+DEBUG_TOOLBAR_CONFIG = settings_local.DEBUG_TOOLBAR_CONFIG
