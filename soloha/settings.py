@@ -314,7 +314,7 @@ THUMBNAIL_ALIASES = {
 
 OSCAR_SHOP_NAME = 'soloha'
 SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
-USE_ETAGS = DEBUG
+USE_ETAGS = not DEBUG
 
 HTML_MINIFY = True
 KEEP_COMMENTS_ON_MINIFYING = False
