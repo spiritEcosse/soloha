@@ -7,9 +7,10 @@ app_name = 'soloha'
 app = angular.module app_name
 
 app.config ['$httpProvider', ($httpProvider) ->
-    $httpProvider.defaults.xsrfCookieName = 'csrftoken'
     $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken'
+    $httpProvider.defaults.headers.post['X-CSRFToken'] = $('input[name=csrfmiddlewaretoken]').val();
     $httpProvider.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest'
+    $httpProvider.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded'
 ]
 
 app.filter 'search_by_title', ->

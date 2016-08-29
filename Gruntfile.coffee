@@ -27,7 +27,7 @@ module.exports = (grunt) ->
             all_src:
                 options:
                     sourceMap : true,
-                    sourceMapName : 'sourceMap.map'
+                    sourceMapName : 'static/build/js/sourceMap.map'
                     report: 'gzip'
                 files:
                     'static/build/js/script.min.js': ["static/bower_components/jquery/dist/jquery.min.js",
