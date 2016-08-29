@@ -91,11 +91,11 @@
     {% block extrascripts %}{% endblock %}
 {% else %}
     <link rel="stylesheet" type="text/css" href="{% static "build/css/style.min.css" %}">
-    <script async src="{% static 'build/js/script.min.js' %}"></script>
+    <script src="{% static 'build/js/script.min.js' %}"></script>
 {% endif %}
 
 {# Block for body onload functions #}
-<script async type="text/javascript">
+<script type="text/javascript">
     $(function() {
         {% block onbodyload %}{% endblock %}
     });
