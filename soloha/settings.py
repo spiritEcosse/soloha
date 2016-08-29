@@ -84,7 +84,6 @@ ROOT_URLCONF = 'soloha.urls'
 
 DJANGO_LIVE_TEST_SERVER_ADDRESS = "localhost:8000-8010,8080,9200-9300"
 
-
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -316,7 +315,13 @@ OSCAR_SHOP_NAME = 'soloha'
 SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
 USE_ETAGS = not DEBUG
 
-HTML_MINIFY = True
+HTML_MINIFY = not DEBUG
 KEEP_COMMENTS_ON_MINIFYING = False
 EXCLUDE_FROM_MINIFYING = ('^spirit/', )
 DEBUG_TOOLBAR_CONFIG = settings_local.DEBUG_TOOLBAR_CONFIG
+SECURE_CONTENT_TYPE_NOSNIFF = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+SECURE_BROWSER_XSS_FILTER = True
+CSRF_COOKIE_HTTPONLY = True
+X_FRAME_OPTIONS = 'DENY'
