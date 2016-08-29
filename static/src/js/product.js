@@ -19,10 +19,12 @@ $(document).ready(function() {
         $('html, body').animate({scrollTop: $(this.hash).offset().top}, 400);
     });
 
-    $('#primary_info').affix({
-        offset: {
-            top: $('#primary_info').offset().top - 20,
-            bottom: ($('#items').outerHeight(true)) + 504
-        }
-    });
+    if ($('#primary_info').length) {
+        $('#primary_info').affix({
+            offset: {
+                top: $('#primary_info').offset().top,
+                bottom: ($('#items').outerHeight(true)) + 504
+            }
+        });
+    }
 });

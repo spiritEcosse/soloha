@@ -6,13 +6,6 @@ app_name = 'soloha'
 #app = angular.module app_name, ['ngResource']
 app = angular.module app_name
 
-app.config ['$httpProvider', ($httpProvider) ->
-    $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken'
-    $httpProvider.defaults.headers.post['X-CSRFToken'] = $('input[name=csrfmiddlewaretoken]').val();
-    $httpProvider.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest'
-    $httpProvider.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded'
-]
-
 app.filter 'search_by_title', ->
     (list, needle) ->
         if list and needle
@@ -27,20 +20,6 @@ app.filter 'filter_attribute', ->
             return if new_list.length then new_list else false
         return list
 
-app.directive 'focusMe', ($timeout, $parse) ->
-    { link: (scope, element, attrs) ->
-        model = $parse(attrs.focusMe)
-        scope.$watch model, (value) ->
-            if value == true
-                $timeout ->
-                    element[0].focus()
-                    return
-            return
-        element.bind 'blur', ->
-            scope.$apply model.assign(scope, false)
-            return
-        return
-    }
 
 app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location', '$compile', '$filter', 'djangoForm', '$rootScope', ($http, $scope, $window, $document, $location, $compile, $filter, djangoForm, $rootScope) ->
     $scope.product = []
@@ -134,7 +113,7 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
             $scope.product.custom_value[attr_pk] = null
 
     $scope.click_dropdown = (attr_id) ->
-        #Todo bug with focus. If click on button three times, open dropdown without focus on us input.
+#Todo bug with focus. If click on button three times, open dropdown without focus on us input.
         $scope.isOpen[attr_id] = if $scope.isOpen[attr_id] is false then true else false
 
     get_prod = (selected_val) ->

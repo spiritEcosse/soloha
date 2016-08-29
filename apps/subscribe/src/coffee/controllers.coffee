@@ -1,11 +1,7 @@
 'use strict'
 
-### Controllers ###
-
-
 app_name = "soloha"
 app = angular.module app_name
-
 
 app.config ['$httpProvider', ($httpProvider) ->
   $httpProvider.defaults.xsrfCookieName = 'csrftoken'
