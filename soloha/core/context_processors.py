@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 ANSWER = str(_('Subscribed successfully!'))
 
 
-@cache_page(CACHE_MIDDLEWARE_SECONDS)
+# @cache_page(CACHE_MIDDLEWARE_SECONDS)
 def context_data(request):
     context = dict()
     queryset_info_page = InfoPage.objects.filter(sites__domain=get_current_site(request).domain)
