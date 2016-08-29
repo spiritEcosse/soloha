@@ -15,14 +15,14 @@ logger = logging.getLogger(__name__)
 ANSWER = str(_('Subscribed successfully!'))
 
 
-@cache_page(CACHE_MIDDLEWARE_SECONDS)
+# @cache_page(CACHE_MIDDLEWARE_SECONDS)
 def context_data(request):
     context = dict()
     queryset_info_page = InfoPage.objects.filter(sites__domain=get_current_site(request).domain)
     context['info_pages'] = queryset_info_page
-    context['categories'] = Category.objects.filter(enable=True, level=0).select_related(
-        'parent__parent'
-    ).prefetch_related('children__children')[:MAX_COUNT_CATEGORIES]
+    # context['categories'] = Category.objects.filter(enable=True, level=0).select_related(
+    #     'parent__parent'
+    # ).prefetch_related('children__children')[:MAX_COUNT_CATEGORIES]
     context['contacts'] = '/contacts/'
     context['current_site'] = get_current_site(request)
     context['form'] = SubscribeForm()
