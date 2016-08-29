@@ -3,7 +3,6 @@
 ### Controllers ###
 
 app_name = 'soloha'
-#app = angular.module app_name, ['ngResource']
 app = angular.module app_name
 
 app.filter 'search_by_title', ->

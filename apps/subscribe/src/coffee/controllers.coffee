@@ -3,12 +3,6 @@
 app_name = "soloha"
 app = angular.module app_name
 
-app.config ['$httpProvider', ($httpProvider) ->
-  $httpProvider.defaults.xsrfCookieName = 'csrftoken'
-  $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken'
-  $httpProvider.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest'
-]
-
 app.controller 'Subscribe', ['$http', '$scope', '$window', 'djangoForm', '$document', '$location', ($http, $scope, $window, djangoForm, $document, $location) ->
   $scope.subscribe = () ->
     if $scope.subscribe_data

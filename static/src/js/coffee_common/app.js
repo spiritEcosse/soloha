@@ -21,6 +21,12 @@
 
 (function() {
   'use strict';
+  var app, app_name;
+
+  app_name = 'soloha';
+
+  app = angular.module(app_name);
+
   app.controller('Header', [
     '$http', '$scope', '$location', '$window', '$document', '$log', '$cacheFactory', function($http, $scope, $location, $window, $document, $log, $cacheFactory) {
       return $scope.update_products = function() {
@@ -414,14 +420,6 @@
 
   app = angular.module(app_name);
 
-  app.config([
-    '$httpProvider', function($httpProvider) {
-      $httpProvider.defaults.xsrfCookieName = 'csrftoken';
-      $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
-      return $httpProvider.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
-    }
-  ]);
-
   app.controller('Contacts', [
     '$http', '$scope', '$window', 'djangoForm', '$document', function($http, $scope, $window, djangoForm, $document) {
       $scope.alerts = [];
@@ -459,21 +457,11 @@
 
 (function() {
   'use strict';
-
-  /* Controllers */
   var app, app_name;
 
   app_name = "soloha";
 
   app = angular.module(app_name);
-
-  app.config([
-    '$httpProvider', function($httpProvider) {
-      $httpProvider.defaults.xsrfCookieName = 'csrftoken';
-      $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
-      return $httpProvider.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
-    }
-  ]);
 
   app.controller('Search', [
     '$http', '$scope', '$window', '$document', '$location', '$routeParams', '$compile', function($http, $scope, $window, $document, $location, $routeParams, $compile) {
@@ -531,14 +519,6 @@
   app_name = "soloha";
 
   app = angular.module(app_name);
-
-  app.config([
-    '$httpProvider', function($httpProvider) {
-      $httpProvider.defaults.xsrfCookieName = 'csrftoken';
-      $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
-      return $httpProvider.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
-    }
-  ]);
 
   app.controller('Subscribe', [
     '$http', '$scope', '$window', 'djangoForm', '$document', '$location', function($http, $scope, $window, djangoForm, $document, $location) {

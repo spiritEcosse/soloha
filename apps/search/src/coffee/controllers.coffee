@@ -1,15 +1,7 @@
 'use strict'
 
-### Controllers ###
-
 app_name = "soloha"
 app = angular.module app_name
-
-app.config ['$httpProvider', ($httpProvider) ->
-  $httpProvider.defaults.xsrfCookieName = 'csrftoken'
-  $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken'
-  $httpProvider.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest'
-]
 
 app.controller 'Search', ['$http', '$scope', '$window', '$document', '$location', '$routeParams', '$compile', ($http, $scope, $window, $document, $location, $routeParams, $compile) ->
   $http.post($location.absUrl()).success (data) ->

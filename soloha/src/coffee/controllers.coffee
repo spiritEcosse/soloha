@@ -1,5 +1,8 @@
 'use strict'
 
+app_name = 'soloha'
+app = angular.module app_name
+
 app.controller 'Header', ['$http', '$scope', '$location', '$window', '$document', '$log', '$cacheFactory', ($http, $scope, $location, $window, $document, $log, $cacheFactory) ->
     $scope.update_products = () ->
         $http.post('/search/', {'search_string': $scope.search}).success (data) ->
