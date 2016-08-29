@@ -69,8 +69,6 @@
 
 {% block content %}
     <div class="col-xs-24 content product" id="info">
-        {% csrf_token %}
-
         {% if user.is_authenticated and user.is_staff %}
             <a class="pull-right hidden-xs" href="{% url 'dashboard:catalogue-product' pk=product.id %}">
                 <small><i class="icon-edit"></i> {% trans "Edit this product" %}</small>
