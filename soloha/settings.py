@@ -182,8 +182,7 @@ CKEDITOR_CONFIGS = {
 
 CACHES = settings_local.CACHES
 CACHE_MIDDLEWARE_SECONDS = settings_local.CACHE_MIDDLEWARE_SECONDS
-# CACHE_MIDDLEWARE_KEY_PREFIX = settings_local.CACHE_MIDDLEWARE_KEY_PREFIX
-KEY_PREFIX = 'soloha_'
+KEY_PREFIX = settings_local.KEY_PREFIX
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 

@@ -137,8 +137,7 @@
                             </a>
                         </div>
                         {% if categories %}
-                            {% cache 5000 categories %}
-                                <div id="navbar_menu" class="collapse navbar-collapse">
+                            <div id="navbar_menu" class="collapse navbar-collapse">
                                     <ul class="nav navbar-nav">
                                         {% for category in categories %}
                                             <li class="dropdown">
@@ -206,7 +205,6 @@
                                         {% endfor %}
                                     </ul>
                                 </div>
-                            {% endcache %}
                         {% endif %}
                     </div>
                 </nav>
