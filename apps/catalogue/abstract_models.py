@@ -19,6 +19,8 @@ logger = logging.getLogger(__name__)
 REGEXP_PHONE = r'/^((8|\+38)[\- ]?)?(\(?\d{3}\)?[\- ]?)?[\d\- ]{7,10}$/'
 REGEXP_EMAIL = r'/^[-\w.]+@([A-z0-9][-A-z0-9]+\.)+[A-z]{2,4}$/'
 
+BrowsableProductManagerCore = get_class('catalogue.managers', 'BrowsableProductManager')
+
 
 def check_exist_image(image):
     current_path = os.getcwd()

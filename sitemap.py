@@ -1,7 +1,7 @@
 from django.contrib.sitemaps import Sitemap
 from apps.catalogue.models import Product
 from apps.catalogue.models import Category
-from apps.flatpages.models import InfoPage
+from apps.flatpages.models import FlatPage
 
 
 class ProductSitemap(Sitemap):
@@ -26,12 +26,12 @@ class CategorySitemap(Sitemap):
         return obj.created
 
 
-class InfoPageSitemap(Sitemap):
+class FlatPageSitemap(Sitemap):
     changefreq = 'monthly'
     priority = 0.5
 
     def items(self):
-        return InfoPage.objects.filter(enable=True)
+        return FlatPage.objects.filter(enable=True)
 
     def lastmod(self, obj):
         return obj.created

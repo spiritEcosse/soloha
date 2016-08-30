@@ -20,7 +20,7 @@ from soloha import settings
 from django.db.models import Min, Sum
 import operator
 import functools
-from apps.flatpages.models import InfoPage
+from apps.flatpages.models import FlatPage
 from django.http import HttpResponse
 import logging
 from decimal import Decimal as D
@@ -42,7 +42,8 @@ from django.core.cache import cache
 from django.contrib.auth.models import User
 logger = logging.getLogger(__name__)
 
-Product = get_model('catalogue', 'product')
+Product = get_model('catalogue', 'Product')
+ProductReview = get_model('reviews', 'ProductReview')
 Category = get_model('catalogue', 'category')
 ProductVersion = get_model('catalogue', 'ProductVersion')
 Feature = get_model('catalogue', 'Feature')
@@ -296,7 +297,7 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
         else:
             self.kwargs['slug'] = self.kwargs['product_slug']
             object = super(ProductDetailView, self).get_object(queryset)
-            self.version_first = object.versions.prefetch_related('attributes').order_by('price_retail').first()
+            self.version_first = object.versions.order_by('price_retail').first()
             return object
 
     def redirect_if_necessary(self, current_path, product):
@@ -307,17 +308,26 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
 
     def get_queryset(self):
         queryset = super(ProductDetailView, self).get_queryset()
-        return queryset.select_related('product_class', 'parent__product_class').prefetch_related(
+        return queryset.prefetch_related(
+            Prefetch('reviews', queryset=ProductReview.objects.filter(status=ProductReview.APPROVED), to_attr='reviews_approved'),
+            Prefetch('options', queryset=Feature.objects.filter(level=0), to_attr='options_enabled'),
             Prefetch('images', queryset=ProductImage.objects.only('original', 'product')),
-            Prefetch('images__original'),
-            Prefetch('versions'),
-            Prefetch('attributes'),
-            Prefetch('categories__parent__parent', queryset=Category.objects.only('slug')),
-            Prefetch('filters'),
-            Prefetch('children__categories__parent__parent'),
-            Prefetch('stockrecords__partner'),
-            Prefetch('characteristics'),
+            Prefetch('categories__parent__parent'),
         )
+            # .select_related('product_class').prefetch_related(
+            # Prefetch('images', queryset=ProductImage.objects.only('original', 'product')),
+            # Prefetch('images__original'),
+            # Prefetch('versions'),
+            # Prefetch('attributes'),
+            # Prefetch('categories__parent__parent'),
+            # Prefetch('filters'),
+            # Prefetch('reviews'),
+            # Prefetch('children__categories__parent__parent'),
+            # Prefetch('children__characteristics'),
+            # Prefetch('children__images'),
+            # Prefetch('stockrecords__partner'),
+            # Prefetch('characteristics'),
+        # )
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -336,6 +346,7 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
 
     def get_context_data_json(self, **kwargs):
         context = dict()
+
         context['product'] = {'pk': self.object.pk, 'non_standard': self.object.non_standard_price_retail}
         context['product_versions'] = self.get_product_versions()
         context['attributes'] = []
@@ -484,17 +495,17 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
 
     def get_context_data(self, **kwargs):
         context = super(ProductDetailView, self).get_context_data(**kwargs)
+        context['reviews'] = []
         self.get_price(context)
         context['product_version_attributes'] = self.version_first
         context['attributes'] = self.get_attributes()
-        context['options'] = self.get_options()
         context['not_selected'] = NOT_SELECTED
         context['form'] = QuickOrderForm(initial={'product': self.object.pk})
         context['answer'] = ANSWER
-        context['flatpages'] = InfoPage.objects.filter(Q(url='delivery') | Q(url='payment') | Q(url='manager')). \
-            filter(enable=True)
+        context['flatpages'] = FlatPage.objects.filter(enable=True).\
+            filter(Q(url='delivery') | Q(url='payment') | Q(url='manager'))
+        raise Exception('dfdfdf')
         context['pages_delivery_and_pay'] = context['flatpages'].exclude(url='manager')
-        context['child'] = self.model.objects.filter(parent__slug=self.object.slug)
         return context
 
     def get_price(self, context):
@@ -561,9 +572,6 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
                     setattr(attr, 'selected_val', intersection.pop())
 
         return attributes
-
-    def get_options(self):
-        return Feature.objects.filter(Q(level=0), Q(product_options__product=self.object) | Q(children__product_options__product=self.object)).distinct()
 
     def get_wish_list(self):
         wish_list = WishList.objects.filter(owner=self.request.user.id).first()

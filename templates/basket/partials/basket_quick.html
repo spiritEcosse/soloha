@@ -7,7 +7,7 @@
 {% load product %}
 
 {% if request.basket.num_lines %}
-    {% for line in request.basket.all_lines %}
+    {% for line in request.m.all_lines %}
         <div class="col-xs-24 item">
             <div class="col-xs-5">
                 <a href="{{ line.product.get_absolute_url }}" title="{{ line.product.title }}">

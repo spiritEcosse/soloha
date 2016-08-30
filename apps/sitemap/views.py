@@ -2,7 +2,7 @@ from django.views import generic
 from django.views.generic.detail import SingleObjectMixin
 from oscar.core.loading import get_model
 from django.contrib.sites.shortcuts import get_current_site
-from apps.flatpages.models import InfoPage
+from apps.flatpages.models import FlatPage
 
 Category = get_model('catalogue', 'category')
 
@@ -22,6 +22,6 @@ class SitemapView(generic.ListView):
         return queryset
 
     def get_info_page(self):
-        queryset = InfoPage.objects.filter(sites__name=get_current_site(self.request).domain)
+        queryset = FlatPage.objects.filter(sites__name=get_current_site(self.request).domain)
         return queryset
 
