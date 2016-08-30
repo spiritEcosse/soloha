@@ -401,11 +401,13 @@ class ProductResource(ModelResource):
                                  widget=widgets.IntermediateModelManyToManyWidget(
                                      model=Product, field='slug',
                                  ))
+    parent = fields.Field(attribute='parent', column_name='parent', widget=import_export_widgets.ForeignKeyWidget(
+        model=Product, field='slug'))
     delete = fields.Field(widget=import_export_widgets.BooleanWidget())
 
     class Meta:
         model = Product
-        fields = ('id', 'delete', 'title', 'slug', 'enable', 'h1', 'meta_title', 'meta_description', 'meta_keywords',
+        fields = ('id', 'delete', 'title', 'slug', 'enable', 'structure', 'parent', 'h1', 'meta_title', 'meta_description', 'meta_keywords',
                   'description', 'categories_slug', 'filters_slug', 'characteristics_slug', 'product_class', 'images',
                   'recommended_products', )
         export_order = fields
