@@ -171,10 +171,8 @@ class AbstractProduct(models.Model):
         verbose_name = _('Product')
         verbose_name_plural = _('Products')
 
-    def __init__(self, *args, **kwargs):
-        super(AbstractProduct, self).__init__(*args, **kwargs)
-        # self.attr = ProductAttributesContainer(product=self)
-        # self.has_versions = self.versions.exists()
+    def get_price(self):
+        return self.versions.order_by('price_retail').first()
 
     def __str__(self):
         if self.title:
@@ -362,14 +360,13 @@ class AbstractProduct(models.Model):
         else:
             return is_valid
 
-    @property
-    def options(self):
-        """
-        Returns a set of all valid options for this product.
-        It's possible to have options product class-wide, and per product.
-        """
-        pclass_options = self.get_product_class().options.all()
-        return set(pclass_options) or set(self.product_options.all())
+    # @property
+    # def options(self):
+    #     """
+    #     Returns a set of all valid options for this product.
+    #     It's possible to have options product class-wide, and per product.
+    #     """
+    #     return self.options.all()
 
     @property
     def is_shipping_required(self):
@@ -789,7 +786,7 @@ class CustomAbstractCategory(MPTTModel):
         return parents
 
     def get_parents(self, obj, parents):
-        if obj.parent is not None:
+        if obj.parent:
             parents.append(obj.parent)
             return self.get_parents(obj=obj.parent, parents=parents)
         parents.reverse()
@@ -1001,6 +998,7 @@ class AbstractProductVersion(models.Model, CommonFeatureProduct):
 
     class Meta:
         abstract = True
+        ordering = ('product', 'price_retail', )
         app_label = 'catalogue'
         verbose_name = _('Product version')
         verbose_name_plural = _('Product versions')

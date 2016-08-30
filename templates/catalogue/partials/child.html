@@ -1,0 +1,19 @@
+{% load i18n %}
+
+<div class="row">
+    <div class="col-xs-24">
+        <div class="panel panel-default">
+            <div class="panel-heading text-center">
+                {% trans 'Childs' %}:
+            </div>
+            <div class="panel-body lightSlider_tree">
+                {% for product in child %}
+                    <div class="col-sm-8 col-md-8 items">
+                        {% include "catalogue/partials/product.html" %}
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+

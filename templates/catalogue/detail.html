@@ -11,6 +11,7 @@
 {% load thumbnail %}
 {% load product %}
 {% load djangular_tags %}
+{% load catalogue %}
 
 {% block styles %}
     {{ block.super }}
@@ -66,6 +67,8 @@
 {% endblock breadcrumbs %}
 
 {% block headertext %}{{ product.get_title }}{% endblock %}
+
+{% assign product|is_review_permitted:user is_review_permitted %}
 
 {% block content %}
     <div class="col-xs-24 content product" id="info">
@@ -126,7 +129,7 @@
                 </div>
             </div>
             <div id="section3" class="col-xs-24 col-sm-11 col-md-15" >
-                <div class="row common" >
+                <div class="row common">
                     {% include "catalogue/partials/price.html" %}
 
                     {% if attributes %}
@@ -144,6 +147,10 @@
                     {% endif %}
                 </div>
 
+                {% if child.exists %}
+                    {% include 'catalogue/partials/child.html' %}
+                {% endif %}
+
                 {% if options %}
                     <div class="col-xs-24 tab-content-info">
                         <div class="panel panel-default info" id="options">
@@ -160,6 +167,7 @@
                 {% endif %}
 
                 {% include "catalogue/partials/characteristics.html" %}
+
                 {% block product_description %}
                     {% if product.description %}
                         <div class="panel panel-default" id="description">
@@ -195,7 +203,7 @@
                                         </div>
                                         {% if product.num_approved_reviews == 0 %}
                                             <p>
-                                                {% if product|is_review_permitted:user %}
+                                                {% if is_review_permitted %}
                                                     {% url 'catalogue:reviews-add' product_slug=product.slug product_pk=product.id as add_review_url %}
                                                     {% blocktrans %}This product does not have any reviews yet -
                                                         <a href="{{ add_review_url }}#addreview">be the first to write one</a>.

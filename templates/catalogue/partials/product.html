@@ -44,7 +44,7 @@
                     </div>
                 {% endblock %}
             </div>
-            {% if product.has_versions or product.price_original.is_available_to_buy %}
+            {% if product.get_price %}
                 <p><button class="btn btn-primary" role="button">{% trans 'Buy' %}</button></p>
             {% endif %}
         </div>
@@ -71,7 +71,7 @@
                     </div>
                 {% endfor %}
             </div>
-            {% if product.has_versions or product.price_original.is_available_to_buy %}
+            {% if product.get_price %}
                 <div class="btn-block">
                     <button class="btn btn-primary" role="button">{% trans 'Buy' %}</button>
                 </div>

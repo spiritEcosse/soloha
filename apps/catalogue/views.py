@@ -39,13 +39,14 @@ from django.db.models import Count, Case, When, IntegerField
 from memoize import memoize, delete_memoized, delete_memoized_verhash
 from soloha import settings
 from django.core.cache import cache
-
+from django.contrib.auth.models import User
 logger = logging.getLogger(__name__)
 
 Product = get_model('catalogue', 'product')
 Category = get_model('catalogue', 'category')
 ProductVersion = get_model('catalogue', 'ProductVersion')
 Feature = get_model('catalogue', 'Feature')
+ProductImage = get_model('catalogue', 'ProductImage')
 ProductOptions = get_model('catalogue', 'ProductOptions')
 ProductFeature = get_model('catalogue', 'ProductFeature')
 SiteInfo = get_model('sites', 'Info')
@@ -290,8 +291,33 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
     only = ['title', 'pk']
 
     def get_object(self, queryset=None):
-        self.kwargs['slug'] = self.kwargs['product_slug']
-        return super(ProductDetailView, self).get_object(queryset)
+        if hasattr(self, 'object'):
+            return self.object
+        else:
+            self.kwargs['slug'] = self.kwargs['product_slug']
+            object = super(ProductDetailView, self).get_object(queryset)
+            self.version_first = object.versions.prefetch_related('attributes').order_by('price_retail').first()
+            return object
+
+    def redirect_if_necessary(self, current_path, product):
+        if self.enforce_paths:
+            expected_path = product.get_absolute_url()
+            if expected_path != urlquote(current_path):
+                return HttpResponsePermanentRedirect(expected_path)
+
+    def get_queryset(self):
+        queryset = super(ProductDetailView, self).get_queryset()
+        return queryset.select_related('product_class', 'parent__product_class').prefetch_related(
+            Prefetch('images', queryset=ProductImage.objects.only('original', 'product')),
+            Prefetch('images__original'),
+            Prefetch('versions'),
+            Prefetch('attributes'),
+            Prefetch('categories__parent__parent', queryset=Category.objects.only('slug')),
+            Prefetch('filters'),
+            Prefetch('children__categories__parent__parent'),
+            Prefetch('stockrecords__partner'),
+            Prefetch('characteristics'),
+        )
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -371,10 +397,9 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
             context['variant_attributes'][attribute.pk] = attributes
 
         product_versions_attributes = {}
-        product_versions = self.product_versions_queryset().first()
 
-        if product_versions:
-            for attr in product_versions.attributes.all():
+        if self.version_first:
+            for attr in self.version_first.attributes.all():
                 product_versions_attributes[attr.parent.pk] = {'id': attr.pk, 'title': attr.title}
         context['product_version_attributes'] = product_versions_attributes
         context['product_id'] = self.object.id
@@ -382,10 +407,6 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
             context['wish_list_url'] = self.get_wish_list().get_absolute_url()
         context['active'] = self.check_active_product_in_wish_list(wish_list=self.get_wish_list(), product_id=self.object.id)
         return context
-
-    def product_versions_queryset(self):
-        # ToDo igor: add to order_by - 'parent__product_features__sort'
-        return ProductVersion.objects.filter(product=self.object).prefetch_related('attributes').order_by('price_retail')
 
     def get_product_attribute_values(self):
         only = ['pk']
@@ -437,8 +458,9 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
 
     def get_product_versions(self):
         product_versions = dict()
+        versions = self.object.versions.prefetch_related('attributes').order_by('price_retail')
 
-        for product_version in self.product_versions_queryset():
+        for product_version in versions:
             attribute_values = []
             price = product_version.price_retail
             version_attributes = product_version.version_attributes.filter(
@@ -463,7 +485,7 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
     def get_context_data(self, **kwargs):
         context = super(ProductDetailView, self).get_context_data(**kwargs)
         self.get_price(context)
-        context['product_version_attributes'] = self.product_versions_queryset().first()
+        context['product_version_attributes'] = self.version_first
         context['attributes'] = self.get_attributes()
         context['options'] = self.get_options()
         context['not_selected'] = NOT_SELECTED
@@ -472,6 +494,7 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
         context['flatpages'] = InfoPage.objects.filter(Q(url='delivery') | Q(url='payment') | Q(url='manager')). \
             filter(enable=True)
         context['pages_delivery_and_pay'] = context['flatpages'].exclude(url='manager')
+        context['child'] = self.model.objects.filter(parent__slug=self.object.slug)
         return context
 
     def get_price(self, context):
@@ -481,10 +504,8 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
         :return:
             context
         """
-        first_prod_version = self.product_versions_queryset().first()
-
         # ToDo make it possible to check whether the product is available for sale
-        if not first_prod_version:
+        if not self.version_first:
             selector = Selector()
             strategy = selector.strategy()
             info = strategy.fetch_for_product(self.object)
@@ -495,8 +516,8 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
             else:
                 context['product_not_availability'] = str(_('Product is not available.'))
         else:
-            price = first_prod_version.price_retail
-            for attribute in first_prod_version.version_attributes.all():
+            price = self.version_first.price_retail
+            for attribute in self.version_first.version_attributes.all():
                 if attribute.price_retail is not None:
                     price += attribute.price_retail
             context['price'] = price
@@ -528,7 +549,7 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
                             key=lambda attr: attr.product_features.filter(product=self.object).first().sort
                             if attr.product_features.filter(product=self.object).first() else 0)
 
-        product_versions = self.product_versions_queryset().first()
+        product_versions = self.version_first
 
         if product_versions:
             target_attributes = set(product_versions.attributes.all())
