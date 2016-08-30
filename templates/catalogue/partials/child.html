@@ -6,12 +6,14 @@
             <div class="panel-heading text-center">
                 {% trans 'Childs' %}:
             </div>
-            <div class="panel-body lightSlider_tree">
-                {% for product in child %}
-                    <div class="col-sm-8 col-md-8 items">
-                        {% include "catalogue/partials/product.html" %}
-                    </div>
-                {% endfor %}
+            <div class="panel-body">
+                <div class="row lightSlider_tree">
+                    {% for product in child %}
+                        <div class="col-sm-8 col-md-8 items">
+                            {% include "catalogue/partials/product.html" %}
+                        </div>
+                    {% endfor %}
+                </div>
             </div>
         </div>
     </div>
