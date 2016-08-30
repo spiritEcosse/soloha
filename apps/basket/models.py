@@ -16,7 +16,8 @@ class Basket(AbstractBasket):
             self._lines = (
                 self.lines
                     .select_related('product', 'product__product_class', 'stockrecord')
-                    .prefetch_related('attributes', 'product__images', 'product__categories'))
+                    .prefetch_related('attributes', 'product__images', 'product__categories__parent__parent',
+                                      'product__stockrecords'))
         return self._lines
 
 from oscar.apps.basket.models import *  # noqa

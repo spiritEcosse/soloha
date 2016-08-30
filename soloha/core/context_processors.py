@@ -1,6 +1,6 @@
 import logging
 from apps.catalogue.models import Category
-from apps.flatpages.models import InfoPage
+from apps.flatpages.models import FlatPage
 from apps.subscribe.forms import SubscribeForm
 from soloha.settings import MAX_COUNT_CATEGORIES
 from django.contrib.sites.shortcuts import get_current_site
@@ -12,7 +12,7 @@ ANSWER = str(_('Subscribed successfully!'))
 
 def context_data(request):
     context = dict()
-    queryset_info_page = InfoPage.objects.filter(sites__domain=get_current_site(request).domain)
+    queryset_info_page = FlatPage.objects.filter(sites__domain=get_current_site(request).domain)
     context['info_pages'] = queryset_info_page
     context['categories'] = Category.objects.filter(enable=True, level=0).select_related(
         'parent__parent'

@@ -15,7 +15,7 @@ from django.utils.decorators import method_decorator
 import forms
 from django.db.models import Q
 from django.contrib.flatpages.models import FlatPage
-from apps.flatpages.models import InfoPage
+# from apps.flatpages.models import InfoPage
 from django.db.models.query import Prefetch
 
 #Todo change list import module
@@ -304,5 +304,5 @@ admin.site.register(ProductVersion, ProductVersionAdmin)
 
 admin.site.unregister(Site)
 admin.site.register(Site, InfoAdmin)
-admin.site.unregister(FlatPage)
-admin.site.register(InfoPage)
+# admin.site.unregister(FlatPage)
+# admin.site.register(FlatPage)

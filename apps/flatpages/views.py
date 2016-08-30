@@ -6,8 +6,7 @@ from django.shortcuts import get_object_or_404
 from django.template import loader
 from django.utils.safestring import mark_safe
 from django.views.decorators.csrf import csrf_protect
-
-from models import InfoPage
+from models import FlatPage
 
 DEFAULT_TEMPLATE = 'flatpages/default.html'
 
@@ -27,12 +26,12 @@ def flatpage(request, url):
         url = '/' + url
     site_id = get_current_site(request).id
     try:
-        f = get_object_or_404(InfoPage,
+        f = get_object_or_404(FlatPage,
             url=url, sites=site_id)
     except Http404:
         if not url.endswith('/') and settings.APPEND_SLASH:
             url += '/'
-            f = get_object_or_404(InfoPage,
+            f = get_object_or_404(FlatPage,
                 url=url, sites=site_id)
             return HttpResponsePermanentRedirect('%s/' % request.path)
         else:
