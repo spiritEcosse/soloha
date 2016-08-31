@@ -282,25 +282,12 @@ class AbstractProduct(models.Model):
         if self.parent_id and not self.parent.is_parent:
             raise ValidationError(
                 _("You can only assign child products to parent products."))
-        if self.product_class:
-            raise ValidationError(
-                _("A child product can't have a product class."))
-        if self.pk and self.categories.exists():
-            raise ValidationError(
-                _("A child product can't have a category assigned."))
-        # Note that we only forbid options on product level
-        if self.pk and self.product_options.exists():
-            raise ValidationError(
-                _("A child product can't have options."))
 
     def _clean_parent(self):
         """
         Validates a parent product.
         """
         self._clean_standalone()
-        if self.has_stockrecords:
-            raise ValidationError(
-                _("A parent product can't have stockrecords."))
 
     def save(self, *args, **kwargs):
         if not self.slug:
