@@ -173,9 +173,6 @@ class AbstractProduct(models.Model):
         verbose_name = _('Product')
         verbose_name_plural = _('Products')
 
-    def get_price(self):
-        return self.versions.order_by('price_retail').first()
-
     def __str__(self):
         if self.title:
             return self.title
@@ -309,6 +306,10 @@ class AbstractProduct(models.Model):
         # self.attr.save()
 
     # Properties
+
+    @property
+    def price(self):
+        return self.versions.order_by('price_retail').first().price_retail
 
     @property
     def price_original(self):

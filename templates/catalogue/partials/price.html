@@ -9,13 +9,14 @@
             {% trans 'Vendor code' %}: {{ product.id }}
             <div class="pull-right">{% trans 'By order' %}</div>
         </div>
+
         <div class="panel-body">
             {% with class_price="number" %}
-                {% if price %}
+                {% if object.price %}
                     <div class="text-center wrapper-number" >
                         {% trans "Price" %}:
-                        <span ng-init="price='{{ price }}';
-                            price_start='{{ price }}'" ng-class="'{{ class_price }}'"
+                        <span ng-init="price='{{ object.price }}';
+                            price_start='{{ object.price }}'" ng-class="'{{ class_price }}'"
                               class="{{ class_price }}" ng-bind="price">{% if not ng %}{{ price }}{% endif %}</span>
                         <span>{{ currency }}</span>
                     </div>
@@ -56,12 +57,6 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
-                {% else %}
-                    <div class="wrapper-number">
-                        <span ng-class="'{{ class_price }}'" class="{{ class_price }}">
-                            {{ product_not_availability }}
-                        </span>
                     </div>
                 {% endif %}
             {% endwith %}
