@@ -71,6 +71,7 @@ INSTALLED_APPS = \
         'ckeditor',
         'apps.sitemap',
         'apps.subscribe',
+        'apps.ex_flatpages',
         'bootstrap_pagination',
         'memoize',
         # 'smart_load_tag',

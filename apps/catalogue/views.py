@@ -20,7 +20,6 @@ from soloha import settings
 from django.db.models import Min, Sum
 import operator
 import functools
-from apps.flatpages.models import FlatPage
 from django.http import HttpResponse
 import logging
 from decimal import Decimal as D
@@ -53,6 +52,8 @@ ProductFeature = get_model('catalogue', 'ProductFeature')
 SiteInfo = get_model('sites', 'Info')
 QuickOrder = get_model('order', 'QuickOrder')
 WishList = get_model('wishlists', 'WishList')
+FlatPage = get_model('flatpages', 'FlatPage')
+
 NOT_SELECTED = str(_('Not selected'))
 ANSWER = str(_('Your message has been sent. We will contact you on the specified details.'))
 
@@ -313,11 +314,11 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
             Prefetch('options', queryset=Feature.objects.filter(level=0), to_attr='options_enabled'),
             Prefetch('images', queryset=ProductImage.objects.only('original', 'product')),
             Prefetch('categories__parent__parent'),
+            Prefetch('versions'),
         )
             # .select_related('product_class').prefetch_related(
             # Prefetch('images', queryset=ProductImage.objects.only('original', 'product')),
             # Prefetch('images__original'),
-            # Prefetch('versions'),
             # Prefetch('attributes'),
             # Prefetch('categories__parent__parent'),
             # Prefetch('filters'),
@@ -496,15 +497,14 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
     def get_context_data(self, **kwargs):
         context = super(ProductDetailView, self).get_context_data(**kwargs)
         context['reviews'] = []
-        self.get_price(context)
-        context['product_version_attributes'] = self.version_first
+        # self.get_price(context)
         context['attributes'] = self.get_attributes()
         context['not_selected'] = NOT_SELECTED
         context['form'] = QuickOrderForm(initial={'product': self.object.pk})
         context['answer'] = ANSWER
-        context['flatpages'] = FlatPage.objects.filter(enable=True).\
-            filter(Q(url='delivery') | Q(url='payment') | Q(url='manager'))
-        raise Exception('dfdfdf')
+        context['flatpages'] = FlatPage.objects.select_related('info').filter(
+            sites__domain=get_current_site(self.request).domain, info__enable=True
+        ).filter(Q(url='delivery') | Q(url='payment') | Q(url='manager'))
         context['pages_delivery_and_pay'] = context['flatpages'].exclude(url='manager')
         return context
 

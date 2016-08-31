@@ -33,7 +33,7 @@ from django.test import TestCase, override_settings
 from django.core.management import call_command
 from django.contrib.auth.models import User
 from selenium.common.exceptions import NoSuchElementException
-from apps.flatpages.models import InfoPage
+from apps.ex_flatpages.models import InfoPage
 import haystack
 from pyvirtualdisplay import Display
 
