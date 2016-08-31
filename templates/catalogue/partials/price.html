@@ -2,6 +2,10 @@
 {% load staticfiles %}
 {% load i18n %}
 {% load djangular_tags %}
+{% load purchase_info_tags %}
+{% load currency_filters %}
+
+{% purchase_info_for_product request product as session %}
 
 <div class="col-xs-24 col-sm-24 col-md-10 price">
     <div class="panel panel-default">
@@ -17,7 +21,7 @@
                         <span ng-init="price='{{ object.price }}';
                             price_start='{{ object.price }}'" ng-class="'{{ class_price }}'"
                               class="{{ class_price }}" ng-bind="price">{% if not ng %}{{ price }}{% endif %}</span>
-                        <span>{{ currency }}</span>
+                        <span>{{ session.price.incl_tax }}</span>
                     </div>
                     <div class="row">
                         {% block product_basket_form %}
