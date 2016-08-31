@@ -309,7 +309,10 @@ class AbstractProduct(models.Model):
 
     @property
     def price(self):
-        return self.versions.order_by('price_retail').first().price_retail
+        version = self.versions.order_by('price_retail').first()
+        print version
+        if version:
+            return version.price_retail
 
     @property
     def price_original(self):
