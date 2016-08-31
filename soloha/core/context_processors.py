@@ -1,6 +1,6 @@
 import logging
 from apps.catalogue.models import Category
-from apps.flatpages.models import FlatPage
+from apps.ex_flatpages.models import FlatPage
 from apps.subscribe.forms import SubscribeForm
 from soloha.settings import MAX_COUNT_CATEGORIES
 from django.contrib.sites.shortcuts import get_current_site
