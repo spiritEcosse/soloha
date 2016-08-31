@@ -310,7 +310,7 @@ class AbstractProduct(models.Model):
     @property
     def price(self):
         version = self.versions.order_by('price_retail').first()
-        print version
+
         if version:
             return version.price_retail
 

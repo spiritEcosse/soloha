@@ -7553,6 +7553,17 @@ div {
   margin-top: 20px;
   padding-left: 15px;
 }
+.alert-error {
+  background-color: #f2dede;
+  border-color: #ebccd1;
+  color: #a94442;
+}
+.alert-error hr {
+  border-top-color: #e4b9c0;
+}
+.alert-error .alert-link {
+  color: #843534;
+}
 header .top {
   height: 40px;
   background-color: #ff890d;
@@ -8373,8 +8384,7 @@ header .bottom .navbar .nav > li .yamm-content .image .btn-menu {
   margin-bottom: 20px;
 }
 .main .product .gallery {
-  margin-top: 20px;
-  margin-bottom: 30px;
+  margin-top: 3px;
 }
 .main .product .gallery .lSSlideOuter {
   width: 414px;
@@ -9160,3 +9170,4 @@ footer .bottom {
     line-height: 24px;
   }
 }
+/*# sourceMappingURL=static/build/css/main.css.map */
