@@ -89,7 +89,7 @@ class Command(BaseCommand):
                             option = namedtuplefetchone(cursor)
 
                             try:
-                                feature = Feature.objects.get(slug=slugify(option + '-' + option.value_name))
+                                feature = Feature.objects.get(slug=slugify(option.name + '-' + option.value_name))
                             except ObjectDoesNotExist as e:
                                 print e, u'does not exists {} - {}'.format(option.name, option.value_name)
                             else:
