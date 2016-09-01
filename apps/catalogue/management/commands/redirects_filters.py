@@ -1,3 +1,5 @@
+# --coding: utf-8--
+
 from apps.catalogue.models import Product, Category, Feature
 from django.core.management.base import BaseCommand
 from django.contrib.redirects.models import Redirect
