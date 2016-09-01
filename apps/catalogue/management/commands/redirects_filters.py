@@ -29,6 +29,7 @@ class Command(BaseCommand):
         :param options:
         :return:
         """
+        Redirect.objects.filter(old_path__contains='?filter').delete()
         url = 'http://soloha.kiev.ua'
         main_page = urllib2.urlopen(url)
         soup_main_page = BeautifulSoup(main_page.read())
@@ -88,7 +89,7 @@ class Command(BaseCommand):
                             option = namedtuplefetchone(cursor)
 
                             try:
-                                feature = Feature.objects.get(title__iexact=option.value_name.strip(), parent__title__iexact=option.name.strip())
+                                feature = Feature.objects.get(slug=slugify(option + '-' + option.value_name))
                             except ObjectDoesNotExist as e:
                                 print e, u'does not exists {} - {}'.format(option.name, option.value_name)
                             else:
