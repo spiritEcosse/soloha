@@ -32,7 +32,7 @@ class Command(BaseCommand):
         url = 'http://soloha.kiev.ua'
         main_page = urllib2.urlopen(url)
         soup_main_page = BeautifulSoup(main_page.read())
-        categories = soup_main_page.select('#topnav2')
+        categories = soup_main_page.find(id='topnav2')
 
         for category_a in categories.find_all('a')[1:]:
             category_link = category_a.attrs['href']
