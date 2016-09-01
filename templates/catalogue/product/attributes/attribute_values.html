@@ -23,7 +23,6 @@
                     <input ng-model="query_attr['{{ attribute.pk }}']"
                            ng-change="'{attribute.non_standard && product.non_standard) ? search(attribute.pk)}'"
                            type="text"
-                           focus-me="isOpen['{{ attribute.pk }}']"
                            placeholder="{% trans "Search" %}"
                            class="form-control">
                 </form>

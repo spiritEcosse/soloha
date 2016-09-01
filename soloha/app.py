@@ -6,7 +6,7 @@ from apps.catalogue.admin import ProductAutocomplete, FeatureAutocomplete, Categ
 from apps.partner.admin import PartnerAutocomplete
 from oscar.core.loading import get_class
 from django.conf.urls import url
-from apps.flatpages import views
+from apps.ex_flatpages import views
 
 detail_view = get_class('catalogue.views', 'ProductDetailView')
 catalogue_view = get_class('catalogue.views', 'CatalogueView')

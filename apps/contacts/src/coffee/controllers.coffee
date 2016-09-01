@@ -3,14 +3,7 @@
 ### Controllers ###
 
 app_name = "soloha"
-#app = angular.module "#{app_name}.controllers", ['djng.forms']
 app = angular.module app_name
-
-app.config ['$httpProvider', ($httpProvider) ->
-  $httpProvider.defaults.xsrfCookieName = 'csrftoken'
-  $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken'
-  $httpProvider.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest'
-]
 
 app.controller 'Contacts', ['$http', '$scope', '$window', 'djangoForm', '$document', ($http, $scope, $window, djangoForm, $document) ->
   $scope.alerts = []

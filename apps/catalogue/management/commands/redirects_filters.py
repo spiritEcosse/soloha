@@ -10,6 +10,16 @@ from bs4 import BeautifulSoup
 from django.core.exceptions import ObjectDoesNotExist
 from urlparse import urlparse as method_urlparse
 import urlparse
+from django.db.utils import IntegrityError
+from django.db import connections
+from collections import namedtuple
+
+
+def namedtuplefetchone(cursor):
+    "Return all rows from a cursor as a namedtuple"
+    desc = cursor.description
+    nt_result = namedtuple('Result', [col[0] for col in desc])
+    return nt_result(*cursor.fetchone())
 
 
 class Command(BaseCommand):
@@ -29,23 +39,29 @@ class Command(BaseCommand):
 
             relative_path = category_link[21:]
 
-            try:
-                redirect = Redirect.objects.get(old_path=relative_path)
-                category_slug = redirect.new_path.split('/')[-2]
-                category = Category.objects.get(slug=category_slug)
-            except ObjectDoesNotExist as e:
-                print e
-            else:
-                self.save_filters(category, category_link)
+            if relative_path == '/krovati/':
+                try:
+                    redirect = Redirect.objects.get(old_path=relative_path)
+                    category_slug = redirect.new_path.split('/')[-2]
+                    category = Category.objects.get(slug=category_slug)
+                except ObjectDoesNotExist as e:
+                    print e
+                else:
+                    self.save_filters(category, category_link)
 
-            raise Exception('dfdf')
+                raise Exception('dfdf')
 
         self.stdout.write('Successfully write redirects.')
 
-    def save_filters(self, category, absolute_link, slugs=[]):
-        current_site = Site.objects.get(pk=1)
+    def save_filters(self, category, parent_absolute_link, value_name='New branch', count=1):
+        print count
+        count += 1
 
-        category_page = urllib2.urlopen(absolute_link)
+        cursor = connections['mysql'].cursor()
+        current_site = Site.objects.get(pk=1)
+        print value_name
+        print parent_absolute_link
+        category_page = urllib2.urlopen(parent_absolute_link)
         category_page_soup = BeautifulSoup(category_page.read())
         filters = category_page_soup.select('#filters > [class=wrapp_options]')
 
@@ -60,19 +76,37 @@ class Command(BaseCommand):
                     absolute_link = value_a.attrs['href']
                     relative_path_filter = absolute_link[21:]
                     print '--', value_a.text
+                    url_page = method_urlparse(absolute_link)
+                    query = url_page.query.replace('filter=', '')
+                    filter_link = urlparse.parse_qs(query)
+                    features = []
 
-                    try:
-                        feature = Feature.objects.get(title__iexact=value_a.text, parent__title__iexact=option_name)
-                    except ObjectDoesNotExist as e:
-                        print e
-                    else:
-                        slugs.append(feature.slug)
-                        filter_slug = '/'.join(set(slugs))
+                    for key, values in filter_link.items():
+                        for value_id in values[0].split(','):
+                            cursor.execute("SELECT covd.name as value_name, cod.name from category_option_value_description covd "
+                                           "INNER JOIN category_option_description cod ON (covd.option_id=cod.option_id) "
+                                           "WHERE covd.value_id = {}".format(value_id))
+                            option = namedtuplefetchone(cursor)
+
+                            try:
+                                feature = Feature.objects.get(title__iexact=option.value_name.strip(), parent__title__iexact=option.name.strip())
+                            except ObjectDoesNotExist as e:
+                                print e, u'does not exists {} - {}'.format(option.name, option.value_name)
+                            else:
+                                features.append(feature)
+
+                    if features:
+                        features = sorted(features, key=lambda slug: slug.pk)
+
+                        filter_slug = '/'.join([feature.slug for feature in set(features)])
                         new_path = category.get_absolute_url(values={'filter_slug': filter_slug})
                         print '----(old, new) ', relative_path_filter, new_path
                         print '\n'
 
-                        Redirect.objects.create(site=current_site, old_path=relative_path_filter, new_path=new_path)
+                        try:
+                            Redirect.objects.create(site=current_site, old_path=relative_path_filter, new_path=new_path)
+                        except IntegrityError as e:
+                            print e
 
                         filter_page = urllib2.urlopen(absolute_link)
                         filter_page_soup = BeautifulSoup(filter_page.read())
@@ -100,11 +134,12 @@ class Command(BaseCommand):
                                 values={'filter_slug': filter_slug, 'page': page_numb})
                             print '------(old, new)', page, new_path
                             print '\n'
-                            Redirect.objects.create(site=current_site, old_path=page, new_path=new_path)
 
-                        self.save_filters(category, absolute_link, slugs)
-                print '\n'
-        else:
-            print 'final !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-            print slugs
-            slugs = []
+                            try:
+                                Redirect.objects.create(site=current_site, old_path=page, new_path=new_path)
+                            except IntegrityError as e:
+                                print e
+
+                        self.save_filters(category, absolute_link, value_a.text, count)
+        print 'final !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
+        print parent_absolute_link, '\n\n'

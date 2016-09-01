@@ -72,7 +72,9 @@ INSTALLED_APPS = \
         'ckeditor',
         'apps.sitemap',
         'apps.subscribe',
+        'apps.ex_flatpages',
         'bootstrap_pagination',
+        'memoize',
         # 'smart_load_tag',
     ] + get_core_apps(['apps.catalogue', 'apps.promotions', 'apps.partner', 'apps.search', 'apps.order',
                        'apps.basket', 'apps.checkout'])
@@ -83,7 +85,6 @@ MIDDLEWARE_CLASSES = settings_local.MIDDLEWARE_CLASSES
 ROOT_URLCONF = 'soloha.urls'
 
 DJANGO_LIVE_TEST_SERVER_ADDRESS = "localhost:8000-8010,8080,9200-9300"
-
 
 TEMPLATES = [
     {
@@ -314,3 +315,14 @@ THUMBNAIL_ALIASES = {
 
 OSCAR_SHOP_NAME = 'soloha'
 DEBUG_TOOLBAR_CONFIG = settings_local.DEBUG_TOOLBAR_CONFIG
+SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
+USE_ETAGS = not DEBUG
+
+HTML_MINIFY = not DEBUG
+KEEP_COMMENTS_ON_MINIFYING = False
+EXCLUDE_FROM_MINIFYING = ('^spirit/', )
+SECURE_CONTENT_TYPE_NOSNIFF = True
+#SESSION_COOKIE_SECURE = True
+#CSRF_COOKIE_SECURE = True
+SECURE_BROWSER_XSS_FILTER = True
+X_FRAME_OPTIONS = 'DENY'

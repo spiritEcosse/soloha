@@ -8,25 +8,24 @@
 
   app = angular.module(app_name, ['ngResource', 'ngRoute', 'ng.django.forms', 'ui.bootstrap', 'ngAnimate', 'duScroll']);
 
+  app.config([
+    '$httpProvider', function($httpProvider) {
+      $httpProvider.defaults.xsrfCookieName = 'csrftoken';
+      $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
+      $httpProvider.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+      return $httpProvider.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
+    }
+  ]);
+
 }).call(this);
 
-
-/* Controllers */
-
 (function() {
+  'use strict';
   var app, app_name;
 
   app_name = 'soloha';
 
   app = angular.module(app_name);
-
-  app.config([
-    '$httpProvider', '$routeProvider', function($httpProvider) {
-      $httpProvider.defaults.xsrfCookieName = 'csrftoken';
-      $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
-      return $httpProvider.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
-    }
-  ]);
 
   app.controller('Header', [
     '$http', '$scope', '$location', '$window', '$document', '$log', '$cacheFactory', function($http, $scope, $location, $window, $document, $log, $cacheFactory) {
@@ -61,14 +60,6 @@
   app_name = 'soloha';
 
   app = angular.module(app_name);
-
-  app.config([
-    '$httpProvider', function($httpProvider) {
-      $httpProvider.defaults.xsrfCookieName = 'csrftoken';
-      $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
-      return $httpProvider.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
-    }
-  ]);
 
   app.filter('search_by_title', function() {
     return function(list, needle) {
@@ -119,25 +110,6 @@
         }
       }
       return list;
-    };
-  });
-
-  app.directive('focusMe', function($timeout, $parse) {
-    return {
-      link: function(scope, element, attrs) {
-        var model;
-        model = $parse(attrs.focusMe);
-        scope.$watch(model, function(value) {
-          if (value === true) {
-            $timeout(function() {
-              element[0].focus();
-            });
-          }
-        });
-        element.bind('blur', function() {
-          scope.$apply(model.assign(scope, false));
-        });
-      }
     };
   });
 
@@ -448,14 +420,6 @@
 
   app = angular.module(app_name);
 
-  app.config([
-    '$httpProvider', function($httpProvider) {
-      $httpProvider.defaults.xsrfCookieName = 'csrftoken';
-      $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
-      return $httpProvider.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
-    }
-  ]);
-
   app.controller('Contacts', [
     '$http', '$scope', '$window', 'djangoForm', '$document', function($http, $scope, $window, djangoForm, $document) {
       $scope.alerts = [];
@@ -493,21 +457,11 @@
 
 (function() {
   'use strict';
-
-  /* Controllers */
   var app, app_name;
 
   app_name = "soloha";
 
   app = angular.module(app_name);
-
-  app.config([
-    '$httpProvider', function($httpProvider) {
-      $httpProvider.defaults.xsrfCookieName = 'csrftoken';
-      $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
-      return $httpProvider.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
-    }
-  ]);
 
   app.controller('Search', [
     '$http', '$scope', '$window', '$document', '$location', '$routeParams', '$compile', function($http, $scope, $window, $document, $location, $routeParams, $compile) {
@@ -560,21 +514,11 @@
 
 (function() {
   'use strict';
-
-  /* Controllers */
   var app, app_name;
 
   app_name = "soloha";
 
   app = angular.module(app_name);
-
-  app.config([
-    '$httpProvider', function($httpProvider) {
-      $httpProvider.defaults.xsrfCookieName = 'csrftoken';
-      $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
-      return $httpProvider.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
-    }
-  ]);
 
   app.controller('Subscribe', [
     '$http', '$scope', '$window', 'djangoForm', '$document', '$location', function($http, $scope, $window, djangoForm, $document, $location) {

@@ -19,6 +19,8 @@ logger = logging.getLogger(__name__)
 REGEXP_PHONE = r'/^((8|\+38)[\- ]?)?(\(?\d{3}\)?[\- ]?)?[\d\- ]{7,10}$/'
 REGEXP_EMAIL = r'/^[-\w.]+@([A-z0-9][-A-z0-9]+\.)+[A-z]{2,4}$/'
 
+BrowsableProductManagerCore = get_class('catalogue.managers', 'BrowsableProductManager')
+
 
 def check_exist_image(image):
     current_path = os.getcwd()
@@ -111,7 +113,7 @@ class AbstractProduct(models.Model):
         _("Date updated"), auto_now=True, db_index=True)
 
     categories = models.ManyToManyField('catalogue.Category', related_name="products", verbose_name=_("Categories"))
-    filters = models.ManyToManyField('catalogue.Feature', related_name="filter_products", verbose_name=_('Filters of product'), blank=True, null=True)
+    filters = models.ManyToManyField('catalogue.Feature', related_name="filter_products", verbose_name=_('Filters of product'), blank=True)
     attributes = models.ManyToManyField('catalogue.Feature', through='ProductFeature', verbose_name=_('Attribute of product'), related_name="attr_products", blank=True)
     characteristics = models.ManyToManyField('catalogue.Feature', verbose_name='Characteristics', related_name='characteristic_products', blank=True)
     options = models.ManyToManyField('catalogue.Feature', through='ProductOptions', related_name='option_products', verbose_name='Additional options')
@@ -171,10 +173,8 @@ class AbstractProduct(models.Model):
         verbose_name = _('Product')
         verbose_name_plural = _('Products')
 
-    def __init__(self, *args, **kwargs):
-        super(AbstractProduct, self).__init__(*args, **kwargs)
-        # self.attr = ProductAttributesContainer(product=self)
-        # self.has_versions = self.versions.exists()
+    def get_price(self):
+        return self.versions.order_by('price_retail').first()
 
     def __str__(self):
         if self.title:
@@ -282,25 +282,12 @@ class AbstractProduct(models.Model):
         if self.parent_id and not self.parent.is_parent:
             raise ValidationError(
                 _("You can only assign child products to parent products."))
-        if self.product_class:
-            raise ValidationError(
-                _("A child product can't have a product class."))
-        if self.pk and self.categories.exists():
-            raise ValidationError(
-                _("A child product can't have a category assigned."))
-        # Note that we only forbid options on product level
-        if self.pk and self.product_options.exists():
-            raise ValidationError(
-                _("A child product can't have options."))
 
     def _clean_parent(self):
         """
         Validates a parent product.
         """
         self._clean_standalone()
-        if self.has_stockrecords:
-            raise ValidationError(
-                _("A parent product can't have stockrecords."))
 
     def save(self, *args, **kwargs):
         if not self.slug:
@@ -362,14 +349,13 @@ class AbstractProduct(models.Model):
         else:
             return is_valid
 
-    @property
-    def options(self):
-        """
-        Returns a set of all valid options for this product.
-        It's possible to have options product class-wide, and per product.
-        """
-        pclass_options = self.get_product_class().options.all()
-        return set(pclass_options) or set(self.product_options.all())
+    # @property
+    # def options(self):
+    #     """
+    #     Returns a set of all valid options for this product.
+    #     It's possible to have options product class-wide, and per product.
+    #     """
+    #     return self.options.all()
 
     @property
     def is_shipping_required(self):
@@ -789,7 +775,7 @@ class CustomAbstractCategory(MPTTModel):
         return parents
 
     def get_parents(self, obj, parents):
-        if obj.parent is not None:
+        if obj.parent:
             parents.append(obj.parent)
             return self.get_parents(obj=obj.parent, parents=parents)
         parents.reverse()
@@ -1001,6 +987,7 @@ class AbstractProductVersion(models.Model, CommonFeatureProduct):
 
     class Meta:
         abstract = True
+        ordering = ('product', 'price_retail', )
         app_label = 'catalogue'
         verbose_name = _('Product version')
         verbose_name_plural = _('Product versions')

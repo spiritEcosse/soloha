@@ -4,12 +4,13 @@ from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext_lazy as _
 
 
-class InfoPage(FlatPage):
+class InfoPage(models.Model):
     GLYPHICON_CHOICES = (
         ('car', 'icon-car'),
         ('pay', 'icon-pay'),
         ('manager', 'icon-manager'),
     )
+    flatpage = models.OneToOneField(FlatPage, on_delete=models.CASCADE, related_name='info', primary_key=True)
     enable = models.BooleanField(verbose_name=_('Enable'), default=True)
     h1 = models.CharField(verbose_name=_('h1'), blank=True, max_length=255)
     meta_title = models.CharField(verbose_name=_('Meta tag: title'), blank=True, max_length=255)

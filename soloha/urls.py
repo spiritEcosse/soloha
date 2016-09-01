@@ -19,13 +19,13 @@ from soloha.app import application
 from django.conf.urls.static import static
 from soloha import settings
 from django.contrib.sitemaps.views import sitemap
-from sitemap import ProductSitemap, CategorySitemap, InfoPageSitemap
+from sitemap import ProductSitemap, CategorySitemap, FlatPageSitemap
 
 
 sitemaps = {
     'products': ProductSitemap,
     'categories': CategorySitemap,
-    'info_page': InfoPageSitemap
+    'info_page': FlatPageSitemap
 }
 
 urlpatterns = [

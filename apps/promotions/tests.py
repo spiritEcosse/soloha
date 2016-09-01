@@ -10,7 +10,7 @@ from oscar.apps.catalogue.categories import create_from_breadcrumbs
 from python_test.factories import catalogue
 from apps.promotions.views import HomeView
 from apps.catalogue.models import SiteInfo
-from apps.flatpages.models import InfoPage
+from apps.ex_flatpages.models import InfoPage
 
 
 Category = get_model('catalogue', 'category')

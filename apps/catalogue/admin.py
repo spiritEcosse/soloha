@@ -3,8 +3,6 @@ from django.db import models
 from oscar.core.loading import get_model
 from django.forms import Textarea
 from django import forms
-from django.contrib.sites.models import Site
-from django.contrib.sites.admin import SiteAdmin as BaseSiteAdmin
 from mptt.admin import DraggableMPTTAdmin
 from import_export.admin import ImportExportMixin, ImportExportActionModelAdmin
 import resources
@@ -14,8 +12,6 @@ from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 import forms
 from django.db.models import Q
-from django.contrib.flatpages.models import FlatPage
-from apps.flatpages.models import InfoPage
 from django.db.models.query import Prefetch
 
 #Todo change list import module
@@ -97,12 +93,6 @@ class VersionAttributeInline(admin.TabularInline):
     form = forms.VersionAttributeForm
     fk_name = 'version'
     extra = 3
-
-
-class InfoInline(admin.StackedInline):
-    model = Info
-    can_delete = False
-    verbose_name_plural = 'info'
 
 
 class StockRecordInline(admin.StackedInline):
@@ -210,7 +200,7 @@ class ProductAdmin(ImportExportMixin, ImportExportActionModelAdmin):
     list_display = ('pk', 'title', 'thumb', 'enable', 'date_updated', 'slug', 'categories_to_str', 'get_product_class',
                     'structure', 'partners_to_str', 'attribute_summary', )
     list_filter = ('enable', 'date_updated', 'stockrecords__partner', 'categories__name', 'structure', 'is_discountable', )
-    inlines = (StockRecordInline, ProductRecommendationInline, ProductImageInline, ProductFeatureInline, )
+    inlines = (ProductRecommendationInline, ProductImageInline, ProductFeatureInline, )
     prepopulated_fields = {"slug": ("title",)}
     search_fields = ('upc', 'title', 'slug', 'id', )
     form = forms.ProductForm
@@ -285,10 +275,6 @@ class CategoryAdmin(ImportExportMixin, ImportExportActionModelAdmin, DraggableMP
               "https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js")
 
 
-class InfoAdmin(BaseSiteAdmin):
-    inlines = (InfoInline, )
-
-
 admin.site.register(ProductClass, ProductClassAdmin)
 admin.site.register(Product, ProductAdmin)
 admin.site.register(ProductAttribute, ProductAttributeAdmin)
@@ -301,8 +287,3 @@ admin.site.register(Feature, FeatureAdmin)
 admin.site.register(ProductFeature, ProductFeatureAdmin)
 admin.site.register(ProductRecommendation, ProductRecommendationAdmin)
 admin.site.register(ProductVersion, ProductVersionAdmin)
-
-admin.site.unregister(Site)
-admin.site.register(Site, InfoAdmin)
-admin.site.unregister(FlatPage)
-admin.site.register(InfoPage)
