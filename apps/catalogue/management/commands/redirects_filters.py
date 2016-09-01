@@ -39,17 +39,16 @@ class Command(BaseCommand):
 
             relative_path = category_link[21:]
 
-            if relative_path == '/krovati/':
-                try:
-                    redirect = Redirect.objects.get(old_path=relative_path)
-                    category_slug = redirect.new_path.split('/')[-2]
-                    category = Category.objects.get(slug=category_slug)
-                except ObjectDoesNotExist as e:
-                    print e
-                else:
-                    self.save_filters(category, category_link)
+            try:
+                redirect = Redirect.objects.get(old_path=relative_path)
+                category_slug = redirect.new_path.split('/')[-2]
+                category = Category.objects.get(slug=category_slug)
+            except ObjectDoesNotExist as e:
+                print e
+            else:
+                self.save_filters(category, category_link)
 
-                raise Exception('dfdf')
+            raise Exception('dfdf')
 
         self.stdout.write('Successfully write redirects.')
 
