@@ -13,7 +13,7 @@ import urlparse
 from django.db.utils import IntegrityError
 from django.db import connections
 from collections import namedtuple
-
+import time
 
 def namedtuplefetchone(cursor):
     "Return all rows from a cursor as a namedtuple"
@@ -32,6 +32,7 @@ class Command(BaseCommand):
         url = 'http://soloha.kiev.ua'
         main_page = urllib2.urlopen(url)
         soup_main_page = BeautifulSoup(main_page.read())
+        time.sleep(2)
         categories = soup_main_page.find(id='topnav2')
 
         for category_a in categories.find_all('a')[1:]:
