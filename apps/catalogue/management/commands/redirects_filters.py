@@ -51,8 +51,6 @@ class Command(BaseCommand):
             else:
                 self.save_filters(category, category_link)
 
-            raise Exception('dfdf')
-
         self.stdout.write('Successfully write redirects.')
 
     def save_filters(self, category, parent_absolute_link, value_name='New branch', count=1):
