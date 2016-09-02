@@ -482,10 +482,13 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
                 price=Min('version__price_retail'),
                 count_child=Count('attribute__parent__children', distinct=True)
             ).order_by('price', '-count_child', 'attribute__parent__title', 'attribute__parent__pk')
+
             for version_attribute in version_attributes:
                 attribute_values.append(version_attribute.attribute)
+
                 if version_attribute.price_retail is not None:
                     price += version_attribute.price_retail
+
             attribute_values = sorted(attribute_values,
                                       key=lambda attr: attr.product_features.filter(
                                           product=self.object).first().sort
