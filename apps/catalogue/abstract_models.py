@@ -127,20 +127,6 @@ class AbstractProduct(models.Model):
         'catalogue.ProductClass', on_delete=models.PROTECT,
         verbose_name=_('Product type'), related_name="products",
         help_text=_("Choose what type of product this is"))
-    # attributes = models.ManyToManyField(
-    #     'catalogue.ProductAttribute',
-    #     through='catalogue.ProductAttributeValue',
-    #     verbose_name=_("Attributes"),
-    #     help_text=_("A product attribute is something that this product may "
-    #                 "have, such as a size, as specified by its class"))
-    #: It's possible to have options product class-wide, and per product.
-    # product_options = models.ManyToManyField(
-    #     'catalogue.Option', blank=True, verbose_name=_("Product options"),
-    #     help_text=_("Options are values that can be associated with a item "
-    #                 "when it is added to a customer's basket.  This could be "
-    #                 "something like a personalised message to be printed on "
-    #                 "a T-shirt."))
-
     recommended_products = models.ManyToManyField(
         'catalogue.Product', through='catalogue.ProductRecommendation', blank=True,
         verbose_name=_("Recommended products"),
@@ -306,36 +292,6 @@ class AbstractProduct(models.Model):
         # self.attr.save()
 
     # Properties
-
-    @property
-    def price(self):
-        version = self.versions.order_by('price_retail').first()
-
-        if version:
-            return version.price_retail
-
-    @property
-    def price_original(self):
-        # ToDo make it possible to check whether the product is available for sale
-        selector = Selector()
-        strategy = selector.strategy()
-        return strategy.fetch_for_product(self)
-
-    @property
-    def price_from_version(self):
-        """
-            get main price for product
-            :param self: object product
-            :return:
-                price of product
-            """
-        first_prod_version = self.versions.order_by('price_retail').first()
-        price = first_prod_version.price_retail
-
-        for attribute in first_prod_version.version_attributes.all():
-            if attribute.price_retail is not None:
-                price += attribute.price_retail
-        return price
 
     @property
     def is_standalone(self):
