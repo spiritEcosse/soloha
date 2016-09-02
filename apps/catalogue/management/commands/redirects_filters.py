@@ -96,7 +96,7 @@ class Command(BaseCommand):
                             try:
                                 feature = Feature.objects.get(title__iexact=value_name, parent__title__iexact=option_name)
                             except ObjectDoesNotExist as e:
-                                print e, u'does not exists {} - {}'.format(option_name, value_name)
+                                print e, u'does not exists {} - {} - {}'.format(option_name, value_name, value_id)
                             else:
                                 features.append(feature)
 
