@@ -92,11 +92,17 @@ class Command(BaseCommand):
                             option_name = option.name.strip()
 
                             try:
-                                feature, created = Feature.objects.get_or_create(title__iexact=value_name, parent__title__iexact=option_name)
+                                feature = Feature.objects.get(title__iexact=value_name, parent__title__iexact=option_name)
                             except ObjectDoesNotExist as e:
+                                try:
+                                    parent = Feature.objects.get(title__iexact=option_name)
+                                except ObjectDoesNotExist:
+                                    parent = Feature.objects.create(title=option_name)
+
+                                feature = Feature.objects.create(title=value_name, parent=parent)
                                 print e, u'does not exists {} - {} - {}'.format(option_name, value_name, value_id)
-                            else:
-                                features.append(feature)
+
+                            features.append(feature)
 
                     if features:
                         features = sorted(features, key=lambda slug: slug.pk)
