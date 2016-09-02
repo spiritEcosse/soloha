@@ -92,7 +92,7 @@ class Command(BaseCommand):
                             option_name = option.name.strip()
 
                             try:
-                                feature = Feature.objects.get(title__iexact=value_name, parent__title__iexact=option_name)
+                                feature, created = Feature.objects.get_or_create(title__iexact=value_name, parent__title__iexact=option_name)
                             except ObjectDoesNotExist as e:
                                 print e, u'does not exists {} - {} - {}'.format(option_name, value_name, value_id)
                             else:
