@@ -67,6 +67,7 @@ INSTALLED_APPS = \
         'filer',
         'apps.contacts',
         'apps.ex_sites',
+        'apps.ex_redirects',
         'import_export',
         'ckeditor',
         'apps.sitemap',
@@ -313,13 +314,13 @@ THUMBNAIL_ALIASES = {
 
 
 OSCAR_SHOP_NAME = 'soloha'
+DEBUG_TOOLBAR_CONFIG = settings_local.DEBUG_TOOLBAR_CONFIG
 SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
 USE_ETAGS = not DEBUG
 
 HTML_MINIFY = not DEBUG
 KEEP_COMMENTS_ON_MINIFYING = False
 EXCLUDE_FROM_MINIFYING = ('^spirit/', )
-DEBUG_TOOLBAR_CONFIG = settings_local.DEBUG_TOOLBAR_CONFIG
 SECURE_CONTENT_TYPE_NOSNIFF = True
 #SESSION_COOKIE_SECURE = True
 #CSRF_COOKIE_SECURE = True

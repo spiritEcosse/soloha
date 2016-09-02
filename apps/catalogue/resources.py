@@ -4,17 +4,19 @@ import functools
 import widgets
 from django.db.models.fields.related import ForeignKey
 from diff_match_patch import diff_match_patch
-try:
-    from django.utils.encoding import force_text
-except ImportError:
-    from django.utils.encoding import force_unicode as force_text
-from diff_match_patch import diff_match_patch
 from django.utils.safestring import mark_safe
 from import_export.results import RowResult
 from copy import deepcopy
 from django.db import transaction
 from django.db.transaction import TransactionManagementError
 import logging  # isort:skip
+import traceback
+from oscar.core.loading import get_model
+from filer.models.imagemodels import Image
+try:
+    from django.utils.encoding import force_text
+except ImportError:
+    from django.utils.encoding import force_unicode as force_text
 #Todo change list import module
 try:  # Python 2.7+
     from logging import NullHandler
@@ -22,9 +24,6 @@ except ImportError:
     class NullHandler(logging.Handler):
         def emit(self, record):
             pass
-import traceback
-from oscar.core.loading import get_model
-from filer.models.imagemodels import Image
 
 logging.getLogger(__name__).addHandler(NullHandler())
 
@@ -408,7 +407,7 @@ class ProductResource(ModelResource):
     class Meta:
         model = Product
         fields = ('id', 'delete', 'title', 'slug', 'enable', 'structure', 'parent', 'h1', 'meta_title',
-                  'meta_description', 'meta_keywords', 'categories_slug', 'filters_slug', 'characteristics_slug',
+                  'meta_description', 'meta_keywords', 'description', 'categories_slug', 'filters_slug', 'characteristics_slug',
                   'product_class', 'images', 'recommended_products', )
         export_order = fields
 
