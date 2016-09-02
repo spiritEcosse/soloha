@@ -266,11 +266,11 @@ class AddToBasketForm(forms.Form):
         Return submitted options in a clean format
         """
         options = []
-        for option in self.parent_product.options:
-            if option.code in self.cleaned_data:
-                options.append({
-                    'option': option,
-                    'value': self.cleaned_data[option.code]})
+        # for option in self.parent_product.options:
+        #     if option.code in self.cleaned_data:
+        #         options.append({
+        #             'option': option,
+        #             'value': self.cleaned_data[option.code]})
         return options
 
 

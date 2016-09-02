@@ -3,6 +3,8 @@
 {% load i18n %}
 {% load djangular_tags %}
 {% load purchase_info_tags %}
+{% load currency_filters %}
+{% load catalogue %}
 
 {% purchase_info_for_product request product as session %}
 
@@ -14,13 +16,17 @@
         </div>
         <div class="panel-body">
             {% with class_price="number" %}
-                {% if object.price %}
+                {% if session.price.exists %}
                     <div class="text-center wrapper-number" >
                         {% trans "Price" %}:
-                        <span ng-init="price='';
-                            price_start=''" ng-class="'{{ class_price }}'"
-                              class="{{ class_price }}" ng-bind="price">{% if not ng %}{{ price }}{% endif %}</span>
-                        <span>{{ currency }}</span>
+                        {% assign price session.price.excl_tax|currency:session.price.currency %}
+
+                        <span ng-init="price='{{ price }}'; price_start='{{ price }}'" ng-class="'{{ class_price }}'"
+                              class="{{ class_price }}" ng-bind="price">
+                            {% if not ng %}
+                                {{ price }}
+                            {% endif %}
+                        </span>
                     </div>
                     <div class="row">
                         {% block product_basket_form %}
