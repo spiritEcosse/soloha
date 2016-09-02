@@ -8616,14 +8616,12 @@ h4,
 h5,
 h6,
 p,
+form,
 .control-group,
 .table,
 .page-header,
 .sub-header {
   margin: 0 0 20px;
-}
-form {
-  margin: 0;
 }
 ul,
 ol {
