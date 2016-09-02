@@ -19,7 +19,7 @@ class AbstractStockRecord(models.Model):
     Stockrecords are used by 'strategies' to determine availability and pricing
     information for the customer.
     """
-    product = models.ForeignKey('catalogue.Product', related_name="stockrecords", verbose_name=_("Product"), null=True)
+    product = models.ForeignKey('catalogue.Product', related_name="stockrecords", verbose_name=_("Product"))
     product_version = models.ForeignKey('catalogue.ProductVersion', related_name="stockrecords",
                                         verbose_name=_("Product Version"), null=True)
     partner = models.ForeignKey('partner.Partner', verbose_name=_("Partner"),related_name='stockrecords', null=True)

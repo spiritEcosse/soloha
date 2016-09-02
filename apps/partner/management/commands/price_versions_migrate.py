@@ -50,6 +50,7 @@ class Command(BaseCommand):
         for product_version in ProductVersion.objects.all():
             StockRecord.objects.create(product_version=product_version,
                                        price_retail=product_version.price_retail,
-                                       cost_price=product_version.cost_price)
+                                       cost_price=product_version.cost_price,
+                                       product=product_version.product)
 
         self.stdout.write('Successfully')
