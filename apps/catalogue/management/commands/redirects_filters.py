@@ -31,7 +31,6 @@ class Command(BaseCommand):
         :param options:
         :return:
         """
-        Redirect.objects.filter(old_path__contains='?filter').delete()
         url = 'http://soloha.kiev.ua'
         main_page = urllib2.urlopen(url)
         soup_main_page = BeautifulSoup(main_page.read())
