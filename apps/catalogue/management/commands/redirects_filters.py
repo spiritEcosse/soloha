@@ -90,8 +90,8 @@ class Command(BaseCommand):
                                            "WHERE covd.value_id = {}".format(value_id))
                             option = namedtuplefetchone(cursor)
 
-                            value_name = option.value_name.strip().title()
-                            option_name = option.name.strip().title()
+                            value_name = option.value_name.strip()
+                            option_name = option.name.strip()
 
                             try:
                                 feature = Feature.objects.get(title__iexact=value_name, parent__title__iexact=option_name)
