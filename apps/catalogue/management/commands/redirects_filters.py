@@ -94,8 +94,6 @@ class Command(BaseCommand):
                             option_name = option.name.strip().title()
 
                             try:
-                                # query = Feature.objects.filter(title__iexact=option.value_name.strip(), parent__title__iexact=option.name.strip())
-                                # print unicode(query.query)
                                 feature = Feature.objects.get(title__iexact=value_name, parent__title__iexact=option_name)
                             except ObjectDoesNotExist as e:
                                 print e, u'does not exists {} - {}'.format(option_name, value_name)
