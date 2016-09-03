@@ -32,7 +32,9 @@ class Command(BaseCommand):
         :return:
         """
         url = 'http://soloha.kiev.ua'
-        main_page = urllib2.urlopen(url)
+        request = urllib2.Request(url)
+        request.add_header('User-agent', 'Mozilla/5.0 (Linux i686)')
+        main_page = urllib2.urlopen(request, timeout=2)
         soup_main_page = BeautifulSoup(main_page.read())
         categories = soup_main_page.find(id='topnav2')
 
@@ -60,7 +62,9 @@ class Command(BaseCommand):
         current_site = Site.objects.get(pk=1)
         print value_name
         print parent_absolute_link
-        category_page = urllib2.urlopen(parent_absolute_link)
+        request = urllib2.Request(parent_absolute_link)
+        request.add_header('User-agent', 'Mozilla/5.0 (Linux i686)')
+        category_page = urllib2.urlopen(request, timeout=2)
         category_page_soup = BeautifulSoup(category_page.read())
         filters = category_page_soup.select('#filters > [class=wrapp_options]')
 
@@ -116,7 +120,9 @@ class Command(BaseCommand):
                         except IntegrityError as e:
                             print e
 
-                        filter_page = urllib2.urlopen(absolute_link)
+                        request = urllib2.Request(absolute_link)
+                        request.add_header('User-agent', 'Mozilla/5.0 (Linux i686)')
+                        filter_page = urllib2.urlopen(request, timeout=2)
                         filter_page_soup = BeautifulSoup(filter_page.read())
                         pages = filter_page_soup.select('#pagination_top .links a')
                         unique_pages = []
@@ -127,7 +133,10 @@ class Command(BaseCommand):
 
                         if len(set(unique_pages)) == 10:
                             unique_pages = list(unique_pages)
-                            filter_page = urllib2.urlopen('{}&page=11'.format(absolute_link))
+
+                            request = urllib2.Request(absolute_link)
+                            request.add_header('User-agent', 'Mozilla/5.0 (Linux i686)')
+                            filter_page = urllib2.urlopen('{}&page=11'.format(absolute_link), timeout=2)
                             filter_page_soup = BeautifulSoup(filter_page.read())
                             pages = filter_page_soup.select('#pagination_top .links a')
 
