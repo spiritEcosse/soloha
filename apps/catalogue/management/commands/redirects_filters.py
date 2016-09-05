@@ -23,6 +23,7 @@ def namedtuplefetchone(cursor):
     nt_result = namedtuple('Result', [col[0] for col in desc])
     return nt_result(*cursor.fetchone())
 
+timeout = 30
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
@@ -31,10 +32,11 @@ class Command(BaseCommand):
         :param options:
         :return:
         """
+
         url = 'http://soloha.kiev.ua'
         request = urllib2.Request(url)
         request.add_header('User-agent', 'Mozilla/5.0 (Linux i686)')
-        main_page = urllib2.urlopen(request, timeout=20)
+        main_page = urllib2.urlopen(request, timeout=timeout)
         soup_main_page = BeautifulSoup(main_page.read())
         categories = soup_main_page.find(id='topnav2')
 
@@ -64,7 +66,7 @@ class Command(BaseCommand):
         print parent_absolute_link
         request = urllib2.Request(parent_absolute_link)
         request.add_header('User-agent', 'Mozilla/5.0 (Linux i686)')
-        category_page = urllib2.urlopen(request, timeout=20)
+        category_page = urllib2.urlopen(request, timeout=timeout)
         category_page_soup = BeautifulSoup(category_page.read())
         filters = category_page_soup.select('#filters > [class=wrapp_options]')
 
@@ -122,7 +124,7 @@ class Command(BaseCommand):
 
                         request = urllib2.Request(absolute_link)
                         request.add_header('User-agent', 'Mozilla/5.0 (Linux i686)')
-                        filter_page = urllib2.urlopen(request, timeout=20)
+                        filter_page = urllib2.urlopen(request, timeout=timeout)
                         filter_page_soup = BeautifulSoup(filter_page.read())
                         pages = filter_page_soup.select('#pagination_top .links a')
                         unique_pages = []
@@ -136,7 +138,7 @@ class Command(BaseCommand):
 
                             request = urllib2.Request(absolute_link)
                             request.add_header('User-agent', 'Mozilla/5.0 (Linux i686)')
-                            filter_page = urllib2.urlopen('{}&page=11'.format(absolute_link), timeout=20)
+                            filter_page = urllib2.urlopen('{}&page=11'.format(absolute_link), timeout=timeout)
                             filter_page_soup = BeautifulSoup(filter_page.read())
                             pages = filter_page_soup.select('#pagination_top .links a')
 
