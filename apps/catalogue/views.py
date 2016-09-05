@@ -436,17 +436,17 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
             children__product_versions__product=self.object, level=0
         ).prefetch_related(
             Prefetch('children', queryset=values_in_group.annotate(
-                price=Min('product_versions__price_retail')
+                price=Min('product_versions__stockrecord__price_excl_tax')
             ).order_by('price', 'title', 'pk'), to_attr='values_in_group'),
             Prefetch('children', queryset=Feature.objects.only(*self.only).filter(
                 level=1, product_versions__product=self.object
             ).exclude(
                 version_attributes__attribute__in=values_in_group.order_by().distinct()
             ).annotate(
-                price=Min('product_versions__price_retail')
+                price=Min('product_versions__stockrecord__price_excl_tax')
             ).order_by('price', 'title', 'pk'), to_attr='values_out_group')
         ).annotate(
-            price=Min('children__product_versions__price_retail'), count_child=Count('children', distinct=True)
+            price=Min('children__product_versions__stockrecord__price_excl_tax'), count_child=Count('children', distinct=True)
         ).order_by('product_features__sort', 'price', '-count_child', 'title', 'pk')
 
         first = ProductVersion.objects.filter(product=self.object).annotate(
@@ -461,7 +461,7 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
                 for prod_ver in val.product_versions.filter(attributes=val, product=self.object).filter(attributes=attribute):
                     price = ProductVersion.objects.filter(pk=prod_ver.pk).aggregate(
                         common=Sum('version_attributes__price_retail'))
-                    price['common'] += prod_ver.price_retail
+                    price['common'] += prod_ver.stockrecord.price_excl_tax
                     val.prices.append(price['common'])
             attr.values_in_group = sorted(attr.values_in_group, key=lambda val: min(val.prices))
 
@@ -541,7 +541,7 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
             children__product_versions__product=self.object, level=0
         ).prefetch_related(
             Prefetch('children', queryset=Feature.objects.only(*self.only).filter(**default_filter_attr_val_args).annotate(
-                price=Min('product_versions__price_retail')
+                price=Min('product_versions__stockrecord__price_excl_tax')
             ).prefetch_related(
                 Prefetch('product_features', queryset=ProductFeature.objects.filter(product=self.object),
                          to_attr='features_by_product')
@@ -549,7 +549,7 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
             Prefetch('product_features', queryset=ProductFeature.objects.filter(product=self.object),
                      to_attr='features_by_product')
         ).annotate(
-            price=Min('children__product_versions__price_retail'), count_child=Count('children', distinct=True)
+            price=Min('children__product_versions__stockrecord__price_excl_tax'), count_child=Count('children', distinct=True)
         ).order_by('product_features__sort', 'price', '-count_child', 'title', 'pk')
 
         product_versions = self.version_first
