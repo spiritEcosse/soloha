@@ -20,8 +20,8 @@
         <div class="dropdown-menu open">
             <div class="bs-searchbox">
                 <form>
-                    <input ng-model="query_attr['{{ attribute.pk }}']"
-                           ng-change="'{attribute.non_standard && product.non_standard) ? search(attribute.pk)}'"
+                    <input ng-model="query_attr[attribute.pk]"
+                           ng-change="'attribute.non_standard && product.non_standard ? search(attribute.pk)'"
                            type="text"
                            placeholder="{% trans "Search" %}"
                            class="form-control">

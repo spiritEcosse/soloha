@@ -33,7 +33,7 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
     $scope.product.custom_values = []
     $scope.product.custom_value = []
     $scope.product.dict_attributes = []
-    $scope.product.query_attr = []
+    $scope.query_attr = []
     $scope.send_form = false
     $scope.alert_mode = 'success'
     $scope.prod_images = []
