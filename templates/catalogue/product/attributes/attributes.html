@@ -2,7 +2,7 @@
 {% load djangular_tags %}
 
 {% angularjs ng %}
-    <div class="panel panel-default" ng-repeat="attribute in attributes" {% if ng %} ng-cloak="" {% endif %}>
+    <div class="panel panel-default" ng-repeat="attribute in attributes" ng-cloak="">
         <div class="alert alert-warning" role="alert" ng-if="attribute.error" ng-bind="attribute.error" ng-cloak=""></div>
         <div class="panel-heading">
             <div class="row option">
@@ -11,14 +11,12 @@
                 </div>
                 {% if ng %}
                     <div class="col-xs-10 pull-right values" ng-if="attribute.values.length">
-                        {% include 'catalogue/product/attributes/attribute_values.html' %}
+                        {% include 'catalogue/product/attributes/attribute_values.html' with ng=1 %}
                     </div>
-                {% else %}
-                    {% if attribute.values %}
-                        <div class="col-xs-10 pull-right values">
-                            {% include 'catalogue/product/attributes/attribute_values.html' %}
-                        </div>
-                    {% endif %}
+                {% elif attribute.values %}
+                    <div class="col-xs-10 pull-right values">
+                        {% include 'catalogue/product/attributes/attribute_values.html' with ng=0 %}
+                    </div>
                 {% endif %}
             </div>
 

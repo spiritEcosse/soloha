@@ -2,10 +2,9 @@
 {% load djangular_tags %}
 
 {% angularjs ng %}
-    <div class="dropdown btn-group bootstrap-select"
-         ng-click="click_dropdown('{{ attribute.pk }}', $event)">
+    <div class="dropdown btn-group bootstrap-select" ng-click="click_dropdown('{{ attribute.pk }}', $event)">
         <button class="btn btn-default dropdown-toggle btn-block" type="button" data-toggle="dropdown">
-            <span class="title" ng-bind="attribute.selected_val.title">
+            <span class="title" {% if ng %} ng-bind="attribute.selected_val.title" {% endif %}>
                 {% if not ng %}
                     {% if attribute.selected_val %}
                         {{ attribute.selected_val.title }}
@@ -17,6 +16,7 @@
             <span class="caret"></span>
             <span class="attr-pk" ng-bind="attribute.selected_val.pk"></span>
         </button>
+
         <div class="dropdown-menu open">
             <div class="bs-searchbox">
                 <form>

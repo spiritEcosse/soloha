@@ -5,6 +5,7 @@
 app_name = 'soloha'
 app = angular.module app_name
 
+
 app.filter 'search_by_title', ->
     (list, needle) ->
         if list and needle
@@ -58,7 +59,7 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
         else
             $scope.parent = true
 
-    $http.post($location.absUrl()).success (data) ->
+    $http.post($location.absUrl(), cache: true).success (data) ->
         clone_data = data
         $scope.options = data.options
         $scope.options_children = data.options_children
