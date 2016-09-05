@@ -39,9 +39,12 @@ from memoize import memoize, delete_memoized, delete_memoized_verhash
 from soloha import settings
 from django.core.cache import cache
 from django.contrib.auth.models import User
+from oscar.apps.partner import prices
+from oscar.templatetags.currency_filters import currency
 logger = logging.getLogger(__name__)
 
 Product = get_model('catalogue', 'Product')
+StockRecord = get_model('partner', 'StockRecord')
 ProductReview = get_model('reviews', 'ProductReview')
 Category = get_model('catalogue', 'category')
 ProductVersion = get_model('catalogue', 'ProductVersion')
@@ -444,15 +447,11 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
             ).order_by('price', 'title', 'pk'), to_attr='values_out_group')
         ).annotate(
             price=Min('children__product_versions__price_retail'), count_child=Count('children', distinct=True)
-        ).order_by('price', '-count_child', 'title', 'pk')
+        ).order_by('product_features__sort', 'price', '-count_child', 'title', 'pk')
 
         first = ProductVersion.objects.filter(product=self.object).annotate(
             price_common=Sum('version_attributes__price_retail') + F('price_retail')
         ).filter(attributes=attribute).order_by('price_common').first()
-
-        attributes = sorted(attributes,
-                            key=lambda attr: attr.product_features.filter(product=self.object).first().sort
-                            if attr.product_features.filter(product=self.object).first() else 0)
 
         for attr in attributes:
             for val in attr.values_in_group:
@@ -470,31 +469,25 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
 
     def get_product_versions(self):
         product_versions = dict()
-        versions = self.object.versions.prefetch_related('attributes').order_by('price_retail')
+        stockrecords = StockRecord.objects.filter(product_version__product=self.object).order_by()
 
-        for product_version in versions:
-            attribute_values = []
-            price = product_version.price_retail
-            version_attributes = product_version.version_attributes.filter(
-                attribute__parent__children__product_versions__product=self.object, attribute__level=1,
-                attribute__parent__level=0
+        for stockrecord in stockrecords:
+            version_attributes = stockrecord.product_version.version_attributes.filter(
+                attribute__parent__children__product_versions__product=self.object
             ).annotate(
-                price=Min('version__price_retail'),
+                price=Min('version__stockrecord__price_excl_tax'),
                 count_child=Count('attribute__parent__children', distinct=True)
-            ).order_by('price', '-count_child', 'attribute__parent__title', 'attribute__parent__pk')
+            ).order_by('attribute__parent__product_features__sort', 'price', '-count_child', 'attribute__parent__title',
+                       'attribute__parent__pk')
 
-            for version_attribute in version_attributes:
-                attribute_values.append(version_attribute.attribute)
+            attribute_values = [str(version_attribute.attribute.pk) for version_attribute in version_attributes]
+            price = prices.FixedPrice(
+                currency=stockrecord.price_currency,
+                excl_tax=stockrecord.price_excl_tax,
+                tax=D('0.00')
+            )
+            product_versions[','.join(attribute_values)] = currency(price.excl_tax)
 
-                if version_attribute.price_retail is not None:
-                    price += version_attribute.price_retail
-
-            attribute_values = sorted(attribute_values,
-                                      key=lambda attr: attr.product_features.filter(
-                                          product=self.object).first().sort
-                                      if attr.product_features.filter(product=self.object).first() else 0)
-            attribute_values = [str(val.pk) for val in attribute_values]
-            product_versions[','.join(attribute_values)] = str(price)
         return product_versions
 
     def get_context_data(self, **kwargs):
@@ -557,11 +550,7 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
                      to_attr='features_by_product')
         ).annotate(
             price=Min('children__product_versions__price_retail'), count_child=Count('children', distinct=True)
-        ).order_by('price', '-count_child', 'title', 'pk')
-
-        attributes = sorted(attributes,
-                            key=lambda attr: attr.product_features.filter(product=self.object).first().sort
-                            if attr.product_features.filter(product=self.object).first() else 0)
+        ).order_by('product_features__sort', 'price', '-count_child', 'title', 'pk')
 
         product_versions = self.version_first
 

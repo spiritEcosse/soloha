@@ -960,8 +960,7 @@ class AbstractProductVersion(models.Model, CommonFeatureProduct):
 class AbstractVersionAttribute(models.Model):
     version = models.ForeignKey('catalogue.ProductVersion', verbose_name=_('Version of product'),
                                 related_name='version_attributes')
-    attribute = models.ForeignKey('catalogue.Feature', verbose_name=_('Attribute'),
-                                  related_name='version_attributes')
+    attribute = models.ForeignKey('catalogue.Feature', verbose_name=_('Attribute'), related_name='version_attributes')
     price_retail = models.DecimalField(_("Price (retail)"), decimal_places=2, max_digits=12, blank=True, default=0)
     cost_price = models.DecimalField(_("Cost Price"), decimal_places=2, max_digits=12, blank=True, default=0)
 

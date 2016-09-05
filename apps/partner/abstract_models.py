@@ -20,8 +20,9 @@ class AbstractStockRecord(models.Model):
     information for the customer.
     """
     product = models.ForeignKey('catalogue.Product', related_name="stockrecords", verbose_name=_("Product"))
-    product_version = models.ForeignKey('catalogue.ProductVersion', related_name="stockrecords",
-                                        verbose_name=_("Product Version"), null=True)
+    product_version = models.OneToOneField('catalogue.ProductVersion', related_name="stockrecord",
+                                           verbose_name=_("Product Version"), null=True)
+    # ToDo delete this field, after pass data to product.partner
     partner = models.ForeignKey('partner.Partner', verbose_name=_("Partner"),related_name='stockrecords', null=True)
 
     #: The fulfilment partner will often have their own SKU for a product,
