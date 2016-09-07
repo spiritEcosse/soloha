@@ -178,6 +178,10 @@ class AbstractProduct(models.Model):
 
         return reverse('catalogue:detail', kwargs=dict_values)
 
+    def get_first_attributes(self):
+        first = self.versions.order_by('stockrecord__price_excl_tax').first()
+        return first.attributes.all() if first else []
+
     def images_all(self):
         images = []
 

@@ -21,7 +21,7 @@ app.filter 'filter_attribute', ->
         return list
 
 
-app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location', '$compile', '$filter', 'djangoForm', '$rootScope', ($http, $scope, $window, $document, $location, $compile, $filter, djangoForm, $rootScope) ->
+app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location', '$compile', '$filter', 'djangoForm', '$rootScope', 'djangoUrl', ($http, $scope, $window, $document, $location, $compile, $filter, djangoForm, $rootScope, djangoUrl) ->
     $scope.product = []
     $scope.product.values = []
     $scope.product.attributes = []
@@ -43,6 +43,7 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
     $rootScope.keys = Object.keys
     $scope.sent_signal = []
     clone_attributes = []
+    $scope.total = 'dfdffdff'
 
     $scope.change_price = (option_id) ->
 #    if $scope.option_model
@@ -76,6 +77,8 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
             $scope.product.custom_value[attr.pk] = null
             $scope.isOpen[attr.pk] = false
             $scope.product.custom_values[attr.pk] = []
+
+        set_price()
     .error ->
         console.error('An error occurred during submission')
 
@@ -152,8 +155,11 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
         exist_selected_attr = clone_data.product_versions[selected_attributes.toString()]
 
         if exist_selected_attr
-            $scope.price = exist_selected_attr
-        return exist_selected_attr
+            $scope.price = exist_selected_attr.price
+            $scope.product_version = exist_selected_attr.version_id
+            return exist_selected_attr.price
+
+        return false
 
     $scope.update_price = (value, current_attribute) ->
         current_attribute.selected_val = value
@@ -190,11 +196,6 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
                     $scope.send_form = true
             ).error ->
                 console.error 'An error occured during submission'
-
-    #    $scope.add_to_basket = () ->
-    #        angular.forEach $scope.selected_image, (key, product) ->
-    #            console.log(product)
-    #            console.log(key)
 
     $scope.change_wishlist = () ->
         if $scope.active !='none'

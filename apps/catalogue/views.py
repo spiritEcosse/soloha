@@ -486,7 +486,10 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
                 excl_tax=stockrecord.price_excl_tax,
                 tax=D('0.00')
             )
-            product_versions[','.join(attribute_values)] = currency(price.excl_tax)
+            product_versions[','.join(attribute_values)] = {
+                'price': currency(price.excl_tax),
+                'version_id': stockrecord.product_version.id
+            }
 
         return product_versions
 

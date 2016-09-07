@@ -97,7 +97,7 @@ class Base(object):
         """
         # Default to ignoring any basket line options as we don't know what to
         # do with them within Oscar - that's up to your project to implement.
-        return self.fetch_for_product(line.product)
+        return self.fetch_for_product(line.product, stockrecord)
 
 
 class Structured(Base):

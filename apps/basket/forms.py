@@ -3,13 +3,14 @@ from django.conf import settings
 from django.forms.models import modelformset_factory, BaseModelFormSet
 from django.db.models import Sum
 from django.utils.translation import ugettext_lazy as _
-
+from django.contrib.postgres.forms import SimpleArrayField
 from oscar.core.loading import get_model
 from oscar.forms import widgets
 
 Line = get_model('basket', 'line')
 Basket = get_model('basket', 'basket')
 Product = get_model('catalogue', 'product')
+ProductVersion = get_model('catalogue', 'ProductVersion')
 
 
 class BasketLineForm(forms.ModelForm):
@@ -132,6 +133,10 @@ class BasketVoucherForm(forms.Form):
 
 class AddToBasketForm(forms.Form):
     quantity = forms.IntegerField(initial=1, min_value=1, label=_('Quantity'))
+    product_version = forms.ModelChoiceField(
+        queryset=ProductVersion.objects.all(),
+        widget=forms.HiddenInput(attrs={'ng-model': 'product_version', 'value': '{{ product_version }}'})
+    )
 
     def __init__(self, basket, product, *args, **kwargs):
         # Note, the product passed in here isn't necessarily the product being

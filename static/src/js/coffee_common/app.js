@@ -6,7 +6,7 @@
 
   app_name = 'soloha';
 
-  app = angular.module(app_name, ['ngResource', 'ngRoute', 'ng.django.forms', 'ui.bootstrap', 'ngAnimate', 'duScroll']);
+  app = angular.module(app_name, ['ngResource', 'ngRoute', 'ng.django.forms', 'ui.bootstrap', 'ngAnimate', 'duScroll', 'ng.django.urls']);
 
   app.config([
     '$httpProvider', function($httpProvider) {
@@ -114,7 +114,7 @@
   });
 
   app.controller('Product', [
-    '$http', '$scope', '$window', '$document', '$location', '$compile', '$filter', 'djangoForm', '$rootScope', function($http, $scope, $window, $document, $location, $compile, $filter, djangoForm, $rootScope) {
+    '$http', '$scope', '$window', '$document', '$location', '$compile', '$filter', 'djangoForm', '$rootScope', 'djangoUrl', function($http, $scope, $window, $document, $location, $compile, $filter, djangoForm, $rootScope, djangoUrl) {
       var attributes, clone_attributes, clone_data, get_prod, set_price;
       $scope.product = [];
       $scope.product.values = [];
@@ -137,6 +137,7 @@
       $rootScope.keys = Object.keys;
       $scope.sent_signal = [];
       clone_attributes = [];
+      $scope.total = 'dfdffdff';
       $scope.change_price = function(option_id) {
         if (Object.keys($scope.options_children).length !== 0) {
           $scope.option_id = Object.keys($scope.options_children[$scope.option_id]).filter(function(key) {
@@ -164,13 +165,14 @@
         angular.copy(data.attributes, clone_attributes);
         $scope.product = data.product;
         $scope.product.custom_values = $scope.isOpen = $scope.product.dict_attributes = $scope.product.custom_value = [];
-        return angular.forEach($scope.attributes, function(attr) {
+        angular.forEach($scope.attributes, function(attr) {
           attributes.push(attr.pk);
           $scope.product.dict_attributes[attr.pk] = attr;
           $scope.product.custom_value[attr.pk] = null;
           $scope.isOpen[attr.pk] = false;
           return $scope.product.custom_values[attr.pk] = [];
         });
+        return set_price();
       }).error(function() {
         return console.error('An error occurred during submission');
       });
@@ -267,9 +269,11 @@
         });
         exist_selected_attr = clone_data.product_versions[selected_attributes.toString()];
         if (exist_selected_attr) {
-          $scope.price = exist_selected_attr;
+          $scope.price = exist_selected_attr.price;
+          $scope.product_version = exist_selected_attr.version_id;
+          return exist_selected_attr.price;
         }
-        return exist_selected_attr;
+        return false;
       };
       $scope.update_price = function(value, current_attribute) {
         current_attribute.selected_val = value;
