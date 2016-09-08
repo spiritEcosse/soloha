@@ -266,6 +266,7 @@ class FixedRateTax(object):
             excl_tax=stockrecord.price_excl_tax,
             tax=tax)
 
+    #Todo check get min price
     def parent_pricing_policy(self, product, children_stock):
         stockrecords = [x[1] for x in children_stock if x[1] is not None]
         if not stockrecords:

@@ -294,15 +294,14 @@ class QuickOrderView(views.JSONResponseMixin, views.AjaxResponseMixin, FormView,
 class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CoreProductDetailView):
     start_option = [{'pk': 0, 'title': NOT_SELECTED}]
     only = ['title', 'pk']
+    lookup_parent = '__parent'
 
     def get_object(self, queryset=None):
         if hasattr(self, 'object'):
             return self.object
         else:
             self.kwargs['slug'] = self.kwargs['product_slug']
-            object = super(ProductDetailView, self).get_object(queryset)
-            self.version_first = object.versions.order_by('price_retail').first()
-            return object
+            return super(ProductDetailView, self).get_object(queryset)
 
     def redirect_if_necessary(self, current_path, product):
         if self.enforce_paths:
@@ -413,8 +412,8 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
 
         product_versions_attributes = {}
 
-        if self.version_first:
-            for attr in self.version_first.attributes.all():
+        if self.object.version_first:
+            for attr in self.object.version_first.attributes.all():
                 product_versions_attributes[attr.parent.pk] = {'id': attr.pk, 'title': attr.title}
         context['product_version_attributes'] = product_versions_attributes
         context['product_id'] = self.object.id
@@ -425,21 +424,19 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
 
     def get_product_attribute_values(self):
         only = ['pk']
-        return Feature.objects.only(*only).filter(level=1, product_versions__product=self.object).distinct()
+        return Feature.objects.only(*only).filter(**self.filter_feature_children()).distinct()
 
     def get_attributes_for_attribute(self, attribute):
         values_in_group = Feature.objects.only(*self.only).filter(
-            level=1, product_versions__product=self.object, product_versions__attributes=attribute
+            **self.filter_feature_children({'product_versions__attributes': attribute})
         )
 
-        attributes = Feature.objects.only(*self.only).filter(
-            children__product_versions__product=self.object, level=0
-        ).prefetch_related(
+        attributes = Feature.objects.only(*self.only).filter(**self.filter_feature()).prefetch_related(
             Prefetch('children', queryset=values_in_group.annotate(
                 price=Min('product_versions__stockrecord__price_excl_tax')
             ).order_by('price', 'title', 'pk'), to_attr='values_in_group'),
             Prefetch('children', queryset=Feature.objects.only(*self.only).filter(
-                level=1, product_versions__product=self.object
+                **self.filter_feature_children()
             ).exclude(
                 version_attributes__attribute__in=values_in_group.order_by().distinct()
             ).annotate(
@@ -449,8 +446,8 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
             price=Min('children__product_versions__stockrecord__price_excl_tax'), count_child=Count('children', distinct=True)
         ).order_by('product_features__sort', 'price', '-count_child', 'title', 'pk')
 
-        first = ProductVersion.objects.filter(product=self.object).annotate(
-            price_common=Sum('version_attributes__price_retail') + F('price_retail')
+        first = ProductVersion.objects.filter(**self.filter_product_version()).annotate(
+            price_common=Sum('version_attributes__price_retail') + F('stockrecord__price_excl_tax')
         ).filter(attributes=attribute).order_by('price_common').first()
 
         for attr in attributes:
@@ -458,7 +455,9 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
                 val.prices = []
                 val.visible = val in first.attributes.all()
 
-                for prod_ver in val.product_versions.filter(attributes=val, product=self.object).filter(attributes=attribute):
+                for prod_ver in val.product_versions.filter(
+                        **self.filter_product_version({'attributes': val})
+                ).filter(attributes=attribute):
                     price = ProductVersion.objects.filter(pk=prod_ver.pk).aggregate(
                         common=Sum('version_attributes__price_retail'))
                     price['common'] += prod_ver.stockrecord.price_excl_tax
@@ -469,11 +468,11 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
 
     def get_product_versions(self):
         product_versions = dict()
-        stockrecords = StockRecord.objects.filter(product_version__product=self.object).order_by()
+        stockrecords = StockRecord.objects.filter(**self.filter_stockrecord()).order_by()
 
         for stockrecord in stockrecords:
             version_attributes = stockrecord.product_version.version_attributes.filter(
-                attribute__parent__children__product_versions__product=self.object
+                **self.filter_stockrecord_version_attributes()
             ).annotate(
                 price=Min('version__stockrecord__price_excl_tax'),
                 count_child=Count('attribute__parent__children', distinct=True)
@@ -496,7 +495,6 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
     def get_context_data(self, **kwargs):
         context = super(ProductDetailView, self).get_context_data(**kwargs)
         context['reviews'] = []
-        # self.get_price(context)
         context['attributes'] = self.get_attributes()
         context['not_selected'] = NOT_SELECTED
         context['form'] = QuickOrderForm(initial={'product': self.object.pk})
@@ -507,55 +505,87 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
         context['pages_delivery_and_pay'] = context['flatpages'].exclude(url='manager')
         return context
 
-    def get_price(self, context):
-        """
-        get main price for product
-        :param context: get context data
-        :return:
-            context
-        """
-        # ToDo make it possible to check whether the product is available for sale
-        if not self.version_first:
-            selector = Selector()
-            strategy = selector.strategy()
-            info = strategy.fetch_for_product(self.object)
+    def filter_stockrecord(self):
+        filter_stockrecord = {}
+        lookup = 'product_version__product'
 
-            if info.availability.is_available_to_buy:
-                context['price'] = info.price.incl_tax
-                context['currency'] = info.price.currency
-            else:
-                context['product_not_availability'] = str(_('Product is not available.'))
-        else:
-            price = self.version_first.price_retail
-            for attribute in self.version_first.version_attributes.all():
-                if attribute.price_retail is not None:
-                    price += attribute.price_retail
-            context['price'] = price
-            context['currency'] = settings.OSCAR_DEFAULT_CURRENCY
-        return context
+        if self.object.is_parent:
+            lookup += self.lookup_parent
 
-    def get_attributes(self, filter_attr_val_args=None):
-        default_filter_attr_val_args = {'level': 1, 'product_versions__product': self.object}
+        filter_stockrecord[lookup] = self.object
+        return filter_stockrecord
 
-        if filter_attr_val_args is not None:
-            default_filter_attr_val_args.update(filter_attr_val_args)
+    def filter_stockrecord_version_attributes(self):
+        filter_stockrecord = {}
+        lookup = 'attribute__parent__children__product_versions__product'
 
-        attributes = Feature.objects.only(*self.only).filter(
-            children__product_versions__product=self.object, level=0
-        ).prefetch_related(
-            Prefetch('children', queryset=Feature.objects.only(*self.only).filter(**default_filter_attr_val_args).annotate(
+        if self.object.is_parent:
+            lookup += self.lookup_parent
+
+        filter_stockrecord[lookup] = self.object
+        return filter_stockrecord
+
+    def filter_feature_children(self, filter_kwargs=None):
+        lookup = 'product_versions__product'
+        filter_children = {'level': 1}
+
+        if self.object.is_parent:
+            lookup += self.lookup_parent
+
+        filter_children[lookup] = self.object
+
+        if filter_kwargs is not None:
+            filter_children.update(filter_kwargs)
+
+        return filter_children
+
+    def filter_product_feature(self):
+        filter_product_feature = {}
+        lookup_product_feature = 'product'
+
+        if self.object.is_parent:
+            lookup_product_feature += self.lookup_parent
+
+        filter_product_feature[lookup_product_feature] = self.object
+        return filter_product_feature
+
+    def filter_feature(self):
+        filter_feature = {'level': 0}
+        lookup_feature = 'children__product_versions__product'
+
+        if self.object.is_parent:
+            lookup_feature += self.lookup_parent
+
+        filter_feature[lookup_feature] = self.object
+        return filter_feature
+
+    def filter_product_version(self, filter_other={}):
+        lookup_feature = 'product'
+
+        if self.object.is_parent:
+            lookup_feature += self.lookup_parent
+
+        filter_kw = {lookup_feature: self.object}
+        filter_kw.update(filter_other)
+        return filter_kw
+
+    def get_attributes(self):
+        attributes = Feature.objects.only(*self.only).filter(**self.filter_feature()).prefetch_related(
+            Prefetch('children', queryset=Feature.objects.only(*self.only).filter(
+                **self.filter_feature_children()
+            ).annotate(
                 price=Min('product_versions__stockrecord__price_excl_tax')
             ).prefetch_related(
-                Prefetch('product_features', queryset=ProductFeature.objects.filter(product=self.object),
+                Prefetch('product_features', queryset=ProductFeature.objects.filter(**self.filter_product_feature()),
                          to_attr='features_by_product')
             ).order_by('price', 'title', 'pk'), to_attr='values'),
-            Prefetch('product_features', queryset=ProductFeature.objects.filter(product=self.object),
+            Prefetch('product_features', queryset=ProductFeature.objects.filter(**self.filter_product_feature()),
                      to_attr='features_by_product')
         ).annotate(
             price=Min('children__product_versions__stockrecord__price_excl_tax'), count_child=Count('children', distinct=True)
         ).order_by('product_features__sort', 'price', '-count_child', 'title', 'pk')
 
-        product_versions = self.version_first
+        product_versions = self.object.version_first
 
         if product_versions:
             target_attributes = set(product_versions.attributes.all())

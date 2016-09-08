@@ -69,6 +69,25 @@ class EnableManagerProduct(models.Manager):
 
 
 @python_2_unicode_compatible
+class AbstractProductVersion(models.Model, CommonFeatureProduct):
+    attributes = models.ManyToManyField('catalogue.Feature', through='catalogue.VersionAttribute',
+                                        verbose_name=_('Attributes'), related_name='product_versions')
+    product = models.ForeignKey('catalogue.Product', related_name='versions', on_delete=models.DO_NOTHING)
+    price_retail = models.DecimalField(_("Price (retail)"), decimal_places=2, max_digits=12)
+    cost_price = models.DecimalField(_("Cost Price"), decimal_places=2, max_digits=12)
+
+    class Meta:
+        abstract = True
+        ordering = ('product', 'price_retail', )
+        app_label = 'catalogue'
+        verbose_name = _('Product version')
+        verbose_name_plural = _('Product versions')
+
+    def __str__(self):
+        return u'{}, Version of product - {}'.format(self.pk, getattr(self, 'product', None))
+
+
+@python_2_unicode_compatible
 class AbstractProduct(models.Model):
     # Title is mandatory for canonical products but optional for child products
     title = models.CharField(pgettext_lazy(u'Product title', u'Title'), max_length=300)
@@ -283,6 +302,15 @@ class AbstractProduct(models.Model):
         # self.attr.save()
 
     # Properties
+
+    @property
+    def version_first(self):
+        if self.is_parent:
+            product_versions = self.versions.model.objects.filter(product__parent=self)
+        else:
+            product_versions = self.versions
+
+        return product_versions.order_by('stockrecord__price_excl_tax').first()
 
     @property
     def is_standalone(self):
@@ -939,25 +967,6 @@ class CustomAbstractCategory(MPTTModel):
             options = {'size': (50, 31), 'crop': True}
             icon = get_thumbnailer(self.icon).get_thumbnail(options).url
         return icon
-
-
-@python_2_unicode_compatible
-class AbstractProductVersion(models.Model, CommonFeatureProduct):
-    attributes = models.ManyToManyField('catalogue.Feature', through='catalogue.VersionAttribute',
-                                        verbose_name=_('Attributes'), related_name='product_versions')
-    product = models.ForeignKey('catalogue.Product', related_name='versions', on_delete=models.DO_NOTHING)
-    price_retail = models.DecimalField(_("Price (retail)"), decimal_places=2, max_digits=12)
-    cost_price = models.DecimalField(_("Cost Price"), decimal_places=2, max_digits=12)
-
-    class Meta:
-        abstract = True
-        ordering = ('product', 'price_retail', )
-        app_label = 'catalogue'
-        verbose_name = _('Product version')
-        verbose_name_plural = _('Product versions')
-
-    def __str__(self):
-        return u'{}, Version of product - {}'.format(self.pk, getattr(self, 'product', None))
 
 
 @python_2_unicode_compatible

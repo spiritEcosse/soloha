@@ -292,8 +292,8 @@
               pk: attr.pk
             })[0];
             attribute.values = attr.values;
-            if (attr.in_group[1] && attr.in_group[1].visible) {
-              attribute.selected_val = attr.in_group[1];
+            if (attr.values[1] && attr.values[1].visible) {
+              attribute.selected_val = attr.values[1];
             } else if (attribute.values) {
               attribute.selected_val = attribute.values[0];
             }

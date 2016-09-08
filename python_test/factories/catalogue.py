@@ -29,6 +29,7 @@ OrderCreator = get_class('order.utils', 'OrderCreator')
 OrderTotalCalculator = get_class('checkout.calculators', 'OrderTotalCalculator')
 ProductOptions = get_model('catalogue', 'ProductOptions')
 Partner = get_model('partner', 'Partner')
+StockRecord = get_model('partner', 'StockRecord')
 
 
 class Test(object):
@@ -201,6 +202,8 @@ class Test(object):
 
         price_retail = D(2000)
         product_version_1, created = ProductVersion.objects.get_or_create(product=product, price_retail=price_retail + 100, cost_price=price_retail)
+        StockRecord.objects.create(product_version=product_version_1, product=product,
+                                   price_excl_tax=product_version_1.price_retail)
 
         VersionAttribute.objects.get_or_create(version=product_version_1, attribute=feature_11)
         VersionAttribute.objects.get_or_create(version=product_version_1, attribute=feature_21)
@@ -208,6 +211,8 @@ class Test(object):
 
         cost_price = D(2100)
         product_version_2, created = ProductVersion.objects.get_or_create(product=product, price_retail=cost_price + 100, cost_price=cost_price)
+        StockRecord.objects.create(product_version=product_version_2, product=product,
+                                   price_excl_tax=product_version_2.price_retail)
 
         VersionAttribute.objects.get_or_create(version=product_version_2, attribute=feature_11)
         VersionAttribute.objects.get_or_create(version=product_version_2, attribute=feature_21)
@@ -216,6 +221,8 @@ class Test(object):
 
         price_retail = D(2200)
         product_version_3, created = ProductVersion.objects.get_or_create(product=product, price_retail=price_retail + 100, cost_price=price_retail)
+        StockRecord.objects.create(product_version=product_version_3, product=product,
+                                   price_excl_tax=product_version_3.price_retail)
 
         VersionAttribute.objects.get_or_create(version=product_version_3, attribute=feature_11)
         VersionAttribute.objects.get_or_create(version=product_version_3, attribute=feature_21)
@@ -223,11 +230,16 @@ class Test(object):
 
         price_retail = D(2300)
         product_version_4, created = ProductVersion.objects.get_or_create(product=product, price_retail=price_retail + 100, cost_price=price_retail)
+        StockRecord.objects.create(product_version=product_version_4, product=product,
+                                   price_excl_tax=product_version_4.price_retail)
+
         VersionAttribute.objects.get_or_create(version=product_version_4, attribute=feature_11)
         VersionAttribute.objects.get_or_create(version=product_version_4, attribute=feature_22)
         VersionAttribute.objects.get_or_create(version=product_version_4, attribute=feature_31)
         price_retail = D(2400)
         product_version_5, created = ProductVersion.objects.get_or_create(product=product, price_retail=price_retail + 100, cost_price=price_retail)
+        StockRecord.objects.create(product_version=product_version_5, product=product,
+                                   price_excl_tax=product_version_5.price_retail)
 
         VersionAttribute.objects.get_or_create(version=product_version_5, attribute=feature_11)
         VersionAttribute.objects.get_or_create(version=product_version_5, attribute=feature_22)
@@ -235,6 +247,8 @@ class Test(object):
 
         price_retail = D(2600)
         product_version_6, created = ProductVersion.objects.get_or_create(product=product, price_retail=price_retail + 100, cost_price=price_retail)
+        StockRecord.objects.create(product_version=product_version_6, product=product,
+                                   price_excl_tax=product_version_6.price_retail)
 
         VersionAttribute.objects.get_or_create(version=product_version_6, attribute=feature_11)
         VersionAttribute.objects.get_or_create(version=product_version_6, attribute=feature_22)

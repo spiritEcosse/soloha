@@ -244,7 +244,10 @@ class AddToBasketForm(forms.Form):
         return getattr(self, 'child_product', self.parent_product)
 
     def clean(self):
-        info = self.basket.strategy.fetch_for_product(self.product)
+        info = self.basket.strategy.fetch_for_product(
+            self.product,
+            stockrecord=self.cleaned_data['product_version'].stockrecord
+        )
 
         # Check currencies are sensible
         if (self.basket.currency and

@@ -174,8 +174,8 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
                 attribute = $filter('filter')($scope.attributes, { pk: attr.pk })[0]
                 attribute.values = attr.values
 
-                if attr.in_group[1] and attr.in_group[1].visible
-                    attribute.selected_val = attr.in_group[1]
+                if attr.values[1] and attr.values[1].visible
+                    attribute.selected_val = attr.values[1]
                 else if attribute.values
                     attribute.selected_val = attribute.values[0]
                 get_prod(attribute.selected_val)

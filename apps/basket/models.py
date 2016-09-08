@@ -50,7 +50,6 @@ class Basket(AbstractBasket):
         # Ensure that all lines are the same currency
         price_currency = self.currency
 
-        # print version.stockrecord.price_excl_tax
         stock_info = self.strategy.fetch_for_product(product, stockrecord=version.stockrecord)
 
         if price_currency and stock_info.price.currency != price_currency:
