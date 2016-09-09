@@ -21,8 +21,11 @@
                         {% trans "Price" %}:
                         {% assign price session.price.excl_tax|currency:session.price.currency %}
 
-                        <span ng-init="price='{{ price }}'; price_start='{{ price }}'" ng-class="'{{ class_price }}'"
-                              class="{{ class_price }}" ng-bind="price">
+                        <span {% if ng %}
+                            ng-init="price='{{ price }}'; price_start='{{ price }}'"
+                            ng-class="'{{ class_price }}'" ng-bind="price"
+                        {% endif %}
+                            class="{{ class_price }}" >
                             {% if not ng %}
                                 {{ price }}
                             {% endif %}

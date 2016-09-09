@@ -1,29 +1,31 @@
 {% load i18n %}
 {% load djangular_tags %}
+{% load catalogue %}
 
 {% angularjs ng %}
-    <div class="dropdown btn-group bootstrap-select" ng-click="click_dropdown('{{ attribute.pk }}', $event)">
+    <div class="dropdown btn-group bootstrap-select" {% if ng %} ng-click="click_dropdown('{{ attribute.pk }}', $event)" {% endif %}>
         <button class="btn btn-default dropdown-toggle btn-block" type="button" data-toggle="dropdown">
             <span class="title" {% if ng %} ng-bind="attribute.selected_val.title" {% endif %}>
                 {% if not ng %}
-                    {% if attribute.selected_val %}
-                        {{ attribute.selected_val.title }}
+                    {% assign selected_val attribute.selected_val.0 %}
+                    {% if selected_val %}
+                        {{ selected_val.title }}
                     {% else %}
                         {{ not_selected }}
                     {% endif %}
                 {% endif %}
             </span>
             <span class="caret"></span>
-            <span class="attr-pk" ng-bind="attribute.selected_val.pk"></span>
+            <span class="attr-pk" {% if ng %} ng-bind="attribute.selected_val.pk" {% endif %}></span>
         </button>
 
         <div class="dropdown-menu open">
             <div class="bs-searchbox">
                 <form>
-                    <input ng-model="query_attr[attribute.pk]"
-                           ng-change="'attribute.non_standard && product.non_standard ? search(attribute.pk)'"
+                    <input {% if ng %}ng-model="query_attr[attribute.pk]"
+                           ng-change="'attribute.non_standard && product.non_standard ? search(attribute.pk)'" {% endif %}
                            type="text"
-                           placeholder="{% trans "Search" %}"
+                           placeholder="{% trans "Filter" %}"
                            class="form-control">
                 </form>
             </div>

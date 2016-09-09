@@ -64,6 +64,20 @@ ANSWER = str(_('Your message has been sent. We will contact you on the specified
 Order = namedtuple('Order', ['title', 'column', 'argument'])
 
 
+class Filter(object):
+    def filter_feature_parent(self, additional={}):
+        filter_product_feature = {}
+        lookup_product_feature = 'product'
+        product = self.object
+
+        if self.object.is_child:
+            product = self.object.parent
+
+        filter_product_feature[lookup_product_feature] = product
+        filter_product_feature.update(**additional)
+        return filter_product_feature
+
+
 class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, SingleObjectMixin, generic.ListView):
     template_name = 'catalogue/category.html'
     enforce_paths = True
@@ -291,7 +305,7 @@ class QuickOrderView(views.JSONResponseMixin, views.AjaxResponseMixin, FormView,
         msg.send()
 
 
-class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CoreProductDetailView):
+class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CoreProductDetailView, Filter):
     start_option = [{'pk': 0, 'title': NOT_SELECTED}]
     only = ['title', 'pk']
     lookup_parent = '__parent'
@@ -363,9 +377,11 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
             selected_val = self.start_option[0]
             selected_val.update({'images': images, 'parent': attr.pk})
 
-            if hasattr(attr, 'selected_val'):
-                if getattr(attr.selected_val, 'features_by_product', False):
-                    for product in attr.selected_val.features_by_product[0].product_with_images.all()[:5]:
+            if attr.selected_val:
+                selected_val = attr.selected_val[0]
+
+                if selected_val.features_by_product:
+                    for product in selected_val.features_by_product[0].product_with_images.all()[:5]:
                         images.append({
                             'title': product.get_title(),
                             'pk': product.pk,
@@ -373,11 +389,11 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
                         })
 
                 selected_val = {
-                    'pk': attr.selected_val.pk,
+                    'pk': selected_val.pk,
                     'parent': attr.pk,
                     'products': [],
                     'images': images,
-                    'title': attr.selected_val.title
+                    'title': selected_val.title
                 }
 
             context['attributes'].append({
@@ -575,26 +591,21 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
                 **self.filter_feature_children()
             ).annotate(
                 price=Min('product_versions__stockrecord__price_excl_tax')
-            ).prefetch_related(
-                Prefetch('product_features', queryset=ProductFeature.objects.filter(**self.filter_product_feature()),
-                         to_attr='features_by_product')
             ).order_by('price', 'title', 'pk'), to_attr='values'),
+            Prefetch('children', queryset=ProductVersion.objects.filter(
+                **self.filter_product_version()
+            ).order_by('stockrecord__price_excl_tax').first().attributes.all().prefetch_related(
+                Prefetch(
+                    'product_features',
+                    queryset=ProductFeature.objects.filter(**self.filter_feature_parent()),
+                    to_attr='features_by_product'
+                )
+            ), to_attr='selected_val'),
             Prefetch('product_features', queryset=ProductFeature.objects.filter(**self.filter_product_feature()),
                      to_attr='features_by_product')
         ).annotate(
             price=Min('children__product_versions__stockrecord__price_excl_tax'), count_child=Count('children', distinct=True)
         ).order_by('product_features__sort', 'price', '-count_child', 'title', 'pk')
-
-        product_versions = self.object.version_first
-
-        if product_versions:
-            target_attributes = set(product_versions.attributes.all())
-
-            for attr in attributes:
-                intersection = target_attributes.intersection(set(attr.values))
-
-                if len(intersection) == 1:
-                    setattr(attr, 'selected_val', intersection.pop())
 
         return attributes
 
@@ -693,7 +704,7 @@ class ProductCalculatePrice(views.JSONRequestResponseMixin, views.AjaxResponseMi
         return context
 
 
-class AttrProd(views.JSONRequestResponseMixin, views.AjaxResponseMixin, SingleObjectMixin, View):
+class AttrProd(views.JSONRequestResponseMixin, views.AjaxResponseMixin, SingleObjectMixin, View, Filter):
     model = Product
 
     def post(self, *args, **kwargs):
@@ -710,7 +721,7 @@ class AttrProd(views.JSONRequestResponseMixin, views.AjaxResponseMixin, SingleOb
         context['product_primary_images'] = []
 
         try:
-            product_feature = ProductFeature.objects.get(product=self.object, feature=self.kwargs['attr_pk'])
+            product_feature = ProductFeature.objects.get(**self.filter_feature_parent({'feature': self.kwargs['attr_pk']}))
         except ObjectDoesNotExist:
             pass
         else:
@@ -747,8 +758,8 @@ class AttrProdImages(views.JSONRequestResponseMixin, views.AjaxResponseMixin, Si
 
         for image in self.object.images.all():
             context['images'].append({
-                'original_url': get_thumbnailer(image.original).get_thumbnail(options).url,
-                'thumb_url': get_thumbnailer(image.original).get_thumbnail(options_thumb).url,
+                'original_url': get_thumbnailer(image.image).get_thumbnail(options).url,
+                'thumb_url': get_thumbnailer(image.image).get_thumbnail(options_thumb).url,
                 'caption': image.caption or self.object.get_title(),
             })
 

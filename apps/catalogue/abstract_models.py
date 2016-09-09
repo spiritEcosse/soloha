@@ -658,6 +658,12 @@ class AbstractProductImage(models.Model, CommonFeatureProduct):
     def __str__(self):
         return u"Image of '%s'" % getattr(self, 'product', None)
 
+    @property
+    def image(self):
+        image = self.original.file.name if self.original is not None else IMAGE_NOT_FOUND
+        image, exist_image = check_exist_image(image)
+        return image
+
     def is_primary(self):
         """
         Return bool if image display order is 0

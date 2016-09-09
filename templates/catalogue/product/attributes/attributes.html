@@ -1,12 +1,16 @@
 {% load i18n %}
 {% load djangular_tags %}
+{% load catalogue %}
 
 {% angularjs ng %}
-    <div class="panel panel-default" ng-repeat="attribute in attributes" ng-cloak="">
-        <div class="alert alert-warning" role="alert" ng-if="attribute.error" ng-bind="attribute.error" ng-cloak=""></div>
+    <div class="panel panel-default" {% if ng %} ng-repeat="attribute in attributes" ng-cloak="" {% endif %}>
+        {% if ng %}
+            <div class="alert alert-warning" role="alert" ng-if="attribute.error" ng-bind="attribute.error" ng-cloak="">
+            </div>
+        {% endif %}
         <div class="panel-heading">
             <div class="row option">
-                <div class="col-xs-14 name" ng-bind="attribute.title">
+                <div class="col-xs-14 name" {% if ng %} ng-bind="attribute.title" {% endif %}>
                     {% if not ng %}{{ attribute.title }}{% endif %}
                 </div>
                 {% if ng %}
@@ -21,11 +25,13 @@
             </div>
 
             {% if ng %}
-                {% include 'catalogue/product/attributes/attributes_all_images.html' %}
+                {% include 'catalogue/product/attributes/attributes_all_images.html' with ng=1 %}
             {% else %}
-                {% if attribute.selected_val.features_by_product %}
-                    {% with attribute.selected_val.features_by_product|first as feature_product %}
-                        {% include 'catalogue/product/attributes/attributes_all_images.html' %}
+                {% assign selected_val attribute.selected_val.0 %}
+
+                {% if selected_val.features_by_product %}
+                    {% with selected_val.features_by_product|first as feature_product %}
+                        {% include 'catalogue/product/attributes/attributes_all_images.html' with ng=0 %}
                     {% endwith %}
                 {% endif %}
             {% endif %}
