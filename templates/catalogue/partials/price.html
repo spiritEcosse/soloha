@@ -2,6 +2,11 @@
 {% load staticfiles %}
 {% load i18n %}
 {% load djangular_tags %}
+{% load purchase_info_tags %}
+{% load currency_filters %}
+{% load catalogue %}
+
+{% purchase_info_for_product request product as session %}
 
 <div class="col-xs-24 col-sm-24 col-md-10 price">
     <div class="panel panel-default">
@@ -11,13 +16,20 @@
         </div>
         <div class="panel-body">
             {% with class_price="number" %}
-                {% if price %}
+                {% if session.price.exists %}
                     <div class="text-center wrapper-number" >
                         {% trans "Price" %}:
-                        <span ng-init="price='{{ price }}';
-                            price_start='{{ price }}'" ng-class="'{{ class_price }}'"
-                              class="{{ class_price }}" ng-bind="price">{% if not ng %}{{ price }}{% endif %}</span>
-                        <span>{{ currency }}</span>
+                        {% assign price session.price.excl_tax|currency:session.price.currency %}
+
+                        <span {% if ng %}
+                            ng-init="price='{{ price }}'; price_start='{{ price }}'"
+                            ng-class="'{{ class_price }}'" ng-bind="price"
+                        {% endif %}
+                            class="{{ class_price }}" >
+                            {% if not ng %}
+                                {{ price }}
+                            {% endif %}
+                        </span>
                     </div>
                     <div class="row">
                         {% block product_basket_form %}
@@ -59,8 +71,8 @@
                     </div>
                 {% else %}
                     <div class="wrapper-number">
-                        <span ng-class="'{{ class_price }}'" class="{{ class_price }}">
-                            {{ product_not_availability }}
+                        <span>
+                            {% trans 'Price check with the manager.' %}
                         </span>
                     </div>
                 {% endif %}

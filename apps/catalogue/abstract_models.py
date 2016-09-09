@@ -69,6 +69,25 @@ class EnableManagerProduct(models.Manager):
 
 
 @python_2_unicode_compatible
+class AbstractProductVersion(models.Model, CommonFeatureProduct):
+    attributes = models.ManyToManyField('catalogue.Feature', through='catalogue.VersionAttribute',
+                                        verbose_name=_('Attributes'), related_name='product_versions')
+    product = models.ForeignKey('catalogue.Product', related_name='versions', on_delete=models.DO_NOTHING)
+    price_retail = models.DecimalField(_("Price (retail)"), decimal_places=2, max_digits=12)
+    cost_price = models.DecimalField(_("Cost Price"), decimal_places=2, max_digits=12)
+
+    class Meta:
+        abstract = True
+        ordering = ('product', 'price_retail', )
+        app_label = 'catalogue'
+        verbose_name = _('Product version')
+        verbose_name_plural = _('Product versions')
+
+    def __str__(self):
+        return u'{}, Version of product - {}'.format(self.pk, getattr(self, 'product', None))
+
+
+@python_2_unicode_compatible
 class AbstractProduct(models.Model):
     # Title is mandatory for canonical products but optional for child products
     title = models.CharField(pgettext_lazy(u'Product title', u'Title'), max_length=300)
@@ -127,20 +146,6 @@ class AbstractProduct(models.Model):
         'catalogue.ProductClass', on_delete=models.PROTECT,
         verbose_name=_('Product type'), related_name="products",
         help_text=_("Choose what type of product this is"))
-    # attributes = models.ManyToManyField(
-    #     'catalogue.ProductAttribute',
-    #     through='catalogue.ProductAttributeValue',
-    #     verbose_name=_("Attributes"),
-    #     help_text=_("A product attribute is something that this product may "
-    #                 "have, such as a size, as specified by its class"))
-    #: It's possible to have options product class-wide, and per product.
-    # product_options = models.ManyToManyField(
-    #     'catalogue.Option', blank=True, verbose_name=_("Product options"),
-    #     help_text=_("Options are values that can be associated with a item "
-    #                 "when it is added to a customer's basket.  This could be "
-    #                 "something like a personalised message to be printed on "
-    #                 "a T-shirt."))
-
     recommended_products = models.ManyToManyField(
         'catalogue.Product', through='catalogue.ProductRecommendation', blank=True,
         verbose_name=_("Recommended products"),
@@ -173,9 +178,6 @@ class AbstractProduct(models.Model):
         verbose_name = _('Product')
         verbose_name_plural = _('Products')
 
-    def get_price(self):
-        return self.versions.order_by('price_retail').first()
-
     def __str__(self):
         if self.title:
             return self.title
@@ -194,6 +196,10 @@ class AbstractProduct(models.Model):
             dict_values.update({'category_slug': self.categories.first().full_slug})
 
         return reverse('catalogue:detail', kwargs=dict_values)
+
+    def get_first_attributes(self):
+        first = self.versions.order_by('stockrecord__price_excl_tax').first()
+        return first.attributes.all() if first else []
 
     def images_all(self):
         images = []
@@ -298,27 +304,13 @@ class AbstractProduct(models.Model):
     # Properties
 
     @property
-    def price_original(self):
-        # ToDo make it possible to check whether the product is available for sale
-        selector = Selector()
-        strategy = selector.strategy()
-        return strategy.fetch_for_product(self)
+    def version_first(self):
+        if self.is_parent:
+            product_versions = self.versions.model.objects.filter(product__parent=self)
+        else:
+            product_versions = self.versions
 
-    @property
-    def price_from_version(self):
-        """
-            get main price for product
-            :param self: object product
-            :return:
-                price of product
-            """
-        first_prod_version = self.versions.order_by('price_retail').first()
-        price = first_prod_version.price_retail
-
-        for attribute in first_prod_version.version_attributes.all():
-            if attribute.price_retail is not None:
-                price += attribute.price_retail
-        return price
+        return product_versions.order_by('stockrecord__price_excl_tax').first()
 
     @property
     def is_standalone(self):
@@ -666,6 +658,12 @@ class AbstractProductImage(models.Model, CommonFeatureProduct):
     def __str__(self):
         return u"Image of '%s'" % getattr(self, 'product', None)
 
+    @property
+    def image(self):
+        image = self.original.file.name if self.original is not None else IMAGE_NOT_FOUND
+        image, exist_image = check_exist_image(image)
+        return image
+
     def is_primary(self):
         """
         Return bool if image display order is 0
@@ -978,30 +976,10 @@ class CustomAbstractCategory(MPTTModel):
 
 
 @python_2_unicode_compatible
-class AbstractProductVersion(models.Model, CommonFeatureProduct):
-    attributes = models.ManyToManyField('catalogue.Feature', through='catalogue.VersionAttribute',
-                                        verbose_name=_('Attributes'), related_name='product_versions')
-    product = models.ForeignKey('catalogue.Product', related_name='versions', on_delete=models.DO_NOTHING)
-    price_retail = models.DecimalField(_("Price (retail)"), decimal_places=2, max_digits=12)
-    cost_price = models.DecimalField(_("Cost Price"), decimal_places=2, max_digits=12)
-
-    class Meta:
-        abstract = True
-        ordering = ('product', 'price_retail', )
-        app_label = 'catalogue'
-        verbose_name = _('Product version')
-        verbose_name_plural = _('Product versions')
-
-    def __str__(self):
-        return u'{}, Version of product - {}'.format(self.pk, getattr(self, 'product', None))
-
-
-@python_2_unicode_compatible
 class AbstractVersionAttribute(models.Model):
     version = models.ForeignKey('catalogue.ProductVersion', verbose_name=_('Version of product'),
                                 related_name='version_attributes')
-    attribute = models.ForeignKey('catalogue.Feature', verbose_name=_('Attribute'),
-                                  related_name='version_attributes')
+    attribute = models.ForeignKey('catalogue.Feature', verbose_name=_('Attribute'), related_name='version_attributes')
     price_retail = models.DecimalField(_("Price (retail)"), decimal_places=2, max_digits=12, blank=True, default=0)
     cost_price = models.DecimalField(_("Cost Price"), decimal_places=2, max_digits=12, blank=True, default=0)
 

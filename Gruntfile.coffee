@@ -8,10 +8,13 @@ module.exports = (grunt) ->
                     'static_root/src/js/coffee_common/app.js': ['soloha/src/coffee/*.coffee', 'apps/**/*.coffee'],
                     'static/src/js/coffee_common/app.js': ['soloha/src/coffee/*.coffee', 'apps/**/*.coffee']
         less:
-            development:
+            production:
                 options:
                     paths: ["assets/css"],
-                files: "static/src/css/main.css": "static/src/less/main.less",
+                    sourceMap: true
+                files:
+                    "static/build/css/main.css": "static/src/less/main.less",
+                    "static/oscar/css/styles.css": "static/oscar/less/styles.less",
         cssmin:
             dist:
                 files:

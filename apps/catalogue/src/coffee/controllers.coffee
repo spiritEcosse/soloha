@@ -5,6 +5,7 @@
 app_name = 'soloha'
 app = angular.module app_name
 
+
 app.filter 'search_by_title', ->
     (list, needle) ->
         if list and needle
@@ -20,7 +21,7 @@ app.filter 'filter_attribute', ->
         return list
 
 
-app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location', '$compile', '$filter', 'djangoForm', '$rootScope', ($http, $scope, $window, $document, $location, $compile, $filter, djangoForm, $rootScope) ->
+app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location', '$compile', '$filter', 'djangoForm', '$rootScope', 'djangoUrl', ($http, $scope, $window, $document, $location, $compile, $filter, djangoForm, $rootScope, djangoUrl) ->
     $scope.product = []
     $scope.product.values = []
     $scope.product.attributes = []
@@ -32,7 +33,7 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
     $scope.product.custom_values = []
     $scope.product.custom_value = []
     $scope.product.dict_attributes = []
-    $scope.product.query_attr = []
+    $scope.query_attr = []
     $scope.send_form = false
     $scope.alert_mode = 'success'
     $scope.prod_images = []
@@ -42,6 +43,7 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
     $rootScope.keys = Object.keys
     $scope.sent_signal = []
     clone_attributes = []
+    $scope.total = 'dfdffdff'
 
     $scope.change_price = (option_id) ->
 #    if $scope.option_model
@@ -58,7 +60,7 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
         else
             $scope.parent = true
 
-    $http.post($location.absUrl()).success (data) ->
+    $http.post($location.absUrl(), cache: true).success (data) ->
         clone_data = data
         $scope.options = data.options
         $scope.options_children = data.options_children
@@ -75,6 +77,7 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
             $scope.product.custom_value[attr.pk] = null
             $scope.isOpen[attr.pk] = false
             $scope.product.custom_values[attr.pk] = []
+        set_price()
     .error ->
         console.error('An error occurred during submission')
 
@@ -112,7 +115,7 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
             $scope.product.custom_value[attr_pk] = null
 
     $scope.click_dropdown = (attr_id) ->
-#Todo bug with focus. If click on button three times, open dropdown without focus on us input.
+        #Todo bug with focus. If click on button three times, open dropdown without focus on us input.
         $scope.isOpen[attr_id] = if $scope.isOpen[attr_id] is false then true else false
 
     get_prod = (selected_val) ->
@@ -151,8 +154,11 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
         exist_selected_attr = clone_data.product_versions[selected_attributes.toString()]
 
         if exist_selected_attr
-            $scope.price = exist_selected_attr
-        return exist_selected_attr
+            $scope.price = exist_selected_attr.price
+            $scope.product_version = exist_selected_attr.version_id
+            return exist_selected_attr.price
+
+        return false
 
     $scope.update_price = (value, current_attribute) ->
         current_attribute.selected_val = value
@@ -167,8 +173,8 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
                 attribute = $filter('filter')($scope.attributes, { pk: attr.pk })[0]
                 attribute.values = attr.values
 
-                if attr.in_group[1] and attr.in_group[1].visible
-                    attribute.selected_val = attr.in_group[1]
+                if attr.values[1] and attr.values[1].visible
+                    attribute.selected_val = attr.values[1]
                 else if attribute.values
                     attribute.selected_val = attribute.values[0]
                 get_prod(attribute.selected_val)
@@ -189,11 +195,6 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
                     $scope.send_form = true
             ).error ->
                 console.error 'An error occured during submission'
-
-    #    $scope.add_to_basket = () ->
-    #        angular.forEach $scope.selected_image, (key, product) ->
-    #            console.log(product)
-    #            console.log(key)
 
     $scope.change_wishlist = () ->
         if $scope.active !='none'

@@ -1,14 +1,15 @@
 {% load djangular_tags %}
 
 {% angularjs ng %}
-    <li role="presentation"
+    <li role="presentation" class="list"
             {% if ng %}
-        ng-repeat="value in attribute.values | filter: {title: query_attr[attribute.selected_val.pk]}"
+        ng-repeat="value in attribute.values | filter: {title: query_attr[attribute.pk]}"
         ng-class="{'selected active': value.pk == attribute.selected_val.pk}"
-            {% endif %} class="list">
-        <a {% if ng %}ng-click="update_price(value, attribute)" {% endif %}
-        {% if ng%} ng-bind="value.title" {% endif %}>
-            {% if not ng %}{{ value.title }}{% endif %}
+            {% endif %}>
+        <a {% if ng %}ng-click="update_price(value, attribute)" ng-bind="value.title" {% endif %}>
+            {% if not ng %}
+                {{ value.title }}
+            {% endif %}
         </a>
     </li>
 {% endangularjs %}

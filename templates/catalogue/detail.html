@@ -135,11 +135,13 @@
                     {% if attributes %}
                         <div class="col-xs-24 col-sm-24 col-md-14 options">
                             <span class="relation">{% trans "*The price depends on the selected parameters:" %}</span>
+
                             <div class="list_attr" ng-if="!attributes">
                                 {% for attribute in attributes %}
                                     {% include "catalogue/product/attributes/attributes.html" with ng=0 %}
                                 {% endfor %}
                             </div>
+
                             <div class="list_attr" ng-if="attributes">
                                 {% include "catalogue/product/attributes/attributes.html" with ng=1 %}
                             </div>

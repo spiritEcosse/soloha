@@ -1,4 +1,5 @@
 {% load string_filters %}
+{% load i18n %}
 
 {% comment %}
 Use message tags to control these alerts.  Available tags include:
@@ -9,11 +10,14 @@ Use message tags to control these alerts.  Available tags include:
 {% endcomment %}
 
 <div id="messages">
-{% if messages %}
-    {% for message in messages %}
-    <div class="alert {% for tag in message.tags|split %}alert-{{ tag }} {% endfor %} fade in">
-            <a class="close" data-dismiss="alert" href="#">&times;</a>
-            <div class="alertinner {% if 'noicon' not in message.tags %}wicon{% endif %}">
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert {% for tag in message.tags|split %}alert-{{ tag }} {% endfor %} fade in">
+                <button type="button" class="close" data-dismiss="alert" aria-label="{% trans 'Close' %}"
+                        title="{% trans 'Close' %}">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+
                 {# Allow HTML to be embedded in messages #}
                 {% if 'safe' in message.tags %}
                     {{ message|safe }}
@@ -34,7 +38,6 @@ Use message tags to control these alerts.  Available tags include:
                     {% endif %}
                 {% endif %}
             </div>
-        </div>
-    {% endfor %}
-{% endif %}
+        {% endfor %}
+    {% endif %}
 </div>

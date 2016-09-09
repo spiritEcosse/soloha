@@ -29,7 +29,6 @@ h4, .h4 {
 .star-rating.One .glyphicon-star:first-child {
     color: @brand-primary;
 }
-
 .star-rating.Two .glyphicon-star:first-child,
 .star-rating.Two .glyphicon-star:first-child + .glyphicon-star {
     color: @brand-primary;
@@ -211,11 +210,13 @@ a, span, div {
 .tab-content > .active, .pill-content > .active {
     height: auto;
 }
-.page-header{
+.page-header {
     margin-top: 20px;
     padding-left: 15px;
 }
-
+.alert-error {
+    .alert-danger();
+}
 header {
     .top {
         height: @header_top;
@@ -1202,8 +1203,7 @@ header {
             margin-bottom: 20px;
         }
         .gallery {
-            margin-top: 20px;
-            margin-bottom: 30px;
+            margin-top: 3px;
 
             .lSSlideOuter {
                 width: 414px;

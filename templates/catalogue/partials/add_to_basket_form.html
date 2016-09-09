@@ -1,4 +1,4 @@
-{% load basket_tags %}
+{% load basket %}
 {% load display_tags %}
 {% load i18n %}
 {% load purchase_info_tags %}
@@ -7,16 +7,16 @@
 
 {% if session.availability.is_available_to_buy %}
     {% basket_form request product as basket_form %}
-    <form id="add_to_basket_form" action="{% url 'basket:add' pk=product.pk  %}" method="post" class="add-to-basket">
-        {% csrf_token %}
-        {% include "partials/form_fields.html" with form=basket_form %}
-        <div class="wrapper-btn-primary col-xs-12">
+    <div class="wrapper-btn-primary col-xs-12">
+        <form id="add_to_basket_form" action="{% url 'basket:add' pk=product.pk  %}" method="post">
+            {% csrf_token %}
+            {% include "partials/form_fields.html" with form=basket_form %}
             <button type="submit" class="btn btn-block btn-md btn-success btn-add-to-basket"
-            value="{% trans "Add to basket" %}" data-loading-text="{% trans 'Adding...' %}">
-                {% trans 'Add to basket' %}
+                    value="{% trans "Buy" %}" data-loading-text="{% trans 'In process...' %}">
+                {% trans 'By' %}
             </button>
-        </div>
-    </form>
+        </form>
+    </div>
 {% else %}
     {% if has_active_alert %}
         <p>{% trans "You have an active stock alert for this product." %}</p>
