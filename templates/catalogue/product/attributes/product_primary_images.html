@@ -7,16 +7,15 @@
         <label>
             <div class="image">
                 {% if not ng %}
-                    {% thumbnail product.primary_image 30x30 crop as thumb %}
+                    {% thumbnail product.primary_image.original 30x30 crop as thumb %}
                 {% endif %}
                 <img ng-src="{{ product.thumb_url }}" ng-attr-title="{{ product.title }}" ng-attr-alt="{{ product.title }}"
                 {% if not ng %}
                     src="{{ thumb.url }}" alt="{{ product.title }}" title="{{ product.title }}"
                 {% endif %}>
             </div>
-            <input name="attr-{{ product.pk }}"
-                    {% if ng %} ng-model="selected_image['{{ attribute.pk }}'].product" {% endif %}
-                   value="{{ product }}" type="radio">
+            <input name="attr-{{ product.pk }}" type="radio" value="{{ product.pk }}"
+                    {% if ng %} ng-model="selected_image[attribute.pk]" {% endif %} >
         </label>
     </div>
 {% endangularjs %}

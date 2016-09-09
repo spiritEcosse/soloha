@@ -129,7 +129,7 @@
                         <div class="image_container">
                             <a href="{{ line.product.get_absolute_url }}">
                                 <img class="thumbnail img-responsive"
-                                     src="{{ line.product.primary_image|thumbnail_url:'checkout' }}"
+                                     src="{{ line.product.primary_image.original|thumbnail_url:'checkout' }}"
                                      alt="{{ product.get_title }}"
                                      title="{{ product.get_title }}" >
                             </a>

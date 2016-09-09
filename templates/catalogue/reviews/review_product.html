@@ -4,7 +4,7 @@
 <div class="row">
     <div class="col-sm-5">
         <div class="image_container">
-            {% with image=product.primary_image %}
+            {% with image=product.primary_image.original %}
                 {% thumbnail image 220x165 crop as thumb %}
                     <a href="{{ product.get_absolute_url }}"><img src="{{ thumb.url }}" alt="{{ product.get_title }}" class="thumbnail"></a>
             {% endwith %}

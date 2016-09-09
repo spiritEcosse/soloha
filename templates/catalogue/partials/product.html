@@ -18,7 +18,7 @@
             </div>
             {% block product_image %}
                 <div class="image_container">
-                    {% with image=product.primary_image %}
+                    {% with image=product.primary_image.original %}
                         {% thumbnail image 220x165 crop as thumb %}
                         <a class="image" ng-attr-href="product.absolute_url" href="{{ product.get_absolute_url }}">
                             <img src="{{ thumb.url }}" ng-bind="product.title" alt="{{ product.get_title }}" title="{{ product.get_title }}">

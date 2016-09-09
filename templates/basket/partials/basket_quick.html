@@ -13,7 +13,7 @@
             <div class="row">
                 <div class="col-xs-5">
                     <a href="{{ line.product.get_absolute_url }}" title="{{ line.product.title }}">
-                        <img src="{{ line.product.primary_image|thumbnail_url:'basket_quick' }}"
+                        <img src="{{ line.product.primary_image.original|thumbnail_url:'basket_quick' }}"
                              alt="{{ line.product.title }}" title="{{ line.product.title }}" />
                     </a>
                 </div>

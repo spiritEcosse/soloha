@@ -382,10 +382,11 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
 
                 if selected_val.features_by_product:
                     for product in selected_val.features_by_product[0].product_with_images.all()[:5]:
+                        product_image = product.primary_image()
                         images.append({
                             'title': product.get_title(),
-                            'pk': product.pk,
-                            'thumb_url': get_thumbnailer(product.primary_image()).get_thumbnail(options_small_thumb).url
+                            'pk': product_image.pk,
+                            'thumb_url': get_thumbnailer(product_image.original).get_thumbnail(options_small_thumb).url
                         })
 
                 selected_val = {
@@ -731,10 +732,11 @@ class AttrProd(views.JSONRequestResponseMixin, views.AjaxResponseMixin, SingleOb
                 context['products'].append({'title': product.get_title(), 'pk': product.pk, 'images': []})
 
             for product in products[:5]:
+                product_image = product.primary_image()
                 context['product_primary_images'].append({
                     'title': product.get_title(),
-                    'pk': product.pk,
-                    'thumb_url': get_thumbnailer(product.primary_image()).get_thumbnail(options_small_thumb).url
+                    'pk': product_image.pk,
+                    'thumb_url': get_thumbnailer(product_image.original).get_thumbnail(options_small_thumb).url
                 })
         finally:
             return context
@@ -756,10 +758,10 @@ class AttrProdImages(views.JSONRequestResponseMixin, views.AjaxResponseMixin, Si
         options_thumb = {'size': (110, 110), 'crop': True}
         context['images'] = []
 
-        for image in self.object.images.all():
+        for image in self.object.images_all():
             context['images'].append({
-                'original_url': get_thumbnailer(image.image).get_thumbnail(options).url,
-                'thumb_url': get_thumbnailer(image.image).get_thumbnail(options_thumb).url,
+                'original_url': get_thumbnailer(image.original).get_thumbnail(options).url,
+                'thumb_url': get_thumbnailer(image.original).get_thumbnail(options_thumb).url,
                 'caption': image.caption or self.object.get_title(),
             })
 

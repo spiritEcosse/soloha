@@ -22,22 +22,6 @@ REGEXP_EMAIL = r'/^[-\w.]+@([A-z0-9][-A-z0-9]+\.)+[A-z]{2,4}$/'
 BrowsableProductManagerCore = get_class('catalogue.managers', 'BrowsableProductManager')
 
 
-def check_exist_image(image):
-    current_path = os.getcwd()
-    os.chdir(MEDIA_ROOT)
-    image_not_found = True
-
-    if not os.path.exists(os.path.abspath(image)) or not os.path.isfile(os.path.abspath(image)):
-        image = IMAGE_NOT_FOUND
-        image_not_found = False
-
-        if not os.path.exists(os.path.abspath(image)):
-            logger.error('image - {} not found!'.format(os.path.abspath(image)))
-
-    os.chdir(current_path)
-    return image, image_not_found
-
-
 class CommonFeatureProduct(object):
     product = None
 
@@ -51,10 +35,21 @@ class CommonFeatureProduct(object):
 
     def product_partners_to_str(self):
         return self.product.partners_to_str()
-    product_partners_to_str.short_description = _("Partners")
+    product_partners_to_str.short_description = _("Partner")
 
-    def thumb(self):
-        return self.product.thumb()
+    def thumb(self, image=None):
+        if not image:
+            image = self.product.primary_image()
+
+        return loader.get_template(
+            'admin/catalogue/product/thumb.html'
+        ).render(
+            Context(
+                {
+                    'image': image
+                }
+            )
+        )
     thumb.allow_tags = True
     thumb.short_description = _('Image of product')
 
@@ -66,6 +61,52 @@ class CommonFeatureProduct(object):
 class EnableManagerProduct(models.Manager):
     def get_queryset(self):
         return self.get_queryset().filter(enable=True)
+
+
+class MissingProductImage(object):
+
+    """
+    Mimics a Django file field by having a name property.
+
+    sorl-thumbnail requires all it's images to be in MEDIA_ROOT. This class
+    tries symlinking the default "missing image" image in STATIC_ROOT
+    into MEDIA_ROOT for convenience, as that is necessary every time an Oscar
+    project is setup. This avoids the less helpful NotFound IOError that would
+    be raised when sorl-thumbnail tries to access it.
+    """
+
+    def __init__(self, name=None):
+        self.name = name if name else settings.OSCAR_MISSING_IMAGE_URL
+        media_file_path = os.path.join(settings.MEDIA_ROOT, self.name)
+        # don't try to symlink if MEDIA_ROOT is not set (e.g. running tests)
+        if settings.MEDIA_ROOT and not os.path.exists(media_file_path):
+            self.symlink_missing_image(media_file_path)
+
+    @property
+    def original(self):
+        return self.name
+
+    @property
+    def is_missing(self):
+        return True
+
+    def symlink_missing_image(self, media_file_path):
+        static_file_path = find('oscar/img/%s' % self.name)
+        if static_file_path is not None:
+            try:
+                os.symlink(static_file_path, media_file_path)
+            except OSError:
+                raise ImproperlyConfigured((
+                    "Please copy/symlink the "
+                    "'missing image' image at %s into your MEDIA_ROOT at %s. "
+                    "This exception was raised because Oscar was unable to "
+                    "symlink it for you.") % (media_file_path,
+                                              settings.MEDIA_ROOT))
+            else:
+                logging.info((
+                    "Symlinked the 'missing image' image at %s into your "
+                    "MEDIA_ROOT at %s") % (media_file_path,
+                                           settings.MEDIA_ROOT))
 
 
 @python_2_unicode_compatible
@@ -88,7 +129,7 @@ class AbstractProductVersion(models.Model, CommonFeatureProduct):
 
 
 @python_2_unicode_compatible
-class AbstractProduct(models.Model):
+class AbstractProduct(models.Model, CommonFeatureProduct):
     # Title is mandatory for canonical products but optional for child products
     title = models.CharField(pgettext_lazy(u'Product title', u'Title'), max_length=300)
     slug = models.SlugField(_('Slug'), max_length=400, unique=True)
@@ -99,6 +140,7 @@ class AbstractProduct(models.Model):
     meta_keywords = models.TextField(verbose_name=_('Meta tag: keywords'), blank=True)
     description = RichTextUploadingField(_('Description'), blank=True)
     views_count = models.IntegerField(verbose_name='views count', editable=False, default=0)
+    partner = models.ForeignKey('partner.Partner', verbose_name=_("Partner"), related_name='products', null=True)
 
     STANDALONE, PARENT, CHILD = 'standalone', 'parent', 'child'
     STRUCTURE_CHOICES = (
@@ -201,41 +243,13 @@ class AbstractProduct(models.Model):
         first = self.versions.order_by('stockrecord__price_excl_tax').first()
         return first.attributes.all() if first else []
 
-    def images_all(self):
-        images = []
-
-        for image in self.images.all():
-            exist_image = False
-
-            if image.original is not None:
-                image, exist_image = check_exist_image(image.original.file.name)
-
-            if exist_image:
-                images.append(image)
-
-        if not images:
-            images.append(self.primary_image())
-
-        return images
-
-    def thumb(self, original=None):
-        if original is not None:
-            image = original
-        else:
-            image = self.primary_image()
-
-        image, exist_image = check_exist_image(image)
-        return loader.get_template('admin/catalogue/product/thumb.html').render(Context({'image': image}))
-    thumb.allow_tags = True
-    thumb.short_description = _('Image')
-
     def categories_to_str(self):
         return self.separator.join([category.name for category in self.get_categories().all()])
     categories_to_str.short_description = _("Categories")
 
     def partners_to_str(self):
-        return self.separator.join([stock.partner.name for stock in self.stockrecords.all()])
-    categories_to_str.short_description = _("Partners")
+        return self.partner
+    categories_to_str.short_description = _("Partner")
 
     def clean(self):
         """
@@ -465,7 +479,12 @@ class AbstractProduct(models.Model):
 
     # Images
 
-    def get_missing_image(self):
+    def images_all(self):
+        images = [image.image for image in self.images.all()]
+        return filter(lambda image: getattr(image, 'is_missing', False) is False, images)
+
+    @staticmethod
+    def get_missing_image():
         """
         Returns a missing image object.
         """
@@ -473,21 +492,15 @@ class AbstractProduct(models.Model):
         # field.
         return MissingProductImage()
 
+    def thumb(self, image=None):
+        return super(AbstractProduct, self).thumb(image=self.primary_image())
+
     def primary_image(self):
         """
         Returns the primary image for a product. Usually used when one can
         only display one product image, e.g. in a list of products.
         """
-        image = self.get_missing_image().name
-
-        if self.images.exists():
-            original = self.images.all()[0].original
-
-            if original is not None:
-                image = original.file.name
-
-        image, exist_image = check_exist_image(image)
-        return image
+        return self.images.all()[0].image if self.images.exists() else self.get_missing_image()
 
     # Updating methods
 
@@ -659,10 +672,12 @@ class AbstractProductImage(models.Model, CommonFeatureProduct):
         return u"Image of '%s'" % getattr(self, 'product', None)
 
     @property
+    def name(self):
+        return self.original.file.name if self.original else ''
+
+    @property
     def image(self):
-        image = self.original.file.name if self.original is not None else IMAGE_NOT_FOUND
-        image, exist_image = check_exist_image(image)
-        return image
+        return self.check_exist_image()
 
     def is_primary(self):
         """
@@ -670,12 +685,20 @@ class AbstractProductImage(models.Model, CommonFeatureProduct):
         """
         return self.display_order == 0
 
-    def thumb(self):
-        image = self.original.file.name if self.original is not None else IMAGE_NOT_FOUND
-        image, exist_image = check_exist_image(image)
-        return loader.get_template('admin/catalogue/product/thumb.html').render(Context({'image': image}))
-    thumb.allow_tags = True
-    thumb.short_description = _('Image')
+    def thumb(self, image=None):
+        return super(AbstractProductImage, self).thumb(image=self.image)
+
+    def check_exist_image(self):
+        current_path = os.getcwd()
+        os.chdir(MEDIA_ROOT)
+        abs_path = os.path.abspath(self.name)
+        image = self
+
+        if not self.name or not os.path.exists(abs_path) or not os.path.isfile(abs_path):
+            image = self.product.get_missing_image()
+
+        os.chdir(current_path)
+        return image
 
     def delete(self, *args, **kwargs):
         """

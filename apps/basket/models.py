@@ -3,6 +3,10 @@ from django.utils.translation import ugettext_lazy as _
 
 
 class Line(AbstractLine):
+    product_attributes_images = models.ManyToManyField(
+        'catalogue.ProductImage', blank=True, related_name='lines', verbose_name=_('Product images')
+    )
+
     def attributes_feature(self):
         return [attribute.feature for attribute in self.attributes.all()]
 
