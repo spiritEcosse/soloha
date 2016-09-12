@@ -481,7 +481,8 @@ class AbstractProduct(models.Model, CommonFeatureProduct):
 
     def images_all(self):
         images = [image.image for image in self.images.all()]
-        return filter(lambda image: getattr(image, 'is_missing', False) is False, images)
+        images = filter(lambda image: getattr(image, 'is_missing', False) is False, images)
+        return [self.get_missing_image()] if not images else images
 
     @staticmethod
     def get_missing_image():
