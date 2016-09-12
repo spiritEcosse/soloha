@@ -726,7 +726,7 @@ class AttrProd(views.JSONRequestResponseMixin, views.AjaxResponseMixin, SingleOb
         except ObjectDoesNotExist:
             pass
         else:
-            products = product_feature.product_with_images.all()
+            products = product_feature.product_with_images.all().order_by('-date_updated', 'title')
 
             for product in products:
                 context['products'].append({'title': product.get_title(), 'pk': product.pk, 'images': []})
