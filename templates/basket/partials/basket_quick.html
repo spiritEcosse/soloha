@@ -1,6 +1,6 @@
 {% load history_tags %}
 {% load basket_tags %}
-{% load basket %}
+{% load common %}
 {% load currency_filters %}
 {% load thumbnail %}
 {% load i18n %}
@@ -22,6 +22,11 @@
                         <a href="{{ line.product.get_absolute_url }}" title="{{ line.product.title }}">{{ line.product.title }}</a>
                     </div>
                     <div class="short-desc">
+                        {% for product_image in line.product_images.all %}
+                            <img src="{{ product_image.original|thumbnail_url:'basket_quick_product_image' }}"
+                                 alt="{{ product_image.get_caption }}" title="{{ product_image.get_caption }}" />
+                        {% endfor %}
+
                         {% regroup line.attributes_feature by parent as attributes %}
 
                         <small>

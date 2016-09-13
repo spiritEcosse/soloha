@@ -38,12 +38,11 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
     $scope.alert_mode = 'success'
     $scope.prod_images = []
     $scope.product_primary_images = []
-    $scope.selected_image = []
+    $scope.product_images = null
     $rootScope.Object = Object
     $rootScope.keys = Object.keys
     $scope.sent_signal = []
     clone_attributes = []
-    $scope.total = 'dfdffdff'
 
     $scope.change_price = (option_id) ->
 #    if $scope.option_model
@@ -73,6 +72,10 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
 
         angular.forEach $scope.attributes, (attr) ->
             attributes.push(attr.pk)
+
+            if attr.selected_val.images.length
+                $scope.product_images = pk: attr.selected_val.images[0].pk
+
             $scope.product.dict_attributes[attr.pk] = attr
             $scope.product.custom_value[attr.pk] = null
             $scope.isOpen[attr.pk] = false
@@ -115,7 +118,7 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
             $scope.product.custom_value[attr_pk] = null
 
     $scope.click_dropdown = (attr_id) ->
-        #Todo bug with focus. If click on button three times, open dropdown without focus on us input.
+#Todo bug with focus. If click on button three times, open dropdown without focus on us input.
         $scope.isOpen[attr_id] = if $scope.isOpen[attr_id] is false then true else false
 
     get_prod = (selected_val) ->

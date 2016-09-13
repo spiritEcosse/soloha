@@ -13,7 +13,7 @@
                    href="#product-{{ product.pk }}"
                    aria-controls="product-{{ product.pk }}"
                    ng-attr-title="{% trans 'Click to expand' %} - {{ product.title }}"
-                   {% if not ng %} title="{{ product.get_title }}" {% endif %} class="stop-propagation">
+                        {% if not ng %} title="{{ product.get_title }}" {% endif %} class="stop-propagation">
                     {% if not ng %}{{ product.get_title }}{% endif %}
                 </a>
             </div>
@@ -36,10 +36,14 @@
                         </a>
                         <span class="text-center" ng-bind="image.caption"></span>
                         <div class="wrapp-button">
-                            <label class="btn btn-success btn-block">
-                                <input ng-model="selected_image['{{ attribute.pk }}'].image" autocomplete="off"
-                                       name="attr-{{ attribute.pk }}-value" value="{{ image }}" type="radio">
-                                {% trans 'Choose' %}
+                            <label class="btn btn-default" ng-click="product_images.pk=image.pk"
+                                   ng-class="product_images.pk == image.pk ? 'active' : ''">
+                                    <span ng-show="product_images.pk !== image.pk">
+                                        {% trans 'Choose' %}
+                                    </span>
+                                <span ng-show="product_images.pk == image.pk">
+                                        {% trans 'Choosen' %}
+                                    </span>
                             </label>
                         </div>
                     </div>

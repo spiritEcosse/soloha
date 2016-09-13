@@ -10,12 +10,11 @@
                     {% thumbnail product.primary_image.original 30x30 crop as thumb %}
                 {% endif %}
                 <img ng-src="{{ product.thumb_url }}" ng-attr-title="{{ product.title }}" ng-attr-alt="{{ product.title }}"
-                {% if not ng %}
-                    src="{{ thumb.url }}" alt="{{ product.title }}" title="{{ product.title }}"
-                {% endif %}>
+                        {% if not ng %}
+                     src="{{ thumb.url }}" alt="{{ product.title }}" title="{{ product.title }}"
+                        {% endif %}>
             </div>
-            <input name="attr-{{ product.pk }}" type="radio" value="{{ product.pk }}"
-                    {% if ng %} ng-model="selected_image[attribute.pk]" {% endif %} >
+            <input type="radio" ng-value="product.pk" {% if ng %} ng-model="product_images.pk" {% endif %} >
         </label>
     </div>
 {% endangularjs %}

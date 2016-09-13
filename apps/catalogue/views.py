@@ -384,7 +384,7 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
                     for product in selected_val.features_by_product[0].product_with_images.all()[:5]:
                         product_image = product.primary_image()
                         images.append({
-                            'title': product.get_title(),
+                            'title': product_image.caption or product.get_title(),
                             'pk': product_image.pk,
                             'thumb_url': get_thumbnailer(product_image.original).get_thumbnail(options_small_thumb).url
                         })
@@ -763,6 +763,7 @@ class AttrProdImages(views.JSONRequestResponseMixin, views.AjaxResponseMixin, Si
                 'original_url': get_thumbnailer(image.original).get_thumbnail(options).url,
                 'thumb_url': get_thumbnailer(image.original).get_thumbnail(options_thumb).url,
                 'caption': image.caption or self.object.get_title(),
+                'pk': image.pk,
             })
 
         return context

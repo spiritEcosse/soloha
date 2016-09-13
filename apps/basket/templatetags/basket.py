@@ -41,7 +41,6 @@ def basket_render_field(*args, **kwargs):
     """
     # error_msg = '%r tag requires a form field followed by a list of attributes and values in the form attr="value"' % token.split_contents()[0]
     form_field = parser.compile_filter(form_field)
-    print form_field
 
     set_attrs = []
     append_attrs = []
@@ -51,7 +50,7 @@ def basket_render_field(*args, **kwargs):
             raise TemplateSyntaxError(error_msg + ": %s" % pair)
         dct = match.groupdict()
         attr, sign, value = dct['attr'], dct['sign'], parser.compile_filter(dct['value'])
-        print attr, sign, value
+
         if sign == "=":
             set_attrs.append((attr, value))
         else:
@@ -76,8 +75,3 @@ def basket_form(request, product, quantity_type='single'):
     form = form_class(request.basket, product=product, initial=initial)
 
     return form
-
-
-@register.filter
-def join(list, separator):
-    return separator.join([item.title for item in list])

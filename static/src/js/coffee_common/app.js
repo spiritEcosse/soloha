@@ -132,12 +132,11 @@
       $scope.alert_mode = 'success';
       $scope.prod_images = [];
       $scope.product_primary_images = [];
-      $scope.selected_image = [];
+      $scope.product_images = null;
       $rootScope.Object = Object;
       $rootScope.keys = Object.keys;
       $scope.sent_signal = [];
       clone_attributes = [];
-      $scope.total = 'dfdffdff';
       $scope.change_price = function(option_id) {
         if (Object.keys($scope.options_children).length !== 0) {
           $scope.option_id = Object.keys($scope.options_children[$scope.option_id]).filter(function(key) {
@@ -167,6 +166,11 @@
         $scope.product.custom_values = $scope.isOpen = $scope.product.dict_attributes = $scope.product.custom_value = [];
         angular.forEach($scope.attributes, function(attr) {
           attributes.push(attr.pk);
+          if (attr.selected_val.images.length) {
+            $scope.product_images = {
+              pk: attr.selected_val.images[0].pk
+            };
+          }
           $scope.product.dict_attributes[attr.pk] = attr;
           $scope.product.custom_value[attr.pk] = null;
           $scope.isOpen[attr.pk] = false;

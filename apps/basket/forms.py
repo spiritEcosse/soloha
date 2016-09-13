@@ -11,6 +11,7 @@ Line = get_model('basket', 'line')
 Basket = get_model('basket', 'basket')
 Product = get_model('catalogue', 'product')
 ProductVersion = get_model('catalogue', 'ProductVersion')
+ProductImage = get_model('catalogue', 'ProductImage')
 
 
 class BasketLineForm(forms.ModelForm):
@@ -135,7 +136,15 @@ class AddToBasketForm(forms.Form):
     quantity = forms.IntegerField(initial=1, min_value=1, label=_('Quantity'))
     product_version = forms.ModelChoiceField(
         queryset=ProductVersion.objects.all(),
-        widget=forms.HiddenInput(attrs={'ng-model': 'product_version', 'value': '{{ product_version }}'})
+        widget=forms.HiddenInput(attrs={'ng-model': 'product_version', 'ng-value': 'product_version'}),
+        required=False
+    )
+    product_images = forms.ModelChoiceField(
+        queryset=ProductImage.objects.all(),
+        widget=forms.HiddenInput(attrs={
+            'ng-model': 'product_images.pk', 'ng-value': 'product_images.pk'
+        }),
+        required=False
     )
 
     def __init__(self, basket, product, *args, **kwargs):
@@ -251,7 +260,7 @@ class AddToBasketForm(forms.Form):
 
         # Check currencies are sensible
         if (self.basket.currency and
-                info.price.currency != self.basket.currency):
+                    info.price.currency != self.basket.currency):
             raise forms.ValidationError(
                 _("This product cannot be added to the basket as its currency "
                   "isn't the same as other products in your basket"))

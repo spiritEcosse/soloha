@@ -18,10 +18,10 @@
                     <div class="btn-group" data-toggle="buttons">
                         <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
                             {% if ng %}
-                                {% include 'catalogue/product/attributes/attribute_products_modal.html' %}
+                                {% include 'catalogue/product/attributes/attribute_products_modal.html' with ng=1 %}
                             {% else %}
                                 {% for product in feature_product.product_with_images.all|slice:":5" %}
-                                    {% include 'catalogue/product/attributes/attribute_products_modal.html' %}
+                                    {% include 'catalogue/product/attributes/attribute_products_modal.html' with ng=0 %}
                                 {% endfor %}
                             {% endif %}
                         </div>

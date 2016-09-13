@@ -306,6 +306,7 @@ THUMBNAIL_ALIASES = {
     '': {
         'category_icon': {'size': (50, 30), 'crop': True},
         'basket_quick': {'size': (85, 50), 'crop': True},
+        'basket_quick_product_image': {'size': (30, 30), 'crop': True},
         'basket_content': {'size': (150, 150), 'crop': True},
         'checkout': {'size': (150, 150), 'crop': True},
         'home_thumb_slide': {'size': (1170, 392), 'crop': True},

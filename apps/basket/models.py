@@ -3,7 +3,7 @@ from django.utils.translation import ugettext_lazy as _
 
 
 class Line(AbstractLine):
-    product_attributes_images = models.ManyToManyField(
+    product_images = models.ManyToManyField(
         'catalogue.ProductImage', blank=True, related_name='lines', verbose_name=_('Product images')
     )
 
@@ -30,7 +30,7 @@ class Basket(AbstractBasket):
                                       'product__stockrecords'))
         return self._lines
 
-    def add_product(self, product, quantity=1, options=None, version=None):
+    def add_product(self, product, quantity=1, options=None, version=None, product_images=None):
         """
         Add a product to the basket
 
@@ -94,6 +94,9 @@ class Basket(AbstractBasket):
 
             for attribute in version.attributes.all():
                 line.attributes.create(feature=attribute)
+
+            line.product_images.add(product_images)
+            line.save()
         else:
             line.quantity += quantity
             line.save()

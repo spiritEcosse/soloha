@@ -701,6 +701,9 @@ class AbstractProductImage(models.Model, CommonFeatureProduct):
         os.chdir(current_path)
         return image
 
+    def get_caption(self):
+        return self.caption or self.product.get_title()
+
     def delete(self, *args, **kwargs):
         """
         Always keep the display_order as consecutive integers. This avoids
