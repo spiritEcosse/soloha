@@ -80,7 +80,7 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
             $scope.product.custom_value[attr.pk] = null
             $scope.isOpen[attr.pk] = false
             $scope.product.custom_values[attr.pk] = []
-        set_price()
+        $scope.price_start = set_price()
     .error ->
         console.error('An error occurred during submission')
 

@@ -6,7 +6,6 @@ from oscar.apps.basket.views import apply_messages
 class BasketAddView(CoreBasketAddView):
     def form_valid(self, form):
         offers_before = self.request.basket.applied_offers()
-        print form.cleaned_data['product_images'].pk
 
         self.request.basket.add_product(
             form.product, form.cleaned_data['quantity'],

@@ -8,112 +8,109 @@
 
 {% purchase_info_for_product request product as session %}
 
-<div class="col-xs-24 col-sm-24 col-md-10 price">
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            {% trans 'Vendor code' %}: {{ product.id }}
-            <div class="pull-right">{% trans 'By order' %}</div>
-        </div>
-        <div class="panel-body">
-            {% with class_price="number" %}
-                {% if session.price.exists %}
-                    <div class="text-center wrapper-number" >
-                        {% trans "Price" %}:
-                        {% assign price session.price.excl_tax|currency:session.price.currency %}
+{% angularjs ng %}
+    <div class="col-xs-24 col-sm-24 col-md-10 price" {% if ng %} ng-cloak="" {% endif %}>
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                {% trans 'Vendor code' %}: {{ product.pk }}
+                <div class="pull-right">{% trans 'By order' %}</div>
+            </div>
+            <div class="panel-body">
+                {% with class_price="number" %}
+                    {% if session.price.exists %}
+                        <div class="text-center wrapper-number" >
+                            {% trans "Price" %}:
+                            {% assign price session.price.excl_tax|currency:session.price.currency %}
 
-                        <span {% if ng %}
-                            ng-init="price='{{ price }}'; price_start='{{ price }}'"
-                            ng-class="'{{ class_price }}'" ng-bind="price"
-                        {% endif %}
-                            class="{{ class_price }}" >
+                            <span {% if ng %} ng-class="'{{ class_price }}'" ng-bind="price" {% endif %} class="{{ class_price }}" >
                             {% if not ng %}
                                 {{ price }}
                             {% endif %}
                         </span>
-                    </div>
-                    <div class="row">
-                        {% block product_basket_form %}
-                            {% include "catalogue/partials/add_to_basket_form.html" %}
-                        {% endblock %}
+                        </div>
+                        <div class="row">
+                            {% block product_basket_form %}
+                                {% include "catalogue/partials/add_to_basket_form.html" %}
+                            {% endblock %}
 
-                        <div class="wrapper-btn-faster col-xs-12">
-                            <button type="button" data-toggle="modal" data-target="#quick_order" class="btn btn-block btn-md btn-default">{% trans 'Quick order' %}</button>
-                            <div class="modal fade" id="quick_order" tabindex="-1" role="dialog" aria-labelledby="quick order">
-                                <div class="modal-dialog" role="document">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                                            <h4 class="modal-title" id="myModalLabel">{% trans 'Quick order' %}</h4>
-                                        </div>
-                                        <div class="modal-body text-left">
-                                            <form name="{{ form.form_name }}" method="post" ng-hide="send_form" novalidate>
-                                                {% csrf_token %}
-                                                {{ form.as_div }}
-                                                <button type="button" ng-disabled="{{ form.form_name }}.$invalid" ng-click="quick_order()"
-                                                        class="btn btn-success">{% trans 'Submit' %}</button>
-                                            </form>
-
-                                            {% verbatim %}
-                                            <div class="alert alert-{{ alert_mode }}" role="alert" ng-show="send_form">
-                                                {% endverbatim %}
-                                                <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
-                                                <span class="sr-only">{% trans 'The form is submitted successfully' %}:</span>
-                                                {{ answer }}
+                            <div class="wrapper-btn-faster col-xs-12">
+                                <button type="button" data-toggle="modal" data-target="#quick_order" class="btn btn-block btn-md btn-default">{% trans 'Quick order' %}</button>
+                                <div class="modal fade" id="quick_order" tabindex="-1" role="dialog" aria-labelledby="quick order">
+                                    <div class="modal-dialog" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                                <h4 class="modal-title" id="myModalLabel">{% trans 'Quick order' %}</h4>
                                             </div>
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                            <div class="modal-body text-left">
+                                                <form name="{{ form.form_name }}" method="post" ng-hide="send_form" novalidate>
+                                                    {% csrf_token %}
+                                                    {{ form.as_div }}
+                                                    <button type="button" ng-disabled="{{ form.form_name }}.$invalid" ng-click="quick_order()"
+                                                            class="btn btn-success">{% trans 'Submit' %}</button>
+                                                </form>
+
+                                                {% verbatim %}
+                                                <div class="alert alert-{{ alert_mode }}" role="alert" ng-show="send_form">
+                                                    {% endverbatim %}
+                                                    <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                                                    <span class="sr-only">{% trans 'The form is submitted successfully' %}:</span>
+                                                    {{ answer }}
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                {% else %}
-                    <div class="wrapper-number">
+                    {% else %}
+                        <div class="wrapper-number">
                         <span>
                             {% trans 'Price check with the manager.' %}
                         </span>
-                    </div>
-                {% endif %}
-            {% endwith %}
-        </div>
-        {% if flatpages %}
-            <div class="panel-footer">
-                <div class="row text-center">
-                    {% for page in flatpages %}
-                        <div class="col-xs-8">
-                            <div class="icon icon-{{ page.icon }}" title="{% trans 'Click to open - ' %}{{ page.title }}"
-                                 data-toggle="modal" data-target="#{{ page.url }}Modal">
-                                <span class="glyphicon glyphicon-info-sign btn-xs"></span>
-                            </div>
-                            <div class="modal fade" id="{{ page.url }}Modal" tabindex="-1" role="dialog"
-                                 aria-labelledby="{{ page.title }}">
-                                <div class="modal-dialog" role="document">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <button type="button" class="close" data-dismiss="modal"
-                                                    aria-label="{% trans "Close" %}">
-                                                <span aria-hidden="true">&times;</span></button>
-                                            <h4 class="modal-title" id="{{ page.url }}Modal">{{ page.title }}</h4>
-                                        </div>
-                                        <div class="modal-body">
-                                            {{ page.content|linebreaks }}
-                                            <a href="{{ page.get_absolute_url }}">{% trans 'View on page.' %}</a>
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-default" data-dismiss="modal">
-                                                {% trans "Close" %}
-                                            </button>
+                        </div>
+                    {% endif %}
+                {% endwith %}
+            </div>
+            {% if flatpages %}
+                <div class="panel-footer">
+                    <div class="row text-center">
+                        {% for page in flatpages %}
+                            <div class="col-xs-8">
+                                <div class="icon icon-{{ page.icon }}" title="{% trans 'Click to open - ' %}{{ page.title }}"
+                                     data-toggle="modal" data-target="#{{ page.url }}Modal">
+                                    <span class="glyphicon glyphicon-info-sign btn-xs"></span>
+                                </div>
+                                <div class="modal fade" id="{{ page.url }}Modal" tabindex="-1" role="dialog"
+                                     aria-labelledby="{{ page.title }}">
+                                    <div class="modal-dialog" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <button type="button" class="close" data-dismiss="modal"
+                                                        aria-label="{% trans "Close" %}">
+                                                    <span aria-hidden="true">&times;</span></button>
+                                                <h4 class="modal-title" id="{{ page.url }}Modal">{{ page.title }}</h4>
+                                            </div>
+                                            <div class="modal-body">
+                                                {{ page.content|linebreaks }}
+                                                <a href="{{ page.get_absolute_url }}">{% trans 'View on page.' %}</a>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-default" data-dismiss="modal">
+                                                    {% trans "Close" %}
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    {% endfor %}
+                        {% endfor %}
+                    </div>
                 </div>
-            </div>
-        {% endif %}
+            {% endif %}
+        </div>
     </div>
-</div>
-
+{% endangularjs %}

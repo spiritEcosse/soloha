@@ -1,14 +1,10 @@
 from oscar.apps.basket.abstract_models import *  # noqa
 from django.utils.translation import ugettext_lazy as _
-
-
-class Line(AbstractLine):
-    product_images = models.ManyToManyField(
-        'catalogue.ProductImage', blank=True, related_name='lines', verbose_name=_('Product images')
-    )
-
-    def attributes_feature(self):
-        return [attribute.feature for attribute in self.attributes.all()]
+from django.core.exceptions import ObjectDoesNotExist
+from oscar.core.loading import get_model
+from django.db.models.query import Prefetch
+from apps.catalogue.fiters import Filter
+ProductFeature = get_model('catalogue', 'ProductFeature')
 
 
 class Basket(AbstractBasket):
@@ -89,15 +85,25 @@ class Basket(AbstractBasket):
             defaults=defaults)
 
         if created:
-            # for option_dict in options:
-            #     line.attributes.create(option=option_dict['option'], value=option_dict['value'])
+            attributes = line.stockrecord.product_version.attributes.prefetch_related(
+                *self.prefetch(product, product_images)
+            )
 
-            for attribute in version.attributes.all():
-                line.attributes.create(feature=attribute)
+            for attribute in attributes:
+                line_attributes = line.attributes.create(feature=attribute)
 
-            line.product_images.add(product_images)
-            line.save()
+                if attribute.have_product_images:
+                    line_attributes.product_images.add(product_images)
         else:
+            line_attributes = line.attributes.select_related('feature').prefetch_related(
+                *self.prefetch(product, product_images, feature=True)
+            )
+
+            for line_attribute in line_attributes:
+                if line_attribute.feature.have_product_images:
+                    line_attribute.product_images.clear()
+                    line_attribute.product_images.add(product_images)
+
             line.quantity += quantity
             line.save()
         self.reset_offer_applications()
@@ -106,6 +112,28 @@ class Basket(AbstractBasket):
         return line, created
     add_product.alters_data = True
     add = add_product
+
+    def prefetch(self, product, product_images, feature=False):
+        lookup = Filter(product=product)
+        prefetch = []
+        fields = 'feature__' if feature else ''
+        fields += 'product_features'
+
+        prefetch.append(
+            Prefetch(
+                fields,
+                queryset=ProductFeature.objects.filter(
+                    **lookup.filter_feature_parent(
+                        {
+                            'product_with_images': product_images.product
+                        }
+                    )
+                ),
+                to_attr='have_product_images',
+            )
+        )
+
+        return prefetch
 
     def _create_line_reference(self, product, stockrecord, options, attributes=None):
         """
@@ -127,6 +155,11 @@ from oscar.apps.basket.models import *  # noqa
 
 feature = models.ForeignKey('catalogue.Feature', verbose_name=_('Feature'), null=True, blank=True)
 feature.contribute_to_class(LineAttribute, "feature")
+
+product_images = models.ManyToManyField(
+    'catalogue.ProductImage', blank=True, related_name='line_attributes', verbose_name=_('Product images')
+)
+product_images.contribute_to_class(LineAttribute, "product_images")
 
 option = LineAttribute._meta.get_field('option')
 option.null = True

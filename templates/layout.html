@@ -32,7 +32,7 @@
                         {% with count_phone_numbers=current_site.info.phone_number|length %}
                             <span class="{% if count_phone_numbers < 4 %}hidden-sm hidden-xs {% else %}hidden-md hidden-sm hidden-xs {% endif %}">
                                 {% for phone in current_site.info.phone_number %}
-                                    <a class="text-white" href="tel:{{ phone }}">{{ phone }}</a>
+                                    <a class="text-white" href="tel:{{ phone }}">{{ phone|phone2numeric }}</a>
                                 {% endfor %}
                             </span>
 
@@ -42,7 +42,7 @@
                                 </button>
                                 <ul class="dropdown-menu stop-propagation">
                                     {% for phone in current_site.info.phone_number %}
-                                        <li><a class="text-white" href="tel:{{ phone }}">{{ phone }}</a></li>
+                                        <li><a class="text-white" href="tel:{{ phone }}">{{ phone|phone2numeric }}</a></li>
                                     {% endfor %}
                                 </ul>
                             </div>

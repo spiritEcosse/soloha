@@ -176,7 +176,7 @@
           $scope.isOpen[attr.pk] = false;
           return $scope.product.custom_values[attr.pk] = [];
         });
-        return set_price();
+        return $scope.price_start = set_price();
       }).error(function() {
         return console.error('An error occurred during submission');
       });

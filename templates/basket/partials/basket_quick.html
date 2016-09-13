@@ -12,9 +12,10 @@
         <div class="col-xs-24 item">
             <div class="row">
                 <div class="col-xs-5">
-                    <a href="{{ line.product.get_absolute_url }}" title="{{ line.product.title }}">
+                    <a href="{{ line.product.get_absolute_url }}" title="{{ line.product.get_title }}">
                         <img src="{{ line.product.primary_image.original|thumbnail_url:'basket_quick' }}"
-                             alt="{{ line.product.title }}" title="{{ line.product.title }}" />
+                             alt="{{ line.product.get_title }}" title="{{ line.product.get_title }}"
+                             class="img-responsive img-thumbnail"/>
                     </a>
                 </div>
                 <div class="col-xs-13">
@@ -22,17 +23,17 @@
                         <a href="{{ line.product.get_absolute_url }}" title="{{ line.product.title }}">{{ line.product.title }}</a>
                     </div>
                     <div class="short-desc">
-                        {% for product_image in line.product_images.all %}
-                            <img src="{{ product_image.original|thumbnail_url:'basket_quick_product_image' }}"
-                                 alt="{{ product_image.get_caption }}" title="{{ product_image.get_caption }}" />
-                        {% endfor %}
-
-                        {% regroup line.attributes_feature by parent as attributes %}
-
                         <small>
-                            {% for attribute in attributes %}
-                                {{ attribute.grouper }}:
-                                {{ attribute.list | join:', ' }}
+                            {% for line_attribute in line.attributes.all %}
+                                <div>
+                                    {{ line_attribute.feature.parent.title|capfirst }}: {{ line_attribute.feature.title|lower }}
+
+                                    {% for product_image in line_attribute.product_images.all %}
+                                        <img src="{{ product_image.original|thumbnail_url:'basket_quick_product_image' }}"
+                                             alt="{{ product_image.get_caption }}" title="{{ product_image.get_caption }}"
+                                             class="img-rounded"/>
+                                    {% endfor %}
+                                </div>
                             {% endfor %}
                         </small>
                     </div>

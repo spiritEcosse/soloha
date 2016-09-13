@@ -130,7 +130,12 @@
             </div>
             <div id="section3" class="col-xs-24 col-sm-11 col-md-15" >
                 <div class="row common">
-                    {% include "catalogue/partials/price.html" %}
+                    <div ng-if="price">
+                        {% include "catalogue/partials/price.html" with ng=1 %}
+                    </div>
+                    <div ng-if="!price">
+                        {% include "catalogue/partials/price.html" with ng=0 %}
+                    </div>
 
                     {% if attributes %}
                         <div class="col-xs-24 col-sm-24 col-md-14 options">
