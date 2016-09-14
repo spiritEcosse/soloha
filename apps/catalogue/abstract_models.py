@@ -25,6 +25,10 @@ BrowsableProductManagerCore = get_class('catalogue.managers', 'BrowsableProductM
 class CommonFeatureProduct(object):
     product = None
 
+    @property
+    def product_slug(self):
+        return self.product.slug
+
     def product_enable(self):
         return self.product.enable
     product_enable.short_description = _('Enable product')
@@ -114,7 +118,9 @@ class AbstractProductVersion(models.Model, CommonFeatureProduct):
     attributes = models.ManyToManyField('catalogue.Feature', through='catalogue.VersionAttribute',
                                         verbose_name=_('Attributes'), related_name='product_versions')
     product = models.ForeignKey('catalogue.Product', related_name='versions', on_delete=models.DO_NOTHING)
+    #todo delete
     price_retail = models.DecimalField(_("Price (retail)"), decimal_places=2, max_digits=12)
+    #todo delete
     cost_price = models.DecimalField(_("Cost Price"), decimal_places=2, max_digits=12)
 
     class Meta:
@@ -1003,7 +1009,7 @@ class CustomAbstractCategory(MPTTModel):
 
 
 @python_2_unicode_compatible
-class AbstractVersionAttribute(models.Model):
+class AbstractVersionAttribute(models.Model, CommonFeatureProduct):
     version = models.ForeignKey('catalogue.ProductVersion', verbose_name=_('Version of product'),
                                 related_name='version_attributes')
     attribute = models.ForeignKey('catalogue.Feature', verbose_name=_('Attribute'), related_name='version_attributes')
@@ -1029,6 +1035,10 @@ class AbstractVersionAttribute(models.Model):
         if current_attributes in search_attributes:
             raise IntegrityError(u'UNIQUE constraint failed: catalogue_productversion.version_id, catalogue_productversion.attribute_id'.format(self.attribute))
         super(AbstractVersionAttribute, self).save(**kwargs)
+
+    @property
+    def product(self):
+        return self.version.product
 
 
 @python_2_unicode_compatible

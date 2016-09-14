@@ -275,6 +275,13 @@ class CategoryAdmin(ImportExportMixin, ImportExportActionModelAdmin, DraggableMP
               "https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js")
 
 
+class VersionAttributeAdmin(ImportExportMixin, ImportExportActionModelAdmin):
+    search_fields = ('version__product__title', 'version__product__slug', 'version__product__id', )
+    list_display = ('pk', 'attribute', 'product', 'product_slug', 'thumb', 'version', )
+    resource_class = resources.VersionAttributeResource
+
+
+admin.site.register(VersionAttribute, VersionAttributeAdmin)
 admin.site.register(ProductClass, ProductClassAdmin)
 admin.site.register(Product, ProductAdmin)
 admin.site.register(ProductAttribute, ProductAttributeAdmin)
