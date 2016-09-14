@@ -131,7 +131,7 @@ class ProductImageInline(admin.TabularInline):
 class ProductImageAdmin(ImportExportMixin, ImportExportActionModelAdmin):
     resource_class = resources.ProductImageResource
     list_display = ('pk', 'thumb', 'product', 'product_date_updated', 'display_order', 'caption', 'product_enable',
-                    'product_categories_to_str', 'product_partners_to_str', 'date_created', )
+                    'product_categories_to_str', 'product_partner', 'date_created', )
     list_filter = ('product__date_updated', 'date_created', 'product__enable', 'display_order',
                    'product__stockrecords__partner', 'product__categories', )
     search_fields = ('product__title', 'product__slug', 'product__pk', )
@@ -168,9 +168,9 @@ class ProductVersionAdmin(ImportExportMixin, ImportExportActionModelAdmin):
     form = forms.ProductVersionForm
     inlines = (VersionAttributeInline, )
     resource_class = resources.ProductVersionResource
-    list_display = ('pk', 'thumb', 'product', 'price_retail', 'cost_price', 'product_date_updated', 'product_enable',
-                    'product_categories_to_str', 'product_partners_to_str', )
-    list_filter = ('product__date_updated', 'product__enable', 'product__stockrecords__partner', 'product__categories',)
+    list_display = ('pk', 'thumb', 'product', 'product_slug', 'product_date_updated', 'product_enable',
+                    'product_categories_to_str', 'product_partner', )
+    list_filter = ('product__date_updated', 'product__enable', 'product__partner', 'product__categories',)
     search_fields = ('product__title', 'product__slug', 'product__pk', )
 
     class Media:
@@ -184,7 +184,7 @@ class ProductVersionAdmin(ImportExportMixin, ImportExportActionModelAdmin):
 
 class ProductFeatureAdmin(ImportExportMixin, ImportExportActionModelAdmin):
     list_display = ('pk', 'product', 'thumb', 'feature', 'product_date_updated', 'sort', 'info', 'product_enable',
-                    'product_categories_to_str', 'product_partners_to_str', )
+                    'product_categories_to_str', 'product_partner', )
     list_filter = ('product__date_updated', 'product__enable', 'sort', 'product__stockrecords__partner',
                    'product__categories', )
     search_fields = ('product__title', 'product__slug', 'product__pk', )
@@ -228,7 +228,7 @@ class ProductAdmin(ImportExportMixin, ImportExportActionModelAdmin):
 
 class ProductRecommendationAdmin(ImportExportMixin, ImportExportActionModelAdmin):
     list_display = ('pk', 'primary', 'product_enable', 'thumb', 'product_date_updated', 'product_categories_to_str',
-                    'product_partners_to_str', 'recommendation', 'recommendation_thumb', 'ranking', )
+                    'product_partner', 'recommendation', 'recommendation_thumb', 'ranking', )
     list_filter = ('primary__date_updated', 'primary__enable', 'ranking', 'primary__stockrecords__partner',
                    'primary__categories', )
     search_fields = ('primary__title', 'primary__slug', 'primary__pk', )

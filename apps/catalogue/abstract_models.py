@@ -37,9 +37,9 @@ class CommonFeatureProduct(object):
         return self.product.categories_to_str()
     product_categories_to_str.short_description = _("Categories")
 
-    def product_partners_to_str(self):
-        return self.product.partners_to_str()
-    product_partners_to_str.short_description = _("Partner")
+    def product_partner(self):
+        return self.product.partner
+    product_partner.short_description = _("Product partner")
 
     def thumb(self, image=None):
         if not image:
@@ -118,9 +118,9 @@ class AbstractProductVersion(models.Model, CommonFeatureProduct):
     attributes = models.ManyToManyField('catalogue.Feature', through='catalogue.VersionAttribute',
                                         verbose_name=_('Attributes'), related_name='product_versions')
     product = models.ForeignKey('catalogue.Product', related_name='versions', on_delete=models.DO_NOTHING)
-    #todo delete
+    # Todo delete this field after pass data to stockrecord
     price_retail = models.DecimalField(_("Price (retail)"), decimal_places=2, max_digits=12)
-    #todo delete
+    # Todo delete this field after pass data to stockrecord
     cost_price = models.DecimalField(_("Cost Price"), decimal_places=2, max_digits=12)
 
     class Meta:

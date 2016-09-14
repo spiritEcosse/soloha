@@ -238,6 +238,11 @@
         if ((selected_val.products != null) && !selected_val.products.length || (selected_val.products == null)) {
           return $http.post('/catalogue/attr/' + selected_val.pk + '/product/' + clone_data.product.pk + '/').success(function(data) {
             selected_val.products = data.products;
+            if (data.product_primary_images && (selected_val.images == null)) {
+              $scope.product_images = {
+                pk: data.product_primary_images[0].pk
+              };
+            }
             return selected_val.images = data.product_primary_images;
           }).error(function() {
             return console.error('An error occurred during submission');

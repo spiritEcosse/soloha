@@ -7,9 +7,10 @@ from oscar.core.utils import get_default_currency
 from oscar.core.compat import AUTH_USER_MODEL
 from oscar.models.fields import AutoSlugField
 from oscar.apps.partner.exceptions import InvalidStockAdjustment
+from apps.catalogue.abstract_models import CommonFeatureProduct
 
 
-class AbstractStockRecord(models.Model):
+class AbstractStockRecord(models.Model, CommonFeatureProduct):
     """
     A stock record.
 
@@ -19,9 +20,13 @@ class AbstractStockRecord(models.Model):
     Stockrecords are used by 'strategies' to determine availability and pricing
     information for the customer.
     """
-    product = models.ForeignKey('catalogue.Product', related_name="stockrecords", verbose_name=_("Product"))
-    product_version = models.OneToOneField('catalogue.ProductVersion', related_name="stockrecord",
-                                           verbose_name=_("Product Version"), null=True)
+    # ToDo delete this field, after pass data to product_version
+    product = models.ForeignKey('catalogue.Product', related_name="stockrecords", verbose_name=_("Product"), null=True)
+    product_version = models.OneToOneField(
+        'catalogue.ProductVersion', related_name="stockrecord",
+        verbose_name=_("Product Version"),
+        null=True
+    )
     # ToDo delete this field, after pass data to product.partner
     partner = models.ForeignKey('partner.Partner', verbose_name=_("Partner"),related_name='stockrecords', null=True)
 
@@ -79,9 +84,9 @@ class AbstractStockRecord(models.Model):
                                         db_index=True)
 
     def __str__(self):
-        msg = u"Partner: %s, product: %s" % (
-            getattr(self.partner, 'code', None),
-            getattr(self, 'product.title', None)
+        msg = u"ProductStockRecord %s of Product: %s" % (
+            getattr(self, 'pk', None),
+            getattr(self, 'product_version.product.title', None)
         )
         if self.partner_sku:
             msg = u"%s (%s)" % (msg, self.partner_sku)
@@ -157,15 +162,7 @@ class AbstractStockRecord(models.Model):
             return False
         return self.net_stock_level < self.low_stock_threshold
 
-    def enable_product(self):
-        return self.product.enable
-    enable_product.short_description = _('Enable product')
-
-    def thumb(self):
-        return self.product.thumb()
-    thumb.allow_tags = True
-    thumb.short_description = _('Image of product')
-
-    def product_categories_to_str(self):
-        return self.product.categories_to_str()
-    product_categories_to_str.short_description = _("Categories")
+    # Todo uncomment after delete field - product
+    # @property
+    # def product(self):
+    #     return self.product_version.product

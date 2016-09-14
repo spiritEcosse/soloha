@@ -330,7 +330,7 @@ class ProductVersionResource(ModelResource):
     )
 
     class Meta:
-        fields = ('id', 'delete', 'product', 'price_retail', 'cost_price', 'attributes', )
+        fields = ('id', 'delete', 'product', 'attributes', )
         export_order = fields
         model = ProductVersion
 

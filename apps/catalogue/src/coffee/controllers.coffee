@@ -125,6 +125,10 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
         if selected_val.products? and not selected_val.products.length or not selected_val.products?
             $http.post('/catalogue/attr/' + selected_val.pk + '/product/' + clone_data.product.pk + '/').success (data) ->
                 selected_val.products = data.products
+
+                if data.product_primary_images and not selected_val.images?
+                    $scope.product_images = pk: data.product_primary_images[0].pk
+
                 selected_val.images = data.product_primary_images
             .error ->
                 console.error('An error occurred during submission')
