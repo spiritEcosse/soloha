@@ -113,14 +113,13 @@ class MissingProductImage(object):
                                            settings.MEDIA_ROOT))
 
 
+# Todo delete this model after transfer data
 @python_2_unicode_compatible
 class AbstractProductVersion(models.Model, CommonFeatureProduct):
     attributes = models.ManyToManyField('catalogue.Feature', through='catalogue.VersionAttribute',
                                         verbose_name=_('Attributes'), related_name='product_versions')
     product = models.ForeignKey('catalogue.Product', related_name='versions', on_delete=models.DO_NOTHING)
-    # Todo delete this field after pass data to stockrecord
     price_retail = models.DecimalField(_("Price (retail)"), decimal_places=2, max_digits=12)
-    # Todo delete this field after pass data to stockrecord
     cost_price = models.DecimalField(_("Cost Price"), decimal_places=2, max_digits=12)
 
     class Meta:
@@ -1010,8 +1009,10 @@ class CustomAbstractCategory(MPTTModel):
 
 @python_2_unicode_compatible
 class AbstractVersionAttribute(models.Model, CommonFeatureProduct):
-    version = models.ForeignKey('catalogue.ProductVersion', verbose_name=_('Version of product'),
-                                related_name='version_attributes')
+    version = models.ForeignKey(
+        'catalogue.ProductVersion', verbose_name=_('Version of product'),
+        related_name='version_attributes'
+    )
     attribute = models.ForeignKey('catalogue.Feature', verbose_name=_('Attribute'), related_name='version_attributes')
     price_retail = models.DecimalField(_("Price (retail)"), decimal_places=2, max_digits=12, blank=True, default=0)
     cost_price = models.DecimalField(_("Cost Price"), decimal_places=2, max_digits=12, blank=True, default=0)

@@ -9,6 +9,41 @@ from django.contrib.postgres.fields import ArrayField
 from django.forms import TextInput
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.flatpages.admin import FlatPageAdmin
+from django.db import IntegrityError
+
+
+@python_2_unicode_compatible
+class StockRecordAttribute(models.Model, CommonFeatureProduct):
+    stock_record = models.ForeignKey(
+        'partner.StockRecord', verbose_name=_('Stock record of product'), related_name='stock_record_attributes'
+    )
+    attribute = models.ForeignKey(
+        'catalogue.Feature', verbose_name=_('Attribute'), related_name='stock_record_attributes'
+    )
+    price_retail = models.DecimalField(_("Price (retail)"), decimal_places=2, max_digits=12, blank=True, default=0)
+    cost_price = models.DecimalField(_("Cost Price"), decimal_places=2, max_digits=12, blank=True, default=0)
+
+    class Meta:
+        unique_together = ('stock_record', 'attribute', )
+        app_label = 'catalogue'
+        verbose_name = _('StockRecord attribute')
+        verbose_name_plural = _('StockRecord attributes')
+
+    def __str__(self):
+        return u'{}, {} - {}'.format(self.pk, self.stock_record.product.title, self.attribute.title)
+
+    def save(self, **kwargs):
+        stock_records = self.stock_record._meta.model.objects.filter(product=self.stock_record.product)
+        search_attributes = (sorted(attr.pk for attr in stock_record.attributes.all()) for stock_record in stock_records)
+        current_attributes = list(self.stock_record.attributes.all()) + [self.attribute]
+        current_attributes = sorted([attr.pk for attr in current_attributes])
+
+        if current_attributes in search_attributes:
+            raise IntegrityError(
+                u'UNIQUE constraint failed: catalogue_stockrecord.stockrecord_id, catalogue_stockrecord.attributes'.format(self.attribute)
+            )
+        super(StockRecordAttribute, self).save(**kwargs)
+
 
 __all__ = ['ProductAttributesContainer']
 
