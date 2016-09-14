@@ -125,7 +125,10 @@
                             </div>
                         </div>
                         <div class="col-sm-12">
-                            <h3><a href="{{ line.product.get_absolute_url }}">{{ line.description }}</a></h3>
+                            <p>
+                                <a href="{{ product.get_absolute_url }}">{{ product.get_title }}</a>
+                            </p>
+                            {% include 'basket/partials/basket_line_attributes.html' %}
                             <span class="availability {{ session.availability.code }}">{{ session.availability.message }}</span>
                         </div>
                         <div class="col-sm-4 text-center">

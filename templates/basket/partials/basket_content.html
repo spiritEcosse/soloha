@@ -48,12 +48,16 @@
                                 <div class="col-sm-4">
                                     {{ form.id }}
                                     <a href="{{ product.get_absolute_url }}">
-                                        <img class="thumbnail img-responsive" src="{{ product.|thumbnail_url:'basket_content' }}"
+                                        <img class="thumbnail img-responsive"
+                                             src="{{ product.primary_image.original|thumbnail_url:'basket_content' }}"
                                              alt="{{ product.get_title }}" title="{{ product.get_title }}" />
                                     </a>
                                 </div>
                                 <div class="col-sm-8">
-                                    <h3><a href="{{ product.get_absolute_url }}">{{ line.description }}</a></h3>
+                                    <p>
+                                        <a href="{{ product.get_absolute_url }}">{{ product.get_title }}</a>
+                                    </p>
+                                    {% include 'basket/partials/basket_line_attributes.html' %}
                                     <p class="availability {{ session.availability.code }}">{{ session.availability.message }}</p>
                                 </div>
                                 <div class="col-sm-6">

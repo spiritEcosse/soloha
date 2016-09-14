@@ -23,19 +23,7 @@
                         <a href="{{ line.product.get_absolute_url }}" title="{{ line.product.title }}">{{ line.product.title }}</a>
                     </div>
                     <div class="short-desc">
-                        <small>
-                            {% for line_attribute in line.attributes.all %}
-                                <div>
-                                    {{ line_attribute.feature.parent.title|capfirst }}: {{ line_attribute.feature.title|lower }}
-
-                                    {% for product_image in line_attribute.product_images.all %}
-                                        <img src="{{ product_image.original|thumbnail_url:'basket_quick_product_image' }}"
-                                             alt="{{ product_image.get_caption }}" title="{{ product_image.get_caption }}"
-                                             class="img-rounded"/>
-                                    {% endfor %}
-                                </div>
-                            {% endfor %}
-                        </small>
+                        <small>{% include 'basket/partials/basket_line_attributes.html' %}</small>
                     </div>
                 </div>
                 <div class="col-xs-6">

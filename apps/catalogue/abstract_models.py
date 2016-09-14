@@ -1053,7 +1053,7 @@ class AbstractProductFeature(models.Model, CommonFeatureProduct):
         verbose_name_plural = _('Product features')
 
     def __str__(self):
-        return u'{}, {} - {}'.format(self.pk, self.product.title, self.feature.title)
+        return u'{}, {} - {}'.format(self.pk, getattr(self, 'product.title', None), getattr(self, 'feature.title', None))
 
     def clean(self):
         if self.non_standard is True:
