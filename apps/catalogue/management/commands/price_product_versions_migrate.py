@@ -67,6 +67,6 @@ class Command(BaseCommand):
                             cost_price=price,
                         )
 
-                        stock.attrbibutes.add(*product_version.attributes.all())
+                        stock.attributes.add(*product_version.attributes.all())
 
         self.stdout.write('Successfully.')
