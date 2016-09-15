@@ -48,7 +48,9 @@ class Command(BaseCommand):
         """
         products = Product.objects.all()
 
-        for product in products:
+        for pos, product in enumerate(products):
+            print pos, ' left prod {}'.format(len(products) - pos)
+
             if product.versions.exists():
                 product.stockrecords.all().delete()
 
@@ -65,6 +67,6 @@ class Command(BaseCommand):
                             cost_price=price,
                         )
 
-                        stock.attrbibutes.add(**product_version.attributes.all())
+                        stock.attrbibutes.add(*product_version.attributes.all())
 
         self.stdout.write('Successfully.')
