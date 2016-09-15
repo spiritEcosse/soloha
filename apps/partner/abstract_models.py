@@ -28,10 +28,9 @@ class AbstractStockRecord(models.Model, CommonFeatureProduct):
         verbose_name=_("Product Version"),
         null=True
     )
-    attributes = models.ManyToManyField(
-        'catalogue.Feature', through='catalogue.StockRecordAttribute',
-        verbose_name=_('Attributes'), related_name='stockrecords'
-    )
+    # attributes = models.ManyToManyField(
+    #     'catalogue.Feature', verbose_name=_('Attributes'), related_name='stockrecords'
+    # )
 
     # ToDo delete this field, after pass data to product.partner
     partner = models.ForeignKey('partner.Partner', verbose_name=_("Partner"),related_name='stockrecords', null=True)

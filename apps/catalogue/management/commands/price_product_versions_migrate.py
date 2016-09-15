@@ -37,8 +37,6 @@ ProductClass = get_model('catalogue', 'ProductClass')
 ProductCategory = get_model('catalogue', 'ProductCategory')
 Partner, StockRecord = get_classes('partner.models', ['Partner', 'StockRecord'])
 
-from apps.catalogue.models import StockRecordAttribute
-
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
@@ -56,7 +54,6 @@ class Command(BaseCommand):
 
                 if not product.is_parent:
                     print product.slug
-                    StockRecordAttribute.objects.filter(stock_record__product=product).delete()
 
                     for product_version in product.versions.all():
                         price = product_version.price_retail or product_version.price_retail
@@ -68,7 +65,6 @@ class Command(BaseCommand):
                             cost_price=price,
                         )
 
-                        for attribute in product_version.attributes.all():
-                            StockRecordAttribute.objects.create(stock_record=stock, attribute=attribute)
+                        stock.attrbibutes.add(**product_version.attributes.all())
 
         self.stdout.write('Successfully.')
