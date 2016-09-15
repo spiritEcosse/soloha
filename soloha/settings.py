@@ -77,7 +77,7 @@ INSTALLED_APPS = \
         'memoize',
         # 'smart_load_tag',
     ] + get_core_apps(['apps.catalogue', 'apps.promotions', 'apps.partner', 'apps.search', 'apps.order',
-                       'apps.basket', 'apps.checkout', 'apps.customer'])
+                       'apps.basket', 'apps.checkout'])
 
 SITE_ID = 1
 
