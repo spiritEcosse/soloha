@@ -1007,6 +1007,7 @@ class CustomAbstractCategory(MPTTModel):
         return icon
 
 
+# todo delete this model, after trans data
 @python_2_unicode_compatible
 class AbstractVersionAttribute(models.Model, CommonFeatureProduct):
     version = models.ForeignKey(
