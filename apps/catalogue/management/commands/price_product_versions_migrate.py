@@ -55,6 +55,7 @@ class Command(BaseCommand):
                 product.stockrecords.all().delete()
 
                 if not product.is_parent:
+                    print product.slug
                     StockRecordAttribute.objects.filter(stock_record__product=product).delete()
 
                     for product_version in product.versions.all():

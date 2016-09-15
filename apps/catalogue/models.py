@@ -40,7 +40,8 @@ class StockRecordAttribute(models.Model, CommonFeatureProduct):
 
         if current_attributes in search_attributes:
             raise IntegrityError(
-                u'UNIQUE constraint failed: catalogue_stockrecord.stockrecord_id, catalogue_stockrecord.attributes'.format(self.attribute)
+                u'UNIQUE constraint failed: catalogue_stockrecord.stockrecord_id, catalogue_stockrecord.attributes '
+                u'{} {}'.format(self.stock_record, self.attribute)
             )
         super(StockRecordAttribute, self).save(**kwargs)
 
