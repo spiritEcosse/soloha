@@ -126,7 +126,7 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
             $http.post('/catalogue/attr/' + selected_val.pk + '/product/' + clone_data.product.pk + '/').success (data) ->
                 selected_val.products = data.products
 
-                if data.product_primary_images and not selected_val.images?
+                if data.product_primary_images.length and not selected_val.images?
                     $scope.product_images = pk: data.product_primary_images[0].pk
 
                 selected_val.images = data.product_primary_images
@@ -153,16 +153,21 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
     set_price = () ->
         selected_attributes = []
 
-        angular.forEach $scope.attributes, (attribute) ->
+        attributes = $filter('orderBy')($scope.attributes, 'pk')
+
+        angular.forEach attributes, (attribute) ->
             if attribute.selected_val.pk != 0
+                console.log(attribute.selected_val)
                 selected_attributes.push(attribute.selected_val.pk)
         #    Todo igor: if selected_attributes is empty - message select - attribute for display price
 
-        exist_selected_attr = clone_data.product_versions[selected_attributes.toString()]
+        exist_selected_attr = clone_data.stockrecords[selected_attributes.toString()]
+
+        console.log(selected_attributes)
 
         if exist_selected_attr
             $scope.price = exist_selected_attr.price
-            $scope.product_version = exist_selected_attr.version_id
+            $scope.product_version = exist_selected_attr.stockrecord_id
             return exist_selected_attr.price
 
         return false
@@ -180,10 +185,14 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
                 attribute = $filter('filter')($scope.attributes, { pk: attr.pk })[0]
                 attribute.values = attr.values
 
+                # remove from if  -- and attr.values[1].visible
+
                 if attr.values[1] and attr.values[1].visible
                     attribute.selected_val = attr.values[1]
                 else if attribute.values
                     attribute.selected_val = attribute.values[0]
+
+                console.log('variant_attributes', attribute.selected_val)
                 get_prod(attribute.selected_val)
 
             if not set_price()

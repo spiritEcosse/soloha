@@ -23,8 +23,6 @@ BrowsableProductManagerCore = get_class('catalogue.managers', 'BrowsableProductM
 
 
 class CommonFeatureProduct(object):
-    product = None
-
     @property
     def product_slug(self):
         return self.product.slug
@@ -636,7 +634,14 @@ class AbstractFeature(MPTTModel):
     def get_absolute_url(self):
         return self.slug
 
-    def get_values(self, names_fields):
+    @property
+    def parent_pk(self):
+        parent = self.parent
+
+        if parent:
+            return parent.pk
+
+    def get_values(self, *names_fields):
         """
         get values by name field
         :param names_fields: name fields in this object
@@ -646,7 +651,8 @@ class AbstractFeature(MPTTModel):
         """
         data = {}
         for name_field in names_fields:
-            data[name_field] = getattr(self, name_field)
+            key = 'parent' if name_field == 'parent_pk' else name_field
+            data[key] = getattr(self, name_field)
         return data
 
 

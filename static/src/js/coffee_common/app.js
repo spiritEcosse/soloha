@@ -238,7 +238,7 @@
         if ((selected_val.products != null) && !selected_val.products.length || (selected_val.products == null)) {
           return $http.post('/catalogue/attr/' + selected_val.pk + '/product/' + clone_data.product.pk + '/').success(function(data) {
             selected_val.products = data.products;
-            if (data.product_primary_images && (selected_val.images == null)) {
+            if (data.product_primary_images.length && (selected_val.images == null)) {
               $scope.product_images = {
                 pk: data.product_primary_images[0].pk
               };
@@ -271,15 +271,18 @@
       set_price = function() {
         var exist_selected_attr, selected_attributes;
         selected_attributes = [];
-        angular.forEach($scope.attributes, function(attribute) {
+        attributes = $filter('orderBy')($scope.attributes, 'pk');
+        angular.forEach(attributes, function(attribute) {
           if (attribute.selected_val.pk !== 0) {
+            console.log(attribute.selected_val);
             return selected_attributes.push(attribute.selected_val.pk);
           }
         });
-        exist_selected_attr = clone_data.product_versions[selected_attributes.toString()];
+        exist_selected_attr = clone_data.stockrecords[selected_attributes.toString()];
+        console.log(selected_attributes);
         if (exist_selected_attr) {
           $scope.price = exist_selected_attr.price;
-          $scope.product_version = exist_selected_attr.version_id;
+          $scope.product_version = exist_selected_attr.stockrecord_id;
           return exist_selected_attr.price;
         }
         return false;
@@ -306,6 +309,7 @@
             } else if (attribute.values) {
               attribute.selected_val = attribute.values[0];
             }
+            console.log('variant_attributes', attribute.selected_val);
             return get_prod(attribute.selected_val);
           });
           if (!set_price()) {

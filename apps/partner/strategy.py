@@ -189,7 +189,7 @@ class UseFirstStockRecord(object):
     product was permitted.
     """
     def select_stockrecord(self, product):
-        return StockRecord.objects.filter(product_version__product=product).order_by('price_excl_tax').first()
+        return StockRecord.objects.filter(product=product).order_by('price_excl_tax').first()
 
 
 class StockRequired(object):
