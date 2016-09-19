@@ -153,9 +153,7 @@
           return $scope.parent = true;
         }
       };
-      $http.post($location.absUrl(), {
-        cache: true
-      }).success(function(data) {
+      $http.post($location.absUrl()).success(function(data) {
         clone_data = data;
         $scope.options = data.options;
         $scope.options_children = data.options_children;
