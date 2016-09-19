@@ -375,22 +375,19 @@ class CategoryResource(ModelResource):
 
 
 class ProductImageResource(ModelResource):
-    original = fields.Field(column_name='original', attribute='original',
-                            widget=widgets.ImageForeignKeyWidget(model=Image, field='original_filename'))
-    product_slug = fields.Field(column_name='product', attribute='product',
-                                widget=import_export_widgets.ForeignKeyWidget(model=Product, field='slug'))
+    original = fields.Field(
+        column_name='original', attribute='original',
+        widget=widgets.ForeignKeyWidget(model=Image, field='original_filename')
+    )
+    product_slug = fields.Field(
+        column_name='product', attribute='product',
+        widget=import_export_widgets.ForeignKeyWidget(model=Product, field='slug')
+    )
 
     class Meta:
         model = ProductImage
-        #ToDo delete column to start list
-        fields = ('id', 'product_slug', 'original', 'caption', 'display_order', 'delete', )
+        fields = ('id', 'delete', 'product_slug', 'original', 'caption', 'display_order', )
         export_order = fields
-
-    def dehydrate_original(self, obj):
-        if obj.original is not None:
-            return obj.original.file.name
-        else:
-            return ''
 
 
 class ProductRecommendationResource(ModelResource):
@@ -415,12 +412,6 @@ class ProductResource(ModelResource):
                                 widget=widgets.ManyToManyWidget(model=Feature, field='slug'))
     characteristics_slug = fields.Field(column_name='characteristics', attribute='characteristics',
                                         widget=widgets.ManyToManyWidget(model=Feature, field='slug'))
-    images = Field(column_name='images', attribute='images',
-                   widget=widgets.ImageManyToManyWidget(model=ProductImage, field='original'))
-    recommended_products = Field(column_name='recommended_products', attribute='recommended_products',
-                                 widget=widgets.IntermediateModelManyToManyWidget(
-                                     model=Product, field='slug',
-                                 ))
     parent = fields.Field(attribute='parent', column_name='parent', widget=import_export_widgets.ForeignKeyWidget(
         model=Product, field='slug'))
 
@@ -428,9 +419,5 @@ class ProductResource(ModelResource):
         model = Product
         fields = ('id', 'delete', 'title', 'slug', 'enable', 'structure', 'parent', 'h1', 'meta_title',
                   'meta_description', 'meta_keywords', 'description', 'categories_slug', 'filters_slug', 'characteristics_slug',
-                  'product_class', 'images', 'recommended_products', )
+                  'product_class', )
         export_order = fields
-
-    def dehydrate_images(self, obj):
-        images = [prod_image.original.file.name for prod_image in obj.images.all() if prod_image.original]
-        return ','.join(images)

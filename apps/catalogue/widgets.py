@@ -231,18 +231,18 @@ class CharWidget(import_export_widgets.Widget):
         return featured_value
 
 
-class ManyToManyWidget(import_export_widgets.ManyToManyWidget):
+class ForeignKeyWidget(import_export_widgets.ForeignKeyWidget):
     def clean(self, value):
+        return super(ForeignKeyWidget, self).clean(value.strip())
+
+
+class ManyToManyWidget(import_export_widgets.ManyToManyWidget):
+    def clean(self, value, row=None, *args, **kwargs):
         if not value:
             return self.model.objects.none()
+
         ids = filter(None, value.split(self.separator))
-        objects = []
-
-        with transaction.atomic():
-            for id in ids:
-                try:
-                    objects.append(self.model.objects.get(**{self.field: id}))
-                except ObjectDoesNotExist as e:
-                    raise ValueError('{} {}: \'{}\'.'.format(e, self.model._meta.object_name, id))
-
-        return objects
+        ids = map(lambda slug: slug.strip(), ids)
+        return self.model.objects.filter(**{
+            '%s__in' % self.field: ids
+        })
