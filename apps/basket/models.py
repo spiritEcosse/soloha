@@ -92,21 +92,19 @@ class Basket(AbstractBasket):
             defaults=defaults)
 
         if created:
-            attributes = self.annotate(line.stockrecord.attributes, product_images)
+            attributes = line.stockrecord.attributes.prefetch_related(*self.prefetch(product, product_images))
 
             for attribute in attributes:
-                print attribute
                 line_attributes = line.attributes.create(feature=attribute)
 
-                if attribute.product_features_exists:
+                if attribute.have_product_images:
                     line_attributes.product_images.add(product_images)
         else:
-            line_attributes = self.annotate(line.attributes, product_images, feature=True)
+            line_attributes = line.attributes.prefetch_related(*self.prefetch(product, product_images, feature=True))
 
             for line_attribute in line_attributes:
-                print line_attribute.feature
 
-                if line_attribute.product_features_exists:
+                if line_attribute.feature.have_product_images:
                     line_attribute.product_images.clear()
                     line_attribute.product_images.add(product_images)
 
