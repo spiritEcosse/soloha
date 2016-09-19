@@ -9,12 +9,11 @@ class BasketAddView(CoreBasketAddView):
 
         self.request.basket.add_product(
             form.product, form.cleaned_data['quantity'],
-            form.cleaned_options(), form.cleaned_data['product_version'],
+            form.cleaned_options(), form.cleaned_data['stockrecord'],
             form.cleaned_data['product_images']
         )
 
-        messages.success(self.request, self.get_success_message(form),
-                         extra_tags='safe noicon')
+        messages.success(self.request, self.get_success_message(form), extra_tags='safe noicon')
 
         # Check for additional offer messages
         apply_messages(self.request, offers_before)

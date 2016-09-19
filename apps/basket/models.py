@@ -4,7 +4,10 @@ from django.core.exceptions import ObjectDoesNotExist
 from oscar.core.loading import get_model
 from django.db.models.query import Prefetch
 from apps.catalogue.fiters import Filter
+from django.db.models import Case, When, BooleanField
+
 ProductFeature = get_model('catalogue', 'ProductFeature')
+StockRecord = get_model('partner', 'StockRecord')
 
 
 class Basket(AbstractBasket):
@@ -26,7 +29,7 @@ class Basket(AbstractBasket):
                                       'product__stockrecords'))
         return self._lines
 
-    def add_product(self, product, quantity=1, options=None, version=None, product_images=None):
+    def add_product(self, product, quantity=1, options=None, stockrecord=None, product_images=None):
         """
         Add a product to the basket
 
@@ -50,7 +53,10 @@ class Basket(AbstractBasket):
         # Ensure that all lines are the same currency
         price_currency = self.currency
 
-        stock_info = self.strategy.fetch_for_product(product, stockrecord=version.stockrecord)
+        stock_info = self.strategy.fetch_for_product(product, stockrecord=stockrecord)
+
+        # if not product_images:
+        #     product_images = self.get_product_images(stock_info.stockrecord)
 
         if price_currency and stock_info.price.currency != price_currency:
             raise ValueError((
@@ -66,7 +72,8 @@ class Basket(AbstractBasket):
         # Line reference is used to distinguish between variations of the same
         # product (eg T-shirts with different personalisations)
         line_ref = self._create_line_reference(
-            product, stock_info.stockrecord, options, version.attributes.all())
+            product, stock_info.stockrecord, options, stock_info.stockrecord.attributes.all()
+        )
 
         # Determine price to store (if one exists).  It is only stored for
         # audit and sometimes caching.
@@ -85,22 +92,21 @@ class Basket(AbstractBasket):
             defaults=defaults)
 
         if created:
-            attributes = line.stockrecord.product_version.attributes.prefetch_related(
-                *self.prefetch(product, product_images)
-            )
+            attributes = self.annotate(line.stockrecord.attributes, product_images)
 
             for attribute in attributes:
+                print attribute
                 line_attributes = line.attributes.create(feature=attribute)
 
-                if attribute.have_product_images:
+                if attribute.product_features_exists:
                     line_attributes.product_images.add(product_images)
         else:
-            line_attributes = line.attributes.select_related('feature').prefetch_related(
-                *self.prefetch(product, product_images, feature=True)
-            )
+            line_attributes = self.annotate(line.attributes, product_images, feature=True)
 
             for line_attribute in line_attributes:
-                if line_attribute.feature.have_product_images:
+                print line_attribute.feature
+
+                if line_attribute.product_features_exists:
                     line_attribute.product_images.clear()
                     line_attribute.product_images.add(product_images)
 
@@ -112,6 +118,22 @@ class Basket(AbstractBasket):
         return line, created
     add_product.alters_data = True
     add = add_product
+
+    def annotate(self, queryset, product_images, feature=False):
+        fields = 'feature__' if feature else ''
+        fields += 'product_features__product_with_images'
+
+        when_kwargs = {fields: product_images.product, 'then': True}
+
+        queryset = queryset.annotate(
+            product_features_exists=Case(
+                When(**when_kwargs),
+                default=False,
+                output_field=BooleanField()
+            )
+        ).distinct()
+
+        return queryset.all()
 
     def prefetch(self, product, product_images, feature=False):
         lookup = Filter(product=product)

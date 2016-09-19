@@ -10,7 +10,7 @@ from oscar.forms import widgets
 Line = get_model('basket', 'line')
 Basket = get_model('basket', 'basket')
 Product = get_model('catalogue', 'product')
-ProductVersion = get_model('catalogue', 'ProductVersion')
+StockRecord = get_model('partner', 'StockRecord')
 ProductImage = get_model('catalogue', 'ProductImage')
 
 
@@ -134,9 +134,9 @@ class BasketVoucherForm(forms.Form):
 
 class AddToBasketForm(forms.Form):
     quantity = forms.IntegerField(initial=1, min_value=1, label=_('Quantity'))
-    product_version = forms.ModelChoiceField(
-        queryset=ProductVersion.objects.all(),
-        widget=forms.HiddenInput(attrs={'ng-model': 'product_version', 'ng-value': 'product_version'}),
+    stockrecord = forms.ModelChoiceField(
+        queryset=StockRecord.objects.all(),
+        widget=forms.HiddenInput(attrs={'ng-model': 'stockrecord', 'ng-value': 'stockrecord'}),
         required=False
     )
     product_images = forms.ModelChoiceField(
@@ -255,7 +255,7 @@ class AddToBasketForm(forms.Form):
     def clean(self):
         info = self.basket.strategy.fetch_for_product(
             self.product,
-            stockrecord=self.cleaned_data['product_version'].stockrecord
+            stockrecord=self.cleaned_data['stockrecord']
         )
 
         # Check currencies are sensible

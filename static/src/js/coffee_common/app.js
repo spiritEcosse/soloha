@@ -282,7 +282,7 @@
         console.log(selected_attributes);
         if (exist_selected_attr) {
           $scope.price = exist_selected_attr.price;
-          $scope.product_version = exist_selected_attr.stockrecord_id;
+          $scope.stockrecord = exist_selected_attr.stockrecord_id;
           return exist_selected_attr.price;
         }
         return false;

@@ -1,5 +1,4 @@
 from oscar.apps.catalogue.views import ProductDetailView as CoreProductDetailView
-from oscar.apps.partner.strategy import Selector
 from django.utils.translation import ugettext_lazy as _
 from django.views import generic
 from django.views.generic import View
@@ -7,17 +6,12 @@ from oscar.core.loading import get_model
 from braces import views
 from django.views.generic.detail import SingleObjectMixin
 from django.db.models.query import Prefetch
-from django.db.models import Count
-from django.http import HttpResponsePermanentRedirect, Http404
+from django.http import HttpResponsePermanentRedirect
 from django.utils.http import urlquote
 from soloha.settings import OSCAR_PRODUCTS_PER_PAGE
-from django.shortcuts import get_object_or_404
-from django.db.models import F
 import json
-import warnings
 from django.db.models import Q
-from soloha import settings
-from django.db.models import Min, Sum
+from django.db.models import Min
 import operator
 import functools
 from django.http import HttpResponse
@@ -34,14 +28,9 @@ from easy_thumbnails.files import get_thumbnailer
 from django.core.exceptions import ObjectDoesNotExist
 from collections import namedtuple
 from itertools import groupby
-from django.db.models import Count, Case, When, IntegerField
-from memoize import memoize, delete_memoized, delete_memoized_verhash
-from soloha import settings
-from django.core.cache import cache
-from django.contrib.auth.models import User
 from oscar.apps.partner import prices
 from oscar.templatetags.currency_filters import currency
-from django.db.models import BooleanField, Case, Value, When
+from django.db.models import BooleanField, Case, When, Count
 
 logger = logging.getLogger(__name__)
 
