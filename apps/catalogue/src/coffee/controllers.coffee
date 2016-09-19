@@ -157,13 +157,10 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
 
         angular.forEach attributes, (attribute) ->
             if attribute.selected_val.pk != 0
-                console.log(attribute.selected_val)
                 selected_attributes.push(attribute.selected_val.pk)
         #    Todo igor: if selected_attributes is empty - message select - attribute for display price
 
         exist_selected_attr = clone_data.stockrecords[selected_attributes.toString()]
-
-        console.log(selected_attributes)
 
         if exist_selected_attr
             $scope.price = exist_selected_attr.price
@@ -192,7 +189,6 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
                 else if attribute.values
                     attribute.selected_val = attribute.values[0]
 
-                console.log('variant_attributes', attribute.selected_val)
                 get_prod(attribute.selected_val)
 
             if not set_price()

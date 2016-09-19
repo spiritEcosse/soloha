@@ -272,12 +272,10 @@
         attributes = $filter('orderBy')($scope.attributes, 'pk');
         angular.forEach(attributes, function(attribute) {
           if (attribute.selected_val.pk !== 0) {
-            console.log(attribute.selected_val);
             return selected_attributes.push(attribute.selected_val.pk);
           }
         });
         exist_selected_attr = clone_data.stockrecords[selected_attributes.toString()];
-        console.log(selected_attributes);
         if (exist_selected_attr) {
           $scope.price = exist_selected_attr.price;
           $scope.stockrecord = exist_selected_attr.stockrecord_id;
@@ -307,7 +305,6 @@
             } else if (attribute.values) {
               attribute.selected_val = attribute.values[0];
             }
-            console.log('variant_attributes', attribute.selected_val);
             return get_prod(attribute.selected_val);
           });
           if (!set_price()) {
