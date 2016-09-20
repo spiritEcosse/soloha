@@ -12,15 +12,14 @@ StockRecord = get_model('partner', 'StockRecord')
 
 class StockRecordAdmin(ImportExportMixin, ImportExportActionModelAdmin):
     resource_class = resources.StockRecordResource
-    list_display = ('pk', 'product', 'product_version',
+    list_display = ('pk', 'product',
                     # Todo uncomment after delete field - product
                     # 'thumb', 'product_enable', 'product_partner', 'product_categories_to_str',
                     'price_currency', 'price_excl_tax',
                     'price_retail', 'cost_price', 'num_in_stock', 'num_allocated', 'low_stock_threshold',)
-    search_fields = ('product_version__product__slug', 'product_version__product__title', 'product_version__product__pk', )
-    list_filter = ('date_created', 'date_updated', 'product_version__product__enable',
-                   'product_version__product__date_updated', 'product_version__product__categories',
-                   'product_version__product__partner', )
+    search_fields = ('product__slug', 'product__title', 'product__pk', )
+    list_filter = ('date_created', 'date_updated', 'product__enable', 'product__date_updated', 'product__categories',
+                   'product__partner', )
 
 
 class PartnerdAdmin(admin.ModelAdmin):

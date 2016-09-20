@@ -1,28 +1,31 @@
 {% load currency_filters %}
 {% load i18n %}
 {% load purchase_info_tags %}
+{% load catalogue %}
 
 {% purchase_info_for_product request product as session %}
 
-{% if session.price.exists %}
-    {% if session.price.excl_tax == 0 %}
-        <p class="price_color">{% trans "Free" %}</p>
-    {% elif session.price.is_tax_known %}
-        <p class="price_color">{{ session.price.incl_tax|currency:session.price.currency }}</p>
-    {% else %}
-        <p class="price_color">{{ session.price.excl_tax|currency:session.price.currency }}</p>
-    {% endif %}
-{% else %}
-    <p class="price_color">&nbsp;</p>
+{% assign price_color 'price_color' %}
+
+{% if mask %}
+    {% assign price_color 'price_color_white' %}
 {% endif %}
-<p class="{{ session.availability.code }} availability">
-    <i class="icon-{% if session.availability.is_available_to_buy %}ok{% else %}remove{% endif %}"></i>
-    {% if verbose %}
-        {{ session.availability.message }}
-    {% else %}
-        {{ session.availability.short_message }}
-    {% endif %}
-</p>
+
+{% if session.price.exists %}
+    <div class="{{ price_color }}">
+        {% if session.price.excl_tax == 0 %}
+            {% trans "Free" %}
+        {% elif session.price.is_tax_known %}
+            {{ session.price.incl_tax|currency:session.price.currency }}
+        {% else %}
+            {{ session.price.excl_tax|currency:session.price.currency }}
+        {% endif %}
+    </div>
+{% else %}
+    <div>
+        {% trans 'Price check with the manager.' %}
+    </div>
+{% endif %}
 
 
 

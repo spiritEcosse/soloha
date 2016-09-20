@@ -125,7 +125,6 @@ class StockRecordForm(forms.ModelForm):
     class Meta:
         model = StockRecord
         fields = '__all__'
-        exclude = ('partner_sku',)
         widgets = {
             'partner': autocomplete.ModelSelect2(url='partner-autocomplete')
         }

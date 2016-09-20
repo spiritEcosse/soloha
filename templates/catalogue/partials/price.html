@@ -16,17 +16,16 @@
                 <div class="pull-right">{% trans 'By order' %}</div>
             </div>
             <div class="panel-body">
-                {% with class_price="number" %}
+                {% with class_price="price_color"  %}
                     {% if session.price.exists %}
                         <div class="text-center wrapper-number" >
-                            {% trans "Price" %}:
                             {% assign price session.price.excl_tax|currency:session.price.currency %}
 
-                            <span {% if ng %} ng-class="'{{ class_price }}'" ng-bind="price" {% endif %} class="{{ class_price }}" >
-                            {% if not ng %}
-                                {{ price }}
-                            {% endif %}
-                        </span>
+                            <div {% if ng %} ng-class="'{{ class_price }}'" ng-bind="price" {% endif %} class="{{ class_price }}" >
+                                {% if not ng %}
+                                    {{ price }}
+                                {% endif %}
+                            </div>
                         </div>
                         <div class="row">
                             {% block product_basket_form %}

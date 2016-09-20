@@ -26,14 +26,14 @@ class AbstractStockRecord(models.Model, CommonFeatureProduct):
     product_version = models.OneToOneField(
         'catalogue.ProductVersion', related_name="stockrecord",
         verbose_name=_("Product Version"),
-        null=True
+        null=True, blank=True
     )
     attributes = models.ManyToManyField(
         'catalogue.Feature', verbose_name=_('Attributes'), related_name='stockrecords'
     )
 
     # ToDo delete this field, after pass data to product.partner
-    partner = models.ForeignKey('partner.Partner', verbose_name=_("Partner"),related_name='stockrecords', null=True)
+    partner = models.ForeignKey('partner.Partner', verbose_name=_("Partner"),related_name='stockrecords', null=True, blank=True)
 
     #: The fulfilment partner will often have their own SKU for a product,
     #: which we store here.  This will sometimes be the same the product's UPC
