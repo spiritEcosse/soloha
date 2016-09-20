@@ -55,9 +55,6 @@ class Basket(AbstractBasket):
 
         stock_info = self.strategy.fetch_for_product(product, stockrecord=stockrecord)
 
-        # if not product_images:
-        #     product_images = self.get_product_images(stock_info.stockrecord)
-
         if price_currency and stock_info.price.currency != price_currency:
             raise ValueError((
                                  "Basket lines must all have the same currency. Proposed "

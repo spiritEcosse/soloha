@@ -134,18 +134,6 @@ class BasketVoucherForm(forms.Form):
 
 class AddToBasketForm(forms.Form):
     quantity = forms.IntegerField(initial=1, min_value=1, label=_('Quantity'))
-    stockrecord = forms.ModelChoiceField(
-        queryset=StockRecord.objects.all(),
-        widget=forms.HiddenInput(attrs={'ng-model': 'stockrecord', 'ng-value': 'stockrecord'}),
-        required=False
-    )
-    product_images = forms.ModelChoiceField(
-        queryset=ProductImage.objects.all(),
-        widget=forms.HiddenInput(attrs={
-            'ng-model': 'product_images.pk', 'ng-value': 'product_images.pk'
-        }),
-        required=False
-    )
 
     def __init__(self, basket, product, *args, **kwargs):
         # Note, the product passed in here isn't necessarily the product being
@@ -157,7 +145,6 @@ class AddToBasketForm(forms.Form):
 
         super(AddToBasketForm, self).__init__(*args, **kwargs)
 
-        # Dynamically build fields
         # if product.is_parent:
         #     self._create_parent_product_fields(product)
         self._create_product_fields(product)
@@ -252,11 +239,38 @@ class AddToBasketForm(forms.Form):
         # method
         return getattr(self, 'child_product', self.parent_product)
 
+    def stockrecord_clean(self):
+        stockrecord = self.cleaned_data.get('stockrecord', None)
+
+        if stockrecord is None:
+            stockrecord = self.basket.strategy
+
+            if self.product.is_parent:
+                product, stockrecord = stockrecord.select_children_stockrecords(self.product)[0]
+            else:
+                stockrecord = stockrecord.select_stockrecord(self.product)
+
+        if self.product.is_parent:
+            try:
+                child = self.product.children.get(
+                    id=stockrecord.product.id
+                )
+            except Product.DoesNotExist:
+                raise forms.ValidationError(
+                    _("Please select a valid product"))
+        else:
+            child = stockrecord.product
+
+        # To avoid duplicate SQL queries, we cache a copy of the loaded child
+        # product as we're going to need it later.
+        self.child_product = child
+        self.stockrecord = stockrecord
+
+        return self.stockrecord
+
     def clean(self):
-        info = self.basket.strategy.fetch_for_product(
-            self.product,
-            stockrecord=self.cleaned_data['stockrecord']
-        )
+        self.stockrecord_clean()
+        info = self.basket.strategy.fetch_for_product(self.product, stockrecord=getattr(self, 'stockrecord', None))
 
         # Check currencies are sensible
         if (self.basket.currency and
@@ -298,3 +312,18 @@ class SimpleAddToBasketForm(AddToBasketForm):
     """
     quantity = forms.IntegerField(
         initial=1, min_value=1, widget=forms.HiddenInput, label=_('Quantity'))
+
+
+class AddToBasketWithAttributesForm(SimpleAddToBasketForm):
+    stockrecord = forms.ModelChoiceField(
+        queryset=StockRecord.objects.all(),
+        widget=forms.HiddenInput(attrs={'ng-model': 'stockrecord', 'ng-value': 'stockrecord'}),
+        required=False
+    )
+    product_images = forms.ModelChoiceField(
+        queryset=ProductImage.objects.all(),
+        widget=forms.HiddenInput(attrs={
+            'ng-model': 'product_images.pk', 'ng-value': 'product_images.pk'
+        }),
+        required=False
+    )

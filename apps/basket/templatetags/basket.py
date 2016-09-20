@@ -3,6 +3,7 @@ from django.template import Library, Node, Variable, TemplateSyntaxError
 from widget_tweaks.templatetags.widget_tweaks import FieldAttributeNode
 from django.template.debug import DebugParser
 from django import template
+from apps.basket.forms import AddToBasketWithAttributesForm
 from oscar.core.loading import get_model
 from oscar.core.loading import get_class
 
@@ -74,4 +75,18 @@ def basket_form(request, product, quantity_type='single'):
 
     form = form_class(request.basket, product=product, initial=initial)
 
+    return form
+
+
+@register.assignment_tag()
+def basket_form_with_attributes(request, product, quantity_type='single'):
+    if not isinstance(product, Product):
+        return ''
+
+    initial = {}
+    if not product.is_parent:
+        initial['product_id'] = product.id
+
+    form_class = AddToBasketWithAttributesForm
+    form = form_class(request.basket, product=product, initial=initial)
     return form

@@ -92,7 +92,7 @@ class AbstractStockRecord(models.Model, CommonFeatureProduct):
     def __str__(self):
         msg = u"ProductStockRecord %s of Product: %s" % (
             getattr(self, 'pk', None),
-            getattr(self, 'product_version.product.title', None)
+            getattr(self, 'product', None)
         )
         if self.partner_sku:
             msg = u"%s (%s)" % (msg, self.partner_sku)
