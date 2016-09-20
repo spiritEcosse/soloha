@@ -96,7 +96,7 @@
                                         {% assign clear_filter selected_filters|remove:value %}
                                         {% trans 'Clear' as title %}
                                     {% else %}
-                                        {% assign clear_filter selected_filters|append:value %}
+                                        {% assign clear_filter selected_filters|append:value|dictsort:'pk' %}
                                         {% trans 'Choose' as title %}
                                     {% endif %}
 

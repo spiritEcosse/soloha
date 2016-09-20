@@ -1,7 +1,6 @@
 from django.core.urlresolvers import reverse
 from django import template
 from django.template import Node, Library, TemplateSyntaxError, VariableDoesNotExist, NodeList, resolve_variable
-import pymorphy2
 
 register = Library()
 

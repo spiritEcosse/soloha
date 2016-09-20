@@ -5,16 +5,13 @@ from django.views.generic import View
 from oscar.core.loading import get_model
 from braces import views
 from django.views.generic.detail import SingleObjectMixin
-from django.db.models.query import Prefetch
-from django.http import HttpResponsePermanentRedirect
+from django.http import HttpResponsePermanentRedirect, HttpResponse, Http404
 from django.utils.http import urlquote
 from soloha.settings import OSCAR_PRODUCTS_PER_PAGE
 import json
-from django.db.models import Q
-from django.db.models import Min
+from django.db.models import Min, Q, Prefetch, BooleanField, Case, When, Count
 import operator
 import functools
-from django.http import HttpResponse
 import logging
 from decimal import Decimal as D
 from decimal import ROUND_DOWN
@@ -30,7 +27,7 @@ from collections import namedtuple
 from itertools import groupby
 from oscar.apps.partner import prices
 from oscar.templatetags.currency_filters import currency
-from django.db.models import BooleanField, Case, When, Count
+from django.utils.functional import cached_property
 
 logger = logging.getLogger(__name__)
 
@@ -73,7 +70,7 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
     template_name = 'catalogue/category.html'
     enforce_paths = True
     model = Product
-    model_single_object = Category
+    model_category = Category
     paginate_by = OSCAR_PRODUCTS_PER_PAGE
     orders = (
         Order(title='By popularity', column='-views_count', argument='popularity'),
@@ -83,6 +80,7 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
     use_keys = ('sort', 'filter_slug', )
     feature_only = ('title', 'slug', 'parent__id', 'parent__title', )
     feature_orders = ('parent__sort', 'parent__title',)
+    filter_slug = 'filter_slug'
 
     def post(self, request, *args, **kwargs):
         if self.request.is_ajax():
@@ -116,8 +114,12 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
         context['sorting_type'] = self.kwargs['sorting_type']
         return context
 
+    @property
+    def object(self):
+        return self.get_object(queryset=self.model_category.objects.filter(enable=True))
+
     def get(self, request, *args, **kwargs):
-        self.object = self.get_object(queryset=self.model_single_object.objects.filter(enable=True))
+        self.kwargs['filter_slug_objects'] = self.selected_filters
         potential_redirect = self.redirect_if_necessary(request.path, self.object)
 
         if potential_redirect is not None:
@@ -125,14 +127,21 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
 
         return super(ProductCategoryView, self).get(request, *args, **kwargs)
 
-    def get_object(self, queryset=None):
-        self.kwargs['slug'] = self.kwargs['category_slug'].split(Category._slug_separator)[-1]
-        obj = super(ProductCategoryView, self).get_object(queryset=queryset)
-        filter_slug = self.kwargs.get('filter_slug').split('/') if self.kwargs.get('filter_slug') else []
-        self.selected_filters = Feature.objects.only(*self.feature_only).select_related('parent').filter(
+    @cached_property
+    def selected_filters(self):
+        filter_slug = self.kwargs.get(self.filter_slug).split('/') if self.kwargs.get(self.filter_slug) else []
+        features = Feature.objects.only(*self.feature_only).select_related('parent').filter(
             slug__in=filter_slug, level=1
-        ).order_by(*self.feature_orders)
-        return obj
+        ).order_by('pk')
+
+        if len(filter_slug) != features.count():
+            raise Http404('"%s" does not exist' % self.request.get_full_path())
+
+        return features
+
+    def get_object(self, queryset=None):
+        self.kwargs['slug'] = self.kwargs['category_slug'].split(self.model_category._slug_separator)[-1]
+        return super(ProductCategoryView, self).get_object(queryset=queryset)
 
     def redirect_if_necessary(self, current_path, category):
         if self.enforce_paths:
@@ -301,6 +310,7 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
     only = ['title', 'pk']
     lookup_parent = '__parent'
 
+    #Todo remove else statement, because this not have mind
     def get_object(self, queryset=None):
         if hasattr(self, 'object'):
             return self.object

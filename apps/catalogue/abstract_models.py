@@ -602,6 +602,7 @@ class AbstractFeature(MPTTModel):
     created = models.DateTimeField(auto_now_add=True)
     bottom_line = models.IntegerField(verbose_name=_('Bottom line size'), blank=True, null=True)
     top_line = models.IntegerField(verbose_name=_('Top line size'), blank=True, null=True)
+    slug_separator = '/'
 
     class MPTTMeta:
         order_insertion_by = ('sort', 'title', )
@@ -911,8 +912,15 @@ class CustomAbstractCategory(MPTTModel):
         """
         dict_values = {'category_slug': self.full_slug}
 
-        if values.get('filter_slug'):
-            dict_values.update({'filter_slug': values.get('filter_slug')})
+        if values.get('filter_slug_objects'):
+            filter_slug = values.get('filter_slug_objects').values_list('slug', flat=True)
+            filter_slug = AbstractFeature.slug_separator.join(filter_slug)
+
+            dict_values.update(
+                {
+                    'filter_slug': filter_slug
+                }
+            )
 
         if values.get('page') and int(values.get('page')) != 1:
             dict_values.update({'page': values.get('page')})
