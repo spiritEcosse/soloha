@@ -1,6 +1,7 @@
 from django.core.urlresolvers import reverse
 from django import template
 from django.template import Node, Library, TemplateSyntaxError, VariableDoesNotExist, NodeList, resolve_variable
+import re
 
 register = Library()
 
@@ -142,3 +143,24 @@ def subtract(value, arg):
 @register.simple_tag
 def join_by_attribute(list, separator, attribute):
     return separator.join([getattr(obj, attribute) for obj in list])
+
+
+class StringStripNode(template.Node):
+    def __init__(self, nodelist):
+        self.nodelist = nodelist
+
+    def render(self, context):
+        output = self.nodelist.render(context)
+        output = re.sub(r'\s+', ' ', output)
+        output = re.sub(r'\n', ' ', output)
+        output = re.sub(r'\t', ' ', output)
+        output = re.sub(r' , ', ', ', output)
+        output = output.strip()
+        return output
+
+
+@register.tag
+def string_strip(parser, token):
+    nodelist = parser.parse(('end_string_strip',))
+    parser.delete_first_token()
+    return StringStripNode(nodelist)

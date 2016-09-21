@@ -10,25 +10,39 @@
 {% load i18n %}
 {% load filters_concatenation %}
 
-{% block meta %}
-    {% if page or selected_filters.exists %}
-        <meta name="robots" content="nofollow" />
+{% block meta_robots %}
+    {{ block.super }}
+    {% if page or url_extra_kwargs.sort %}
+        , noindex, nofollow
     {% endif %}
 {% endblock %}
 
 {#{% block ngController %}ng-controller="" {% endblock ngController %}#}
 {% block ngController%}ng-controller="More_goods"{% endblock ngController %}
 
+{# Todo refactoring remove {% regroup selected_filters by parent as group_filters %} and query from db #}
 {% block title %}
-    {% if selected_filters.exists %}{% include 'catalogue/partials/meta_tags.html' %}.{% endif %}{{ category.meta_title }} | {{ block.super }}
+    {% if selected_filters.exists %}
+        {% include 'catalogue/partials/meta_tags.html' %}.
+    {% endif %}
+    {{ category.meta_title }} | {{ block.super }}
 {% endblock %}
 
+{# Todo refactoring remove {% regroup selected_filters by parent as group_filters %} and query from db #}
 {% block description %}
-    {% if selected_filters.exists %}{% include 'catalogue/partials/meta_tags.html' %}.{% endif %}{{ category.meta_description|default:""|striptags }}
+    {% if selected_filters.exists %}
+        {% include 'catalogue/partials/meta_tags.html' %}.
+    {% endif %}
+    {{ category.meta_description|default:""|striptags }}
 {% endblock %}
 
+{# Todo refactoring remove {% regroup selected_filters by parent as group_filters %} and query from db #}
 {% block keywords %}
-    {% if selected_filters.exists %}{% include 'catalogue/partials/meta_tags.html' %}{% else %}{{ category.meta_keywords|default:""|striptags }}{% endif %}
+    {% if selected_filters.exists %}
+        {% include 'catalogue/partials/meta_tags.html' %}
+    {% else %}
+        {{ category.meta_keywords|default:""|striptags }}
+    {% endif %}
 {% endblock %}
 
 {% block left-bar %}
