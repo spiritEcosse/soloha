@@ -6,27 +6,26 @@
 
   app_name = 'soloha';
 
-  app = angular.module(app_name, ['ngResource', 'ngRoute', 'ng.django.forms', 'ui.bootstrap', 'ngAnimate', 'duScroll']);
+  app = angular.module(app_name, ['ngResource', 'ngRoute', 'ng.django.forms', 'ui.bootstrap', 'ngAnimate', 'duScroll', 'ng.django.urls']);
+
+  app.config([
+    '$httpProvider', function($httpProvider) {
+      $httpProvider.defaults.xsrfCookieName = 'csrftoken';
+      $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
+      $httpProvider.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+      return $httpProvider.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
+    }
+  ]);
 
 }).call(this);
 
-
-/* Controllers */
-
 (function() {
+  'use strict';
   var app, app_name;
 
   app_name = 'soloha';
 
   app = angular.module(app_name);
-
-  app.config([
-    '$httpProvider', '$routeProvider', function($httpProvider) {
-      $httpProvider.defaults.xsrfCookieName = 'csrftoken';
-      $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
-      return $httpProvider.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
-    }
-  ]);
 
   app.controller('Header', [
     '$http', '$scope', '$location', '$window', '$document', '$log', '$cacheFactory', function($http, $scope, $location, $window, $document, $log, $cacheFactory) {
@@ -61,14 +60,6 @@
   app_name = 'soloha';
 
   app = angular.module(app_name);
-
-  app.config([
-    '$httpProvider', function($httpProvider) {
-      $httpProvider.defaults.xsrfCookieName = 'csrftoken';
-      $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
-      return $httpProvider.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
-    }
-  ]);
 
   app.filter('search_by_title', function() {
     return function(list, needle) {
@@ -122,27 +113,8 @@
     };
   });
 
-  app.directive('focusMe', function($timeout, $parse) {
-    return {
-      link: function(scope, element, attrs) {
-        var model;
-        model = $parse(attrs.focusMe);
-        scope.$watch(model, function(value) {
-          if (value === true) {
-            $timeout(function() {
-              element[0].focus();
-            });
-          }
-        });
-        element.bind('blur', function() {
-          scope.$apply(model.assign(scope, false));
-        });
-      }
-    };
-  });
-
   app.controller('Product', [
-    '$http', '$scope', '$window', '$document', '$location', '$compile', '$filter', 'djangoForm', '$rootScope', function($http, $scope, $window, $document, $location, $compile, $filter, djangoForm, $rootScope) {
+    '$http', '$scope', '$window', '$document', '$location', '$compile', '$filter', 'djangoForm', '$rootScope', 'djangoUrl', function($http, $scope, $window, $document, $location, $compile, $filter, djangoForm, $rootScope, djangoUrl) {
       var attributes, clone_attributes, clone_data, get_prod, set_price;
       $scope.product = [];
       $scope.product.values = [];
@@ -155,12 +127,12 @@
       $scope.product.custom_values = [];
       $scope.product.custom_value = [];
       $scope.product.dict_attributes = [];
-      $scope.product.query_attr = [];
+      $scope.query_attr = [];
       $scope.send_form = false;
       $scope.alert_mode = 'success';
       $scope.prod_images = [];
       $scope.product_primary_images = [];
-      $scope.selected_image = [];
+      $scope.product_images = null;
       $rootScope.Object = Object;
       $rootScope.keys = Object.keys;
       $scope.sent_signal = [];
@@ -190,13 +162,19 @@
         angular.copy(data.attributes, clone_attributes);
         $scope.product = data.product;
         $scope.product.custom_values = $scope.isOpen = $scope.product.dict_attributes = $scope.product.custom_value = [];
-        return angular.forEach($scope.attributes, function(attr) {
+        angular.forEach($scope.attributes, function(attr) {
           attributes.push(attr.pk);
+          if (attr.selected_val.images.length) {
+            $scope.product_images = {
+              pk: attr.selected_val.images[0].pk
+            };
+          }
           $scope.product.dict_attributes[attr.pk] = attr;
           $scope.product.custom_value[attr.pk] = null;
           $scope.isOpen[attr.pk] = false;
           return $scope.product.custom_values[attr.pk] = [];
         });
+        return $scope.price_start = set_price();
       }).error(function() {
         return console.error('An error occurred during submission');
       });
@@ -258,6 +236,11 @@
         if ((selected_val.products != null) && !selected_val.products.length || (selected_val.products == null)) {
           return $http.post('/catalogue/attr/' + selected_val.pk + '/product/' + clone_data.product.pk + '/').success(function(data) {
             selected_val.products = data.products;
+            if (data.product_primary_images.length && (selected_val.images == null)) {
+              $scope.product_images = {
+                pk: data.product_primary_images[0].pk
+              };
+            }
             return selected_val.images = data.product_primary_images;
           }).error(function() {
             return console.error('An error occurred during submission');
@@ -286,16 +269,19 @@
       set_price = function() {
         var exist_selected_attr, selected_attributes;
         selected_attributes = [];
-        angular.forEach($scope.attributes, function(attribute) {
+        attributes = $filter('orderBy')($scope.attributes, 'pk');
+        angular.forEach(attributes, function(attribute) {
           if (attribute.selected_val.pk !== 0) {
             return selected_attributes.push(attribute.selected_val.pk);
           }
         });
-        exist_selected_attr = clone_data.product_versions[selected_attributes.toString()];
+        exist_selected_attr = clone_data.stockrecords[selected_attributes.toString()];
         if (exist_selected_attr) {
-          $scope.price = exist_selected_attr;
+          $scope.price = exist_selected_attr.price;
+          $scope.stockrecord = exist_selected_attr.stockrecord_id;
+          return exist_selected_attr.price;
         }
-        return exist_selected_attr;
+        return false;
       };
       $scope.update_price = function(value, current_attribute) {
         current_attribute.selected_val = value;
@@ -314,8 +300,8 @@
               pk: attr.pk
             })[0];
             attribute.values = attr.values;
-            if (attr.in_group[1] && attr.in_group[1].visible) {
-              attribute.selected_val = attr.in_group[1];
+            if (attr.values[1] && attr.values[1].visible) {
+              attribute.selected_val = attr.values[1];
             } else if (attribute.values) {
               attribute.selected_val = attribute.values[0];
             }
@@ -448,14 +434,6 @@
 
   app = angular.module(app_name);
 
-  app.config([
-    '$httpProvider', function($httpProvider) {
-      $httpProvider.defaults.xsrfCookieName = 'csrftoken';
-      $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
-      return $httpProvider.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
-    }
-  ]);
-
   app.controller('Contacts', [
     '$http', '$scope', '$window', 'djangoForm', '$document', function($http, $scope, $window, djangoForm, $document) {
       $scope.alerts = [];
@@ -493,21 +471,11 @@
 
 (function() {
   'use strict';
-
-  /* Controllers */
   var app, app_name;
 
   app_name = "soloha";
 
   app = angular.module(app_name);
-
-  app.config([
-    '$httpProvider', function($httpProvider) {
-      $httpProvider.defaults.xsrfCookieName = 'csrftoken';
-      $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
-      return $httpProvider.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
-    }
-  ]);
 
   app.controller('Search', [
     '$http', '$scope', '$window', '$document', '$location', '$routeParams', '$compile', function($http, $scope, $window, $document, $location, $routeParams, $compile) {
@@ -560,21 +528,11 @@
 
 (function() {
   'use strict';
-
-  /* Controllers */
   var app, app_name;
 
   app_name = "soloha";
 
   app = angular.module(app_name);
-
-  app.config([
-    '$httpProvider', function($httpProvider) {
-      $httpProvider.defaults.xsrfCookieName = 'csrftoken';
-      $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
-      return $httpProvider.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
-    }
-  ]);
 
   app.controller('Subscribe', [
     '$http', '$scope', '$window', 'djangoForm', '$document', '$location', function($http, $scope, $window, djangoForm, $document, $location) {

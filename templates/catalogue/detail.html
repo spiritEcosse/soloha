@@ -11,6 +11,7 @@
 {% load thumbnail %}
 {% load product %}
 {% load djangular_tags %}
+{% load catalogue %}
 
 {% block styles %}
     {{ block.super }}
@@ -20,7 +21,6 @@
 
 {% block extrascripts %}
     {{ block.super }}
-    <script src="{% static 'bower_components/lightslider/dist/js/lightslider.min.js' %}"></script>
     <script src="{% static 'src/js/product.js' %}"></script>
     <script src="//blueimp.github.io/Gallery/js/jquery.blueimp-gallery.min.js"></script>
     <script src="{% static "bower_components/blueimp-bootstrap-image-gallery/js/bootstrap-image-gallery.min.js" %}"></script>
@@ -67,10 +67,10 @@
 
 {% block headertext %}{{ product.get_title }}{% endblock %}
 
+{% assign product|is_review_permitted:user is_review_permitted %}
+
 {% block content %}
     <div class="col-xs-24 content product" id="info">
-        {% csrf_token %}
-
         {% if user.is_authenticated and user.is_staff %}
             <a class="pull-right hidden-xs" href="{% url 'dashboard:catalogue-product' pk=product.id %}">
                 <small><i class="icon-edit"></i> {% trans "Edit this product" %}</small>
@@ -128,23 +128,34 @@
                 </div>
             </div>
             <div id="section3" class="col-xs-24 col-sm-11 col-md-15" >
-                <div class="row common" >
-                    {% include "catalogue/partials/price.html" %}
+                <div class="row common">
+                    <div ng-if="price">
+                        {% include "catalogue/partials/price.html" with ng=1 %}
+                    </div>
+                    <div ng-if="!price">
+                        {% include "catalogue/partials/price.html" with ng=0 %}
+                    </div>
 
                     {% if attributes %}
                         <div class="col-xs-24 col-sm-24 col-md-14 options">
                             <span class="relation">{% trans "*The price depends on the selected parameters:" %}</span>
+
                             <div class="list_attr" ng-if="!attributes">
                                 {% for attribute in attributes %}
                                     {% include "catalogue/product/attributes/attributes.html" with ng=0 %}
                                 {% endfor %}
                             </div>
+
                             <div class="list_attr" ng-if="attributes">
                                 {% include "catalogue/product/attributes/attributes.html" with ng=1 %}
                             </div>
                         </div>
                     {% endif %}
                 </div>
+
+                {% if object.children.exists %}
+                    {% include 'catalogue/partials/child.html' %}
+                {% endif %}
 
                 {% if options %}
                     <div class="col-xs-24 tab-content-info">
@@ -162,6 +173,7 @@
                 {% endif %}
 
                 {% include "catalogue/partials/characteristics.html" %}
+
                 {% block product_description %}
                     {% if product.description %}
                         <div class="panel panel-default" id="description">
@@ -197,7 +209,7 @@
                                         </div>
                                         {% if product.num_approved_reviews == 0 %}
                                             <p>
-                                                {% if product|is_review_permitted:user %}
+                                                {% if is_review_permitted %}
                                                     {% url 'catalogue:reviews-add' product_slug=product.slug product_pk=product.id as add_review_url %}
                                                     {% blocktrans %}This product does not have any reviews yet -
                                                         <a href="{{ add_review_url }}#addreview">be the first to write one</a>.

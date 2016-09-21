@@ -9,6 +9,7 @@ from django.contrib.postgres.fields import ArrayField
 from django.forms import TextInput
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.flatpages.admin import FlatPageAdmin
+from django.db import IntegrityError
 
 __all__ = ['ProductAttributesContainer']
 

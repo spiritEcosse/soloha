@@ -119,13 +119,16 @@
                             <div class="image_container">
                                 <a href="{{ form.instance.product.get_absolute_url }}">
                                     <img class="img-responsive thumbnail"
-                                         src="{{ line.product.primary_image|thumbnail_url:'checkout' }}"
+                                         src="{{ line.product.primary_image.original|thumbnail_url:'checkout' }}"
                                          alt="{{ product.get_title }}">
                                 </a>
                             </div>
                         </div>
                         <div class="col-sm-12">
-                            <h3><a href="{{ line.product.get_absolute_url }}">{{ line.description }}</a></h3>
+                            <p>
+                                <a href="{{ product.get_absolute_url }}">{{ product.get_title }}</a>
+                            </p>
+                            {% include 'basket/partials/basket_line_attributes.html' %}
                             <span class="availability {{ session.availability.code }}">{{ session.availability.message }}</span>
                         </div>
                         <div class="col-sm-4 text-center">

@@ -67,11 +67,14 @@ INSTALLED_APPS = \
         'filer',
         'apps.contacts',
         'apps.ex_sites',
+        'apps.ex_redirects',
         'import_export',
         'ckeditor',
         'apps.sitemap',
         'apps.subscribe',
+        'apps.ex_flatpages',
         'bootstrap_pagination',
+        'memoize',
         # 'smart_load_tag',
     ] + get_core_apps(['apps.catalogue', 'apps.promotions', 'apps.partner', 'apps.search', 'apps.order',
                        'apps.basket', 'apps.checkout'])
@@ -82,7 +85,6 @@ MIDDLEWARE_CLASSES = settings_local.MIDDLEWARE_CLASSES
 ROOT_URLCONF = 'soloha.urls'
 
 DJANGO_LIVE_TEST_SERVER_ADDRESS = "localhost:8000-8010,8080,9200-9300"
-
 
 TEMPLATES = [
     {
@@ -181,7 +183,7 @@ CKEDITOR_CONFIGS = {
 
 CACHES = settings_local.CACHES
 CACHE_MIDDLEWARE_SECONDS = settings_local.CACHE_MIDDLEWARE_SECONDS
-CACHE_MIDDLEWARE_KEY_PREFIX = settings_local.CACHE_MIDDLEWARE_KEY_PREFIX
+KEY_PREFIX = settings_local.KEY_PREFIX
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
@@ -304,6 +306,7 @@ THUMBNAIL_ALIASES = {
     '': {
         'category_icon': {'size': (50, 30), 'crop': True},
         'basket_quick': {'size': (85, 50), 'crop': True},
+        'basket_quick_product_image': {'size': (30, 30), 'crop': True},
         'basket_content': {'size': (150, 150), 'crop': True},
         'checkout': {'size': (150, 150), 'crop': True},
         'home_thumb_slide': {'size': (1170, 392), 'crop': True},
@@ -312,3 +315,15 @@ THUMBNAIL_ALIASES = {
 
 
 OSCAR_SHOP_NAME = 'soloha'
+DEBUG_TOOLBAR_CONFIG = settings_local.DEBUG_TOOLBAR_CONFIG
+SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
+USE_ETAGS = not DEBUG
+
+HTML_MINIFY = not DEBUG
+KEEP_COMMENTS_ON_MINIFYING = False
+EXCLUDE_FROM_MINIFYING = ('^spirit/', )
+SECURE_CONTENT_TYPE_NOSNIFF = True
+#SESSION_COOKIE_SECURE = True
+#CSRF_COOKIE_SECURE = True
+SECURE_BROWSER_XSS_FILTER = True
+X_FRAME_OPTIONS = 'DENY'

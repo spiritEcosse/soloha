@@ -4,53 +4,127 @@
 {% load promotion_tags %}
 {% load category_tags %}
 {% load product_tags %}
+{% load catalogue %}
+{% load product %}
 {% load staticfiles %}
 {% load i18n %}
+{% load filters_concatenation %}
+
+{% block meta_robots %}
+    {{ block.super }}
+    {% if page or url_extra_kwargs.sort %}
+        , noindex, nofollow
+    {% endif %}
+{% endblock %}
 
 {#{% block ngController %}ng-controller="" {% endblock ngController %}#}
 {% block ngController%}ng-controller="More_goods"{% endblock ngController %}
 
-{% load filters_concatenation %}
-
+{# Todo refactoring remove {% regroup selected_filters by parent as group_filters %} and query from db #}
 {% block title %}
+    {% if selected_filters.exists %}
+        {% include 'catalogue/partials/meta_tags.html' %}.
+    {% endif %}
     {{ category.meta_title }} | {{ block.super }}
 {% endblock %}
 
+{# Todo refactoring remove {% regroup selected_filters by parent as group_filters %} and query from db #}
 {% block description %}
+    {% if selected_filters.exists %}
+        {% include 'catalogue/partials/meta_tags.html' %}.
+    {% endif %}
     {{ category.meta_description|default:""|striptags }}
 {% endblock %}
 
+{# Todo refactoring remove {% regroup selected_filters by parent as group_filters %} and query from db #}
 {% block keywords %}
-    {{ category.meta_keywords|default:""|striptags }}
+    {% if selected_filters.exists %}
+        {% include 'catalogue/partials/meta_tags.html' %}
+    {% else %}
+        {{ category.meta_keywords|default:""|striptags }}
+    {% endif %}
 {% endblock %}
 
 {% block left-bar %}
-    {% if filters %}
-        <div class="heading">Подбор по параметрам</div>
+    {% if filters.exists %}
+        {% assign trancate_filter 32 %}
+        {% assign trancate_filter_value 23 %}
+        {% if selected_filters.exists %}
+            {% regroup selected_filters by parent as group_filters %}
+            {% assign filter_parents group_filters|fetch_from_dict:'grouper' %}
+
+            <div class="heading">{% trans 'Selected' %}</div>
+            <div class="filter">
+                {% for filter in group_filters %}
+                    <div class="items">
+                        <div class="name" title="{{ filter.grouper.title }}">
+                            {{ filter.grouper.title|truncatechars:trancate_filter }}
+                        </div>
+                        <div class="values">
+                            <ul class="list-group">
+                                {% for value in filter.list %}
+                                    <li class="list-group-item checkbox">
+                                        {% assign clear_filter selected_filters|remove:value %}
+                                        {% trans 'Clear' as title %}
+
+                                        <a class="btn btn-default btn-block active"
+                                           href="{% reverse_url 'catalogue:category' url_extra_kwargs filter_slug=clear_filter|join_slug:"/"|default:None %}"
+                                           title="{{ title }} {{ value.title|lower }}" aria-label="{{ title }} {{ value.title|lower }}">
+                                            {{ value.title|truncatechars:trancate_filter_value }}
+                                            <span class="glyphicon glyphicon-remove pull-right" aria-hidden="true"></span>
+                                        </a>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <div class="heading">{% trans 'Selection of parameters' %}</div>
         <div class="filter">
+            {% regroup filters by parent as filters %}
+
             {% for filter in filters %}
+                {% if filter_parents %}
+                    {% assign filter_in_parents filter.grouper|in_list:filter_parents %}
+                {% endif %}
+
                 <div class="items">
-                    <div class="name" >{{ filter }}</div>
+                    <div class="name" title="{{ filter.grouper.title }}">
+                        {{ filter.grouper.title|truncatechars:trancate_filter }}
+                    </div>
                     <div class="values">
                         <ul class="list-group">
-                            {% for filter_value in filter.children_in_products %}
+                            {% for value in filter.list %}
+                                {% assign add '' %}
+
+                                {% if filter_in_parents and value.potential_products_count %}
+                                    {% assign add '+' %}
+                                {% endif %}
+
                                 <li class="list-group-item checkbox">
-                                    <label>
-                                        {# ToDo open tag a once #}
-                                        {% for sorting_url, text, is_active, link in sort_types %}
-                                            {% if is_active %}
-                                                <a href="{% concatenate category filter_slug filter_value %}?{{ link }}">
-                                                {% if filter_value.get_absolute_url in filter_slug %}
-                                                    <input type="checkbox" checked onclick="location.href='{% concatenate category filter_slug filter_value %}?{{ link }}'"/>
-                                                {% else %}
-                                                    <input type="checkbox" onclick="location.href='{% concatenate category filter_slug filter_value %}?{{ link }}'"/>
-                                                {% endif %}
-                                            {% endif %}
-                                        {% endfor %}
-                                        {{ filter_value.title }}
-                                        <span class="count">({{ filter_value.num_prod }})</span>
-                                        </a>
-                                    </label>
+                                    {% if value|in_list:selected_filters %}
+                                        {% assign clear_filter selected_filters|remove:value %}
+                                        {% trans 'Clear' as title %}
+                                    {% else %}
+                                        {% assign clear_filter selected_filters|append:value|dictsort:'pk' %}
+                                        {% trans 'Choose' as title %}
+                                    {% endif %}
+
+                                    <a href="{% reverse_url 'catalogue:category' url_extra_kwargs filter_slug=clear_filter|join_slug:"/"|default:None %}"
+                                       class="btn btn-default btn-block
+                                       {% if value|in_list:selected_filters %}active
+                                       {% elif not value.potential_products_count %} disabled{% endif %}"
+                                       title="{{ title }} {{ value.title|lower }}" aria-label="{{ title }} {{ value.title|lower }}">
+                                        {{ value.title|truncatechars:trancate_filter_value }}
+                                        {% if value|in_list:selected_filters %}
+                                            <span class="glyphicon glyphicon-remove pull-right" aria-hidden="true"></span>
+                                        {% else %}
+                                            <span class="count">({{ add }}{{ value.potential_products_count }})</span>
+                                        {% endif %}
+                                    </a>
                                 </li>
                             {% endfor %}
                         </ul>
@@ -88,8 +162,8 @@
                             {% for children in category.children.all %}
                                 <div class="col-xs-12 col-sm-4 item text-center">
                                     <a href="{{ children.get_absolute_url }}">
-                                        <img src="/media/images/make_up/almeriya1-200x100-.png" class="img-responsive"/>
-                                        <div class="title">{{ children }}</div>
+                                        <img src="" class="img-responsive"/>
+                                        <div class="title"></div>
                                     </a>
                                 </div>
                             {% endfor %}
@@ -110,41 +184,45 @@
         <div class="col-xs-16">
             <span class="text">Сортировать:</span>
             <div class="btn-group btn-group-md" role="group" aria-label="Sort">
-                {% for sorting_url, name, is_active in sort_types %}
-                    {% if is_active %}
-                        <a href="{{ sorting_url }}" type="button" class="btn btn-default btn-danger">{{ name }}</a>
-                    {% else %}
-                        <a href="{{ sorting_url }}" type="button" class="btn btn-default"> {{ name }}</a>
-                    {% endif %}
-                {% endfor %}
+                {% with url_extra_kwargs.sort|default:orders.0.argument as select_order %}
+                    {% for order in orders %}
+                        {% if forloop.first %}
+                            {% assign sort None %}
+                        {% else %}
+                            {% assign sort order.argument %}
+                        {% endif %}
+                        <a href="{% reverse_url 'catalogue:category' url_extra_kwargs sort=sort %}"
+                           class="btn {% if select_order == order.argument %} btn-danger disabled{% else %} btn-default{% endif %}"
+                           title="{{ order.title }}">
+                            {{ order.title }}
+                        </a>
+                    {% endfor %}
+                {% endwith %}
             </div>
         </div>
     </div>
 
     <div class="row items">
-        {% if page_obj %}
+        {% if page_obj|length %}
             {% for product in page_obj %}
                 <div class="col-sm-6 col-md-6">
                     {% include "catalogue/partials/product.html" %}
                 </div>
             {% endfor %}
-            <div class="clearfix"></div>
-                <div name="more_products" class="col-xs-6 col-xs-offset-8 wrapper" action=".">
-                    {% csrf_token %}
-                    {% if page_obj.number != paginator.num_pages %}
-                    <a href="#" class="more_products" ng-click="submit()" ng-hide="hide == true"> {#  onclick="location.href='/test/'" #}
-                        ПОКАЗАТЬ ЕЩЕ
-                    </a>
-                        {% endif %}
-                </div>
-            <div>
+            <div class="col-xs-24 text-right">
                 {% include "catalogue/partials/pagination.html" %}
             </div>
         {% else %}
-            <div class="nonefound col-xs-24">{% trans "No products found." %}</div>
+            <div class="col-xs-24">
+                <div class="alert alert-info">
+                    <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                    {% trans "No products found." %}
+                </div>
+            </div>
         {% endif %}
     </div>
 {% endblock %}
+
 
 {% block post_content %}
     <div class="row">

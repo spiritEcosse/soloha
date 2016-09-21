@@ -1,0 +1,5 @@
+{% load catalogue %}
+
+{% regroup selected_filters by parent as group_filters %}
+
+{% for filter in group_filters %}{{ filter.grouper.title }}: {% join_by_attribute filter.list ', ' 'title' %} {% endfor %}

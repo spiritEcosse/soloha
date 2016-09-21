@@ -1,4 +1,22 @@
+// Oscar variables
+@import "../../oscar/less/page/mixins.less"; // Kept separate for bootstrap updates - but should be imported into bootstap mixins.
+
+
+// Oscar: Unique
+@import "../../oscar/less/page/layout.less";
+@import "../../oscar/less/page/type.less";
+@import "../../oscar/less/page/forms.less";
+@import "../../oscar/less/page/header.less";
+@import "../../oscar/less/page/product_lists.less";
+@import "../../oscar/less/page/product_page.less";
+@import "../../oscar/less/page/reviews.less";
+@import "../../oscar/less/page/promotions.less";
+@import "../../oscar/less/page/checkout.less";
+@import "../../oscar/less/page/wells.less";
+@import "../../oscar/less/page/plugins.less";
+
 @import 'variables.less';
+
 
 .lSAction > a {
     background-image: url('../../image/controls.png');
@@ -29,7 +47,6 @@ h4, .h4 {
 .star-rating.One .glyphicon-star:first-child {
     color: @brand-primary;
 }
-
 .star-rating.Two .glyphicon-star:first-child,
 .star-rating.Two .glyphicon-star:first-child + .glyphicon-star {
     color: @brand-primary;
@@ -57,6 +74,18 @@ h4, .h4 {
     color: @brand-primary;
 }
 
+.price_color {
+    font-size: 22px;
+    line-height: 40px;
+    font-weight: bold;
+    color: @brand-success;
+}
+
+.price_color_white {
+    .price_color();
+
+    color: white;
+}
 .line-bottom {
     background: url("../../image/product_line_bottom.png") bottom center repeat-x;
 }
@@ -211,11 +240,13 @@ a, span, div {
 .tab-content > .active, .pill-content > .active {
     height: auto;
 }
-.page-header{
+.page-header {
     margin-top: 20px;
     padding-left: 15px;
 }
-
+.alert-error {
+    .alert-danger();
+}
 header {
     .top {
         height: @header_top;
@@ -742,17 +773,19 @@ header {
                     opacity: 1;
                 }
 
+                .price {
+                    padding: 0 @thumbnail-padding + @thumbnail-caption-padding;
+                }
+
                 .rows {
                     padding-bottom: 5px;
                 }
 
                 .filters {
                     text-align: left;
-                    padding: 10px;
-                    padding-bottom: 5px;
-                    line-height: 16px;
-                    font-size: 16px;
-                    height: 214px;
+                    line-height: 11px;
+                    font-size: 13px;
+                    height: 204px;
                     overflow: hidden;
 
                     .option_name {
@@ -774,14 +807,9 @@ header {
                 }
 
                 .title {
-                    text-align: center;
                     position: relative;
-                    padding: 4px;
                     background: rgba(0, 0, 0, 0.8);
-                    margin: 20px 0 0 0;
-                    height: 60px;
-                    font-weight: normal;
-                    text-transform: none;
+                    margin-top: @thumbnail-padding - 1;
 
                     a {
                         color: #fff;
@@ -789,10 +817,13 @@ header {
                 }
             }
 
+            .title, .filters {
+                padding: @thumbnail-padding;
+            }
+
             .title {
-                height: 37px;
+                height: 60px;
                 overflow: hidden;
-                margin-bottom: 10px;
             }
 
             .model {
@@ -1202,8 +1233,7 @@ header {
             margin-bottom: 20px;
         }
         .gallery {
-            margin-top: 20px;
-            margin-bottom: 30px;
+            margin-top: 3px;
 
             .lSSlideOuter {
                 width: 414px;
@@ -1366,12 +1396,6 @@ header {
                             color: black;
                             font-size: 11px;
                             font-weight: 400;
-
-                            .number {
-                                color: #2ea32b;
-                                font-size: 14px;
-                                font-weight: 700;
-                            }
                         }
                         .add-to-collection {
                             .btn {
@@ -1527,7 +1551,7 @@ header {
                                 margin-top: 10px;
 
                                 input {
-                                    display: none;
+                                    //display: none;
                                 }
                             }
                         }

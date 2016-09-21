@@ -6,10 +6,10 @@
     <div class="row option more-image" {% if ng %} ng-if="attribute.selected_val.images.length"{% endif %}>
         <div class="col-xs-14 btn-radio-group">
             {% if ng %}
-                {% include 'catalogue/product/attributes/product_primary_images.html' %}
+                {% include 'catalogue/product/attributes/product_primary_images.html' with ng=1 %}
             {% else %}
                 {% for product in feature_product.product_with_images.all|slice:":5" %}
-                    {% include 'catalogue/product/attributes/product_primary_images.html' %}
+                    {% include 'catalogue/product/attributes/product_primary_images.html' with ng=0 %}
                 {% endfor %}
             {% endif %}
         </div>
@@ -19,7 +19,9 @@
                     data-toggle="modal" data-target="#attribute-{{ attribute.pk }}">
                 {% trans 'View all fabrics' %}
             </button>
-            {% include 'catalogue/product/attributes/attribute_modal.html' %}
+            {% if ng %}
+                {% include 'catalogue/product/attributes/attribute_modal.html' %}
+            {% endif %}
         </div>
     </div>
 {% endangularjs %}

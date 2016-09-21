@@ -19,17 +19,17 @@ from soloha.app import application
 from django.conf.urls.static import static
 from soloha import settings
 from django.contrib.sitemaps.views import sitemap
-from sitemap import ProductSitemap, CategorySitemap, InfoPageSitemap
+from sitemap import ProductSitemap, CategorySitemap, FlatPageSitemap
+
 
 sitemaps = {
     'products': ProductSitemap,
     'categories': CategorySitemap,
-    'info_page': InfoPageSitemap
+    'info_page': FlatPageSitemap
 }
 
 urlpatterns = [
-    url(r'^spirit/', include(admin.site.urls)),
-    url(r'', include(application.urls)),
-    url(r'^sitemap\.xml$', sitemap, {'sitemaps': sitemaps},
-        name='django.contrib.sitemaps.views.sitemap'),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+                  url(r'^spirit/', include(admin.site.urls)),
+                  url(r'', include(application.urls)),
+                  url(r'^sitemap\.xml$', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
+              ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -2,12 +2,6 @@
 {% load product_tags %}
 {% load staticfiles %}
 
-{% block scripts %}
-    <script src="{% static 'bower_components/jquery/dist/jquery.min.js' %}"></script>
-    <script src="{% static 'src/js/custom.js' %}"></script>
-    <script src="{% static 'bower_components/lightslider/dist/js/lightslider.min.js' %}"></script>
-{% endblock %}
-
 {% with products_sliced=products|slice:":6" %}
     {% if products_sliced %}
         <h2 class="page-header row">{% trans 'Products you recently viewed' %}</h2>

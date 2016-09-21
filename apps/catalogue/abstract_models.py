@@ -19,25 +19,13 @@ logger = logging.getLogger(__name__)
 REGEXP_PHONE = r'/^((8|\+38)[\- ]?)?(\(?\d{3}\)?[\- ]?)?[\d\- ]{7,10}$/'
 REGEXP_EMAIL = r'/^[-\w.]+@([A-z0-9][-A-z0-9]+\.)+[A-z]{2,4}$/'
 
-
-def check_exist_image(image):
-    current_path = os.getcwd()
-    os.chdir(MEDIA_ROOT)
-    image_not_found = True
-
-    if not os.path.exists(os.path.abspath(image)) or not os.path.isfile(os.path.abspath(image)):
-        image = IMAGE_NOT_FOUND
-        image_not_found = False
-
-        if not os.path.exists(os.path.abspath(image)):
-            logger.error('image - {} not found!'.format(os.path.abspath(image)))
-
-    os.chdir(current_path)
-    return image, image_not_found
+BrowsableProductManagerCore = get_class('catalogue.managers', 'BrowsableProductManager')
 
 
 class CommonFeatureProduct(object):
-    product = None
+    @property
+    def product_slug(self):
+        return self.product.slug
 
     def product_enable(self):
         return self.product.enable
@@ -47,12 +35,23 @@ class CommonFeatureProduct(object):
         return self.product.categories_to_str()
     product_categories_to_str.short_description = _("Categories")
 
-    def product_partners_to_str(self):
-        return self.product.partners_to_str()
-    product_partners_to_str.short_description = _("Partners")
+    def product_partner(self):
+        return self.product.partner
+    product_partner.short_description = _("Product partner")
 
-    def thumb(self):
-        return self.product.thumb()
+    def thumb(self, image=None):
+        if not image:
+            image = self.product.primary_image()
+
+        return loader.get_template(
+            'admin/catalogue/product/thumb.html'
+        ).render(
+            Context(
+                {
+                    'image': image
+                }
+            )
+        )
     thumb.allow_tags = True
     thumb.short_description = _('Image of product')
 
@@ -66,8 +65,74 @@ class EnableManagerProduct(models.Manager):
         return self.get_queryset().filter(enable=True)
 
 
+class MissingProductImage(object):
+
+    """
+    Mimics a Django file field by having a name property.
+
+    sorl-thumbnail requires all it's images to be in MEDIA_ROOT. This class
+    tries symlinking the default "missing image" image in STATIC_ROOT
+    into MEDIA_ROOT for convenience, as that is necessary every time an Oscar
+    project is setup. This avoids the less helpful NotFound IOError that would
+    be raised when sorl-thumbnail tries to access it.
+    """
+
+    def __init__(self, name=None):
+        self.name = name if name else settings.OSCAR_MISSING_IMAGE_URL
+        media_file_path = os.path.join(settings.MEDIA_ROOT, self.name)
+        # don't try to symlink if MEDIA_ROOT is not set (e.g. running tests)
+        if settings.MEDIA_ROOT and not os.path.exists(media_file_path):
+            self.symlink_missing_image(media_file_path)
+
+    @property
+    def original(self):
+        return self.name
+
+    @property
+    def is_missing(self):
+        return True
+
+    def symlink_missing_image(self, media_file_path):
+        static_file_path = find('oscar/img/%s' % self.name)
+        if static_file_path is not None:
+            try:
+                os.symlink(static_file_path, media_file_path)
+            except OSError:
+                raise ImproperlyConfigured((
+                    "Please copy/symlink the "
+                    "'missing image' image at %s into your MEDIA_ROOT at %s. "
+                    "This exception was raised because Oscar was unable to "
+                    "symlink it for you.") % (media_file_path,
+                                              settings.MEDIA_ROOT))
+            else:
+                logging.info((
+                    "Symlinked the 'missing image' image at %s into your "
+                    "MEDIA_ROOT at %s") % (media_file_path,
+                                           settings.MEDIA_ROOT))
+
+
+# Todo delete this model after transfer data
 @python_2_unicode_compatible
-class AbstractProduct(models.Model):
+class AbstractProductVersion(models.Model, CommonFeatureProduct):
+    attributes = models.ManyToManyField('catalogue.Feature', through='catalogue.VersionAttribute',
+                                        verbose_name=_('Attributes'), related_name='product_versions')
+    product = models.ForeignKey('catalogue.Product', related_name='versions', on_delete=models.DO_NOTHING)
+    price_retail = models.DecimalField(_("Price (retail)"), decimal_places=2, max_digits=12)
+    cost_price = models.DecimalField(_("Cost Price"), decimal_places=2, max_digits=12)
+
+    class Meta:
+        abstract = True
+        ordering = ('product', 'price_retail', )
+        app_label = 'catalogue'
+        verbose_name = _('Product version')
+        verbose_name_plural = _('Product versions')
+
+    def __str__(self):
+        return u'{}, Version of product - {}'.format(self.pk, getattr(self, 'product', None))
+
+
+@python_2_unicode_compatible
+class AbstractProduct(models.Model, CommonFeatureProduct):
     # Title is mandatory for canonical products but optional for child products
     title = models.CharField(pgettext_lazy(u'Product title', u'Title'), max_length=300)
     slug = models.SlugField(_('Slug'), max_length=400, unique=True)
@@ -78,6 +143,7 @@ class AbstractProduct(models.Model):
     meta_keywords = models.TextField(verbose_name=_('Meta tag: keywords'), blank=True)
     description = RichTextUploadingField(_('Description'), blank=True)
     views_count = models.IntegerField(verbose_name='views count', editable=False, default=0)
+    partner = models.ForeignKey('partner.Partner', verbose_name=_("Partner"), related_name='products', null=True)
 
     STANDALONE, PARENT, CHILD = 'standalone', 'parent', 'child'
     STRUCTURE_CHOICES = (
@@ -111,7 +177,7 @@ class AbstractProduct(models.Model):
         _("Date updated"), auto_now=True, db_index=True)
 
     categories = models.ManyToManyField('catalogue.Category', related_name="products", verbose_name=_("Categories"))
-    filters = models.ManyToManyField('catalogue.Feature', related_name="filter_products", verbose_name=_('Filters of product'), blank=True, null=True)
+    filters = models.ManyToManyField('catalogue.Feature', related_name="filter_products", verbose_name=_('Filters of product'), blank=True)
     attributes = models.ManyToManyField('catalogue.Feature', through='ProductFeature', verbose_name=_('Attribute of product'), related_name="attr_products", blank=True)
     characteristics = models.ManyToManyField('catalogue.Feature', verbose_name='Characteristics', related_name='characteristic_products', blank=True)
     options = models.ManyToManyField('catalogue.Feature', through='ProductOptions', related_name='option_products', verbose_name='Additional options')
@@ -125,20 +191,6 @@ class AbstractProduct(models.Model):
         'catalogue.ProductClass', on_delete=models.PROTECT,
         verbose_name=_('Product type'), related_name="products",
         help_text=_("Choose what type of product this is"))
-    # attributes = models.ManyToManyField(
-    #     'catalogue.ProductAttribute',
-    #     through='catalogue.ProductAttributeValue',
-    #     verbose_name=_("Attributes"),
-    #     help_text=_("A product attribute is something that this product may "
-    #                 "have, such as a size, as specified by its class"))
-    #: It's possible to have options product class-wide, and per product.
-    # product_options = models.ManyToManyField(
-    #     'catalogue.Option', blank=True, verbose_name=_("Product options"),
-    #     help_text=_("Options are values that can be associated with a item "
-    #                 "when it is added to a customer's basket.  This could be "
-    #                 "something like a personalised message to be printed on "
-    #                 "a T-shirt."))
-
     recommended_products = models.ManyToManyField(
         'catalogue.Product', through='catalogue.ProductRecommendation', blank=True,
         verbose_name=_("Recommended products"),
@@ -167,14 +219,9 @@ class AbstractProduct(models.Model):
     class Meta:
         abstract = True
         app_label = 'catalogue'
-        ordering = ['-date_updated', '-views_count', 'title', 'slug', 'pk']
+        ordering = ('-date_updated', '-views_count', 'title', )
         verbose_name = _('Product')
         verbose_name_plural = _('Products')
-
-    def __init__(self, *args, **kwargs):
-        super(AbstractProduct, self).__init__(*args, **kwargs)
-        # self.attr = ProductAttributesContainer(product=self)
-        # self.has_versions = self.versions.exists()
 
     def __str__(self):
         if self.title:
@@ -195,41 +242,17 @@ class AbstractProduct(models.Model):
 
         return reverse('catalogue:detail', kwargs=dict_values)
 
-    def images_all(self):
-        images = []
-
-        for image in self.images.all():
-            exist_image = False
-
-            if image.original is not None:
-                image, exist_image = check_exist_image(image.original.file.name)
-
-            if exist_image:
-                images.append(image)
-
-        if not images:
-            images.append(self.primary_image())
-
-        return images
-
-    def thumb(self, original=None):
-        if original is not None:
-            image = original
-        else:
-            image = self.primary_image()
-
-        image, exist_image = check_exist_image(image)
-        return loader.get_template('admin/catalogue/product/thumb.html').render(Context({'image': image}))
-    thumb.allow_tags = True
-    thumb.short_description = _('Image')
+    def get_first_attributes(self):
+        first = self.versions.order_by('stockrecord__price_excl_tax').first()
+        return first.attributes.all() if first else []
 
     def categories_to_str(self):
         return self.separator.join([category.name for category in self.get_categories().all()])
     categories_to_str.short_description = _("Categories")
 
     def partners_to_str(self):
-        return self.separator.join([stock.partner.name for stock in self.stockrecords.all()])
-    categories_to_str.short_description = _("Partners")
+        return self.partner
+    categories_to_str.short_description = _("Partner")
 
     def clean(self):
         """
@@ -282,25 +305,12 @@ class AbstractProduct(models.Model):
         if self.parent_id and not self.parent.is_parent:
             raise ValidationError(
                 _("You can only assign child products to parent products."))
-        if self.product_class:
-            raise ValidationError(
-                _("A child product can't have a product class."))
-        if self.pk and self.categories.exists():
-            raise ValidationError(
-                _("A child product can't have a category assigned."))
-        # Note that we only forbid options on product level
-        if self.pk and self.product_options.exists():
-            raise ValidationError(
-                _("A child product can't have options."))
 
     def _clean_parent(self):
         """
         Validates a parent product.
         """
         self._clean_standalone()
-        if self.has_stockrecords:
-            raise ValidationError(
-                _("A parent product can't have stockrecords."))
 
     def save(self, *args, **kwargs):
         if not self.slug:
@@ -311,27 +321,13 @@ class AbstractProduct(models.Model):
     # Properties
 
     @property
-    def price_original(self):
-        # ToDo make it possible to check whether the product is available for sale
-        selector = Selector()
-        strategy = selector.strategy()
-        return strategy.fetch_for_product(self)
+    def version_first(self):
+        if self.is_parent:
+            product_versions = self.versions.model.objects.filter(product__parent=self)
+        else:
+            product_versions = self.versions
 
-    @property
-    def price_from_version(self):
-        """
-            get main price for product
-            :param self: object product
-            :return:
-                price of product
-            """
-        first_prod_version = self.versions.order_by('price_retail').first()
-        price = first_prod_version.price_retail
-
-        for attribute in first_prod_version.version_attributes.all():
-            if attribute.price_retail is not None:
-                price += attribute.price_retail
-        return price
+        return product_versions.order_by('stockrecord__price_excl_tax').first()
 
     @property
     def is_standalone(self):
@@ -362,14 +358,13 @@ class AbstractProduct(models.Model):
         else:
             return is_valid
 
-    @property
-    def options(self):
-        """
-        Returns a set of all valid options for this product.
-        It's possible to have options product class-wide, and per product.
-        """
-        pclass_options = self.get_product_class().options.all()
-        return set(pclass_options) or set(self.product_options.all())
+    # @property
+    # def options(self):
+    #     """
+    #     Returns a set of all valid options for this product.
+    #     It's possible to have options product class-wide, and per product.
+    #     """
+    #     return self.options.all()
 
     @property
     def is_shipping_required(self):
@@ -487,7 +482,13 @@ class AbstractProduct(models.Model):
 
     # Images
 
-    def get_missing_image(self):
+    def images_all(self):
+        images = [image.image for image in self.images.all()]
+        images = filter(lambda image: getattr(image, 'is_missing', False) is False, images)
+        return [self.get_missing_image()] if not images else images
+
+    @staticmethod
+    def get_missing_image():
         """
         Returns a missing image object.
         """
@@ -495,34 +496,15 @@ class AbstractProduct(models.Model):
         # field.
         return MissingProductImage()
 
+    def thumb(self, image=None):
+        return super(AbstractProduct, self).thumb(image=self.primary_image())
+
     def primary_image(self):
         """
         Returns the primary image for a product. Usually used when one can
         only display one product image, e.g. in a list of products.
         """
-        images = self.images.all()
-        ordering = self.images.model.Meta.ordering
-        if not ordering or ordering[0] != 'display_order':
-            # Only apply order_by() if a custom model doesn't use default
-            # ordering. Applying order_by() busts the prefetch cache of
-            # the ProductManager
-            images = images.order_by('display_order')
-
-        try:
-            image = images[0].original
-        except IndexError:
-            # We return a dict with fields that mirror the key properties of
-            # the ProductImage class so this missing image can be used
-            # interchangeably in templates.  Strategy pattern ftw!
-            image = self.get_missing_image().name
-        else:
-            if image is None:
-                image = self.get_missing_image().name
-            else:
-                image = image.file.name
-
-        image, exist_image = check_exist_image(image)
-        return image
+        return self.images.all()[0].image if self.images.exists() else self.get_missing_image()
 
     # Updating methods
 
@@ -620,6 +602,7 @@ class AbstractFeature(MPTTModel):
     created = models.DateTimeField(auto_now_add=True)
     bottom_line = models.IntegerField(verbose_name=_('Bottom line size'), blank=True, null=True)
     top_line = models.IntegerField(verbose_name=_('Top line size'), blank=True, null=True)
+    slug_separator = '/'
 
     class MPTTMeta:
         order_insertion_by = ('sort', 'title', )
@@ -652,7 +635,14 @@ class AbstractFeature(MPTTModel):
     def get_absolute_url(self):
         return self.slug
 
-    def get_values(self, names_fields):
+    @property
+    def parent_pk(self):
+        parent = self.parent
+
+        if parent:
+            return parent.pk
+
+    def get_values(self, *names_fields):
         """
         get values by name field
         :param names_fields: name fields in this object
@@ -662,7 +652,8 @@ class AbstractFeature(MPTTModel):
         """
         data = {}
         for name_field in names_fields:
-            data[name_field] = getattr(self, name_field)
+            key = 'parent' if name_field == 'parent_pk' else name_field
+            data[key] = getattr(self, name_field)
         return data
 
 
@@ -693,18 +684,37 @@ class AbstractProductImage(models.Model, CommonFeatureProduct):
     def __str__(self):
         return u"Image of '%s'" % getattr(self, 'product', None)
 
+    @property
+    def name(self):
+        return self.original.file.name if self.original else ''
+
+    @property
+    def image(self):
+        return self.check_exist_image()
+
     def is_primary(self):
         """
         Return bool if image display order is 0
         """
         return self.display_order == 0
 
-    def thumb(self):
-        image = self.original.file.name if self.original is not None else IMAGE_NOT_FOUND
-        image, exist_image = check_exist_image(image)
-        return loader.get_template('admin/catalogue/product/thumb.html').render(Context({'image': image}))
-    thumb.allow_tags = True
-    thumb.short_description = _('Image')
+    def thumb(self, image=None):
+        return super(AbstractProductImage, self).thumb(image=self.image)
+
+    def check_exist_image(self):
+        current_path = os.getcwd()
+        os.chdir(MEDIA_ROOT)
+        abs_path = os.path.abspath(self.name)
+        image = self
+
+        if not self.name or not os.path.exists(abs_path) or not os.path.isfile(abs_path):
+            image = self.product.get_missing_image()
+
+        os.chdir(current_path)
+        return image
+
+    def get_caption(self):
+        return self.caption or self.product.get_title()
 
     def delete(self, *args, **kwargs):
         """
@@ -727,8 +737,8 @@ class CustomAbstractCategory(MPTTModel):
     slug = models.SlugField(verbose_name=_('Slug'), max_length=400, unique=True)
     enable = models.BooleanField(verbose_name=_('Enable'), default=True, db_index=True)
     parent = TreeForeignKey('self', verbose_name=_('Parent'), related_name='children', blank=True, null=True, db_index=True)
-    meta_title = models.CharField(verbose_name=_('Meta tag: title'), blank=True, max_length=480)
     h1 = models.CharField(verbose_name=_('h1'), blank=True, max_length=310)
+    meta_title = models.CharField(verbose_name=_('Meta tag: title'), blank=True, max_length=480)
     meta_description = models.TextField(verbose_name=_('Meta tag: description'), blank=True)
     meta_keywords = models.TextField(verbose_name=_('Meta tag: keywords'), blank=True)
     sort = models.IntegerField(blank=True, null=True, default=0, db_index=True)
@@ -802,7 +812,7 @@ class CustomAbstractCategory(MPTTModel):
         return parents
 
     def get_parents(self, obj, parents):
-        if obj.parent is not None:
+        if obj.parent:
             parents.append(obj.parent)
             return self.get_parents(obj=obj.parent, parents=parents)
         parents.reverse()
@@ -901,8 +911,22 @@ class CustomAbstractCategory(MPTTModel):
         approach.
         """
         dict_values = {'category_slug': self.full_slug}
-        if values.get('filter_slug'):
-            dict_values.update({'filter_slug': values.get('filter_slug')})
+
+        if values.get('filter_slug_objects'):
+            filter_slug = values.get('filter_slug_objects').values_list('slug', flat=True)
+            filter_slug = AbstractFeature.slug_separator.join(filter_slug)
+
+            dict_values.update(
+                {
+                    'filter_slug': filter_slug
+                }
+            )
+
+        if values.get('page') and int(values.get('page')) != 1:
+            dict_values.update({'page': values.get('page')})
+
+        if values.get('sort'):
+            dict_values.update({'sort': values.get('sort')})
 
         return reverse('catalogue:category', kwargs=dict_values)
 
@@ -997,30 +1021,14 @@ class CustomAbstractCategory(MPTTModel):
         return icon
 
 
+# todo delete this model, after trans data
 @python_2_unicode_compatible
-class AbstractProductVersion(models.Model, CommonFeatureProduct):
-    attributes = models.ManyToManyField('catalogue.Feature', through='catalogue.VersionAttribute',
-                                        verbose_name=_('Attributes'), related_name='product_versions')
-    product = models.ForeignKey('catalogue.Product', related_name='versions', on_delete=models.DO_NOTHING)
-    price_retail = models.DecimalField(_("Price (retail)"), decimal_places=2, max_digits=12)
-    cost_price = models.DecimalField(_("Cost Price"), decimal_places=2, max_digits=12)
-
-    class Meta:
-        abstract = True
-        app_label = 'catalogue'
-        verbose_name = _('Product version')
-        verbose_name_plural = _('Product versions')
-
-    def __str__(self):
-        return u'{}, Version of product - {}'.format(self.pk, self.product.title)
-
-
-@python_2_unicode_compatible
-class AbstractVersionAttribute(models.Model):
-    version = models.ForeignKey('catalogue.ProductVersion', verbose_name=_('Version of product'),
-                                related_name='version_attributes')
-    attribute = models.ForeignKey('catalogue.Feature', verbose_name=_('Attribute'),
-                                  related_name='version_attributes')
+class AbstractVersionAttribute(models.Model, CommonFeatureProduct):
+    version = models.ForeignKey(
+        'catalogue.ProductVersion', verbose_name=_('Version of product'),
+        related_name='version_attributes'
+    )
+    attribute = models.ForeignKey('catalogue.Feature', verbose_name=_('Attribute'), related_name='version_attributes')
     price_retail = models.DecimalField(_("Price (retail)"), decimal_places=2, max_digits=12, blank=True, default=0)
     cost_price = models.DecimalField(_("Cost Price"), decimal_places=2, max_digits=12, blank=True, default=0)
 
@@ -1043,6 +1051,10 @@ class AbstractVersionAttribute(models.Model):
         if current_attributes in search_attributes:
             raise IntegrityError(u'UNIQUE constraint failed: catalogue_productversion.version_id, catalogue_productversion.attribute_id'.format(self.attribute))
         super(AbstractVersionAttribute, self).save(**kwargs)
+
+    @property
+    def product(self):
+        return self.version.product
 
 
 @python_2_unicode_compatible
@@ -1067,7 +1079,7 @@ class AbstractProductFeature(models.Model, CommonFeatureProduct):
         verbose_name_plural = _('Product features')
 
     def __str__(self):
-        return u'{}, {} - {}'.format(self.pk, self.product.title, self.feature.title)
+        return u'{}, {} - {}'.format(self.pk, getattr(self, 'product.title', None), getattr(self, 'feature.title', None))
 
     def clean(self):
         if self.non_standard is True:

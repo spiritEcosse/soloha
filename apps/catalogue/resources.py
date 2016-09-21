@@ -4,17 +4,20 @@ import functools
 import widgets
 from django.db.models.fields.related import ForeignKey
 from diff_match_patch import diff_match_patch
-try:
-    from django.utils.encoding import force_text
-except ImportError:
-    from django.utils.encoding import force_unicode as force_text
-from diff_match_patch import diff_match_patch
 from django.utils.safestring import mark_safe
 from import_export.results import RowResult
 from copy import deepcopy
 from django.db import transaction
 from django.db.transaction import TransactionManagementError
 import logging  # isort:skip
+import traceback
+from oscar.core.loading import get_model
+from filer.models.imagemodels import Image
+from django.utils.translation import ugettext_lazy as _
+try:
+    from django.utils.encoding import force_text
+except ImportError:
+    from django.utils.encoding import force_unicode as force_text
 #Todo change list import module
 try:  # Python 2.7+
     from logging import NullHandler
@@ -22,9 +25,6 @@ except ImportError:
     class NullHandler(logging.Handler):
         def emit(self, record):
             pass
-import traceback
-from oscar.core.loading import get_model
-from filer.models.imagemodels import Image
 
 logging.getLogger(__name__).addHandler(NullHandler())
 
@@ -118,6 +118,10 @@ class Field(fields.Field):
 
 
 class ModelResource(resources.ModelResource):
+    delete = fields.Field(
+        column_name=_('Delete this object ? (set 1 if True)'),
+        widget=import_export_widgets.BooleanWidget()
+    )
     prefix = 'rel_'
 
     def __new__(cls, *args, **kwargs):
@@ -288,7 +292,6 @@ class FeatureResource(ModelResource):
     title = fields.Field(column_name='title', attribute='title', widget=widgets.CharWidget())
     parent = fields.Field(attribute='parent', column_name='parent', widget=import_export_widgets.ForeignKeyWidget(
         model=Feature, field='slug'))
-    delete = fields.Field(widget=import_export_widgets.BooleanWidget())
 
     class Meta:
         model = Feature
@@ -296,17 +299,38 @@ class FeatureResource(ModelResource):
         export_order = fields
 
 
-class ProductVersionResource(ModelResource):
-    product = fields.Field(column_name='product', attribute='product', widget=import_export_widgets.ForeignKeyWidget(
-        model=Product, field='slug'))
-    attributes = Field(column_name='attributes', attribute='attributes',
-                       widget=widgets.IntermediateModelManyToManyWidget(
-                           model=Feature, field='slug'
-                       ))
-    delete = fields.Field(widget=import_export_widgets.BooleanWidget())
+class VersionAttributeResource(ModelResource):
+    attribute = fields.Field(
+        attribute='attribute', column_name=_('Attribute'),
+        widget=import_export_widgets.ForeignKeyWidget(model=Feature, field='slug')
+    )
+    version = fields.Field(
+        attribute='version', column_name=_('Version of product'),
+        widget=import_export_widgets.ForeignKeyWidget(model=ProductVersion)
+    )
+    product = fields.Field(
+        attribute='version__product', column_name=_('Product title (will not change the product)'),
+        widget=import_export_widgets.ForeignKeyWidget(model=Product, field='slug')
+    )
 
     class Meta:
-        fields = ('id', 'delete', 'product', 'price_retail', 'cost_price', 'attributes', )
+        model = VersionAttribute
+        fields = ('id', 'delete', 'attribute', 'version', 'product', )
+        export_order = fields
+
+
+class ProductVersionResource(ModelResource):
+    product = fields.Field(
+        column_name='product', attribute='product',
+        widget=import_export_widgets.ForeignKeyWidget(model=Product, field='slug')
+    )
+    attributes = Field(
+        column_name='attributes', attribute='attributes',
+        widget=widgets.IntermediateModelManyToManyWidget(model=Feature, field='slug')
+    )
+
+    class Meta:
+        fields = ('id', 'delete', 'product', 'attributes', )
         export_order = fields
         model = ProductVersion
 
@@ -316,11 +340,10 @@ class ProductFeatureResource(ModelResource):
         model=Product, field='slug'))
     feature = fields.Field(column_name='feature', attribute='feature', widget=import_export_widgets.ForeignKeyWidget(
         model=Feature, field='slug'))
-    image = fields.Field(column_name='image', attribute='image', widget=widgets.ImageManyToManyWidget(
+    image = fields.Field(column_name='image', attribute='image', widget=widgets.ImageForeignKeyWidget(
         model=Image, field='original_filename'))
     product_with_images = fields.Field(column_name='product_with_images', attribute='product_with_images',
                                        widget=widgets.ManyToManyWidget(model=Product, field='slug'))
-    delete = fields.Field(widget=import_export_widgets.BooleanWidget())
 
     class Meta:
         model = ProductFeature
@@ -337,13 +360,12 @@ class ProductFeatureResource(ModelResource):
 class CategoryResource(ModelResource):
     parent = fields.Field(attribute='parent', column_name='parent', widget=import_export_widgets.ForeignKeyWidget(
         model=Category, field='slug'))
-    icon = fields.Field(column_name='icon', attribute='icon', widget=widgets.ImageManyToManyWidget(
+    icon = fields.Field(column_name='icon', attribute='icon', widget=widgets.ImageForeignKeyWidget(
         model=Image, field='original_filename'))
-    image_banner = fields.Field(column_name='image_banner', attribute='image_banner', widget=widgets.ImageManyToManyWidget(
+    image_banner = fields.Field(column_name='image_banner', attribute='image_banner', widget=widgets.ImageForeignKeyWidget(
         model=Image, field='original_filename'))
-    image = fields.Field(column_name='image', attribute='image', widget=widgets.ImageManyToManyWidget(
+    image = fields.Field(column_name='image', attribute='image', widget=widgets.ImageForeignKeyWidget(
         model=Image, field='original_filename'))
-    delete = fields.Field(widget=import_export_widgets.BooleanWidget())
 
     class Meta:
         model = Category
@@ -353,23 +375,19 @@ class CategoryResource(ModelResource):
 
 
 class ProductImageResource(ModelResource):
-    original = fields.Field(column_name='original', attribute='original',
-                            widget=widgets.ImageForeignKeyWidget(model=Image, field='original_filename'))
-    product_slug = fields.Field(column_name='product', attribute='product',
-                                widget=import_export_widgets.ForeignKeyWidget(model=Product, field='slug'))
-    delete = fields.Field(widget=import_export_widgets.BooleanWidget())
+    original = fields.Field(
+        column_name='original', attribute='original',
+        widget=widgets.ForeignKeyWidget(model=Image, field='original_filename')
+    )
+    product_slug = fields.Field(
+        column_name='product', attribute='product',
+        widget=import_export_widgets.ForeignKeyWidget(model=Product, field='slug')
+    )
 
     class Meta:
         model = ProductImage
-        #ToDo delete column to start list
-        fields = ('id', 'product_slug', 'original', 'caption', 'display_order', 'delete', )
+        fields = ('id', 'delete', 'product_slug', 'original', 'caption', 'display_order', )
         export_order = fields
-
-    def dehydrate_original(self, obj):
-        if obj.original is not None:
-            return obj.original.file.name
-        else:
-            return ''
 
 
 class ProductRecommendationResource(ModelResource):
@@ -380,7 +398,6 @@ class ProductRecommendationResource(ModelResource):
                                   widget=import_export_widgets.ForeignKeyWidget(
                                       model=Product, field='slug',
                                   ))
-    delete = fields.Field(widget=import_export_widgets.BooleanWidget())
 
     class Meta:
         model = ProductRecommendation
@@ -395,21 +412,12 @@ class ProductResource(ModelResource):
                                 widget=widgets.ManyToManyWidget(model=Feature, field='slug'))
     characteristics_slug = fields.Field(column_name='characteristics', attribute='characteristics',
                                         widget=widgets.ManyToManyWidget(model=Feature, field='slug'))
-    images = fields.Field(column_name='images', attribute='images',
-                          widget=widgets.ImageManyToManyWidget(model=ProductImage, field='original'))
-    recommended_products = Field(column_name='recommended_products', attribute='recommended_products',
-                                 widget=widgets.IntermediateModelManyToManyWidget(
-                                     model=Product, field='slug',
-                                 ))
-    delete = fields.Field(widget=import_export_widgets.BooleanWidget())
+    parent = fields.Field(attribute='parent', column_name='parent', widget=import_export_widgets.ForeignKeyWidget(
+        model=Product, field='slug'))
 
     class Meta:
         model = Product
-        fields = ('id', 'delete', 'title', 'slug', 'enable', 'h1', 'meta_title', 'meta_description', 'meta_keywords',
-                  'description', 'categories_slug', 'filters_slug', 'characteristics_slug', 'product_class', 'images',
-                  'recommended_products', )
+        fields = ('id', 'delete', 'title', 'slug', 'enable', 'structure', 'parent', 'h1', 'meta_title',
+                  'meta_description', 'meta_keywords', 'description', 'categories_slug', 'filters_slug', 'characteristics_slug',
+                  'product_class', )
         export_order = fields
-
-    def dehydrate_images(self, obj):
-        images = [prod_image.original.file.name for prod_image in obj.images.all() if prod_image.original]
-        return ','.join(images)

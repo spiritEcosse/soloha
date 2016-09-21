@@ -11,6 +11,14 @@ $(document).ready(function() {
          pager: false
     });
 
+    $('.lightSlider_tree').lightSlider({
+         item:3,
+         loop:true,
+         slideMove:1,
+         slideMargin:0,
+         pager: false
+    });
+
     // $('#link_news').click(function(){
     //     slider.refresh();
     // });

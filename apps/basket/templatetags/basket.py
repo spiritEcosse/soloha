@@ -2,8 +2,18 @@ import re
 from django.template import Library, Node, Variable, TemplateSyntaxError
 from widget_tweaks.templatetags.widget_tweaks import FieldAttributeNode
 from django.template.debug import DebugParser
-register = Library()
+from django import template
+from apps.basket.forms import AddToBasketWithAttributesForm
+from oscar.core.loading import get_model
+from oscar.core.loading import get_class
+
+AddToBasketForm = get_class('basket.forms', 'AddToBasketForm')
+SimpleAddToBasketForm = get_class('basket.forms', 'SimpleAddToBasketForm')
+Product = get_model('catalogue', 'product')
+QNT_SINGLE, QNT_MULTIPLE = 'single', 'multiple'
 parser = DebugParser
+
+register = template.Library()
 
 ATTRIBUTE_RE = re.compile(r"""
     (?P<attr>
@@ -32,7 +42,6 @@ def basket_render_field(*args, **kwargs):
     """
     # error_msg = '%r tag requires a form field followed by a list of attributes and values in the form attr="value"' % token.split_contents()[0]
     form_field = parser.compile_filter(form_field)
-    print form_field
 
     set_attrs = []
     append_attrs = []
@@ -42,10 +51,42 @@ def basket_render_field(*args, **kwargs):
             raise TemplateSyntaxError(error_msg + ": %s" % pair)
         dct = match.groupdict()
         attr, sign, value = dct['attr'], dct['sign'], parser.compile_filter(dct['value'])
-        print attr, sign, value
+
         if sign == "=":
             set_attrs.append((attr, value))
         else:
             append_attrs.append((attr, value))
 
     return FieldAttributeNode(form_field, set_attrs, append_attrs)
+
+
+@register.assignment_tag()
+def basket_form(request, product, quantity_type='single'):
+    if not isinstance(product, Product):
+        return ''
+
+    initial = {}
+    if not product.is_parent:
+        initial['product_id'] = product.id
+
+    form_class = AddToBasketForm
+    if quantity_type == QNT_SINGLE:
+        form_class = SimpleAddToBasketForm
+
+    form = form_class(request.basket, product=product, initial=initial)
+
+    return form
+
+
+@register.assignment_tag()
+def basket_form_with_attributes(request, product, quantity_type='single'):
+    if not isinstance(product, Product):
+        return ''
+
+    initial = {}
+    if not product.is_parent:
+        initial['product_id'] = product.id
+
+    form_class = AddToBasketWithAttributesForm
+    form = form_class(request.basket, product=product, initial=initial)
+    return form
