@@ -8,9 +8,10 @@
 {% load product %}
 {% load staticfiles %}
 {% load i18n %}
+{% load filters_concatenation %}
 
 {% block meta %}
-    {% if page %}
+    {% if page or selected_filters.exists %}
         <meta name="robots" content="nofollow" />
     {% endif %}
 {% endblock %}
@@ -18,18 +19,16 @@
 {#{% block ngController %}ng-controller="" {% endblock ngController %}#}
 {% block ngController%}ng-controller="More_goods"{% endblock ngController %}
 
-{% load filters_concatenation %}
-
 {% block title %}
-    {{ category.meta_title }} | {{ block.super }}
+    {% if selected_filters.exists %}{% include 'catalogue/partials/meta_tags.html' %}.{% endif %}{{ category.meta_title }} | {{ block.super }}
 {% endblock %}
 
 {% block description %}
-    {{ category.meta_description|default:""|striptags }}
+    {% if selected_filters.exists %}{% include 'catalogue/partials/meta_tags.html' %}.{% endif %}{{ category.meta_description|default:""|striptags }}
 {% endblock %}
 
 {% block keywords %}
-    {{ category.meta_keywords|default:""|striptags }}
+    {% if selected_filters.exists %}{% include 'catalogue/partials/meta_tags.html' %}{% else %}{{ category.meta_keywords|default:""|striptags }}{% endif %}
 {% endblock %}
 
 {% block left-bar %}
@@ -38,7 +37,7 @@
         {% assign trancate_filter_value 23 %}
         {% if selected_filters.exists %}
             {% regroup selected_filters by parent as group_filters %}
-            {% assign filter_parents group_filters|fetch_from_list:'grouper' %}
+            {% assign filter_parents group_filters|fetch_from_dict:'grouper' %}
 
             <div class="heading">{% trans 'Selected' %}</div>
             <div class="filter">

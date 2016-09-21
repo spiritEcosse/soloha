@@ -28,7 +28,7 @@ from itertools import groupby
 from oscar.apps.partner import prices
 from oscar.templatetags.currency_filters import currency
 from django.utils.functional import cached_property
-
+from django.utils.text import capfirst
 logger = logging.getLogger(__name__)
 
 Product = get_model('catalogue', 'Product')
@@ -198,6 +198,7 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
     def get_context_data(self, **kwargs):
         context = super(ProductCategoryView, self).get_context_data(**kwargs)
 
+        # Todo replace on one query, without regroup
         context['filters'] = Feature.objects.only(*self.feature_only).filter(
             level=1, filter_products__categories=self.object.get_descendants(include_self=True),
             filter_products__enable=True, filter_products__categories__enable=True
@@ -207,6 +208,7 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
 
         products = lambda **kwargs: map(lambda obj: obj.id, self.get_products(**kwargs))
         key = lambda feature: feature.parent.pk
+        # Todo really need sort by feature.parent.pk ?
         iter = groupby(sorted(self.selected_filters, key=key), key=key)
         filters_parent = map(lambda obj: obj[0], iter)
 

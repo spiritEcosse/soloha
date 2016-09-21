@@ -130,7 +130,7 @@ def append(list, needle):
 
 
 @register.filter
-def fetch_from_list(source, needle):
+def fetch_from_dict(source, needle):
     return [value for dictionary in source for key, value in dictionary.items() if key == needle]
 
 
@@ -138,3 +138,7 @@ def fetch_from_list(source, needle):
 def subtract(value, arg):
     return value - arg
 
+
+@register.simple_tag
+def join_by_attribute(list, separator, attribute):
+    return separator.join([getattr(obj, attribute) for obj in list])
