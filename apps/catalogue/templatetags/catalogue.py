@@ -151,12 +151,7 @@ class StringStripNode(template.Node):
 
     def render(self, context):
         output = self.nodelist.render(context)
-        output = re.sub(r'\s+', ' ', output)
-        output = re.sub(r'\n', ' ', output)
-        output = re.sub(r'\t', ' ', output)
-        output = re.sub(r' , ', ', ', output)
-        output = output.strip()
-        return output
+        return re.sub(r'\n\s+', ' ', output).strip()
 
 
 @register.tag
