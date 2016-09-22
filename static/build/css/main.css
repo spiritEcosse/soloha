@@ -9239,8 +9239,8 @@ header .bottom .navbar .nav > li .yamm-content .image .btn-menu {
   width: 12px;
 }
 .main .left-bar .filter .items .values::-webkit-scrollbar-thumb {
-  background-color: #6f6f6f;
-  border: 0.299809px solid #c2c2c2;
+  background-color: #c2c2c2;
+  border: 0.299809px solid #b7b7b7;
 }
 .main .left-bar .filter .items .values .slider-handle {
   background: url("../../image/slider-handle.png") center center no-repeat;
