@@ -62,6 +62,6 @@ module.exports = (grunt) ->
     grunt.loadNpmTasks 'grunt-contrib-uglify'
     grunt.loadNpmTasks 'grunt-contrib-cssmin'
     grunt.loadNpmTasks 'grunt-contrib-imagemin'
-    grunt.registerTask 'default', ['uglify', 'imagemin', 'cssmin', 'coffee', 'less']
+    grunt.registerTask 'default', ['uglify', 'cssmin', 'imagemin', 'coffee', 'less']
 
 
