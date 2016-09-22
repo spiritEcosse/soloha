@@ -85,10 +85,8 @@ class AbstractStockRecord(models.Model, CommonFeatureProduct):
     def __str__(self):
         msg = u"ProductStockRecord %s of Product: %s" % (
             getattr(self, 'pk', None),
-            getattr(self, 'product', None)
+            getattr(self, 'product.title', None)
         )
-        if self.partner_sku:
-            msg = u"%s (%s)" % (msg, self.partner_sku)
         return msg
 
     class Meta:
@@ -161,7 +159,3 @@ class AbstractStockRecord(models.Model, CommonFeatureProduct):
             return False
         return self.net_stock_level < self.low_stock_threshold
 
-    # Todo uncomment after delete field - product
-    # @property
-    # def product(self):
-    #     return self.product_version.product

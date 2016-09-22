@@ -2,7 +2,6 @@ from django.contrib import admin
 from django.db import models
 from oscar.core.loading import get_model
 from django.forms import Textarea
-from django import forms
 from mptt.admin import DraggableMPTTAdmin
 from import_export.admin import ImportExportMixin, ImportExportActionModelAdmin
 import resources
@@ -10,7 +9,8 @@ import logging  # isort:skip
 from dal import autocomplete
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
-import forms
+import forms as catalogue_forms
+import apps.partner.forms as partner_forms
 from django.db.models import Q
 from django.db.models.query import Prefetch
 
@@ -56,7 +56,13 @@ class ProductAutocomplete(autocomplete.Select2QuerySetView):
         qs = Product.objects.all().only('pk', 'title', 'slug', )
 
         if self.q:
-            qs = qs.filter(Q(title__icontains=self.q) | Q(slug__icontains=self.q))
+            try:
+                self.q = int(self.q)
+            except ValueError:
+                qs = qs.filter(Q(title__icontains=self.q) | Q(slug__icontains=self.q))
+            else:
+                qs = qs.filter(Q(pk=self.q))
+
         return qs
 
 
@@ -69,7 +75,13 @@ class CategoriesAutocomplete(autocomplete.Select2QuerySetView):
         qs = Category.objects.all().only('pk', 'name', 'slug', )
 
         if self.q:
-            qs = qs.filter(Q(name__icontains=self.q) | Q(slug__icontains=self.q))
+            try:
+                self.q = int(self.q)
+            except ValueError:
+                qs = qs.filter(Q(name__icontains=self.q) | Q(slug__icontains=self.q))
+            else:
+                qs = qs.filter(Q(pk=self.q))
+
         return qs
 
 
@@ -82,18 +94,24 @@ class FeatureAutocomplete(autocomplete.Select2QuerySetView):
         qs = Feature.objects.all().only('pk', 'title', 'slug', )
 
         if self.q:
-            qs = qs.filter(Q(title__icontains=self.q) | Q(slug__icontains=self.q))
+            try:
+                self.q = int(self.q)
+            except ValueError:
+                qs = qs.filter(Q(title__icontains=self.q) | Q(slug__icontains=self.q))
+            else:
+                qs = qs.filter(Q(pk=self.q))
+
         return qs
 
 
 class StockRecordInline(admin.StackedInline):
     model = StockRecord
-    form = forms.StockRecordForm
+    form = partner_forms.StockRecordForm
 
 
 class ProductFeatureInline(admin.StackedInline):
     model = ProductFeature
-    form = forms.ProductFeatureForm
+    form = catalogue_forms.ProductFeatureForm
 
 
 class AttributeInline(admin.TabularInline):
@@ -103,7 +121,7 @@ class AttributeInline(admin.TabularInline):
 class ProductRecommendationInline(admin.TabularInline):
     model = ProductRecommendation
     fk_name = 'primary'
-    form = forms.ProductRecommendationForm
+    form = catalogue_forms.ProductRecommendationForm
 
 
 class ProductAttributeInline(admin.TabularInline):
@@ -121,12 +139,12 @@ class ProductImageInline(admin.TabularInline):
 
 class ProductImageAdmin(ImportExportMixin, ImportExportActionModelAdmin):
     resource_class = resources.ProductImageResource
-    list_display = ('pk', 'thumb', 'product', 'product_date_updated', 'display_order', 'caption', 'product_enable',
-                    'product_categories_to_str', 'product_partner', 'date_created', )
+    list_display = ('pk', 'thumb', 'product', 'product_slug', 'product_enable', 'product_date_updated', 'display_order',
+                    'caption', 'product_categories_to_str', 'product_partner', 'date_created', )
     list_filter = ('product__date_updated', 'date_created', 'product__enable', 'display_order',
                    'product__partner', 'product__categories', )
     search_fields = ('product__title', 'product__slug', 'product__pk', )
-    form = forms.ProductImageForm
+    form = catalogue_forms.ProductImageForm
 
     class Media:
         js = ("https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css",
@@ -139,7 +157,7 @@ class FeatureAdmin(ImportExportMixin, ImportExportActionModelAdmin, DraggableMPT
     prepopulated_fields = {"slug": ("title",)}
     search_fields = ('title', 'slug', )
     resource_class = resources.FeatureResource
-    form = forms.FeatureForm
+    form = catalogue_forms.FeatureForm
 
     #ToDo @igor: user cannot delete if has permission
     def for_delete(self, row, instance):
@@ -156,13 +174,13 @@ class ProductClassAdmin(admin.ModelAdmin):
 
 
 class ProductFeatureAdmin(ImportExportMixin, ImportExportActionModelAdmin):
-    list_display = ('pk', 'product', 'thumb', 'feature', 'product_date_updated', 'sort', 'info', 'product_enable',
+    list_display = ('pk', 'product', 'product_slug', 'thumb', 'feature', 'product_date_updated', 'sort', 'info', 'product_enable',
                     'product_categories_to_str', 'product_partner', )
     list_filter = ('product__date_updated', 'product__enable', 'sort', 'product__partner',
                    'product__categories', )
     search_fields = ('product__title', 'product__slug', 'product__pk', )
     resource_class = resources.ProductFeatureResource
-    form = forms.ProductFeatureForm
+    form = catalogue_forms.ProductFeatureForm
 
     class Media:
         js = ("https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css",
@@ -173,13 +191,13 @@ class ProductAdmin(ImportExportMixin, ImportExportActionModelAdmin):
     list_display = ('pk', 'title', 'thumb', 'enable', 'date_updated', 'slug', 'categories_to_str', 'get_product_class',
                     'structure', 'partners_to_str', 'attribute_summary', )
     list_filter = ('enable', 'date_updated', 'partner', 'categories__name', 'structure', 'is_discountable', )
-    inlines = (ProductImageInline, ProductRecommendationInline, ProductFeatureInline)
+    inlines = (StockRecordInline, ProductImageInline, ProductRecommendationInline, ProductFeatureInline)
     prepopulated_fields = {"slug": ("title",)}
     search_fields = ('upc', 'title', 'slug', 'id', )
-    form = forms.ProductForm
+    form = catalogue_forms.ProductForm
     resource_class = resources.ProductResource
     list_select_related = ('product_class', 'partner',)
-    list_attr = ('pk', 'title', 'enable', 'date_updated', 'slug', 'structure', 'product_class__name', )
+    list_attr = ('pk', 'title', 'enable', 'date_updated', 'slug', 'structure', 'product_class__name', 'partner', )
 
     class Media:
         js = ("https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css",
@@ -199,13 +217,13 @@ class ProductAdmin(ImportExportMixin, ImportExportActionModelAdmin):
 
 
 class ProductRecommendationAdmin(ImportExportMixin, ImportExportActionModelAdmin):
-    list_display = ('pk', 'primary', 'product_enable', 'thumb', 'product_date_updated', 'product_categories_to_str',
-                    'product_partner', 'recommendation', 'recommendation_thumb', 'ranking', )
+    list_display = ('pk', 'primary', 'product_slug', 'product_enable', 'thumb', 'product_date_updated',
+                    'product_categories_to_str', 'product_partner', 'recommendation', 'recommendation_thumb', 'ranking',)
     list_filter = ('primary__date_updated', 'primary__enable', 'ranking', 'primary__partner',
                    'primary__categories', )
     search_fields = ('primary__title', 'primary__slug', 'primary__pk', )
     resource_class = resources.ProductRecommendationResource
-    form = forms.ProductRecommendationForm
+    form = catalogue_forms.ProductRecommendationForm
 
     class Media:
         js = ("https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css",
@@ -240,7 +258,7 @@ class CategoryAdmin(ImportExportMixin, ImportExportActionModelAdmin, DraggableMP
     mptt_level_indent = 20
     search_fields = ('name', 'slug', 'id', )
     resource_class = resources.CategoryResource
-    form = forms.CategoryForm
+    form = catalogue_forms.CategoryForm
 
     class Media:
         js = ("https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css",

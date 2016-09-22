@@ -101,21 +101,13 @@ class CategoryForm(forms.ModelForm):
         }
 
 
-class StockRecordForm(forms.ModelForm):
-    class Meta:
-        model = StockRecord
-        fields = '__all__'
-        widgets = {
-            'partner': autocomplete.ModelSelect2(url='partner-autocomplete')
-        }
-
-
 class ProductForm(forms.ModelForm):
     class Meta:
         model = Product
         fields = '__all__'
         widgets = {
             'parent': autocomplete.ModelSelect2(url='product-autocomplete'),
+            'partner': autocomplete.ModelSelect2(url='partner-autocomplete'),
             'filters': autocomplete.ModelSelect2Multiple(url='feature-autocomplete'),
             'categories': autocomplete.ModelSelect2Multiple(url='categories-autocomplete'),
             'characteristics': autocomplete.ModelSelect2Multiple(url='feature-autocomplete'),
