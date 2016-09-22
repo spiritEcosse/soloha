@@ -113,26 +113,6 @@ class MissingProductImage(object):
                                            settings.MEDIA_ROOT))
 
 
-# Todo delete this model after transfer data
-@python_2_unicode_compatible
-class AbstractProductVersion(models.Model, CommonFeatureProduct):
-    attributes = models.ManyToManyField('catalogue.Feature', through='catalogue.VersionAttribute',
-                                        verbose_name=_('Attributes'), related_name='product_versions')
-    product = models.ForeignKey('catalogue.Product', related_name='versions', on_delete=models.DO_NOTHING)
-    price_retail = models.DecimalField(_("Price (retail)"), decimal_places=2, max_digits=12)
-    cost_price = models.DecimalField(_("Cost Price"), decimal_places=2, max_digits=12)
-
-    class Meta:
-        abstract = True
-        ordering = ('product', 'price_retail', )
-        app_label = 'catalogue'
-        verbose_name = _('Product version')
-        verbose_name_plural = _('Product versions')
-
-    def __str__(self):
-        return u'{}, Version of product - {}'.format(self.pk, getattr(self, 'product', None))
-
-
 @python_2_unicode_compatible
 class AbstractProduct(models.Model, CommonFeatureProduct):
     # Title is mandatory for canonical products but optional for child products
@@ -321,15 +301,6 @@ class AbstractProduct(models.Model, CommonFeatureProduct):
         # self.attr.save()
 
     # Properties
-
-    @property
-    def version_first(self):
-        if self.is_parent:
-            product_versions = self.versions.model.objects.filter(product__parent=self)
-        else:
-            product_versions = self.versions
-
-        return product_versions.order_by('stockrecord__price_excl_tax').first()
 
     @property
     def is_standalone(self):
@@ -1039,42 +1010,6 @@ class CustomAbstractCategory(MPTTModel):
             options = {'size': (50, 31), 'crop': True}
             icon = get_thumbnailer(self.icon).get_thumbnail(options).url
         return icon
-
-
-# todo delete this model, after trans data
-@python_2_unicode_compatible
-class AbstractVersionAttribute(models.Model, CommonFeatureProduct):
-    version = models.ForeignKey(
-        'catalogue.ProductVersion', verbose_name=_('Version of product'),
-        related_name='version_attributes'
-    )
-    attribute = models.ForeignKey('catalogue.Feature', verbose_name=_('Attribute'), related_name='version_attributes')
-    price_retail = models.DecimalField(_("Price (retail)"), decimal_places=2, max_digits=12, blank=True, default=0)
-    cost_price = models.DecimalField(_("Cost Price"), decimal_places=2, max_digits=12, blank=True, default=0)
-
-    class Meta:
-        abstract = True
-        unique_together = ('version', 'attribute', )
-        app_label = 'catalogue'
-        verbose_name = _('Version attribute')
-        verbose_name_plural = _('Version attributes')
-
-    def __str__(self):
-        return u'{}, {} - {}'.format(self.pk, self.version.product.title, self.attribute.title)
-
-    def save(self, **kwargs):
-        product_versions = self.version._meta.model.objects.filter(product=self.version.product)
-        search_attributes = (sorted(attr.pk for attr in product_version.attributes.all()) for product_version in product_versions)
-        current_attributes = list(self.version.attributes.all()) + [self.attribute]
-        current_attributes = sorted([attr.pk for attr in current_attributes])
-
-        if current_attributes in search_attributes:
-            raise IntegrityError(u'UNIQUE constraint failed: catalogue_productversion.version_id, catalogue_productversion.attribute_id'.format(self.attribute))
-        super(AbstractVersionAttribute, self).save(**kwargs)
-
-    @property
-    def product(self):
-        return self.version.product
 
 
 @python_2_unicode_compatible

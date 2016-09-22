@@ -12,8 +12,6 @@ Feature = get_model('catalogue', 'Feature')
 Category = get_model('catalogue', 'Category')
 Product = get_model('catalogue', 'Product')
 ProductImage = get_model('catalogue', 'ProductImage')
-ProductVersion = get_model('catalogue', 'ProductVersion')
-VersionAttribute = get_model('catalogue', 'VersionAttribute')
 ProductFeature = get_model('catalogue', 'ProductFeature')
 StockRecord = get_model('partner', 'StockRecord')
 Partner = get_model('partner', 'Partner')
@@ -83,15 +81,6 @@ class ProductRecommendationForm(forms.ModelForm):
         }
 
 
-class ProductVersionForm(forms.ModelForm):
-    class Meta:
-        fields = '__all__'
-        model = ProductVersion
-        widgets = {
-            'product': autocomplete.ModelSelect2(url='product-autocomplete'),
-        }
-
-
 class ProductFeatureForm(forms.ModelForm):
     class Meta:
         fields = '__all__'
@@ -100,15 +89,6 @@ class ProductFeatureForm(forms.ModelForm):
             'product': autocomplete.ModelSelect2(url='product-autocomplete'),
             'feature': autocomplete.ModelSelect2(url='feature-autocomplete'),
             'product_with_images': autocomplete.ModelSelect2Multiple(url='product-autocomplete'),
-        }
-
-
-class VersionAttributeForm(forms.ModelForm):
-    class Meta:
-        model = VersionAttribute
-        fields = '__all__'
-        widgets = {
-            'attribute': autocomplete.ModelSelect2(url='feature-autocomplete'),
         }
 
 

@@ -16,6 +16,5 @@ class BrowsableProductManager(BrowsableProductManagerCore):
             Prefetch('images__original'),
             Prefetch('categories__parent__parent'),
             Prefetch('characteristics'),
-            Prefetch('versions'),
         )
 

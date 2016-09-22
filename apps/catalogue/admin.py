@@ -40,8 +40,6 @@ ProductAttribute = get_model('catalogue', 'ProductAttribute')
 ProductAttributeValue = get_model('catalogue', 'ProductAttributeValue')
 ProductClass = get_model('catalogue', 'ProductClass')
 ProductImage = get_model('catalogue', 'ProductImage')
-ProductVersion = get_model('catalogue', 'ProductVersion')
-VersionAttribute = get_model('catalogue', 'VersionAttribute')
 ProductFeature = get_model('catalogue', 'ProductFeature')
 ProductRecommendation = get_model('catalogue', 'ProductRecommendation')
 StockRecord = get_model('partner', 'StockRecord')
@@ -88,13 +86,6 @@ class FeatureAutocomplete(autocomplete.Select2QuerySetView):
         return qs
 
 
-class VersionAttributeInline(admin.TabularInline):
-    model = VersionAttribute
-    form = forms.VersionAttributeForm
-    fk_name = 'version'
-    extra = 3
-
-
 class StockRecordInline(admin.StackedInline):
     model = StockRecord
     form = forms.StockRecordForm
@@ -133,7 +124,7 @@ class ProductImageAdmin(ImportExportMixin, ImportExportActionModelAdmin):
     list_display = ('pk', 'thumb', 'product', 'product_date_updated', 'display_order', 'caption', 'product_enable',
                     'product_categories_to_str', 'product_partner', 'date_created', )
     list_filter = ('product__date_updated', 'date_created', 'product__enable', 'display_order',
-                   'product__stockrecords__partner', 'product__categories', )
+                   'product__partner', 'product__categories', )
     search_fields = ('product__title', 'product__slug', 'product__pk', )
     form = forms.ProductImageForm
 
@@ -164,28 +155,10 @@ class ProductClassAdmin(admin.ModelAdmin):
     inlines = [ProductAttributeInline]
 
 
-class ProductVersionAdmin(ImportExportMixin, ImportExportActionModelAdmin):
-    form = forms.ProductVersionForm
-    inlines = (VersionAttributeInline, )
-    resource_class = resources.ProductVersionResource
-    list_display = ('pk', 'thumb', 'product', 'product_slug', 'product_date_updated', 'product_enable',
-                    'product_categories_to_str', 'product_partner', )
-    list_filter = ('product__date_updated', 'product__enable', 'product__partner', 'product__categories',)
-    search_fields = ('product__title', 'product__slug', 'product__pk', )
-
-    class Media:
-        js = ("https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css",
-              "https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js")
-
-    # ToDo @igor: user cannot delete if has permission
-    def for_delete(self, row, instance):
-        return self.fields['delete'].clean(row)
-
-
 class ProductFeatureAdmin(ImportExportMixin, ImportExportActionModelAdmin):
     list_display = ('pk', 'product', 'thumb', 'feature', 'product_date_updated', 'sort', 'info', 'product_enable',
                     'product_categories_to_str', 'product_partner', )
-    list_filter = ('product__date_updated', 'product__enable', 'sort', 'product__stockrecords__partner',
+    list_filter = ('product__date_updated', 'product__enable', 'sort', 'product__partner',
                    'product__categories', )
     search_fields = ('product__title', 'product__slug', 'product__pk', )
     resource_class = resources.ProductFeatureResource
@@ -199,13 +172,13 @@ class ProductFeatureAdmin(ImportExportMixin, ImportExportActionModelAdmin):
 class ProductAdmin(ImportExportMixin, ImportExportActionModelAdmin):
     list_display = ('pk', 'title', 'thumb', 'enable', 'date_updated', 'slug', 'categories_to_str', 'get_product_class',
                     'structure', 'partners_to_str', 'attribute_summary', )
-    list_filter = ('enable', 'date_updated', 'stockrecords__partner', 'categories__name', 'structure', 'is_discountable', )
+    list_filter = ('enable', 'date_updated', 'partner', 'categories__name', 'structure', 'is_discountable', )
     inlines = (ProductImageInline, ProductRecommendationInline, ProductFeatureInline)
     prepopulated_fields = {"slug": ("title",)}
     search_fields = ('upc', 'title', 'slug', 'id', )
     form = forms.ProductForm
     resource_class = resources.ProductResource
-    list_select_related = ('product_class', )
+    list_select_related = ('product_class', 'partner',)
     list_attr = ('pk', 'title', 'enable', 'date_updated', 'slug', 'structure', 'product_class__name', )
 
     class Media:
@@ -220,7 +193,6 @@ class ProductAdmin(ImportExportMixin, ImportExportActionModelAdmin):
             Prefetch('attribute_values'),
             Prefetch('attributes'),
             Prefetch('categories__parent__parent'),
-            Prefetch('stockrecords__partner'),
             Prefetch('filters'),
             Prefetch('characteristics'),
         )
@@ -229,7 +201,7 @@ class ProductAdmin(ImportExportMixin, ImportExportActionModelAdmin):
 class ProductRecommendationAdmin(ImportExportMixin, ImportExportActionModelAdmin):
     list_display = ('pk', 'primary', 'product_enable', 'thumb', 'product_date_updated', 'product_categories_to_str',
                     'product_partner', 'recommendation', 'recommendation_thumb', 'ranking', )
-    list_filter = ('primary__date_updated', 'primary__enable', 'ranking', 'primary__stockrecords__partner',
+    list_filter = ('primary__date_updated', 'primary__enable', 'ranking', 'primary__partner',
                    'primary__categories', )
     search_fields = ('primary__title', 'primary__slug', 'primary__pk', )
     resource_class = resources.ProductRecommendationResource
@@ -275,13 +247,6 @@ class CategoryAdmin(ImportExportMixin, ImportExportActionModelAdmin, DraggableMP
               "https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js")
 
 
-class VersionAttributeAdmin(ImportExportMixin, ImportExportActionModelAdmin):
-    search_fields = ('version__product__title', 'version__product__slug', 'version__product__id', )
-    list_display = ('pk', 'attribute', 'product', 'product_slug', 'thumb', 'version', )
-    resource_class = resources.VersionAttributeResource
-
-
-admin.site.register(VersionAttribute, VersionAttributeAdmin)
 admin.site.register(ProductClass, ProductClassAdmin)
 admin.site.register(Product, ProductAdmin)
 admin.site.register(ProductAttribute, ProductAttributeAdmin)
@@ -293,4 +258,3 @@ admin.site.register(Category, CategoryAdmin)
 admin.site.register(Feature, FeatureAdmin)
 admin.site.register(ProductFeature, ProductFeatureAdmin)
 admin.site.register(ProductRecommendation, ProductRecommendationAdmin)
-admin.site.register(ProductVersion, ProductVersionAdmin)

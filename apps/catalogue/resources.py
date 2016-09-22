@@ -34,8 +34,6 @@ Product = get_model('catalogue', 'Product')
 ProductAttribute = get_model('catalogue', 'ProductAttribute')
 ProductAttributeValue = get_model('catalogue', 'ProductAttributeValue')
 ProductImage = get_model('catalogue', 'ProductImage')
-ProductVersion = get_model('catalogue', 'ProductVersion')
-VersionAttribute = get_model('catalogue', 'VersionAttribute')
 ProductFeature = get_model('catalogue', 'ProductFeature')
 ProductRecommendation = get_model('catalogue', 'ProductRecommendation')
 
@@ -297,42 +295,6 @@ class FeatureResource(ModelResource):
         model = Feature
         fields = ('id', 'delete', 'title', 'slug', 'parent', 'sort', 'bottom_line', 'top_line',)
         export_order = fields
-
-
-class VersionAttributeResource(ModelResource):
-    attribute = fields.Field(
-        attribute='attribute', column_name=_('Attribute'),
-        widget=import_export_widgets.ForeignKeyWidget(model=Feature, field='slug')
-    )
-    version = fields.Field(
-        attribute='version', column_name=_('Version of product'),
-        widget=import_export_widgets.ForeignKeyWidget(model=ProductVersion)
-    )
-    product = fields.Field(
-        attribute='version__product', column_name=_('Product title (will not change the product)'),
-        widget=import_export_widgets.ForeignKeyWidget(model=Product, field='slug')
-    )
-
-    class Meta:
-        model = VersionAttribute
-        fields = ('id', 'delete', 'attribute', 'version', 'product', )
-        export_order = fields
-
-
-class ProductVersionResource(ModelResource):
-    product = fields.Field(
-        column_name='product', attribute='product',
-        widget=import_export_widgets.ForeignKeyWidget(model=Product, field='slug')
-    )
-    attributes = Field(
-        column_name='attributes', attribute='attributes',
-        widget=widgets.IntermediateModelManyToManyWidget(model=Feature, field='slug')
-    )
-
-    class Meta:
-        fields = ('id', 'delete', 'product', 'attributes', )
-        export_order = fields
-        model = ProductVersion
 
 
 class ProductFeatureResource(ModelResource):

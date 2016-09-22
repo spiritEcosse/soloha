@@ -20,26 +20,19 @@ class AbstractStockRecord(models.Model, CommonFeatureProduct):
     Stockrecords are used by 'strategies' to determine availability and pricing
     information for the customer.
     """
-    # ToDo clean null = True
-    product = models.ForeignKey('catalogue.Product', related_name="stockrecords", verbose_name=_("Product"), null=True)
-    # Todo delete this field
-    product_version = models.OneToOneField(
-        'catalogue.ProductVersion', related_name="stockrecord",
-        verbose_name=_("Product Version"),
-        null=True, blank=True
-    )
+    product = models.ForeignKey('catalogue.Product', related_name="stockrecords", verbose_name=_("Product"))
     attributes = models.ManyToManyField(
         'catalogue.Feature', verbose_name=_('Attributes'), related_name='stockrecords'
     )
 
-    # ToDo delete this field, after pass data to product.partner
+    # ToDo delete this field
     partner = models.ForeignKey('partner.Partner', verbose_name=_("Partner"),related_name='stockrecords', null=True, blank=True)
 
     #: The fulfilment partner will often have their own SKU for a product,
     #: which we store here.  This will sometimes be the same the product's UPC
     #: but not always.  It should be unique per partner.
     #: See also http://en.wikipedia.org/wiki/Stock-keeping_unit
-    # ToDo delete this field, after pass data to product.partner
+    # ToDo delete this field
     partner_sku = models.CharField(_("Partner SKU"), max_length=128, blank=True)
 
     # Price info:

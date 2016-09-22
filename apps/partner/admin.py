@@ -1,20 +1,16 @@
 from import_export.admin import ImportExportMixin, ImportExportActionModelAdmin
-from oscar.apps.partner.admin import *  # noqa
 from dal import autocomplete
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 import resources
-
-Partner = get_model('partner', 'Partner')
-StockRecord = get_model('partner', 'StockRecord')
+from django.contrib import admin
+from models import Partner, StockRecord
 
 
 class StockRecordAdmin(ImportExportMixin, ImportExportActionModelAdmin):
     resource_class = resources.StockRecordResource
-    list_display = ('pk', 'product',
-                    # Todo uncomment after delete field - product
-                    # 'thumb', 'product_enable', 'product_partner', 'product_categories_to_str',
+    list_display = ('pk', 'product', 'thumb', 'product_enable', 'product_partner', 'product_categories_to_str',
                     'price_currency', 'price_excl_tax',
                     'price_retail', 'cost_price', 'num_in_stock', 'num_allocated', 'low_stock_threshold',)
     search_fields = ('product__slug', 'product__title', 'product__pk', )
@@ -41,7 +37,5 @@ class PartnerAutocomplete(autocomplete.Select2QuerySetView):
         return qs
 
 
-admin.site.unregister(Partner)
 admin.site.register(Partner, PartnerdAdmin)
-admin.site.unregister(StockRecord)
 admin.site.register(StockRecord, StockRecordAdmin)

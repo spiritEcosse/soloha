@@ -2,8 +2,7 @@ from oscar.core.loading import is_model_registered
 from oscar.apps.catalogue.abstract_models import *  # noqa
 from django.utils.translation import ugettext_lazy as _
 from apps.catalogue.abstract_models import AbstractProduct, AbstractFeature, CustomAbstractCategory, \
-    AbstractProductVersion, AbstractVersionAttribute, AbstractProductFeature, AbstractProductOptions, \
-    AbstractProductImage, CommonFeatureProduct
+    AbstractProductFeature, AbstractProductOptions, AbstractProductImage, CommonFeatureProduct
 from django.contrib.sites.models import Site
 from django.contrib.postgres.fields import ArrayField
 from django.forms import TextInput
@@ -32,18 +31,6 @@ if not is_model_registered('catalogue', 'ProductOptions'):
         pass
 
     __all__.append(ProductOptions)
-
-if not is_model_registered('catalogue', 'ProductVersion'):
-    class ProductVersion(AbstractProductVersion):
-        pass
-
-    __all__.append(ProductVersion)
-
-if not is_model_registered('catalogue', 'VersionAttribute'):
-    class VersionAttribute(AbstractVersionAttribute):
-        pass
-
-    __all__.append('VersionAttribute')
 
 if not is_model_registered('catalogue', 'Category'):
     class Category(CustomAbstractCategory):
