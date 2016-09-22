@@ -4,6 +4,8 @@
 {% load promotion_tags %}
 {% load category_tags %}
 {% load product_tags %}
+{% load mptt_tags %}
+{% load catalogue %}
 {% load i18n %}
 
 {% block title %}
@@ -21,28 +23,30 @@
     </ul>
 {% endblock breadcrumbs %}
 
-{% block column_left %}
-    {% category_tree as tree_categories %}
-    {% if tree_categories %}
-        <h4>{% trans "Show results for" %}</h4>
-        <div class="side_categories">
-            <ul class="nav nav-list">
-                {% for tree_category, info in tree_categories %}
-                    <li>
-                    {% if tree_category.pk == category.pk %}
-                        <strong>{{ tree_category.name }}</strong>
-                    {% else %}
-                        <a href="{{ tree_category.get_absolute_url }}">{{ tree_category.name }}</a>
-                    {% endif %}
+{% block left-bar %}
+    {% full_tree_for_model catalogue.Category as categories %}
 
-                    {% if info.has_children %}<ul>{% else %}</li>{% endif %}
-                    {% for n in info.num_to_close %}
-                        </ul></li>
-                    {% endfor %}
-                {% endfor %}
-            </ul>
-        </div>
+    {% if categories %}
+        <div class="heading">{% trans "All categories" %}</div>
+        <div class="list-group">
+                {% recursetree categories %}
+                    {% if node.enable %}
+                        {% with title=node.name|lower|capfirst|truncatechars:63 url=node.get_absolute_url %}
+                            <a href="{{ node.get_absolute_url }}" class="list-group-item{% ifequal category.slug node.slug %} active{% endifequal %}">
+                                {{ title }} {% if not node.is_leaf_node %}<span class="caret"></span>{% endif %}
+                            </a>
+
+                            {% if not node.is_leaf_node %}
+                                <div class="collapse list-group-submenu in">
+                                    {{ children }}
+                                </div>
+                            {% endif %}
+                        {% endwith %}
+                    {% endif %}
+                {% endrecursetree %}
+            </div>
     {% endif %}
+
     {% if has_facets %}
         <h4>{% trans "Refine by" %}</h4>
         <div class="side_categories">
@@ -56,7 +60,9 @@
 {% endblock %}
 
 {% block content %}
-    <form method="get" class="form-horizontal">
+    <div class="row sort">
+        <div class="col-xs-8">
+            <form method="get" class="form-horizontal">
         {# Render other search params in a hidden block #}
         <div style="display:none">
             {% for value in selected_facets %}
@@ -90,22 +96,49 @@
             </p>
         {% endif %}
     </form>
-
-    {% if products %}
-        <section>
-            <div>
-                <ol class="row">
-                    {% for product in products %}
-                        <li class="col-xs-6 col-sm-4 col-md-3 col-lg-3">{% render_product product %}</li>
+        </div>
+        <div class="col-xs-16">
+            <span class="text">{% trans 'Sort by' %}:</span>
+            <div class="btn-group btn-group-md" role="group" aria-label="{% trans 'Sort by' %}">
+                {% with url_extra_kwargs.sort|default:orders.0.argument as select_order %}
+                    {% for order in orders %}
+                        {% if forloop.first %}
+                            {% assign sort None %}
+                        {% else %}
+                            {% assign sort order.argument %}
+                        {% endif %}
+                        <a href="{% reverse_url url_view_name url_extra_kwargs sort=sort %}"
+                           class="btn {% if select_order == order.argument %} btn-danger disabled{% else %} btn-default{% endif %}"
+                           title="{{ order.title }}">
+                            {{ order.title }}
+                        </a>
                     {% endfor %}
-                </ol>
-                {% include "partials/pagination.html" %}
+                {% endwith %}
             </div>
-        </section>
-    {% else %}
-        <p class="nonefound">{% trans "No products found." %}</p>
-    {% endif %}
+        </div>
+    </div>
 
+    <section>
+        <div class="row items">
+            {% if page_obj|length %}
+                {% for product in page_obj %}
+                    <div class="col-sm-6 col-md-6">
+                        {% render_product product %}
+                    </div>
+                {% endfor %}
+                <div class="col-xs-24 text-right">
+                    {% include "catalogue/partials/pagination.html" %}
+                </div>
+            {% else %}
+                <div class="col-xs-24">
+                    <div class="alert alert-info">
+                        <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                        {% trans "No products found." %}
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </section>
 {% endblock content %}
 
 {% block onbodyload %}

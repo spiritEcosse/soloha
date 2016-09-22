@@ -4,7 +4,7 @@ from django.views import generic
 from django.views.generic import View
 from oscar.core.loading import get_model
 from braces import views
-from django.views.generic.detail import SingleObjectMixin
+from django.views.generic.detail import SingleObjectMixin, ContextMixin
 from django.http import HttpResponsePermanentRedirect, HttpResponse, Http404
 from django.utils.http import urlquote
 from soloha.settings import OSCAR_PRODUCTS_PER_PAGE
@@ -66,21 +66,63 @@ class Filter(object):
         return filter_product_feature
 
 
-class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, SingleObjectMixin, generic.ListView):
-    template_name = 'catalogue/category.html'
-    enforce_paths = True
-    model = Product
-    model_category = Category
-    paginate_by = OSCAR_PRODUCTS_PER_PAGE
+class BaseCatalogue(ContextMixin):
+    url_view_name = 'catalogue:index'
+    use_keys = ('sort', )
     orders = (
         Order(title='By popularity', column='-views_count', argument='popularity'),
         Order(title='By price ascending', column='stockrecords__price_excl_tax', argument='price_ascending'),
         Order(title='By price descending', column='-stockrecords__price_excl_tax', argument='price_descending'),
     )
+
+    def get_context_data(self, **kwargs):
+        context = super(BaseCatalogue, self).get_context_data(**kwargs)
+        context['url_view_name'] = self.url_view_name
+        context['url_extra_kwargs'] = {key: value for key, value in self.kwargs.items()
+                                       if key in self.use_keys and value is not None}
+        context['page'] = self.kwargs.get('page', None)
+        context['orders'] = self.orders
+        return context
+
+
+class CatalogueView(BaseCatalogue, generic.ListView):
+    model = Product
+    paginate_by = OSCAR_PRODUCTS_PER_PAGE
+    template_name = 'catalogue/browse.html'
+
+    def get_queryset(self, **kwargs):
+        sort_argument = self.kwargs.get('sort') or self.orders[0].argument
+        sort = filter(lambda order: order.argument == sort_argument, self.orders)[0]
+
+        queryset = super(CatalogueView, self).get_queryset()
+        queryset = queryset.filter(enable=True)
+
+        queryset = queryset.distinct().select_related('product_class').prefetch_related(
+            Prefetch('images'),
+            Prefetch('characteristics'),
+            Prefetch('product_class__options'),
+            Prefetch('stockrecords'),
+            Prefetch('categories__parent__parent'),
+        ).order_by(sort.column)
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super(CatalogueView, self).get_context_data(**kwargs)
+        context['summary'] = _("All products")
+        return context
+
+
+class ProductCategoryView(BaseCatalogue, views.JSONResponseMixin, views.AjaxResponseMixin, SingleObjectMixin, generic.ListView):
+    template_name = 'catalogue/category.html'
+    enforce_paths = True
+    model = Product
+    model_category = Category
+    paginate_by = OSCAR_PRODUCTS_PER_PAGE
     use_keys = ('sort', 'filter_slug', )
     feature_only = ('title', 'slug', 'parent__id', 'parent__title', )
     feature_orders = ('parent__sort', 'parent__title',)
     filter_slug = 'filter_slug'
+    url_view_name = 'catalogue:category'
 
     def post(self, request, *args, **kwargs):
         if self.request.is_ajax():
@@ -222,11 +264,7 @@ class ProductCategoryView(views.JSONResponseMixin, views.AjaxResponseMixin, Sing
 
             feature.potential_products_count = feature.potential_products_count.count()
 
-        context['url_extra_kwargs'] = {key: value for key, value in self.kwargs.items()
-                                       if key in self.use_keys and value is not None}
         context['url_extra_kwargs'].update({'category_slug': self.kwargs.get('category_slug')})
-        context['page'] = self.kwargs.get('page', None)
-        context['orders'] = self.orders
         context['selected_filters'] = self.selected_filters
         return context
 

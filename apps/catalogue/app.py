@@ -14,6 +14,7 @@ class CatalogueApplication(CoreCatalogueApplication):
 
     def get_urls(self):
         urlpatterns = [
+            url(r'^(?:page/(?P<page>\d+)/)?(?:sort/(?P<sort>[\w-]+)/)?$', self.catalogue_view.as_view(), name='index'),
             url(r'^category/(?P<category_slug>[\w-]+(/[\w-]+)*)/product/(?P<product_slug>[\w-]+)/$', self.detail_view.as_view(), name='detail'),
             url(r'^category/(?P<category_slug>[\w-]+(/(?!filter|page|sort)[\w-]+(?!filter|page|sort))*)(?:/filter/(?P<filter_slug>[\w-]+(/(?!page|sort)[\w-]+(?!page|sort))*))*/(?:page/(?P<page>\d+)/)?(?:sort/(?P<sort>[\w-]+)/)?$',
                 self.product_category_view.as_view(), name='category'),

@@ -13,6 +13,8 @@ from ckeditor_uploader.fields import RichTextUploadingField
 from filer.fields.image import FilerImageField
 import logging
 from django.template import loader, Context
+from django.template.defaultfilters import truncatechars
+from django.utils.html import strip_tags
 
 logger = logging.getLogger(__name__)
 
@@ -439,6 +441,15 @@ class AbstractProduct(models.Model, CommonFeatureProduct):
         return raw_prices[0] if raw_prices else None
 
     # Wrappers for child products
+
+    def get_h1(self):
+        return self.h1 or self.get_title()
+
+    def get_meta_title(self):
+        return self.meta_title or self.get_title()
+
+    def get_meta_description(self):
+        return self.meta_description or truncatechars(strip_tags(self.description), 100)
 
     def get_title(self):
         """
@@ -900,6 +911,15 @@ class CustomAbstractCategory(MPTTModel):
             options = {'size': (544, 212), 'crop': True}
             image_banner = get_thumbnailer(self.image_banner).get_thumbnail(options).url
         return image_banner
+
+    def get_meta_title(self):
+        return self.meta_title or self.name
+
+    def get_h1(self):
+        return self.h1 or self.name
+
+    def get_meta_description(self):
+        return self.meta_description or truncatechars(strip_tags(self.description), 100)
 
     def get_absolute_url(self, values={}):
         """

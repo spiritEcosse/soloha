@@ -9188,17 +9188,14 @@ header .bottom .navbar .nav > li .yamm-content .image .btn-menu {
 }
 .main .left-bar {
   padding-bottom: 10px;
-  border: 1px solid rgba(194, 194, 194, 0.32);
-  border-radius: 2px;
   box-shadow: 1.2px 1.6px 3px rgba(194, 194, 194, 0.75);
   margin-top: 10px;
   margin-bottom: 10px;
 }
 .main .left-bar .checkbox {
-  padding-left: 0;
-  padding-right: 0;
-  padding-top: 0;
+  padding: 0;
   border: none;
+  margin-bottom: 10px;
 }
 .main .left-bar .heading {
   text-align: center;
@@ -9209,7 +9206,6 @@ header .bottom .navbar .nav > li .yamm-content .image .btn-menu {
   font-weight: 400;
 }
 .main .left-bar .filter .items {
-  padding: 10px;
   border-top: 1px solid rgba(194, 194, 194, 0.39);
   border-radius: 2px;
 }

@@ -25,7 +25,7 @@
     {% if selected_filters.exists %}
         {% include 'catalogue/partials/meta_tags.html' %}.
     {% endif %}
-    {{ category.meta_title }} | {{ block.super }}
+    {{ category.get_meta_title }} | {{ block.super }}
 {% endblock %}
 
 {# Todo refactoring remove {% regroup selected_filters by parent as group_filters %} and query from db #}
@@ -33,7 +33,7 @@
     {% if selected_filters.exists %}
         {% include 'catalogue/partials/meta_tags.html' %}.
     {% endif %}
-    {{ category.meta_description|default:""|striptags }}
+    {{ category.get_meta_description|default:""|striptags }}
 {% endblock %}
 
 {# Todo refactoring remove {% regroup selected_filters by parent as group_filters %} and query from db #}
@@ -57,7 +57,7 @@
             <div class="filter">
                 {% for filter in group_filters %}
                     <div class="items">
-                        <div class="name" title="{{ filter.grouper.title }}">
+                        <div class="name text-center" title="{{ filter.grouper.title }}">
                             {{ filter.grouper.title|truncatechars:trancate_filter }}
                         </div>
                         <div class="values">
@@ -92,7 +92,7 @@
                 {% endif %}
 
                 <div class="items">
-                    <div class="name" title="{{ filter.grouper.title }}">
+                    <div class="name text-center" title="{{ filter.grouper.title }}">
                         {{ filter.grouper.title|truncatechars:trancate_filter }}
                     </div>
                     <div class="values">
@@ -149,80 +149,7 @@
     </ol>
 {% endblock %}
 
-{% block headertext %}{{ category.name }}{% endblock %}
-
-{% block content %}
-    <div class="row categories">
-        <div class="col-xs-18 col-sm-21">
-            <div class="row relative">
-                <div class="col-xs-1 prevSlide absolute" id="goToPrevSlide"></div>
-                <div class="col-xs-22 col-xs-offset-1">
-                    <div class="lightSlider">
-                        <a href="{{ category.get_absolute_url }}">
-                            {% for children in category.children.all %}
-                                <div class="col-xs-12 col-sm-4 item text-center">
-                                    <a href="{{ children.get_absolute_url }}">
-                                        <img src="" class="img-responsive"/>
-                                        <div class="title"></div>
-                                    </a>
-                                </div>
-                            {% endfor %}
-                        </a>
-                    </div>
-                </div>
-                <div class="col-xs-1 nextSlide absolute" id="goToNextSlide"></div>
-            </div>
-        </div>
-        <div class="col-xs-3 col-sm-3 text-center">
-            <a href="#"><div class="arrow"></div>Посмотреть все кровати</a>
-        </div>
-    </div>
-
-    <div class="row sort">
-        <div class="col-xs-8">
-        </div>
-        <div class="col-xs-16">
-            <span class="text">Сортировать:</span>
-            <div class="btn-group btn-group-md" role="group" aria-label="Sort">
-                {% with url_extra_kwargs.sort|default:orders.0.argument as select_order %}
-                    {% for order in orders %}
-                        {% if forloop.first %}
-                            {% assign sort None %}
-                        {% else %}
-                            {% assign sort order.argument %}
-                        {% endif %}
-                        <a href="{% reverse_url 'catalogue:category' url_extra_kwargs sort=sort %}"
-                           class="btn {% if select_order == order.argument %} btn-danger disabled{% else %} btn-default{% endif %}"
-                           title="{{ order.title }}">
-                            {{ order.title }}
-                        </a>
-                    {% endfor %}
-                {% endwith %}
-            </div>
-        </div>
-    </div>
-
-    <div class="row items">
-        {% if page_obj|length %}
-            {% for product in page_obj %}
-                <div class="col-sm-6 col-md-6">
-                    {% include "catalogue/partials/product.html" %}
-                </div>
-            {% endfor %}
-            <div class="col-xs-24 text-right">
-                {% include "catalogue/partials/pagination.html" %}
-            </div>
-        {% else %}
-            <div class="col-xs-24">
-                <div class="alert alert-info">
-                    <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
-                    {% trans "No products found." %}
-                </div>
-            </div>
-        {% endif %}
-    </div>
-{% endblock %}
-
+{% block headertext %}{{ category.get_h1 }}{% endblock %}
 
 {% block post_content %}
     <div class="row">

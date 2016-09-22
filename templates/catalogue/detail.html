@@ -29,11 +29,11 @@
 {% block ngController %}ng-controller="Product" {% endblock ngController %}
 
 {% block title %}
-    {{ product.title }} | {{ block.super }}
+    {{ product.get_meta_title|default:""|striptags }} | {{ block.super }}
 {% endblock %}
 
 {% block description %}
-    {{ product.meta_description|default:""|striptags }}
+    {{ product.get_meta_description|default:""|striptags }}
 {% endblock %}
 
 {% block keywords %}
@@ -65,7 +65,7 @@
     </ul>
 {% endblock breadcrumbs %}
 
-{% block headertext %}{{ product.get_title }}{% endblock %}
+{% block headertext %}{{ product.get_h1|default:""|striptags }}{% endblock %}
 
 {% assign product|is_review_permitted:user is_review_permitted %}
 
