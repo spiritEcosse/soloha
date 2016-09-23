@@ -55,7 +55,7 @@
                         </div>
                         <div class="values">
                             <ul class="list-group">
-                                {% for value in filter.list %}
+                                {% for value in filter.list|dictsort:'title' %}
                                     <li class="list-group-item checkbox">
                                         {% assign clear_filter selected_filters|remove:value %}
                                         {% trans 'Clear' as title %}
@@ -90,7 +90,7 @@
                     </div>
                     <div class="values">
                         <ul class="list-group">
-                            {% for value in filter.list %}
+                            {% for value in filter.list|dictsort:'title' %}
                                 {% assign add '' %}
 
                                 {% if filter_in_parents and value.potential_products_count %}
