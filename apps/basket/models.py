@@ -169,8 +169,8 @@ class Basket(AbstractBasket):
         if options:
             base = "%s_%s" % (base, zlib.crc32(repr(options).encode('utf8')))
 
-        if attributes is not None:
-            base = "%s_%s" % (base, zlib.crc32(repr(attributes).encode('utf8')))
+        if attributes:
+            base = u"%s_%s" % (base, zlib.crc32(repr(attributes)))
 
         return base
 
