@@ -11,8 +11,8 @@
     {% assign price_color 'price_color_white' %}
 {% endif %}
 
-{% if session.price.exists %}
-    <div class="{{ price_color }}">
+<div class="{{ price_color }}">
+    {% if session.price.exists %}
         {% if session.price.excl_tax == 0 %}
             {% trans "Free" %}
         {% elif session.price.is_tax_known %}
@@ -20,12 +20,11 @@
         {% else %}
             {{ session.price.excl_tax|currency:session.price.currency }}
         {% endif %}
-    </div>
-{% else %}
-    <div>
-        {% trans 'Price check with the manager.' %}
-    </div>
-{% endif %}
-
-
-
+    {% else %}
+        {% if verbose %}
+            {{ session.availability.message }}
+        {% else %}
+            {{ session.availability.short_message }}
+        {% endif %}
+    {% endif %}
+</div>
