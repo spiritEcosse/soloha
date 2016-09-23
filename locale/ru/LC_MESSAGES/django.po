@@ -1,0 +1,4806 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2016-09-23 13:44+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+
+#: apps/basket/forms.py:19
+msgid "Save for Later"
+msgstr ""
+
+#: apps/basket/forms.py:77
+msgid "Move to Basket"
+msgstr ""
+
+#: apps/basket/forms.py:126
+#: templates/dashboard/catalogue/product_class_form.html:98
+#: templates/dashboard/comms/list.html:31
+#: templates/dashboard/vouchers/voucher_delete.html:38
+#: templates/dashboard/vouchers/voucher_detail.html:33
+#: templates/dashboard/vouchers/voucher_list.html:51
+msgid "Code"
+msgstr ""
+
+#: apps/basket/forms.py:136 apps/basket/forms.py:314
+#: templates/basket/partials/basket_content.html:31
+#: templates/checkout/checkout.html:110 templates/checkout/thank_you.html:120
+#: templates/customer/wishlists/wishlists_detail.html:33
+#: templates/dashboard/orders/line_detail.html:53
+#: templates/dashboard/orders/line_detail.html:111
+#: templates/dashboard/orders/line_detail.html:136
+#: templates/dashboard/orders/line_detail.html:167
+#: templates/dashboard/orders/order_detail.html:108
+msgid "Quantity"
+msgstr ""
+
+#: apps/basket/forms.py:180
+msgid "Variant"
+msgstr ""
+
+#: apps/basket/forms.py:209 apps/basket/forms.py:260
+msgid "Please select a valid product"
+msgstr ""
+
+#: apps/basket/forms.py:226
+#, python-format
+msgid ""
+"Due to technical limitations we are not able to ship more than %(threshold)d "
+"items in one order. Your basket currently has %(basket)d items."
+msgstr ""
+
+#: apps/basket/forms.py:279
+msgid ""
+"This product cannot be added to the basket as its currency isn't the same as "
+"other products in your basket"
+msgstr ""
+"Этот товар невозможно добавить в корзину, так как валюта цены отличается от "
+"валюты других товаров в вашей корзине"
+
+#: apps/basket/models.py:180 apps/catalogue/abstract_models.py:596
+#: apps/catalogue/abstract_models.py:1021
+msgid "Feature"
+msgstr "Особенности"
+
+#: apps/basket/models.py:184 apps/catalogue/abstract_models.py:664
+msgid "Product images"
+msgstr "Изображения товара"
+
+#: apps/catalogue/abstract_models.py:34
+msgid "Enable product"
+msgstr "Включенные товары"
+
+#: apps/catalogue/abstract_models.py:38 apps/catalogue/abstract_models.py:161
+#: apps/catalogue/abstract_models.py:233 apps/catalogue/abstract_models.py:463
+#: apps/catalogue/abstract_models.py:748
+#: templates/dashboard/catalogue/category_delete.html:12
+#: templates/dashboard/catalogue/category_form.html:8
+#: templates/dashboard/catalogue/category_form.html:17
+#: templates/dashboard/catalogue/category_list.html:9
+#: templates/dashboard/catalogue/category_list.html:17
+#: templates/dashboard/catalogue/category_list.html:24
+#: templates/dashboard/catalogue/product_update.html:73
+msgid "Categories"
+msgstr "Категории"
+
+#: apps/catalogue/abstract_models.py:42
+msgid "Product partner"
+msgstr "Производитель товара"
+
+#: apps/catalogue/abstract_models.py:58
+msgid "Image of product"
+msgstr "Картинка товара"
+
+#: apps/catalogue/abstract_models.py:62
+msgid "Product date updated"
+msgstr "Дата обновления товара"
+
+#: apps/catalogue/abstract_models.py:119 apps/catalogue/abstract_models.py:433
+#: templates/dashboard/orders/line_detail.html:37
+#: templates/dashboard/ranges/range_product_list.html:95
+msgctxt "Product title"
+msgid "Title"
+msgstr "Наименование"
+
+#: apps/catalogue/abstract_models.py:120 apps/catalogue/abstract_models.py:581
+#: apps/catalogue/abstract_models.py:719
+msgid "Slug"
+msgstr "Имя в url"
+
+#: apps/catalogue/abstract_models.py:121 apps/catalogue/abstract_models.py:720
+#: apps/ex_flatpages/models.py:14
+msgid "Enable"
+msgstr "Включенный"
+
+#: apps/catalogue/abstract_models.py:122 apps/catalogue/abstract_models.py:722
+#: apps/ex_flatpages/models.py:15
+msgid "h1"
+msgstr ""
+
+#: apps/catalogue/abstract_models.py:123 apps/catalogue/abstract_models.py:723
+#: apps/ex_flatpages/models.py:16
+msgid "Meta tag: title"
+msgstr "Мета тег: title"
+
+#: apps/catalogue/abstract_models.py:124 apps/catalogue/abstract_models.py:724
+#: apps/ex_flatpages/models.py:17
+msgid "Meta tag: description"
+msgstr "Мета тег: description"
+
+#: apps/catalogue/abstract_models.py:125 apps/catalogue/abstract_models.py:725
+#: apps/ex_flatpages/models.py:18
+msgid "Meta tag: keywords"
+msgstr "Мета тег: keywords"
+
+#: apps/catalogue/abstract_models.py:126 apps/catalogue/abstract_models.py:729
+#: templates/catalogue/detail.html:119
+#: templates/dashboard/offers/offer_detail.html:67
+#: templates/dashboard/offers/summary.html:12
+#: templates/dashboard/shipping/weight_based_detail.html:35
+msgid "Description"
+msgstr "Описание"
+
+#: apps/catalogue/abstract_models.py:128 apps/catalogue/abstract_models.py:237
+#: apps/partner/abstract_models.py:29
+#: templates/dashboard/catalogue/product_update.html:191
+#: templates/dashboard/catalogue/stockalert_list.html:49
+#: templates/dashboard/orders/line_detail.html:77
+msgid "Partner"
+msgstr "Производитель"
+
+#: apps/catalogue/abstract_models.py:132
+msgid "Stand-alone product"
+msgstr ""
+
+#: apps/catalogue/abstract_models.py:133 apps/catalogue/abstract_models.py:148
+msgid "Parent product"
+msgstr ""
+
+#: apps/catalogue/abstract_models.py:134
+msgid "Child product"
+msgstr ""
+
+#: apps/catalogue/abstract_models.py:137
+msgid "Product structure"
+msgstr ""
+
+#: apps/catalogue/abstract_models.py:141
+#: templates/dashboard/orders/line_detail.html:50
+#: templates/dashboard/orders/order_detail.html:110
+#: templates/dashboard/ranges/range_product_list.html:94
+msgid "UPC"
+msgstr ""
+
+#: apps/catalogue/abstract_models.py:142
+msgid ""
+"Universal Product Code (UPC) is an identifier for a product which is not "
+"specific to a particular  supplier. Eg an ISBN for a book."
+msgstr ""
+
+#: apps/catalogue/abstract_models.py:149
+msgid ""
+"Only choose a parent product if you're creating a child product.  For "
+"example if this is a size 4 of a particular t-shirt.  Leave blank if this is "
+"a stand-alone product (i.e. there is only one version of this product)."
+msgstr ""
+
+#: apps/catalogue/abstract_models.py:155 apps/catalogue/abstract_models.py:654
+#: apps/partner/abstract_models.py:81
+#: templates/dashboard/promotions/promotion_list.html:44
+#: templates/dashboard/ranges/range_list.html:34
+#: templates/dashboard/reports/partials/submitted_basket_report.html:12
+#: templates/dashboard/reviews/review_delete.html:42
+#: templates/dashboard/reviews/review_list.html:62
+#: templates/dashboard/users/alerts/list.html:47
+#: templates/dashboard/users/alerts/partials/alert.html:24
+#: templates/dashboard/users/detail.html:182
+#: templates/dashboard/vouchers/voucher_list.html:55
+msgid "Date created"
+msgstr ""
+
+#: apps/catalogue/abstract_models.py:159 apps/partner/abstract_models.py:82
+msgid "Date updated"
+msgstr ""
+
+#: apps/catalogue/abstract_models.py:162
+msgid "Filters of product"
+msgstr "Фильтры товара"
+
+#: apps/catalogue/abstract_models.py:163
+msgid "Attribute of product"
+msgstr "Аттрибуты товара"
+
+#: apps/catalogue/abstract_models.py:167
+msgid "Non-standard retail price"
+msgstr "Нестандартные розничная цена"
+
+#: apps/catalogue/abstract_models.py:168
+msgid "Non-standard cost price"
+msgstr "Нестандартные оптовая цена"
+
+#: apps/catalogue/abstract_models.py:174
+#: templates/dashboard/catalogue/product_class_delete.html:12
+msgid "Product type"
+msgstr ""
+
+#: apps/catalogue/abstract_models.py:175
+msgid "Choose what type of product this is"
+msgstr ""
+
+#: apps/catalogue/abstract_models.py:178
+#: templates/dashboard/catalogue/product_update.html:298
+msgid "Recommended products"
+msgstr ""
+
+#: apps/catalogue/abstract_models.py:179
+msgid "These are products that are recommended to accompany the main product."
+msgstr ""
+
+#: apps/catalogue/abstract_models.py:184
+msgid "Rating"
+msgstr ""
+
+#: apps/catalogue/abstract_models.py:192
+msgid "Is discountable?"
+msgstr ""
+
+#: apps/catalogue/abstract_models.py:193
+msgid "This flag indicates if this product can be used in an offer or not"
+msgstr ""
+
+#: apps/catalogue/abstract_models.py:205 apps/catalogue/abstract_models.py:647
+#: apps/catalogue/abstract_models.py:1019 apps/partner/abstract_models.py:23
+#: templates/customer/wishlists/wishlists_detail.html:32
+#: templates/dashboard/catalogue/stockalert_list.html:48
+#: templates/dashboard/orders/order_detail.html:109
+#: templates/dashboard/reports/partials/product_report.html:8
+#: templates/dashboard/reviews/review_delete.html:37
+#: templates/dashboard/reviews/review_list.html:57
+#: templates/dashboard/users/alerts/list.html:44
+#: templates/dashboard/users/alerts/partials/alert.html:6
+msgid "Product"
+msgstr ""
+
+#: apps/catalogue/abstract_models.py:206
+#: templates/dashboard/catalogue/product_delete.html:17
+#: templates/dashboard/catalogue/product_list.html:11
+#: templates/dashboard/catalogue/product_list.html:19
+#: templates/dashboard/catalogue/product_list.html:25
+#: templates/dashboard/catalogue/product_update.html:11
+#: templates/dashboard/catalogue/product_update.html:20
+#: templates/dashboard/promotions/handpickedproductlist_form.html:5
+#: templates/dashboard/ranges/range_product_list.html:21
+msgid "Products"
+msgstr ""
+
+#: apps/catalogue/abstract_models.py:275
+msgid "Your product must have a title."
+msgstr ""
+
+#: apps/catalogue/abstract_models.py:277
+msgid "Your product must have a product class."
+msgstr ""
+
+#: apps/catalogue/abstract_models.py:279
+msgid "Only child products can have a parent."
+msgstr ""
+
+#: apps/catalogue/abstract_models.py:286
+msgid "A child product needs a parent."
+msgstr ""
+
+#: apps/catalogue/abstract_models.py:289
+msgid "You can only assign child products to parent products."
+msgstr ""
+
+#: apps/catalogue/abstract_models.py:323
+msgid "The specified parent product is a child product."
+msgstr ""
+
+#: apps/catalogue/abstract_models.py:326
+msgid "One can't add a child product to a product with stock records."
+msgstr ""
+
+#: apps/catalogue/abstract_models.py:443
+msgid "Product class"
+msgstr "Класс товара"
+
+#: apps/catalogue/abstract_models.py:582 apps/catalogue/abstract_models.py:721
+msgid "Parent"
+msgstr "Родитель"
+
+#: apps/catalogue/abstract_models.py:585
+msgid "Bottom line size"
+msgstr "Верхняя граница"
+
+#: apps/catalogue/abstract_models.py:586
+msgid "Top line size"
+msgstr "Нижняя граница"
+
+#: apps/catalogue/abstract_models.py:597
+msgid "Features"
+msgstr "Особенности"
+
+#: apps/catalogue/abstract_models.py:648
+msgid "Original"
+msgstr ""
+
+#: apps/catalogue/abstract_models.py:649
+msgid "Caption"
+msgstr ""
+
+#: apps/catalogue/abstract_models.py:652
+msgid "Display order"
+msgstr "Отобразить в порядке"
+
+#: apps/catalogue/abstract_models.py:653
+msgid ""
+"An image with a display order of zero will be the primary image for a product"
+msgstr ""
+
+#: apps/catalogue/abstract_models.py:663
+msgid "Product image"
+msgstr "Картинка товара"
+
+#: apps/catalogue/abstract_models.py:718 apps/contacts/forms.py:10
+#: templates/customer/wishlists/wishlists_list.html:9
+#: templates/dashboard/catalogue/product_class_form.html:97
+#: templates/dashboard/catalogue/product_class_list.html:27
+#: templates/dashboard/comms/list.html:32
+#: templates/dashboard/offers/offer_detail.html:62
+#: templates/dashboard/offers/summary.html:10
+#: templates/dashboard/orders/order_detail.html:33
+#: templates/dashboard/orders/order_detail.html:44
+#: templates/dashboard/partners/partner_list.html:44
+#: templates/dashboard/promotions/promotion_list.html:41
+#: templates/dashboard/ranges/range_list.html:31
+#: templates/dashboard/reports/partials/open_basket_report.html:9
+#: templates/dashboard/reports/partials/order_report.html:10
+#: templates/dashboard/reports/partials/submitted_basket_report.html:9
+#: templates/dashboard/reports/partials/user_report.html:9
+#: templates/dashboard/shipping/weight_based_detail.html:31
+#: templates/dashboard/shipping/weight_based_list.html:31
+#: templates/dashboard/users/detail.html:32
+#: templates/dashboard/vouchers/voucher_delete.html:37
+#: templates/dashboard/vouchers/voucher_detail.html:32
+#: templates/dashboard/vouchers/voucher_list.html:50
+msgid "Name"
+msgstr "Имя"
+
+#: apps/catalogue/abstract_models.py:728
+msgid "Link banner"
+msgstr "Ссылка на баннер"
+
+#: apps/catalogue/abstract_models.py:730
+msgid "Image banner"
+msgstr "Картирка баннера"
+
+#: apps/catalogue/abstract_models.py:732
+msgid "Icon"
+msgstr "Иконка"
+
+#: apps/catalogue/abstract_models.py:733 apps/catalogue/abstract_models.py:1024
+msgid "Image"
+msgstr "Картинка"
+
+#: apps/catalogue/abstract_models.py:747
+#: templates/dashboard/catalogue/product_update.html:124
+#: templates/dashboard/comms/list.html:33
+msgid "Category"
+msgstr "Категория"
+
+#: apps/catalogue/abstract_models.py:1017
+msgid "Sort"
+msgstr "Сортировка"
+
+#: apps/catalogue/abstract_models.py:1018
+msgid "Block info"
+msgstr "Блок информация"
+
+#: apps/catalogue/abstract_models.py:1023
+msgid "Available non standard size for this feature"
+msgstr "Доступен не стандартный размер для этой функции"
+
+#: apps/catalogue/abstract_models.py:1025
+msgid "Product with images."
+msgstr "Продукт с изображениями."
+
+#: apps/catalogue/abstract_models.py:1033
+msgid "Product feature"
+msgstr "Особенность товара"
+
+#: apps/catalogue/abstract_models.py:1034
+msgid "Product features"
+msgstr "Особенности товара"
+
+#: apps/catalogue/abstract_models.py:1042
+msgid "For this feature not specified bottom_line."
+msgstr "Для этой функции не указана верхняя граница."
+
+#: apps/catalogue/abstract_models.py:1045
+msgid "For this feature not specified top_line."
+msgstr "Для этой функции не указан нижняя граница."
+
+#: apps/catalogue/abstract_models.py:1048
+msgid "For this product set non_standard_price_retail to 0."
+msgstr "Для этого продукта установить non_standard_price_retail к 0."
+
+#: apps/catalogue/abstract_models.py:1068
+msgid "Plus on price"
+msgstr "Плюс к цене"
+
+#: apps/catalogue/abstract_models.py:1069
+msgid "Percent"
+msgstr "Процент"
+
+#: apps/catalogue/abstract_models.py:1070 apps/partner/abstract_models.py:55
+msgid "Price (retail)"
+msgstr "Рекомендованная цена от производителя"
+
+#: apps/catalogue/abstract_models.py:1071 apps/partner/abstract_models.py:62
+msgid "Cost Price"
+msgstr "Себестоимость"
+
+#: apps/catalogue/abstract_models.py:1077
+msgid "Product option"
+msgstr "Опция товара"
+
+#: apps/catalogue/abstract_models.py:1078
+msgid "Product options"
+msgstr "Опции товара"
+
+#: apps/catalogue/forms.py:34 apps/catalogue/forms.py:43
+msgid "You comment"
+msgstr "Ваш комментарий"
+
+#: apps/catalogue/forms.py:35 apps/catalogue/forms.py:41
+msgid "You name"
+msgstr "Ваше имя"
+
+#: apps/catalogue/forms.py:36 apps/catalogue/forms.py:42
+msgid "You phone number"
+msgstr "Ваш номер телефона"
+
+#: apps/catalogue/forms.py:37 apps/catalogue/forms.py:44
+msgid "You email"
+msgstr "Ваш email"
+
+#: apps/catalogue/forms.py:48 apps/catalogue/forms.py:51
+#: apps/subscribe/forms.py:28 apps/subscribe/forms.py:31
+#: apps/subscribe/forms.py:34
+msgid "This field required."
+msgstr "Это поле обязательно."
+
+#: apps/catalogue/models.py:71
+msgid "Image of recommendation product."
+msgstr "Изображение рекомендуемого товара."
+
+#: apps/catalogue/resources.py:120
+msgid "Delete this object ? (set 1 if True)"
+msgstr "Установите 1, чтобы удалить"
+
+#: apps/catalogue/tests.py:123 apps/catalogue/tests.py:287
+msgid "Product is not available."
+msgstr "Товар не доступен."
+
+#: apps/catalogue/tests.py:766 apps/catalogue/tests.py:1123
+#: apps/search/views.py:97
+msgid "By popularity"
+msgstr "По популярности"
+
+#: apps/catalogue/tests.py:766 apps/catalogue/tests.py:1123
+#: apps/search/views.py:98
+msgid "By price descending"
+msgstr "По убыванию цены"
+
+#: apps/catalogue/tests.py:767 apps/catalogue/tests.py:1124
+#: apps/search/views.py:99
+msgid "By price ascending"
+msgstr "По возрастанию цены"
+
+#: apps/catalogue/views.py:48 local.py:119
+msgid "Not selected"
+msgstr "Не выбрано"
+
+#: apps/catalogue/views.py:49
+msgid ""
+"Your message has been sent. We will contact you on the specified details."
+msgstr "Ваше сообщение было отправлено. Мы свяжемся с Вами по указанным реквизитам."
+
+#: apps/catalogue/views.py:114 templates/partials/nav_primary.html:45
+msgid "All products"
+msgstr ""
+
+#: apps/catalogue/views.py:331 apps/subscribe/views.py:46
+#, python-format
+msgid "Order online %s"
+msgstr ""
+
+#: apps/catalogue/views.py:685
+msgid "Please, enter number."
+msgstr "Пожалуйста, введите номер."
+
+#: apps/catalogue/views.py:718
+msgid "Available size limits: min - \"{}\", max - \"{}\""
+msgstr ""
+
+#: apps/contacts/forms.py:12
+msgid "Enter a valid phone number"
+msgstr "Введите действительный номер телефона."
+
+#: apps/contacts/forms.py:13 apps/ex_sites/models.py:15
+#: templates/checkout/checkout.html:49 templates/checkout/thank_you.html:53
+#: templates/dashboard/partners/partner_manage.html:41
+#: templates/dashboard/partners/partner_user_list.html:43
+#: templates/dashboard/partners/partner_user_select.html:49
+#: templates/dashboard/reports/partials/open_basket_report.html:8
+#: templates/dashboard/reports/partials/order_report.html:11
+#: templates/dashboard/reports/partials/submitted_basket_report.html:8
+#: templates/dashboard/reports/partials/user_report.html:8
+#: templates/dashboard/users/detail.html:36
+msgid "Email"
+msgstr ""
+
+#: apps/contacts/forms.py:14
+msgid "Please enter your email."
+msgstr "Пожалуйста, введите свой email."
+
+#: apps/contacts/forms.py:17 templates/dashboard/orders/order_detail.html:565
+#: templates/dashboard/orders/order_detail.html:612
+msgid "Message"
+msgstr ""
+
+#: apps/contacts/forms.py:18
+msgid "Please enter your message."
+msgstr "Пожалуйста, введите ваше сообщение."
+
+#: apps/contacts/views.py:41
+msgid "Your message sent!"
+msgstr "Ваше сообщение отправлено!"
+
+#: apps/contacts/views.py:49
+#, python-format
+msgid "You received a letter from the site %s"
+msgstr ""
+
+#: apps/ex_sites/models.py:12
+msgid "Work time"
+msgstr "Рабочее время"
+
+#: apps/ex_sites/models.py:13
+msgid "Actual address"
+msgstr "Фактический адрес"
+
+#: apps/ex_sites/models.py:14
+msgid "Phone number"
+msgstr "Номер телефона"
+
+#: apps/ex_sites/models.py:16
+msgid "Short description of shop"
+msgstr "Краткое описание магазина"
+
+#: apps/order/models.py:11
+msgid "Name client"
+msgstr "Имя клиента"
+
+#: apps/order/models.py:13
+msgid "Phone number client"
+msgstr "Номер телефона клиента"
+
+#: apps/order/models.py:14
+msgid "Email client"
+msgstr "Email клиента"
+
+#: apps/order/models.py:15
+msgid "Comment client"
+msgstr "Комменатрий клиента"
+
+#: apps/order/models.py:25 templates/catalogue/partials/price.html:36
+#: templates/catalogue/partials/price.html:42
+msgid "Quick order"
+msgstr "Быстрый заказ"
+
+#: apps/order/models.py:26
+msgid "Quick orders"
+msgstr "Заказы в один клик"
+
+#: apps/partner/abstract_models.py:25 apps/partner/resources.py:18
+#: templates/dashboard/catalogue/product_update.html:76
+#: templates/dashboard/catalogue/product_update.html:144
+#: templates/dashboard/catalogue/product_update.html:255
+msgid "Attributes"
+msgstr "Аттрибуты"
+
+#: apps/partner/abstract_models.py:36
+#: templates/dashboard/orders/line_detail.html:80
+msgid "Partner SKU"
+msgstr ""
+
+#: apps/partner/abstract_models.py:40
+#: templates/dashboard/catalogue/product_update.html:198
+msgid "Currency"
+msgstr ""
+
+#: apps/partner/abstract_models.py:48
+msgid "Price (excl. tax)"
+msgstr ""
+
+#: apps/partner/abstract_models.py:67
+msgid "Number in stock"
+msgstr ""
+
+#: apps/partner/abstract_models.py:73
+msgid "Number allocated"
+msgstr ""
+
+#: apps/partner/abstract_models.py:78
+msgid "Low Stock Threshold"
+msgstr ""
+
+#: apps/partner/abstract_models.py:95
+msgid "Stock record"
+msgstr ""
+
+#: apps/partner/abstract_models.py:96
+#: templates/dashboard/catalogue/product_update.html:256
+msgid "Stock records"
+msgstr ""
+
+#: apps/partner/abstract_models.py:143
+msgid "Invalid stock consumption request"
+msgstr ""
+
+#: apps/partner/resources.py:14
+msgid "Product title"
+msgstr ""
+
+#: apps/subscribe/forms.py:22
+msgid "Your email"
+msgstr ""
+
+#: apps/subscribe/forms.py:23
+msgid "Your name"
+msgstr ""
+
+#: apps/subscribe/forms.py:24
+msgid "Your city"
+msgstr ""
+
+#: apps/subscribe/models.py:5
+msgctxt "User email"
+msgid "Email"
+msgstr ""
+
+#: apps/subscribe/models.py:6
+msgctxt "User name"
+msgid "Name"
+msgstr ""
+
+#: apps/subscribe/models.py:7
+msgctxt "User city"
+msgid "City"
+msgstr ""
+
+#: apps/subscribe/views.py:17 soloha/core/context_processors.py:11
+msgid "Subscribed successfully!"
+msgstr ""
+
+#: soloha/settings.py:148
+msgid "Russia"
+msgstr ""
+
+#: templates/base.html:14
+msgid "Build"
+msgstr ""
+
+#: templates/base.html:105
+msgid "Version:"
+msgstr ""
+
+#: templates/basket/basket.html:6 templates/basket/basket.html.py:14
+#: templates/basket/basket.html:22
+#: templates/basket/partials/basket_totals.html:9
+#: templates/basket/partials/basket_totals.html:164
+#: templates/checkout/thank_you.html:176 templates/partials/nav_primary.html:20
+msgid "Basket"
+msgstr ""
+
+#: templates/basket/basket.html:12 templates/catalogue/browse.html:27
+#: templates/catalogue/category.html:134 templates/catalogue/detail.html:46
+#: templates/catalogue/reviews/review_detail.html:13
+#: templates/catalogue/reviews/review_list.html:15
+#: templates/customer/baseaccountpage.html:14
+#: templates/customer/wishlists/wishlists_delete.html:7
+#: templates/customer/wishlists/wishlists_delete_product.html:7
+#: templates/customer/wishlists/wishlists_detail.html:10
+#: templates/customer/wishlists/wishlists_form.html:7
+#: templates/dashboard/catalogue/category_list.html:31
+#: templates/layout.html:136 templates/search/results.html:15
+#: templates/sitemap/sitemap.html:11
+msgid "Home"
+msgstr ""
+
+#: templates/basket/partials/basket_content.html:9
+msgid "Important messages about items in your basket"
+msgstr ""
+
+#: templates/basket/partials/basket_content.html:17
+msgid "You could be missing out on offers!"
+msgstr ""
+
+#: templates/basket/partials/basket_content.html:19
+#, python-format
+msgid ""
+"\n"
+"                    <div class=\"warning\">%(message)s to qualify for the <a "
+"href=\"%(url)s\">%(offer_name)s</a> special offer</div>\n"
+"                "
+msgstr ""
+
+#: templates/basket/partials/basket_content.html:30
+msgid "Items to buy now"
+msgstr ""
+
+#: templates/basket/partials/basket_content.html:32
+#: templates/basket/partials/basket_content.html:172
+#: templates/basket/partials/basket_quick.html:32
+msgid "Price"
+msgstr ""
+
+#: templates/basket/partials/basket_content.html:33
+#: templates/basket/partials/basket_quick.html:43
+#: templates/basket/partials/basket_quick.html:45
+#: templates/checkout/checkout.html:111 templates/checkout/thank_you.html:121
+msgid "Total"
+msgstr ""
+
+#: templates/basket/partials/basket_content.html:68
+#: templates/customer/wishlists/wishlists_detail.html:106
+#: templates/dashboard/orders/shippingaddress_form.html:33
+#: templates/dashboard/reviews/review_list.html:50
+msgid "Updating..."
+msgstr ""
+
+#: templates/basket/partials/basket_content.html:68
+#: templates/dashboard/catalogue/stockalert_list.html:69
+#: templates/dashboard/orders/order_detail.html:452
+#: templates/dashboard/reviews/review_list.html:50
+msgid "Update"
+msgstr ""
+
+#: templates/basket/partials/basket_content.html:73
+#: templates/basket/partials/basket_content.html:195
+#: templates/basket/partials/basket_totals.html:48
+#: templates/customer/wishlists/wishlists_delete_product.html:31
+#: templates/customer/wishlists/wishlists_detail.html:88
+#: templates/dashboard/promotions/delete_pagepromotion.html:31
+#: templates/dashboard/promotions/page_detail.html:55
+#: templates/dashboard/ranges/range_product_list.html:110
+msgid "Remove"
+msgstr ""
+
+#: templates/basket/partials/basket_content.html:75
+msgid "Save for later"
+msgstr ""
+
+#: templates/basket/partials/basket_content.html:85
+msgid "Error"
+msgstr ""
+
+#: templates/basket/partials/basket_content.html:123
+msgid "Voucher/promo code"
+msgstr ""
+
+#: templates/basket/partials/basket_content.html:125
+msgid "I have a voucher code..."
+msgstr ""
+
+#: templates/basket/partials/basket_content.html:131
+#: templates/catalogue/partials/add_to_basket_form_compact.html:13
+#: templates/dashboard/catalogue/product_update.html:247
+#: templates/dashboard/promotions/form.html:83
+#: templates/dashboard/shipping/weight_based_detail.html:93
+msgid "Adding..."
+msgstr ""
+
+#: templates/basket/partials/basket_content.html:131
+msgid "Add voucher"
+msgstr ""
+
+#: templates/basket/partials/basket_content.html:132
+#: templates/catalogue/reviews/review_form.html:43
+#: templates/checkout/shipping_address.html:80
+#: templates/checkout/user_address_delete.html:30
+#: templates/checkout/user_address_form.html:27
+#: templates/customer/wishlists/wishlists_delete.html:32
+#: templates/customer/wishlists/wishlists_delete_product.html:31
+#: templates/customer/wishlists/wishlists_form.html:41
+#: templates/dashboard/catalogue/category_delete.html:34
+#: templates/dashboard/catalogue/product_class_delete.html:37
+#: templates/dashboard/catalogue/product_class_form.html:137
+#: templates/dashboard/catalogue/product_delete.html:60
+#: templates/dashboard/catalogue/product_update.html:323
+#: templates/dashboard/comms/detail.html:104
+#: templates/dashboard/offers/offer_delete.html:34
+#: templates/dashboard/orders/shippingaddress_form.html:34
+#: templates/dashboard/pages/delete.html:37
+#: templates/dashboard/pages/update.html:36
+#: templates/dashboard/partials/form.html:11
+#: templates/dashboard/partners/partner_delete.html:34
+#: templates/dashboard/partners/partner_user_form.html:36
+#: templates/dashboard/promotions/delete.html:37
+#: templates/dashboard/promotions/delete_pagepromotion.html:32
+#: templates/dashboard/promotions/form.html:37
+#: templates/dashboard/ranges/range_delete.html:34
+#: templates/dashboard/ranges/range_form.html:36
+#: templates/dashboard/ranges/range_form.html:39
+#: templates/dashboard/ranges/range_product_list.html:133
+#: templates/dashboard/reviews/review_delete.html:47
+#: templates/dashboard/reviews/review_update.html:79
+#: templates/dashboard/shipping/weight_band_delete.html:49
+#: templates/dashboard/shipping/weight_band_form.html:37
+#: templates/dashboard/shipping/weight_based_delete.html:32
+#: templates/dashboard/shipping/weight_based_form.html:47
+#: templates/dashboard/users/alerts/delete.html:37
+#: templates/dashboard/users/alerts/list.html:32
+#: templates/dashboard/vouchers/voucher_delete.html:48
+#: templates/dashboard/vouchers/voucher_detail.html:82
+#: templates/dashboard/vouchers/voucher_detail.html:83
+#: templates/dashboard/vouchers/voucher_form.html:45
+#: templates/partials/form.html:12
+msgid "or"
+msgstr ""
+
+#: templates/basket/partials/basket_content.html:132
+#: templates/catalogue/reviews/review_form.html:44
+#: templates/checkout/user_address_delete.html:30
+#: templates/checkout/user_address_form.html:27
+#: templates/customer/wishlists/wishlists_delete.html:32
+#: templates/customer/wishlists/wishlists_delete_product.html:31
+#: templates/customer/wishlists/wishlists_form.html:41
+#: templates/dashboard/catalogue/category_delete.html:34
+#: templates/dashboard/catalogue/product_class_delete.html:37
+#: templates/dashboard/catalogue/product_delete.html:61
+#: templates/dashboard/comms/detail.html:104
+#: templates/dashboard/offers/offer_delete.html:35
+#: templates/dashboard/offers/step_form.html:80
+#: templates/dashboard/orders/shippingaddress_form.html:34
+#: templates/dashboard/pages/delete.html:37
+#: templates/dashboard/pages/update.html:36
+#: templates/dashboard/partials/form.html:11
+#: templates/dashboard/partners/partner_delete.html:35
+#: templates/dashboard/partners/partner_user_form.html:36
+#: templates/dashboard/promotions/delete.html:37
+#: templates/dashboard/promotions/delete_pagepromotion.html:32
+#: templates/dashboard/promotions/form.html:37
+#: templates/dashboard/ranges/range_delete.html:35
+#: templates/dashboard/ranges/range_form.html:40
+#: templates/dashboard/reviews/review_delete.html:48
+#: templates/dashboard/reviews/review_update.html:80
+#: templates/dashboard/shipping/weight_band_delete.html:50
+#: templates/dashboard/shipping/weight_band_form.html:38
+#: templates/dashboard/shipping/weight_based_delete.html:33
+#: templates/dashboard/shipping/weight_based_form.html:48
+#: templates/dashboard/users/alerts/delete.html:38
+#: templates/dashboard/users/alerts/update.html:34
+#: templates/dashboard/vouchers/voucher_delete.html:49
+#: templates/dashboard/vouchers/voucher_detail.html:84
+#: templates/dashboard/vouchers/voucher_form.html:46
+#: templates/partials/form.html:12
+msgid "cancel"
+msgstr ""
+
+#: templates/basket/partials/basket_content.html:142
+#: templates/checkout/checkout.html:154 templates/checkout/thank_you.html:170
+msgid "Totals"
+msgstr ""
+
+#: templates/basket/partials/basket_content.html:153
+msgid "Proceed to checkout"
+msgstr ""
+
+#: templates/basket/partials/basket_content.html:160
+#: templates/basket/partials/basket_quick.html:56
+msgid "Your basket is empty."
+msgstr ""
+
+#: templates/basket/partials/basket_content.html:161
+#: templates/checkout/thank_you.html:320
+msgid "Continue shopping"
+msgstr ""
+
+#: templates/basket/partials/basket_content.html:168
+msgid "Items to buy later"
+msgstr ""
+
+#: templates/basket/partials/basket_content.html:171
+msgid "Items"
+msgstr ""
+
+#: templates/basket/partials/basket_content.html:212
+msgid "Move to basket"
+msgstr ""
+
+#: templates/basket/partials/basket_quick.html:30
+msgid "Qty"
+msgstr ""
+
+#: templates/basket/partials/basket_quick.html:49
+msgid "View basket"
+msgstr ""
+
+#: templates/basket/partials/basket_quick.html:52
+#: templates/checkout/checkout.html:9
+msgid "Checkout"
+msgstr ""
+
+#: templates/basket/partials/basket_totals.html:16
+#: templates/checkout/thank_you.html:182
+msgid "Basket total (before discounts)"
+msgstr ""
+
+#: templates/basket/partials/basket_totals.html:28
+#: templates/basket/partials/basket_totals.html:134
+#: templates/checkout/thank_you.html:187 templates/checkout/thank_you.html:234
+#: templates/dashboard/orders/order_detail.html:159
+#: templates/dashboard/orders/order_detail.html:177
+#: templates/dashboard/orders/order_detail.html:215
+#: templates/dashboard/vouchers/voucher_delete.html:42
+#: templates/dashboard/vouchers/voucher_detail.html:37
+#: templates/dashboard/vouchers/voucher_detail.html:63
+msgid "Discount"
+msgstr ""
+
+#: templates/basket/partials/basket_totals.html:39
+#: templates/dashboard/vouchers/voucher_delete.html:8
+#: templates/dashboard/vouchers/voucher_delete.html:17
+#: templates/dashboard/vouchers/voucher_detail.html:6
+#: templates/dashboard/vouchers/voucher_detail.html:15
+#: templates/dashboard/vouchers/voucher_form.html:8
+#: templates/dashboard/vouchers/voucher_form.html:17
+#: templates/dashboard/vouchers/voucher_list.html:17
+#: templates/dashboard/vouchers/voucher_list.html:27
+msgid "Vouchers"
+msgstr ""
+
+#: templates/basket/partials/basket_totals.html:62
+#: templates/checkout/thank_you.html:197
+msgid "Basket total (after discounts)"
+msgstr ""
+
+#: templates/basket/partials/basket_totals.html:74
+#: templates/checkout/thank_you.html:202
+#: templates/dashboard/orders/order_detail.html:195
+#: templates/partials/mini_basket.html:8
+msgid "Basket total"
+msgstr ""
+
+#: templates/basket/partials/basket_totals.html:95
+#: templates/basket/partials/basket_totals.html:170
+#: templates/checkout/checkout.html:28 templates/checkout/thank_you.html:37
+#: templates/checkout/thank_you.html:221
+#: templates/dashboard/orders/order_detail.html:87
+#: templates/dashboard/orders/order_detail.html:425
+msgid "Shipping"
+msgstr ""
+
+#: templates/basket/partials/basket_totals.html:97
+msgid "Alternative shipping methods can be chosen during checkout"
+msgstr ""
+
+#: templates/basket/partials/basket_totals.html:119
+#: templates/checkout/checkout.html:68
+#: templates/checkout/shipping_methods.html:8
+#: templates/checkout/shipping_methods.html:15
+#: templates/checkout/thank_you.html:68 templates/checkout/thank_you.html:224
+#: templates/dashboard/shipping/weight_based_detail.html:27
+msgid "Shipping method"
+msgstr ""
+
+#: templates/basket/partials/basket_totals.html:123
+msgid "Shipping total (before discounts)"
+msgstr ""
+
+#: templates/basket/partials/basket_totals.html:139
+msgid "Shipping total (after discounts)"
+msgstr ""
+
+#: templates/basket/partials/basket_totals.html:160
+msgid "Tax"
+msgstr ""
+
+#: templates/basket/partials/basket_totals.html:185
+#: templates/checkout/thank_you.html:275
+msgid "Post order actions"
+msgstr ""
+
+#: templates/basket/partials/basket_totals.html:185
+msgid "These will be applied once your order is placed."
+msgstr ""
+
+#: templates/basket/partials/basket_totals.html:205
+#: templates/checkout/thank_you.html:291
+#: templates/dashboard/offers/offer_detail.html:107
+#: templates/dashboard/orders/order_detail.html:242
+#: templates/dashboard/vouchers/voucher_detail.html:62
+msgid "Order total"
+msgstr ""
+
+#: templates/basket/partials/basket_totals.html:218
+msgid "Taxes will be added during checkout."
+msgstr ""
+
+#: templates/catalogue/browse.html:37
+msgid "All categories"
+msgstr ""
+
+#: templates/catalogue/browse.html:58
+msgid "Refine by"
+msgstr ""
+
+#: templates/catalogue/browse.html:83
+#, python-format
+msgid ""
+"\n"
+"                    <strong>%(num_results)s</strong> result - showing "
+"<strong>%(start)s</strong> to <strong>%(end)s</strong>.\n"
+"                "
+msgid_plural ""
+"\n"
+"                    <strong>%(num_results)s</strong> results - showing "
+"<strong>%(start)s</strong> to <strong>%(end)s</strong>.\n"
+"                "
+msgstr[0] ""
+msgstr[1] ""
+
+#: templates/catalogue/browse.html:89
+#, python-format
+msgid ""
+"\n"
+"                    <strong>1</strong> result.\n"
+"                "
+msgid_plural ""
+"\n"
+"                    <strong>%(num_results)s</strong> results.\n"
+"                "
+msgstr[0] ""
+msgstr[1] ""
+
+#: templates/catalogue/browse.html:102
+msgid "<strong>0</strong> results."
+msgstr ""
+
+#: templates/catalogue/browse.html:108 templates/catalogue/browse.html:109
+msgid "Sort by"
+msgstr ""
+
+#: templates/catalogue/browse.html:143
+#: templates/dashboard/catalogue/product_list.html:73
+#: templates/dashboard/ranges/range_product_list.html:125
+#: templates/search/results.html:108
+msgid "No products found."
+msgstr ""
+
+#: templates/catalogue/category.html:49
+msgid "Selected"
+msgstr ""
+
+#: templates/catalogue/category.html:61 templates/catalogue/category.html:103
+msgid "Clear"
+msgstr ""
+
+#: templates/catalogue/category.html:78
+msgid "Selection of parameters"
+msgstr ""
+
+#: templates/catalogue/category.html:106
+#: templates/catalogue/product/attributes/attribute_products_modal.html:42
+msgid "Choose"
+msgstr ""
+
+#: templates/catalogue/detail.html:76
+msgid "Edit this product"
+msgstr ""
+
+#: templates/catalogue/detail.html:91
+msgid "reviews"
+msgstr ""
+
+#: templates/catalogue/detail.html:99
+msgid "Share"
+msgstr ""
+
+#: templates/catalogue/detail.html:106
+msgid "Compare"
+msgstr ""
+
+#: templates/catalogue/detail.html:112
+msgid "General information"
+msgstr "Общая информация"
+
+#: templates/catalogue/detail.html:114 templates/catalogue/detail.html:164
+msgid "Select additional options"
+msgstr ""
+
+#: templates/catalogue/detail.html:116
+#: templates/catalogue/partials/characteristics.html:10
+msgid "Characteristics"
+msgstr "Характеристики"
+
+#: templates/catalogue/detail.html:121
+#: templates/catalogue/reviews/review_detail.html:5
+#: templates/catalogue/reviews/review_detail.html:25
+#: templates/dashboard/reviews/review_delete.html:8
+#: templates/dashboard/reviews/review_delete.html:17
+#: templates/dashboard/reviews/review_list.html:8
+#: templates/dashboard/reviews/review_list.html:16
+#: templates/dashboard/reviews/review_list.html:22
+#: templates/dashboard/reviews/review_update.html:17
+#: templates/dashboard/users/detail.html:108
+#: templates/dashboard/users/detail.html:175
+msgid "Reviews"
+msgstr ""
+
+#: templates/catalogue/detail.html:123 templates/catalogue/detail.html:243
+#: templates/layout.html:76
+msgid "Shipping and payment"
+msgstr ""
+
+#: templates/catalogue/detail.html:141
+msgid "The price depends on the selected parameters"
+msgstr "Цена зависит от выбранных параметров"
+
+#: templates/catalogue/detail.html:180
+msgid "Product Description"
+msgstr ""
+
+#: templates/catalogue/detail.html:189
+msgid "Reviews:"
+msgstr ""
+
+#: templates/catalogue/detail.html:193
+#, python-format
+msgid ""
+"\n"
+"                                <a href=\"%(add_review_url)s#addreview\">\n"
+"                                    <span class=\"glyphicon glyphicon-pencil"
+"\"></span>\n"
+"                                    Write Review\n"
+"                                </a>\n"
+"                            "
+msgstr ""
+
+#: templates/catalogue/detail.html:206
+msgid "See all reviews"
+msgstr ""
+
+#: templates/catalogue/detail.html:208
+msgid "Customer Reviews"
+msgstr ""
+
+#: templates/catalogue/detail.html:214
+#, python-format
+msgid ""
+"This product does not have any reviews yet -\n"
+"                                                        <a href="
+"\"%(add_review_url)s#addreview\">be the first to write one</a>.\n"
+"                                                    "
+msgstr ""
+
+#: templates/catalogue/detail.html:218
+msgid "This product does not have any reviews yet"
+msgstr ""
+
+#: templates/catalogue/detail.html:236
+msgid "View all comments >>"
+msgstr ""
+
+#: templates/catalogue/partials/add_to_basket_form.html:15
+msgid "Buy"
+msgstr ""
+
+#: templates/catalogue/partials/add_to_basket_form.html:15
+msgid "In process..."
+msgstr ""
+
+#: templates/catalogue/partials/add_to_basket_form.html:16
+msgid "By"
+msgstr ""
+
+#: templates/catalogue/partials/add_to_basket_form.html:22
+msgid "You have an active stock alert for this product."
+msgstr ""
+
+#: templates/catalogue/partials/add_to_basket_form.html:26
+msgid "You can get an email alert when this product is back in stock."
+msgstr ""
+
+#: templates/catalogue/partials/add_to_basket_form.html:28
+#: templates/catalogue/partials/review.html:38
+#: templates/catalogue/partials/review.html:43
+#: templates/checkout/preview.html:36
+#: templates/checkout/shipping_methods.html:58
+#: templates/checkout/user_address_delete.html:29
+#: templates/dashboard/catalogue/product_list.html:37
+#: templates/dashboard/comms/detail.html:80
+#: templates/dashboard/offers/step_form.html:74
+#: templates/dashboard/orders/order_list.html:109
+#: templates/dashboard/orders/partials/bulk_edit_form.html:6
+#: templates/dashboard/orders/partials/bulk_edit_form.html:27
+#: templates/partials/nav_accounts.html:29
+msgid "Submitting..."
+msgstr ""
+
+#: templates/catalogue/partials/add_to_basket_form.html:28
+msgid "Notify me"
+msgstr ""
+
+#: templates/catalogue/partials/add_to_basket_form_compact.html:14
+#: templates/catalogue/partials/add_to_basket_form_compact.html:18
+msgid "Add to basket"
+msgstr ""
+
+#: templates/catalogue/partials/add_to_wishlist.html:6
+#: templates/catalogue/partials/add_to_wishlist.html:11
+msgid "Add to wish list"
+msgstr ""
+
+#: templates/catalogue/partials/add_to_wishlist.html:7
+msgid "Remove from wish list"
+msgstr ""
+
+#: templates/catalogue/partials/add_to_wishlist.html:10
+msgid "Please login to add products to a wish list."
+msgstr ""
+
+#: templates/catalogue/partials/characteristics.html:15
+msgid "ISBN"
+msgstr ""
+
+#: templates/catalogue/partials/characteristics.html:37
+msgid "Number of reviews"
+msgstr ""
+
+#: templates/catalogue/partials/child.html:7
+msgid "Childs"
+msgstr ""
+
+#: templates/catalogue/partials/price.html:15
+#: templates/catalogue/partials/product.html:29
+msgid "Vendor code"
+msgstr "Артикул"
+
+#: templates/catalogue/partials/price.html:16
+msgid "By order"
+msgstr "Под заказ"
+
+#: templates/catalogue/partials/price.html:49
+msgid "Submit"
+msgstr ""
+
+#: templates/catalogue/partials/price.html:56
+msgid "The form is submitted successfully"
+msgstr ""
+
+#: templates/catalogue/partials/price.html:71
+msgid "Price check with the manager."
+msgstr ""
+
+#: templates/catalogue/partials/price.html:82
+msgid "Click to open - "
+msgstr ""
+
+#: templates/catalogue/partials/price.html:92
+#: templates/catalogue/partials/price.html:102
+#: templates/catalogue/product/attributes/attribute_modal.html:11
+#: templates/catalogue/product/attributes/attribute_modal.html:12
+#: templates/catalogue/product/attributes/attribute_modal.html:30
+#: templates/dashboard/orders/order_list.html:72
+#: templates/partials/alert_messages.html:16
+#: templates/partials/alert_messages.html:17
+msgid "Close"
+msgstr ""
+
+#: templates/catalogue/partials/price.html:98
+msgid "View on page."
+msgstr ""
+
+#: templates/catalogue/partials/product_json.html:16
+msgid "Купить"
+msgstr ""
+
+#: templates/catalogue/partials/quick_order.html:3
+msgid "Order date:"
+msgstr ""
+
+#: templates/catalogue/partials/quick_order.html:7
+#: templates/subscribe/subscribe.html:8
+msgid "Name:"
+msgstr ""
+
+#: templates/catalogue/partials/quick_order.html:8
+msgid "Phone number:"
+msgstr ""
+
+#: templates/catalogue/partials/quick_order.html:9
+#: templates/subscribe/subscribe.html:7
+msgid "Email:"
+msgstr ""
+
+#: templates/catalogue/partials/quick_order.html:10
+msgid "Comment:"
+msgstr ""
+
+#: templates/catalogue/partials/quick_order.html:11
+#: templates/dashboard/orders/order_detail.html:404
+msgid "Product:"
+msgstr ""
+
+#: templates/catalogue/partials/recommended_products.html:5
+msgid "Recommended items"
+msgstr ""
+
+#: templates/catalogue/partials/review.html:21
+#, python-format
+msgid ""
+"\n"
+"                Reviewed by you on %(review_date)s\n"
+"                "
+msgstr ""
+
+#: templates/catalogue/partials/review.html:25
+#, python-format
+msgid ""
+"\n"
+"                    Reviewed by <strong>%(name)s</strong> on "
+"%(review_date)s\n"
+"                "
+msgstr ""
+
+#: templates/catalogue/partials/review.html:29
+msgid "Permalink"
+msgstr ""
+
+#: templates/catalogue/partials/review.html:34
+msgid "Is this review helpful?"
+msgstr ""
+
+#: templates/catalogue/partials/review.html:38
+#: templates/dashboard/offers/offer_list.html:65
+#: templates/dashboard/ranges/range_list.html:55
+#: templates/dashboard/ranges/range_product_list.html:108
+msgid "Yes"
+msgstr ""
+
+#: templates/catalogue/partials/review.html:43
+#: templates/dashboard/offers/offer_list.html:67
+#: templates/dashboard/ranges/range_list.html:57
+#: templates/dashboard/ranges/range_product_list.html:108
+msgid "No"
+msgstr ""
+
+#: templates/catalogue/partials/review.html:50
+#, python-format
+msgid ""
+"\n"
+"            <strong>%(num_up_votes)s</strong> of %(num_votes)s customer "
+"found this useful\n"
+"            "
+msgid_plural ""
+"\n"
+"            <strong>%(num_up_votes)s</strong> of %(num_votes)s customers "
+"found this useful\n"
+"            "
+msgstr[0] ""
+msgstr[1] ""
+
+#: templates/catalogue/partials/review.html:56
+msgid "This review has no votes."
+msgstr ""
+
+#: templates/catalogue/partials/stock_record.html:17
+msgid "Free"
+msgstr ""
+
+#: templates/catalogue/product/attributes/attribute_modal.html:15
+msgid "All fabrics"
+msgstr ""
+
+#: templates/catalogue/product/attributes/attribute_products_modal.html:15
+msgid "Click to expand"
+msgstr ""
+
+#: templates/catalogue/product/attributes/attribute_products_modal.html:28
+msgid "Loading..."
+msgstr ""
+
+#: templates/catalogue/product/attributes/attribute_products_modal.html:45
+msgid "Choosen"
+msgstr ""
+
+#: templates/catalogue/product/attributes/attribute_values.html:28
+#: templates/dashboard/catalogue/stockalert_list.html:33
+#: templates/dashboard/orders/statistics.html:27
+msgid "Filter"
+msgstr ""
+
+#: templates/catalogue/product/attributes/attributes_all_images.html:20
+msgid "View all fabrics"
+msgstr ""
+
+#: templates/catalogue/reviews/partials/review_stars.html:14
+#, python-format
+msgid ""
+"\n"
+"                    1 customer review\n"
+"                "
+msgid_plural ""
+"\n"
+"                    %(num_reviews)s customer reviews\n"
+"                "
+msgstr[0] ""
+msgstr[1] ""
+
+#: templates/catalogue/reviews/partials/review_stars.html:29
+msgid "Write a review"
+msgstr ""
+
+#: templates/catalogue/reviews/review_detail.html:33
+#: templates/catalogue/reviews/review_list.html:32
+msgid "Customer reviews"
+msgstr ""
+
+#: templates/catalogue/reviews/review_form.html:8
+msgid "Leave a product review"
+msgstr ""
+
+#: templates/catalogue/reviews/review_form.html:42
+#: templates/checkout/shipping_address.html:41
+#: templates/checkout/shipping_address.html:43
+#: templates/checkout/user_address_form.html:26
+#: templates/customer/wishlists/wishlists_form.html:40
+#: templates/dashboard/catalogue/product_update.html:325
+#: templates/dashboard/catalogue/product_update.html:329
+#: templates/dashboard/catalogue/product_update.html:332
+#: templates/dashboard/comms/detail.html:103
+#: templates/dashboard/offers/restrictions_form.html:14
+#: templates/dashboard/offers/step_form.html:76
+#: templates/dashboard/pages/update.html:35
+#: templates/dashboard/partials/form.html:10
+#: templates/dashboard/partners/partner_user_form.html:35
+#: templates/dashboard/promotions/form.html:36
+#: templates/dashboard/ranges/range_form.html:36
+#: templates/dashboard/reviews/review_update.html:79
+#: templates/dashboard/shipping/weight_band_form.html:37
+#: templates/dashboard/shipping/weight_based_form.html:47
+#: templates/dashboard/users/alerts/update.html:33
+#: templates/dashboard/vouchers/voucher_form.html:45
+#: templates/partials/form.html:11
+msgid "Saving..."
+msgstr ""
+
+#: templates/catalogue/reviews/review_form.html:42
+msgid "Save review"
+msgstr ""
+
+#: templates/catalogue/reviews/review_list.html:7
+#: templates/catalogue/reviews/review_list.html:27
+msgid "All reviews"
+msgstr ""
+
+#: templates/catalogue/reviews/review_list.html:45
+#: templates/partials/nav_accounts.html:29
+msgid "Go"
+msgstr ""
+
+#: templates/catalogue/reviews/review_list.html:53
+msgid "This product does not have any reviews yet."
+msgstr ""
+
+#: templates/checkout/checkout.html:34 templates/checkout/checkout.html:65
+#: templates/checkout/checkout.html:88
+msgid "Change"
+msgstr ""
+
+#: templates/checkout/checkout.html:37 templates/checkout/thank_you.html:40
+#: templates/dashboard/orders/order_detail.html:446
+msgid "Address"
+msgstr ""
+
+#: templates/checkout/checkout.html:45 templates/checkout/thank_you.html:49
+msgid "Contact"
+msgstr ""
+
+#: templates/checkout/checkout.html:47 templates/checkout/thank_you.html:51
+#: templates/dashboard/orders/order_detail.html:457
+msgid "Phone"
+msgstr ""
+
+#: templates/checkout/checkout.html:55 templates/checkout/thank_you.html:59
+#: templates/dashboard/orders/order_detail.html:461
+msgid "Instructions"
+msgstr ""
+
+#: templates/checkout/checkout.html:84 templates/checkout/checkout.html:90
+#: templates/checkout/thank_you.html:77 templates/checkout/thank_you.html:80
+#: templates/dashboard/orders/order_detail.html:88
+msgid "Payment"
+msgstr ""
+
+#: templates/checkout/checkout.html:91
+msgid "Payment details to go here"
+msgstr ""
+
+#: templates/checkout/checkout.html:101
+msgid "Edit order contents"
+msgstr ""
+
+#: templates/checkout/checkout.html:105 templates/checkout/thank_you.html:114
+#: templates/dashboard/orders/order_detail.html:86
+msgid "Order contents"
+msgstr ""
+
+#: templates/checkout/checkout.html:109
+msgid "Item"
+msgstr ""
+
+#: templates/checkout/gateway.html:7
+msgid "Checkout gateway"
+msgstr ""
+
+#: templates/checkout/gateway.html:14
+msgid "Who are you?"
+msgstr ""
+
+#: templates/checkout/gateway.html:39
+msgid "Get a password reminder"
+msgstr ""
+
+#: templates/checkout/gateway.html:59
+#: templates/checkout/shipping_address.html:79
+msgid "Continuing..."
+msgstr ""
+
+#: templates/checkout/gateway.html:59
+#: templates/checkout/payment_details.html:24
+#: templates/checkout/shipping_address.html:79
+#: templates/dashboard/offers/step_form.html:74
+msgid "Continue"
+msgstr ""
+
+#: templates/checkout/nav.html:11 templates/checkout/nav.html.py:16
+msgid "1. Shipping address"
+msgstr ""
+
+#: templates/checkout/nav.html:26 templates/checkout/nav.html.py:31
+msgid "2. Shipping method"
+msgstr ""
+
+#: templates/checkout/nav.html:41 templates/checkout/nav.html.py:46
+msgid "3. Payment"
+msgstr ""
+
+#: templates/checkout/nav.html:53
+msgid "4. Preview"
+msgstr ""
+
+#: templates/checkout/nav.html:59
+msgid "5. Confirmation"
+msgstr ""
+
+#: templates/checkout/payment_details.html:5
+msgid "Payment details"
+msgstr ""
+
+#: templates/checkout/payment_details.html:12
+msgid "Enter payment details"
+msgstr ""
+
+#: templates/checkout/payment_details.html:22
+msgid "Cash on delivery."
+msgstr ""
+
+#: templates/checkout/preview.html:5
+msgid "Order preview"
+msgstr ""
+
+#: templates/checkout/preview.html:13
+msgid "Preview order"
+msgstr ""
+
+#: templates/checkout/preview.html:36
+msgid "Place order"
+msgstr ""
+
+#: templates/checkout/shipping_address.html:5
+#: templates/checkout/shipping_address.html:12
+#: templates/dashboard/orders/order_list.html:122
+#: templates/dashboard/orders/shippingaddress_form.html:5
+msgid "Shipping address"
+msgstr ""
+
+#: templates/checkout/shipping_address.html:18
+msgid "Where should we ship to?"
+msgstr ""
+
+#: templates/checkout/shipping_address.html:22
+msgid "An address from your addressbook?"
+msgstr ""
+
+#: templates/checkout/shipping_address.html:41
+msgid "Ship to your default shipping address"
+msgstr ""
+
+#: templates/checkout/shipping_address.html:43
+msgid "Ship to this address"
+msgstr ""
+
+#: templates/checkout/shipping_address.html:47
+#: templates/checkout/user_address_form.html:5
+#: templates/checkout/user_address_form.html:17
+msgid "Edit address"
+msgstr ""
+
+#: templates/checkout/shipping_address.html:52
+#: templates/customer/wishlists/wishlists_delete.html:32
+#: templates/customer/wishlists/wishlists_list.html:31
+#: templates/dashboard/catalogue/category_delete.html:33
+#: templates/dashboard/catalogue/category_row_actions.html:32
+#: templates/dashboard/catalogue/product_class_delete.html:36
+#: templates/dashboard/catalogue/product_class_list.html:48
+#: templates/dashboard/catalogue/product_delete.html:59
+#: templates/dashboard/catalogue/product_row_actions.html:17
+#: templates/dashboard/catalogue/product_update.html:269
+#: templates/dashboard/offers/offer_delete.html:34
+#: templates/dashboard/offers/offer_list.html:94
+#: templates/dashboard/orders/order_detail.html:628
+#: templates/dashboard/pages/delete.html:36
+#: templates/dashboard/pages/index.html:70
+#: templates/dashboard/partners/partner_delete.html:34
+#: templates/dashboard/promotions/delete.html:36
+#: templates/dashboard/promotions/promotion_list.html:64
+#: templates/dashboard/ranges/range_delete.html:34
+#: templates/dashboard/ranges/range_list.html:77
+#: templates/dashboard/reviews/review_delete.html:47
+#: templates/dashboard/reviews/review_list.html:112
+#: templates/dashboard/shipping/weight_band_delete.html:49
+#: templates/dashboard/shipping/weight_based_delete.html:32
+#: templates/dashboard/shipping/weight_based_detail.html:79
+#: templates/dashboard/shipping/weight_based_list.html:48
+#: templates/dashboard/users/alerts/delete.html:37
+#: templates/dashboard/users/alerts/list.html:77
+#: templates/dashboard/vouchers/voucher_delete.html:48
+#: templates/dashboard/vouchers/voucher_detail.html:83
+#: templates/dashboard/vouchers/voucher_list.html:84
+msgid "Delete"
+msgstr ""
+
+#: templates/checkout/shipping_address.html:67
+msgid "Or a new address?"
+msgstr ""
+
+#: templates/checkout/shipping_address.html:80
+msgid "return to basket"
+msgstr ""
+
+#: templates/checkout/shipping_methods.html:24
+msgid "Method"
+msgstr ""
+
+#: templates/checkout/shipping_methods.html:25
+#: templates/dashboard/offers/offer_detail.html:108
+#: templates/dashboard/offers/offer_list.html:54
+msgid "Cost"
+msgstr ""
+
+#: templates/checkout/shipping_methods.html:39
+#, python-format
+msgid ""
+"\n"
+"                                This includes a discount of <strong>"
+"%(amount)s</strong> as\n"
+"                                your basket qualifies for the <strong>"
+"%(name)s</strong> offer.\n"
+"                            "
+msgstr ""
+
+#: templates/checkout/shipping_methods.html:58
+msgid "Select option"
+msgstr ""
+
+#: templates/checkout/thank_you.html:8 templates/checkout/thank_you.html:18
+#, python-format
+msgid ""
+"\n"
+"        Order %(number)s: confirmation\n"
+"    "
+msgstr ""
+
+#: templates/checkout/thank_you.html:26
+#, python-format
+msgid ""
+"\n"
+"                Your order has been placed and a confirmation email has been "
+"sent - your order number is\n"
+"                <strong>%(number)s</strong>.\n"
+"            "
+msgstr ""
+
+#: templates/checkout/thank_you.html:30
+msgid ""
+"Please make a note of this reference or print this page and quote it in any "
+"communication with us regarding your order."
+msgstr ""
+
+#: templates/checkout/thank_you.html:63
+msgid "No shipping address required."
+msgstr ""
+
+#: templates/checkout/thank_you.html:84
+#, python-format
+msgid ""
+"\n"
+"                                        Allocation of %(amount)s from type "
+"%(type)s (reference: %(reference)s)\n"
+"                                    "
+msgstr ""
+
+#: templates/checkout/thank_you.html:88
+#, python-format
+msgid ""
+"\n"
+"                                        Allocation of %(amount)s from type "
+"%(type)s\n"
+"                                    "
+msgstr ""
+
+#: templates/checkout/thank_you.html:95
+msgid "No payment was required for this order."
+msgstr ""
+
+#: templates/checkout/thank_you.html:100
+#: templates/dashboard/orders/order_detail.html:474
+#: templates/dashboard/orders/order_list.html:123
+msgid "Billing address"
+msgstr ""
+
+#: templates/checkout/thank_you.html:119
+msgid "Items purchased"
+msgstr ""
+
+#: templates/checkout/thank_you.html:143
+#, python-format
+msgid ""
+"\n"
+"                                    Estimated dispatch: <strong>%(date)s</"
+"strong>\n"
+"                                "
+msgstr ""
+
+#: templates/checkout/thank_you.html:229
+msgid "Shipping charge (before discounts)"
+msgstr ""
+
+#: templates/checkout/thank_you.html:239
+msgid "Shipping charge (after discounts)"
+msgstr ""
+
+#: templates/checkout/thank_you.html:244
+msgid "Shipping charge"
+msgstr ""
+
+#: templates/checkout/thank_you.html:261
+msgid "Order tax"
+msgstr ""
+
+#: templates/checkout/thank_you.html:304
+msgid "Tracking your order"
+msgstr ""
+
+#: templates/checkout/thank_you.html:306
+msgid "You can track the status of your order"
+msgstr ""
+
+#: templates/checkout/thank_you.html:308
+msgid "View order status"
+msgstr ""
+
+#: templates/checkout/thank_you.html:317
+msgid "Print this page"
+msgstr ""
+
+#: templates/checkout/user_address_delete.html:5
+#: templates/checkout/user_address_delete.html:17
+msgid "Delete address?"
+msgstr ""
+
+#: templates/checkout/user_address_delete.html:29
+msgid "Are you sure you want to delete this address?"
+msgstr ""
+
+#: templates/checkout/user_address_delete.html:29
+msgid "Yes!"
+msgstr ""
+
+#: templates/checkout/user_address_form.html:26
+#: templates/customer/wishlists/wishlists_form.html:40
+#: templates/dashboard/catalogue/product_class_form.html:139
+#: templates/dashboard/catalogue/product_update.html:333
+#: templates/dashboard/comms/detail.html:103
+#: templates/dashboard/pages/update.html:35
+#: templates/dashboard/partials/form.html:10
+#: templates/dashboard/partners/partner_user_form.html:35
+#: templates/dashboard/promotions/form.html:36
+#: templates/dashboard/ranges/range_form.html:36
+#: templates/dashboard/reviews/review_update.html:79
+#: templates/dashboard/shipping/weight_band_form.html:37
+#: templates/dashboard/shipping/weight_based_form.html:47
+#: templates/dashboard/users/alerts/update.html:33
+#: templates/dashboard/vouchers/voucher_form.html:45
+#: templates/partials/form.html:11
+msgid "Save"
+msgstr ""
+
+#: templates/customer/baseaccountpage.html:6
+#: templates/customer/baseaccountpage.html:17
+#: templates/customer/wishlists/wishlists_delete.html:10
+#: templates/customer/wishlists/wishlists_delete_product.html:10
+#: templates/customer/wishlists/wishlists_detail.html:13
+#: templates/customer/wishlists/wishlists_form.html:10
+#: templates/dashboard/layout.html:51 templates/partials/nav_accounts.html:39
+#: templates/partials/nav_accounts.html:43
+msgid "Account"
+msgstr ""
+
+#: templates/customer/baseaccountpage.html:30
+msgid "Profile"
+msgstr ""
+
+#: templates/customer/baseaccountpage.html:33
+msgid "Order History"
+msgstr ""
+
+#: templates/customer/baseaccountpage.html:36
+msgid "Address Book"
+msgstr ""
+
+#: templates/customer/baseaccountpage.html:39
+msgid "Email History"
+msgstr ""
+
+#: templates/customer/baseaccountpage.html:42
+msgid "Product Alerts"
+msgstr ""
+
+#: templates/customer/baseaccountpage.html:45
+msgid "Notifications"
+msgstr ""
+
+#: templates/customer/baseaccountpage.html:48
+#: templates/customer/wishlists/wishlists_delete.html:13
+#: templates/customer/wishlists/wishlists_delete_product.html:13
+#: templates/customer/wishlists/wishlists_detail.html:16
+#: templates/customer/wishlists/wishlists_form.html:13
+msgid "Wish Lists"
+msgstr ""
+
+#: templates/customer/history/recently_viewed_products.html:7
+msgid "Products you recently viewed"
+msgstr ""
+
+#: templates/customer/wishlists/wishlists_delete.html:18
+#: templates/dashboard/catalogue/product_class_form.html:101
+#: templates/dashboard/catalogue/product_update.html:202
+#: templates/dashboard/offers/offer_delete.html:21
+#: templates/dashboard/partners/partner_delete.html:21
+#: templates/dashboard/ranges/range_delete.html:21
+#: templates/dashboard/shipping/weight_based_delete.html:19
+#: templates/dashboard/vouchers/voucher_delete.html:22
+msgid "Delete?"
+msgstr ""
+
+#: templates/customer/wishlists/wishlists_delete.html:26
+#, python-format
+msgid ""
+"\n"
+"                Are you sure you want to delete %(name)s?\n"
+"            "
+msgstr ""
+
+#: templates/customer/wishlists/wishlists_delete.html:32
+#: templates/dashboard/catalogue/category_delete.html:33
+#: templates/dashboard/catalogue/product_class_delete.html:36
+#: templates/dashboard/catalogue/product_delete.html:59
+#: templates/dashboard/offers/offer_delete.html:34
+#: templates/dashboard/pages/delete.html:36
+#: templates/dashboard/partners/partner_delete.html:34
+#: templates/dashboard/promotions/delete.html:36
+#: templates/dashboard/ranges/range_delete.html:34
+#: templates/dashboard/reviews/review_delete.html:47
+#: templates/dashboard/shipping/weight_band_delete.html:49
+#: templates/dashboard/shipping/weight_based_delete.html:32
+#: templates/dashboard/users/alerts/delete.html:37
+#: templates/dashboard/vouchers/voucher_delete.html:48
+msgid "Deleting..."
+msgstr ""
+
+#: templates/customer/wishlists/wishlists_delete_product.html:18
+msgid "Remove product"
+msgstr ""
+
+#: templates/customer/wishlists/wishlists_delete_product.html:26
+#, python-format
+msgid ""
+"\n"
+"                Are you sure you want to delete %(product_name)s from wish "
+"list %(wishlist_name)s?\n"
+"            "
+msgstr ""
+
+#: templates/customer/wishlists/wishlists_delete_product.html:31
+#: templates/dashboard/promotions/delete_pagepromotion.html:31
+#: templates/dashboard/promotions/form.html:65
+#: templates/dashboard/ranges/range_product_list.html:88
+msgid "Removing..."
+msgstr ""
+
+#: templates/customer/wishlists/wishlists_detail.html:34
+#: templates/customer/wishlists/wishlists_list.html:11
+msgid "Action"
+msgstr ""
+
+#: templates/customer/wishlists/wishlists_detail.html:54
+msgid "Not available anymore"
+msgstr ""
+
+#: templates/customer/wishlists/wishlists_detail.html:76
+msgid "View product"
+msgstr ""
+
+#: templates/customer/wishlists/wishlists_detail.html:82
+#: templates/dashboard/catalogue/category_row_actions.html:6
+#: templates/dashboard/catalogue/product_class_list.html:43
+#: templates/dashboard/catalogue/product_row_actions.html:6
+#: templates/dashboard/offers/offer_list.html:87
+#: templates/dashboard/orders/order_detail.html:117
+#: templates/dashboard/pages/index.html:64
+#: templates/dashboard/partners/partner_list.html:88
+#: templates/dashboard/promotions/form.html:51
+#: templates/dashboard/promotions/page_detail.html:38
+#: templates/dashboard/promotions/page_detail.html:50
+#: templates/dashboard/promotions/pagepromotion_list.html:45
+#: templates/dashboard/promotions/promotion_list.html:45
+#: templates/dashboard/promotions/promotion_list.html:59
+#: templates/dashboard/ranges/range_list.html:64
+#: templates/dashboard/reviews/review_list.html:104
+#: templates/dashboard/users/alerts/list.html:72
+#: templates/dashboard/users/detail.html:87
+#: templates/dashboard/vouchers/voucher_list.html:78
+msgid "Actions"
+msgstr ""
+
+#: templates/customer/wishlists/wishlists_detail.html:92
+#, python-format
+msgid ""
+"\n"
+"                                                    Move to '%(name)s' wish "
+"list\n"
+"                                                "
+msgstr ""
+
+#: templates/customer/wishlists/wishlists_detail.html:106
+msgid "Update quantities"
+msgstr ""
+
+#: templates/customer/wishlists/wishlists_detail.html:115
+msgid "Your wish list is empty."
+msgstr ""
+
+#: templates/customer/wishlists/wishlists_form.html:19
+msgid "Create"
+msgstr ""
+
+#: templates/customer/wishlists/wishlists_form.html:29
+msgid "What should your new wish list be called?"
+msgstr ""
+
+#: templates/customer/wishlists/wishlists_form.html:34
+#, python-format
+msgid ""
+"\n"
+"                    After your wishlist is created, <strong>%(title)s</"
+"strong> will be added.\n"
+"                "
+msgstr ""
+
+#: templates/customer/wishlists/wishlists_list.html:10
+msgid "Number of products"
+msgstr ""
+
+#: templates/customer/wishlists/wishlists_list.html:19
+#: templates/dashboard/orders/order_detail.html:152
+#: templates/dashboard/orders/order_list.html:149
+#: templates/dashboard/pages/index.html:68
+#: templates/dashboard/reports/partials/order_report.html:30
+#: templates/dashboard/shipping/weight_based_list.html:46
+#: templates/dashboard/users/detail.html:134
+#: templates/dashboard/users/user_row_actions.html:2
+msgid "View"
+msgstr ""
+
+#: templates/customer/wishlists/wishlists_list.html:26
+msgid "Wish list settings"
+msgstr ""
+
+#: templates/customer/wishlists/wishlists_list.html:44
+msgid "You don't have any wish lists yet."
+msgstr ""
+
+#: templates/customer/wishlists/wishlists_list.html:49
+msgid "Create a new wish list"
+msgstr ""
+
+#: templates/dashboard/catalogue/category_delete.html:9
+#: templates/dashboard/catalogue/category_form.html:14
+#: templates/dashboard/catalogue/category_list.html:15
+#: templates/dashboard/catalogue/product_class_delete.html:9
+#: templates/dashboard/catalogue/product_class_form.html:14
+#: templates/dashboard/catalogue/product_class_list.html:8
+#: templates/dashboard/catalogue/product_delete.html:14
+#: templates/dashboard/catalogue/product_list.html:17
+#: templates/dashboard/catalogue/product_update.html:17
+#: templates/dashboard/catalogue/stockalert_list.html:14
+#: templates/dashboard/comms/detail.html:14
+#: templates/dashboard/comms/list.html:13 templates/dashboard/index.html:16
+#: templates/dashboard/layout.html:32 templates/dashboard/layout.html.py:110
+#: templates/dashboard/offers/offer_delete.html:13
+#: templates/dashboard/offers/offer_detail.html:14
+#: templates/dashboard/offers/offer_list.html:14
+#: templates/dashboard/offers/step_form.html:21
+#: templates/dashboard/orders/line_detail.html:13
+#: templates/dashboard/orders/order_detail.html:14
+#: templates/dashboard/orders/order_list.html:16
+#: templates/dashboard/orders/shippingaddress_form.html:11
+#: templates/dashboard/orders/statistics.html:14
+#: templates/dashboard/pages/delete.html:14
+#: templates/dashboard/pages/index.html:14
+#: templates/dashboard/pages/update.html:13
+#: templates/dashboard/partners/partner_delete.html:13
+#: templates/dashboard/partners/partner_form.html:14
+#: templates/dashboard/partners/partner_list.html:12
+#: templates/dashboard/partners/partner_manage.html:13
+#: templates/dashboard/partners/partner_user_form.html:14
+#: templates/dashboard/partners/partner_user_list.html:12
+#: templates/dashboard/partners/partner_user_select.html:12
+#: templates/dashboard/promotions/delete.html:14
+#: templates/dashboard/promotions/delete_pagepromotion.html:9
+#: templates/dashboard/promotions/form.html:9
+#: templates/dashboard/promotions/page_detail.html:15
+#: templates/dashboard/promotions/pagepromotion_list.html:17
+#: templates/dashboard/promotions/promotion_list.html:19
+#: templates/dashboard/ranges/range_delete.html:13
+#: templates/dashboard/ranges/range_form.html:13
+#: templates/dashboard/ranges/range_list.html:11
+#: templates/dashboard/ranges/range_product_list.html:13
+#: templates/dashboard/reports/index.html:12
+#: templates/dashboard/reviews/review_delete.html:14
+#: templates/dashboard/reviews/review_list.html:14
+#: templates/dashboard/reviews/review_update.html:14
+#: templates/dashboard/shipping/weight_band_delete.html:14
+#: templates/dashboard/shipping/weight_band_form.html:14
+#: templates/dashboard/shipping/weight_based_delete.html:11
+#: templates/dashboard/shipping/weight_based_detail.html:12
+#: templates/dashboard/shipping/weight_based_form.html:17
+#: templates/dashboard/shipping/weight_based_list.html:12
+#: templates/dashboard/users/alerts/delete.html:14
+#: templates/dashboard/users/alerts/list.html:14
+#: templates/dashboard/users/alerts/update.html:13
+#: templates/dashboard/users/detail.html:12
+#: templates/dashboard/users/index.html:21
+#: templates/dashboard/vouchers/voucher_delete.html:14
+#: templates/dashboard/vouchers/voucher_detail.html:12
+#: templates/dashboard/vouchers/voucher_form.html:14
+#: templates/dashboard/vouchers/voucher_list.html:13
+#: templates/partials/nav_accounts.html:47
+msgid "Dashboard"
+msgstr ""
+
+#: templates/dashboard/catalogue/category_delete.html:14
+#: templates/dashboard/catalogue/category_delete.html:19
+msgid "Delete category?"
+msgstr ""
+
+#: templates/dashboard/catalogue/category_delete.html:24
+msgid "Delete category"
+msgstr ""
+
+#: templates/dashboard/catalogue/category_delete.html:29
+#, python-format
+msgid ""
+"\n"
+"            <p>Delete category <strong>%(name)s</strong> - are you sure?</"
+"p>\n"
+"        "
+msgstr ""
+
+#: templates/dashboard/catalogue/category_list.html:23
+msgid "Create new category"
+msgstr ""
+
+#: templates/dashboard/catalogue/category_list.html:30
+msgid "You are editing:"
+msgstr ""
+
+#: templates/dashboard/catalogue/category_list.html:44
+msgid "There are no categories."
+msgstr ""
+
+#: templates/dashboard/catalogue/category_row_actions.html:12
+msgid "Edit category"
+msgstr ""
+
+#: templates/dashboard/catalogue/category_row_actions.html:17
+msgid "Add child category"
+msgstr ""
+
+#: templates/dashboard/catalogue/category_row_actions.html:22
+msgid "Edit children"
+msgstr ""
+
+#: templates/dashboard/catalogue/category_row_actions.html:27
+#: templates/dashboard/catalogue/product_row_actions.html:14
+#: templates/dashboard/catalogue/product_update.html:337
+#: templates/dashboard/pages/index.html:59
+#: templates/dashboard/pages/messages/saved.html:9
+#: templates/dashboard/ranges/range_list.html:75
+#: templates/dashboard/reviews/review_list.html:109
+msgid "View on site"
+msgstr ""
+
+#: templates/dashboard/catalogue/messages/product_saved.html:10
+#, python-format
+msgid ""
+"\n"
+"                    Created product variant '%(name)s'.\n"
+"                "
+msgstr ""
+
+#: templates/dashboard/catalogue/messages/product_saved.html:14
+#, python-format
+msgid ""
+"\n"
+"                    Created variant of '%(parent_name)s'.\n"
+"                "
+msgstr ""
+
+#: templates/dashboard/catalogue/messages/product_saved.html:20
+#, python-format
+msgid ""
+"\n"
+"                    Updated product variant '%(name)s'.\n"
+"                "
+msgstr ""
+
+#: templates/dashboard/catalogue/messages/product_saved.html:24
+#, python-format
+msgid ""
+"\n"
+"                    Updated a variant of '%(parent_name)s'.\n"
+"                "
+msgstr ""
+
+#: templates/dashboard/catalogue/messages/product_saved.html:33
+#, python-format
+msgid ""
+"\n"
+"                Created product '%(name)s'.\n"
+"            "
+msgstr ""
+
+#: templates/dashboard/catalogue/messages/product_saved.html:37
+#, python-format
+msgid ""
+"\n"
+"                Updated product '%(name)s'.\n"
+"            "
+msgstr ""
+
+#: templates/dashboard/catalogue/messages/product_saved.html:48
+#: templates/dashboard/pages/messages/saved.html:10
+#: templates/dashboard/ranges/messages/range_saved.html:6
+msgid "Edit again"
+msgstr ""
+
+#: templates/dashboard/catalogue/messages/product_saved.html:49
+msgid "View it on the site"
+msgstr ""
+
+#: templates/dashboard/catalogue/product_class_delete.html:14
+msgid "Delete product type?"
+msgstr ""
+
+#: templates/dashboard/catalogue/product_class_delete.html:24
+msgid ""
+"Please make sure all products are assigned to another type before deletion."
+msgstr ""
+
+#: templates/dashboard/catalogue/product_class_delete.html:27
+msgid "Delete product type"
+msgstr ""
+
+#: templates/dashboard/catalogue/product_class_delete.html:33
+#, python-format
+msgid "Delete product type <strong>%(name)s</strong> - are you sure?"
+msgstr ""
+
+#: templates/dashboard/catalogue/product_class_form.html:6
+msgid "Create product type"
+msgstr ""
+
+#: templates/dashboard/catalogue/product_class_form.html:17
+#: templates/dashboard/catalogue/product_class_list.html:10
+#: templates/dashboard/orders/line_detail.html:47
+msgid "Product Type"
+msgstr ""
+
+#: templates/dashboard/catalogue/product_class_form.html:35
+#: templates/dashboard/catalogue/product_update.html:59
+msgid "Sections"
+msgstr ""
+
+#: templates/dashboard/catalogue/product_class_form.html:40
+#: templates/dashboard/catalogue/product_class_form.html:54
+msgid "Product Class details"
+msgstr ""
+
+#: templates/dashboard/catalogue/product_class_form.html:41
+#: templates/dashboard/catalogue/product_class_form.html:86
+msgid "Product attributes"
+msgstr ""
+
+#: templates/dashboard/catalogue/product_class_form.html:99
+#: templates/dashboard/orders/order_detail.html:561
+#: templates/dashboard/orders/order_detail.html:611
+#: templates/dashboard/promotions/page_detail.html:37
+#: templates/dashboard/promotions/promotion_list.html:42
+msgid "Type"
+msgstr ""
+
+#: templates/dashboard/catalogue/product_class_form.html:100
+msgid "Required"
+msgstr ""
+
+#: templates/dashboard/catalogue/product_class_form.html:135
+#: templates/dashboard/catalogue/product_update.html:321
+#: templates/dashboard/orders/partials/bulk_edit_form.html:26
+msgid "Cancel"
+msgstr ""
+
+#: templates/dashboard/catalogue/product_class_list.html:16
+msgid "Create new product type"
+msgstr ""
+
+#: templates/dashboard/catalogue/product_class_list.html:17
+msgid "Product types"
+msgstr ""
+
+#: templates/dashboard/catalogue/product_class_list.html:24
+msgid "Product Types"
+msgstr ""
+
+#: templates/dashboard/catalogue/product_class_list.html:28
+msgid "Requires shipping"
+msgstr ""
+
+#: templates/dashboard/catalogue/product_class_list.html:29
+msgid "Track stock?"
+msgstr ""
+
+#: templates/dashboard/catalogue/product_class_list.html:47
+msgid "Edit product type"
+msgstr ""
+
+#: templates/dashboard/catalogue/product_class_list.html:58
+msgid "There are no product types."
+msgstr ""
+
+#: templates/dashboard/catalogue/product_delete.html:37
+#, python-format
+msgid ""
+"\n"
+"                    Delete product variant <strong>%(title)s</strong> - are "
+"you sure?\n"
+"                "
+msgstr ""
+
+#: templates/dashboard/catalogue/product_delete.html:41
+#, python-format
+msgid ""
+"\n"
+"                    Delete product <strong>%(title)s</strong> - are you "
+"sure?\n"
+"                "
+msgstr ""
+
+#: templates/dashboard/catalogue/product_delete.html:49
+msgid "This will also delete the following child products:"
+msgstr ""
+
+#: templates/dashboard/catalogue/product_list.html:32
+msgid "Create new product"
+msgstr ""
+
+#: templates/dashboard/catalogue/product_list.html:37
+msgid "New Product"
+msgstr ""
+
+#: templates/dashboard/catalogue/product_list.html:44
+msgid "Search Products"
+msgstr ""
+
+#: templates/dashboard/catalogue/product_list.html:60
+#: templates/dashboard/offers/offer_list.html:31
+#: templates/dashboard/orders/order_list.html:73
+#: templates/dashboard/pages/index.html:34
+#: templates/dashboard/partners/partner_list.html:29
+#: templates/dashboard/partners/partner_user_select.html:33
+#: templates/dashboard/reviews/review_list.html:34
+#: templates/dashboard/users/alerts/list.html:31
+#: templates/dashboard/users/index.html:34
+#: templates/dashboard/vouchers/voucher_list.html:39
+msgid "Searching..."
+msgstr ""
+
+#: templates/dashboard/catalogue/product_list.html:60
+#: templates/dashboard/offers/offer_list.html:31
+#: templates/dashboard/orders/order_list.html:30
+#: templates/dashboard/orders/order_list.html:51
+#: templates/dashboard/orders/order_list.html:73
+#: templates/dashboard/pages/index.html:29
+#: templates/dashboard/pages/index.html:34
+#: templates/dashboard/partners/partner_list.html:29
+#: templates/dashboard/partners/partner_user_select.html:33
+#: templates/dashboard/reviews/review_list.html:34
+#: templates/dashboard/users/alerts/list.html:31
+#: templates/dashboard/users/index.html:29
+#: templates/dashboard/users/index.html:34
+#: templates/dashboard/vouchers/voucher_list.html:34
+#: templates/dashboard/vouchers/voucher_list.html:39
+#: templates/partials/search.html:7 templates/search/results.html:18
+msgid "Search"
+msgstr ""
+
+#: templates/dashboard/catalogue/product_row_actions.html:11
+#: templates/dashboard/catalogue/product_update.html:266
+#: templates/dashboard/comms/detail.html:37
+#: templates/dashboard/comms/list.html:44
+#: templates/dashboard/offers/offer_detail.html:64
+#: templates/dashboard/offers/offer_detail.html:73
+#: templates/dashboard/offers/offer_detail.html:78
+#: templates/dashboard/offers/offer_detail.html:93
+#: templates/dashboard/offers/offer_list.html:93
+#: templates/dashboard/offers/summary.html:9
+#: templates/dashboard/offers/summary.html:18
+#: templates/dashboard/offers/summary.html:25
+#: templates/dashboard/offers/summary.html:31
+#: templates/dashboard/orders/order_detail.html:623
+#: templates/dashboard/pages/index.html:69
+#: templates/dashboard/promotions/page_detail.html:54
+#: templates/dashboard/promotions/pagepromotion_list.html:54
+#: templates/dashboard/promotions/promotion_list.html:63
+#: templates/dashboard/ranges/range_list.html:69
+#: templates/dashboard/reviews/review_list.html:111
+#: templates/dashboard/shipping/weight_based_detail.html:78
+#: templates/dashboard/shipping/weight_based_form.html:26
+#: templates/dashboard/shipping/weight_based_list.html:47
+#: templates/dashboard/users/alerts/list.html:76
+#: templates/dashboard/vouchers/voucher_detail.html:82
+#: templates/dashboard/vouchers/voucher_form.html:24
+#: templates/dashboard/vouchers/voucher_list.html:83
+msgid "Edit"
+msgstr ""
+
+#: templates/dashboard/catalogue/product_update.html:44
+#, python-format
+msgid ""
+"\n"
+"                            You are currently editing a product variant of\n"
+"                            <a href=\"%(parent_url)s\">%(title)s</a>.\n"
+"                        "
+msgstr ""
+
+#: templates/dashboard/catalogue/product_update.html:71
+#: templates/dashboard/catalogue/product_update.html:101
+#: templates/dashboard/orders/line_detail.html:33
+msgid "Product details"
+msgstr ""
+
+#: templates/dashboard/catalogue/product_update.html:79
+msgid "Images"
+msgstr ""
+
+#: templates/dashboard/catalogue/product_update.html:82
+#: templates/dashboard/catalogue/product_update.html:186
+msgid "Stock and pricing"
+msgstr ""
+
+#: templates/dashboard/catalogue/product_update.html:85
+#: templates/dashboard/catalogue/product_update.html:246
+msgid "Variants"
+msgstr ""
+
+#: templates/dashboard/catalogue/product_update.html:88
+msgid "Upselling"
+msgstr ""
+
+#: templates/dashboard/catalogue/product_update.html:146
+msgid "Product Type:"
+msgstr ""
+
+#: templates/dashboard/catalogue/product_update.html:167
+msgid "Upload, change or remove images"
+msgstr ""
+
+#: templates/dashboard/catalogue/product_update.html:192
+msgid "SKU"
+msgstr ""
+
+#: templates/dashboard/catalogue/product_update.html:194
+msgid "Num in stock"
+msgstr ""
+
+#: templates/dashboard/catalogue/product_update.html:195
+msgid "Num allocated"
+msgstr ""
+
+#: templates/dashboard/catalogue/product_update.html:196
+#: templates/dashboard/catalogue/stockalert_list.html:50
+msgid "Low stock threshold"
+msgstr ""
+
+#: templates/dashboard/catalogue/product_update.html:199
+msgid "Cost price"
+msgstr ""
+
+#: templates/dashboard/catalogue/product_update.html:200
+msgid "Price (excl tax)"
+msgstr ""
+
+#: templates/dashboard/catalogue/product_update.html:201
+msgid "Retail price"
+msgstr ""
+
+#: templates/dashboard/catalogue/product_update.html:249
+msgid "Add variant"
+msgstr ""
+
+#: templates/dashboard/catalogue/product_update.html:254
+msgid "Title"
+msgstr ""
+
+#: templates/dashboard/catalogue/product_update.html:278
+msgid "This product does not have any variants."
+msgstr ""
+
+#: templates/dashboard/catalogue/product_update.html:280
+msgid "One can't add variants to this product at this point."
+msgstr ""
+
+#: templates/dashboard/catalogue/product_update.html:282
+msgid "This is likely because this product still has stock records."
+msgstr ""
+
+#: templates/dashboard/catalogue/product_update.html:326
+msgid "Save and add another variant"
+msgstr ""
+
+#: templates/dashboard/catalogue/product_update.html:330
+msgid "Save and continue editing"
+msgstr ""
+
+#: templates/dashboard/catalogue/stockalert_list.html:8
+#: templates/dashboard/catalogue/stockalert_list.html:16
+#: templates/dashboard/catalogue/stockalert_list.html:22
+msgid "Stock alerts"
+msgstr ""
+
+#: templates/dashboard/catalogue/stockalert_list.html:37
+#: templates/dashboard/ranges/range_list.html:49
+msgid "All"
+msgstr ""
+
+#: templates/dashboard/catalogue/stockalert_list.html:38
+msgid "Open"
+msgstr ""
+
+#: templates/dashboard/catalogue/stockalert_list.html:39
+msgid "Closed"
+msgstr ""
+
+#: templates/dashboard/catalogue/stockalert_list.html:51
+msgid "Current available stock"
+msgstr ""
+
+#: templates/dashboard/catalogue/stockalert_list.html:52
+msgid "Date alert raised"
+msgstr ""
+
+#: templates/dashboard/catalogue/stockalert_list.html:53
+#: templates/dashboard/orders/line_detail.html:74
+#: templates/dashboard/orders/order_detail.html:64
+#: templates/dashboard/orders/order_detail.html:111
+#: templates/dashboard/orders/order_detail.html:528
+#: templates/dashboard/orders/order_list.html:120
+#: templates/dashboard/orders/statistics.html:57
+#: templates/dashboard/reviews/review_delete.html:41
+#: templates/dashboard/reviews/review_list.html:61
+#: templates/dashboard/users/alerts/list.html:46
+#: templates/dashboard/users/alerts/partials/alert.html:20
+#: templates/dashboard/users/detail.html:124
+#: templates/dashboard/vouchers/voucher_list.html:52
+msgid "Status"
+msgstr ""
+
+#: templates/dashboard/catalogue/stockalert_list.html:76
+msgid "No stock alerts found."
+msgstr ""
+
+#: templates/dashboard/comms/detail.html:17
+#: templates/dashboard/comms/list.html:7 templates/dashboard/comms/list.html:15
+#: templates/dashboard/comms/list.html:21
+#: templates/dashboard/comms/list.html:27
+msgid "Emails"
+msgstr ""
+
+#: templates/dashboard/comms/detail.html:38
+#: templates/dashboard/comms/detail.html:73
+msgid "Preview"
+msgstr ""
+
+#: templates/dashboard/comms/detail.html:42
+msgid "Edit email"
+msgstr ""
+
+#: templates/dashboard/comms/detail.html:51
+msgid "Email content"
+msgstr ""
+
+#: templates/dashboard/comms/detail.html:54
+msgid "These fields are rendered using Django's template system."
+msgstr ""
+
+#: templates/dashboard/comms/detail.html:55
+msgid "You can use the following variables:"
+msgstr ""
+
+#: templates/dashboard/comms/detail.html:58
+msgid "The full name of the user (if they have one)"
+msgstr ""
+
+#: templates/dashboard/comms/detail.html:60
+msgid "The user's email address"
+msgstr ""
+
+#: templates/dashboard/comms/detail.html:62
+msgid "The name of the site (eg example.com)"
+msgstr ""
+
+#: templates/dashboard/comms/detail.html:65
+#: templates/dashboard/offers/offer_detail.html:105
+#: templates/dashboard/orders/order_list.html:117
+#: templates/dashboard/reports/partials/order_report.html:9
+#: templates/dashboard/vouchers/voucher_detail.html:61
+msgid "Order number"
+msgstr ""
+
+#: templates/dashboard/comms/detail.html:77
+msgid "View a preview of this email using order:"
+msgstr ""
+
+#: templates/dashboard/comms/detail.html:80
+msgid "View preview"
+msgstr ""
+
+#: templates/dashboard/comms/detail.html:81
+msgid "or send a preview to:"
+msgstr ""
+
+#: templates/dashboard/comms/detail.html:83
+#: templates/dashboard/users/detail.html:92
+msgid "Sending..."
+msgstr ""
+
+#: templates/dashboard/comms/detail.html:83
+msgid "Send preview email"
+msgstr ""
+
+#: templates/dashboard/comms/detail.html:89
+msgid "Subject"
+msgstr ""
+
+#: templates/dashboard/comms/detail.html:93
+msgid "Body text"
+msgstr ""
+
+#: templates/dashboard/comms/detail.html:97
+msgid "Body HTML"
+msgstr ""
+
+#: templates/dashboard/comms/list.html:52
+msgid "There are no defined emails to edit."
+msgstr ""
+
+#: templates/dashboard/index.html:22
+msgid "Your Store Statistics"
+msgstr ""
+
+#: templates/dashboard/index.html:28
+msgid "Total Orders"
+msgstr ""
+
+#: templates/dashboard/index.html:29
+msgid "New Customers"
+msgstr ""
+
+#: templates/dashboard/index.html:30
+msgid "Total Customers"
+msgstr ""
+
+#: templates/dashboard/index.html:31
+msgid "Total Products"
+msgstr ""
+
+#: templates/dashboard/index.html:35
+msgid "Latest Orders (last 24 hours)"
+msgstr ""
+
+#: templates/dashboard/index.html:62
+msgid "Orders - Last 24 Hours"
+msgstr ""
+
+#: templates/dashboard/index.html:65 templates/dashboard/index.html.py:92
+#: templates/dashboard/orders/statistics.html:40
+msgid "Total orders"
+msgstr ""
+
+#: templates/dashboard/index.html:69 templates/dashboard/index.html.py:96
+#: templates/dashboard/orders/statistics.html:44
+msgid "Total lines"
+msgstr ""
+
+#: templates/dashboard/index.html:73 templates/dashboard/index.html.py:100
+#: templates/dashboard/orders/statistics.html:48
+msgid "Total revenue"
+msgstr ""
+
+#: templates/dashboard/index.html:77
+msgid "Average order costs"
+msgstr ""
+
+#: templates/dashboard/index.html:87 templates/dashboard/index.html.py:136
+msgid "Manage"
+msgstr ""
+
+#: templates/dashboard/index.html:89
+msgid "Orders - All Time"
+msgstr ""
+
+#: templates/dashboard/index.html:104 templates/dashboard/index.html.py:122
+msgid "Total <em>open</em> baskets"
+msgstr ""
+
+#: templates/dashboard/index.html:112 templates/dashboard/users/detail.html:15
+#: templates/dashboard/users/index.html:9
+#: templates/dashboard/users/index.html:14
+#: templates/dashboard/users/index.html:23
+msgid "Customers"
+msgstr ""
+
+#: templates/dashboard/index.html:114
+msgid "Total customers"
+msgstr ""
+
+#: templates/dashboard/index.html:118
+msgid "New customers"
+msgstr ""
+
+#: templates/dashboard/index.html:141
+msgid "View Stock Alerts"
+msgstr ""
+
+#: templates/dashboard/index.html:145
+msgid "Catalogue and stock"
+msgstr ""
+
+#: templates/dashboard/index.html:148
+msgid "Total products"
+msgstr ""
+
+#: templates/dashboard/index.html:152
+msgid "<em>Open</em> stock alerts"
+msgstr ""
+
+#: templates/dashboard/index.html:156
+msgid "<em>Closed</em> stock alerts"
+msgstr ""
+
+#: templates/dashboard/index.html:164
+msgid "Offers, vouchers and promotions"
+msgstr ""
+
+#: templates/dashboard/index.html:166
+msgid "Active <em>Site</em> Offers"
+msgstr ""
+
+#: templates/dashboard/index.html:170
+msgid "Active <em>Vouchers</em>"
+msgstr ""
+
+#: templates/dashboard/index.html:173
+msgid "Promotions"
+msgstr ""
+
+#: templates/dashboard/layout.html:49
+msgid "Welcome"
+msgstr ""
+
+#: templates/dashboard/layout.html:50
+msgid "Return to site"
+msgstr ""
+
+#: templates/dashboard/layout.html:52
+msgid "Log out"
+msgstr ""
+
+#: templates/dashboard/offers/benefit_form.html:14
+msgid "Build a new incentive"
+msgstr ""
+
+#: templates/dashboard/offers/benefit_form.html:19
+#: templates/dashboard/offers/condition_form.html:23
+#, python-format
+msgid ""
+"\n"
+"        Ranges can be created and edited from within the <a href="
+"\"%(range_list_url)s\">range dashboard</a>.\n"
+"        "
+msgstr ""
+
+#: templates/dashboard/offers/benefit_form.html:28
+#: templates/dashboard/offers/condition_form.html:31
+msgid "...or choose a pre-defined one"
+msgstr ""
+
+#: templates/dashboard/offers/benefit_form.html:33
+msgid "Continue to step 3"
+msgstr ""
+
+#: templates/dashboard/offers/condition_form.html:18
+msgid "Build a new condition"
+msgstr ""
+
+#: templates/dashboard/offers/condition_form.html:36
+msgid "Continue to step 4"
+msgstr ""
+
+#: templates/dashboard/offers/metadata_form.html:8
+msgid "Continue to step 2"
+msgstr ""
+
+#: templates/dashboard/offers/offer_delete.html:7
+#: templates/dashboard/offers/offer_detail.html:32
+msgid "Delete offer"
+msgstr ""
+
+#: templates/dashboard/offers/offer_delete.html:7
+#: templates/dashboard/offers/offer_delete.html:16
+#: templates/dashboard/offers/offer_detail.html:17
+#: templates/dashboard/offers/offer_list.html:8
+#: templates/dashboard/offers/offer_list.html:16
+#: templates/dashboard/offers/offer_list.html:23
+#: templates/dashboard/offers/step_form.html:15
+#: templates/dashboard/offers/step_form.html:24
+#: templates/partials/nav_primary.html:64
+msgid "Offers"
+msgstr ""
+
+#: templates/dashboard/offers/offer_delete.html:32
+msgid "Are you sure you want to delete this offer?"
+msgstr ""
+
+#: templates/dashboard/offers/offer_detail.html:6
+#, python-format
+msgid ""
+"\n"
+"        %(name)s | Offers\n"
+"    "
+msgstr ""
+
+#: templates/dashboard/offers/offer_detail.html:28
+msgid "Reinstating..."
+msgstr ""
+
+#: templates/dashboard/offers/offer_detail.html:28
+msgid "Reinstate offer"
+msgstr ""
+
+#: templates/dashboard/offers/offer_detail.html:30
+msgid "Suspending..."
+msgstr ""
+
+#: templates/dashboard/offers/offer_detail.html:30
+msgid "Suspend offer"
+msgstr ""
+
+#: templates/dashboard/offers/offer_detail.html:44
+msgid "Offer currently available"
+msgstr ""
+
+#: templates/dashboard/offers/offer_detail.html:46
+msgid "Offer not available due to restrictions!"
+msgstr ""
+
+#: templates/dashboard/offers/offer_detail.html:49
+msgid "Total cost:"
+msgstr ""
+
+#: templates/dashboard/offers/offer_detail.html:50
+msgid "Number of orders:"
+msgstr ""
+
+#: templates/dashboard/offers/offer_detail.html:51
+msgid "Number of uses:"
+msgstr ""
+
+#: templates/dashboard/offers/offer_detail.html:56
+msgid "Date created:"
+msgstr ""
+
+#: templates/dashboard/offers/offer_detail.html:57
+msgid "Offer details"
+msgstr ""
+
+#: templates/dashboard/offers/offer_detail.html:71
+#: templates/dashboard/offers/offer_list.html:49
+#: templates/dashboard/offers/summary.html:19
+msgid "Incentive"
+msgstr ""
+
+#: templates/dashboard/offers/offer_detail.html:76
+#: templates/dashboard/offers/offer_list.html:50
+#: templates/dashboard/offers/summary.html:26
+msgid "Condition"
+msgstr ""
+
+#: templates/dashboard/offers/offer_detail.html:81
+#: templates/dashboard/offers/offer_list.html:52
+#: templates/dashboard/offers/summary.html:32
+msgid "Restrictions"
+msgstr ""
+
+#: templates/dashboard/offers/offer_detail.html:100
+msgid "Export to CSV"
+msgstr ""
+
+#: templates/dashboard/offers/offer_detail.html:101
+msgid "Orders that used this offer"
+msgstr ""
+
+#: templates/dashboard/offers/offer_detail.html:106
+msgid "Order date"
+msgstr ""
+
+#: templates/dashboard/offers/offer_list.html:22
+#: templates/dashboard/offers/step_form.html:13
+#: templates/dashboard/offers/step_form.html:32
+#: templates/dashboard/offers/step_form.html:41
+msgid "Create new offer"
+msgstr ""
+
+#: templates/dashboard/offers/offer_list.html:41
+#: templates/dashboard/orders/statistics.html:33
+#: templates/dashboard/pages/index.html:35
+#: templates/dashboard/partners/partner_list.html:31
+#: templates/dashboard/partners/partner_user_select.html:35
+#: templates/dashboard/users/index.html:35
+#: templates/dashboard/vouchers/voucher_list.html:40
+msgid "Reset"
+msgstr ""
+
+#: templates/dashboard/offers/offer_list.html:46
+#: templates/dashboard/orders/order_detail.html:563
+msgid "Offer name"
+msgstr ""
+
+#: templates/dashboard/offers/offer_list.html:47
+msgid "Start date"
+msgstr ""
+
+#: templates/dashboard/offers/offer_list.html:48
+msgid "End date"
+msgstr ""
+
+#: templates/dashboard/offers/offer_list.html:51
+msgid "Is available?"
+msgstr ""
+
+#: templates/dashboard/offers/offer_list.html:53
+msgid "Uses"
+msgstr ""
+
+#: templates/dashboard/offers/offer_list.html:91
+msgid "Browse"
+msgstr ""
+
+#: templates/dashboard/offers/offer_list.html:92
+#: templates/dashboard/vouchers/voucher_list.html:82
+msgid "Stats"
+msgstr ""
+
+#: templates/dashboard/offers/offer_list.html:103
+msgid "No offers found."
+msgstr ""
+
+#: templates/dashboard/offers/progress.html:5
+msgid "Steps"
+msgstr ""
+
+#: templates/dashboard/offers/progress.html:10
+#: templates/dashboard/offers/progress.html:12
+msgid "1. Name and description"
+msgstr ""
+
+#: templates/dashboard/offers/progress.html:17
+#: templates/dashboard/offers/progress.html:19
+msgid "2. Incentive"
+msgstr ""
+
+#: templates/dashboard/offers/progress.html:24
+#: templates/dashboard/offers/progress.html:26
+msgid "3. Condition"
+msgstr ""
+
+#: templates/dashboard/offers/progress.html:30
+msgid "4. Restrictions"
+msgstr ""
+
+#: templates/dashboard/offers/restrictions_form.html:14
+msgid "Save this offer"
+msgstr ""
+
+#: templates/dashboard/offers/step_form.html:61
+msgid "Fields marked with * are mandatory."
+msgstr ""
+
+#: templates/dashboard/offers/step_form.html:76
+msgid "Save changes"
+msgstr ""
+
+#: templates/dashboard/offers/summary.html:4
+msgid "Offer summary"
+msgstr ""
+
+#: templates/dashboard/orders/line_detail.html:5
+#, python-format
+msgid ""
+"\n"
+"        Order %(number)s - Line #%(id)s\n"
+"    "
+msgstr ""
+
+#: templates/dashboard/orders/line_detail.html:16
+#: templates/dashboard/orders/order_detail.html:17
+#: templates/dashboard/orders/order_list.html:10
+#: templates/dashboard/orders/order_list.html:18
+#: templates/dashboard/orders/order_list.html:24
+#: templates/dashboard/orders/shippingaddress_form.html:14
+#: templates/dashboard/orders/statistics.html:17
+#: templates/dashboard/reports/partials/user_report.html:13
+#: templates/dashboard/users/detail.html:106
+#: templates/dashboard/users/detail.html:116
+msgid "Orders"
+msgstr ""
+
+#: templates/dashboard/orders/line_detail.html:21
+#, python-format
+msgid "Line #%(id)s"
+msgstr ""
+
+#: templates/dashboard/orders/line_detail.html:26
+#, python-format
+msgid "Order #%(number)s - Line #%(id)s"
+msgstr ""
+
+#: templates/dashboard/orders/line_detail.html:57
+msgid "Product Options"
+msgstr ""
+
+#: templates/dashboard/orders/line_detail.html:70
+msgid "Partner details"
+msgstr ""
+
+#: templates/dashboard/orders/line_detail.html:86
+msgid "Shipping details"
+msgstr ""
+
+#: templates/dashboard/orders/line_detail.html:90
+msgid "Partner reference number"
+msgstr ""
+
+#: templates/dashboard/orders/line_detail.html:93
+msgid "Partner notes"
+msgstr ""
+
+#: templates/dashboard/orders/line_detail.html:96
+msgid "Estimate dispatch date"
+msgstr ""
+
+#: templates/dashboard/orders/line_detail.html:105
+msgid "Shipping status"
+msgstr ""
+
+#: templates/dashboard/orders/line_detail.html:110
+msgid "State"
+msgstr ""
+
+#: templates/dashboard/orders/line_detail.html:122
+#: templates/dashboard/orders/line_detail.html:153
+msgid "No shipping events have occurred."
+msgstr ""
+
+#: templates/dashboard/orders/line_detail.html:130
+msgid "Shipping events"
+msgstr ""
+
+#: templates/dashboard/orders/line_detail.html:135
+#: templates/dashboard/orders/line_detail.html:166
+#: templates/dashboard/orders/order_detail.html:343
+#: templates/dashboard/orders/order_detail.html:389
+msgid "Event"
+msgstr ""
+
+#: templates/dashboard/orders/line_detail.html:137
+#: templates/dashboard/orders/order_detail.html:345
+#: templates/dashboard/orders/order_detail.html:392
+#: templates/dashboard/orders/order_detail.html:495
+#: templates/dashboard/orders/order_detail.html:527
+msgid "Reference"
+msgstr ""
+
+#: templates/dashboard/orders/line_detail.html:138
+#: templates/dashboard/orders/line_detail.html:168
+#: templates/dashboard/orders/order_detail.html:342
+#: templates/dashboard/orders/order_detail.html:388
+#: templates/dashboard/orders/order_detail.html:529
+#: templates/dashboard/orders/order_detail.html:609
+msgid "Date"
+msgstr ""
+
+#: templates/dashboard/orders/line_detail.html:161
+msgid "Payment events"
+msgstr ""
+
+#: templates/dashboard/orders/line_detail.html:182
+msgid "No payment events have occurred."
+msgstr ""
+
+#: templates/dashboard/orders/order_detail.html:8
+#, python-format
+msgid "Order %(number)s"
+msgstr ""
+
+#: templates/dashboard/orders/order_detail.html:24
+#, python-format
+msgid "Order #%(number)s"
+msgstr ""
+
+#: templates/dashboard/orders/order_detail.html:30
+msgid "Customer Information"
+msgstr ""
+
+#: templates/dashboard/orders/order_detail.html:35
+msgid "Customer checked out as a guest."
+msgstr ""
+
+#: templates/dashboard/orders/order_detail.html:39
+#: templates/dashboard/orders/order_detail.html:45
+msgid "Email address"
+msgstr ""
+
+#: templates/dashboard/orders/order_detail.html:52
+msgid "Customer has deleted their account."
+msgstr ""
+
+#: templates/dashboard/orders/order_detail.html:59
+msgid "Order information"
+msgstr ""
+
+#: templates/dashboard/orders/order_detail.html:61
+msgid "Order Total"
+msgstr ""
+
+#: templates/dashboard/orders/order_detail.html:62
+#: templates/dashboard/orders/order_list.html:124
+msgid "Date of purchase"
+msgstr ""
+
+#: templates/dashboard/orders/order_detail.html:63
+msgid "Time of purchase"
+msgstr ""
+
+#: templates/dashboard/orders/order_detail.html:79
+msgid "Order Details"
+msgstr ""
+
+#: templates/dashboard/orders/order_detail.html:89
+#: templates/dashboard/orders/order_detail.html:555
+msgid "Discounts"
+msgstr ""
+
+#: templates/dashboard/orders/order_detail.html:90
+#: templates/dashboard/orders/order_detail.html:603
+msgid "Notes"
+msgstr ""
+
+#: templates/dashboard/orders/order_detail.html:97
+msgid "Items ordered"
+msgstr ""
+
+#: templates/dashboard/orders/order_detail.html:107
+msgid "Line ID"
+msgstr ""
+
+#: templates/dashboard/orders/order_detail.html:112
+msgid "Supplier"
+msgstr ""
+
+#: templates/dashboard/orders/order_detail.html:113
+msgid "Supplier SKU"
+msgstr ""
+
+#: templates/dashboard/orders/order_detail.html:114
+msgid "Est. dispatch date"
+msgstr ""
+
+#: templates/dashboard/orders/order_detail.html:115
+msgid "Price excl tax (before discounts)"
+msgstr ""
+
+#: templates/dashboard/orders/order_detail.html:116
+msgid "Price inc tax (before discounts)"
+msgstr ""
+
+#: templates/dashboard/orders/order_detail.html:168
+msgid "Basket total (excl. discounts)"
+msgstr ""
+
+#: templates/dashboard/orders/order_detail.html:187
+msgid "Basket total (inc. discounts)"
+msgstr ""
+
+#: templates/dashboard/orders/order_detail.html:206
+msgid "Shipping total (excl. discounts)"
+msgstr ""
+
+#: templates/dashboard/orders/order_detail.html:225
+msgid "Shipping total (inc. discounts)"
+msgstr ""
+
+#: templates/dashboard/orders/order_detail.html:233
+msgid "Shipping total"
+msgstr ""
+
+#: templates/dashboard/orders/order_detail.html:259
+msgid "With selected lines"
+msgstr ""
+
+#: templates/dashboard/orders/order_detail.html:264
+msgid "Change line status to"
+msgstr ""
+
+#: templates/dashboard/orders/order_detail.html:268
+#: templates/dashboard/orders/order_list.html:164
+msgid "choose new status"
+msgstr ""
+
+#: templates/dashboard/orders/order_detail.html:279
+msgid "Create shipping event"
+msgstr ""
+
+#: templates/dashboard/orders/order_detail.html:283
+#: templates/dashboard/orders/order_detail.html:301
+msgid "choose event type"
+msgstr ""
+
+#: templates/dashboard/orders/order_detail.html:290
+msgid "with reference"
+msgstr ""
+
+#: templates/dashboard/orders/order_detail.html:297
+msgid "Create payment event"
+msgstr ""
+
+#: templates/dashboard/orders/order_detail.html:308
+msgid "with amount"
+msgstr ""
+
+#: templates/dashboard/orders/order_detail.html:312
+#: templates/dashboard/ranges/range_product_list.html:46
+#: templates/dashboard/users/table.html:16
+msgid "Go!"
+msgstr ""
+
+#: templates/dashboard/orders/order_detail.html:321
+#: templates/dashboard/orders/order_list.html:158
+msgid "Change order status"
+msgstr ""
+
+#: templates/dashboard/orders/order_detail.html:325
+#: templates/dashboard/orders/order_list.html:171
+msgid "Change status"
+msgstr ""
+
+#: templates/dashboard/orders/order_detail.html:327
+#: templates/dashboard/orders/order_list.html:173
+msgid "This order can't have its status changed."
+msgstr ""
+
+#: templates/dashboard/orders/order_detail.html:335
+msgid "Shipping Events"
+msgstr ""
+
+#: templates/dashboard/orders/order_detail.html:344
+#: templates/dashboard/orders/order_detail.html:391
+msgid "Lines"
+msgstr ""
+
+#: templates/dashboard/orders/order_detail.html:357
+#, python-format
+msgid ""
+"\n"
+"                                                                %(title)s "
+"(quantity %(event_qty)s/%(total_qty)s)\n"
+"                                                            "
+msgstr ""
+
+#: templates/dashboard/orders/order_detail.html:371
+msgid "No shipping events."
+msgstr ""
+
+#: templates/dashboard/orders/order_detail.html:381
+msgid "Payment Events"
+msgstr ""
+
+#: templates/dashboard/orders/order_detail.html:390
+#: templates/dashboard/orders/order_detail.html:526
+#: templates/dashboard/orders/order_detail.html:566
+msgid "Amount"
+msgstr ""
+
+#: templates/dashboard/orders/order_detail.html:404
+msgid "quantity"
+msgstr ""
+
+#: templates/dashboard/orders/order_detail.html:414
+msgid "No payment events."
+msgstr ""
+
+#: templates/dashboard/orders/order_detail.html:430
+msgid "Method name"
+msgstr ""
+
+#: templates/dashboard/orders/order_detail.html:434
+msgid "Method code"
+msgstr ""
+
+#: templates/dashboard/orders/order_detail.html:438
+msgid "Charge (incl tax)"
+msgstr ""
+
+#: templates/dashboard/orders/order_detail.html:442
+msgid "Charge (excl tax)"
+msgstr ""
+
+#: templates/dashboard/orders/order_detail.html:485
+msgid "Payment sources"
+msgstr ""
+
+#: templates/dashboard/orders/order_detail.html:491
+#: templates/dashboard/orders/order_detail.html:525
+msgid "Source"
+msgstr ""
+
+#: templates/dashboard/orders/order_detail.html:492
+msgid "Allocation"
+msgstr ""
+
+#: templates/dashboard/orders/order_detail.html:493
+msgid "Amount debited"
+msgstr ""
+
+#: templates/dashboard/orders/order_detail.html:494
+msgid "Amount refunded"
+msgstr ""
+
+#: templates/dashboard/orders/order_detail.html:512
+msgid "No payment sources found for this order."
+msgstr ""
+
+#: templates/dashboard/orders/order_detail.html:520
+msgid "Transactions"
+msgstr ""
+
+#: templates/dashboard/orders/order_detail.html:562
+msgid "Voucher"
+msgstr ""
+
+#: templates/dashboard/orders/order_detail.html:564
+#: templates/dashboard/orders/statistics.html:58
+msgid "Frequency"
+msgstr ""
+
+#: templates/dashboard/orders/order_detail.html:592
+msgid "No discounts were applied to this order."
+msgstr ""
+
+#: templates/dashboard/orders/order_detail.html:610
+#: templates/dashboard/reviews/review_delete.html:38
+#: templates/dashboard/reviews/review_list.html:58
+#: templates/dashboard/users/alerts/list.html:45
+#: templates/dashboard/users/alerts/partials/alert.html:10
+msgid "User"
+msgstr ""
+
+#: templates/dashboard/orders/order_detail.html:613
+msgid "Admin"
+msgstr ""
+
+#: templates/dashboard/orders/order_detail.html:636
+msgid "No notes available."
+msgstr ""
+
+#: templates/dashboard/orders/order_detail.html:647
+msgid "Save note"
+msgstr ""
+
+#: templates/dashboard/orders/order_detail.html:648
+msgid "Notes are only editable for 5 minutes after being saved."
+msgstr ""
+
+#: templates/dashboard/orders/order_list.html:52
+#: templates/dashboard/orders/order_list.html:61
+msgid "Advanced Search"
+msgstr ""
+
+#: templates/dashboard/orders/order_list.html:101
+#: templates/dashboard/orders/order_list.html:185
+msgid "Order Search Results"
+msgstr ""
+
+#: templates/dashboard/orders/order_list.html:103
+#: templates/dashboard/orders/order_list.html:187
+msgid "All Orders"
+msgstr ""
+
+#: templates/dashboard/orders/order_list.html:108
+msgid "Download selected orders as a CSV"
+msgstr ""
+
+#: templates/dashboard/orders/order_list.html:109
+msgid "Download"
+msgstr ""
+
+#: templates/dashboard/orders/order_list.html:118
+msgid "Total inc tax"
+msgstr ""
+
+#: templates/dashboard/orders/order_list.html:119
+msgid "Number of items"
+msgstr ""
+
+#: templates/dashboard/orders/order_list.html:121
+msgid "Customer"
+msgstr ""
+
+#: templates/dashboard/orders/order_list.html:142
+msgid "Deleted"
+msgstr ""
+
+#: templates/dashboard/orders/order_list.html:171
+msgid "Changing..."
+msgstr ""
+
+#: templates/dashboard/orders/order_list.html:190
+msgid "No orders found."
+msgstr ""
+
+#: templates/dashboard/orders/partials/bulk_edit_form.html:6
+msgid "Print Packaging Slips"
+msgstr ""
+
+#: templates/dashboard/orders/partials/bulk_edit_form.html:10
+msgid "Mark as"
+msgstr ""
+
+#: templates/dashboard/orders/partials/bulk_edit_form.html:15
+#: templates/dashboard/orders/partials/bulk_edit_form.html:20
+msgid "Change order status to"
+msgstr ""
+
+#: templates/dashboard/orders/partials/bulk_edit_form.html:27
+msgid "Done"
+msgstr ""
+
+#: templates/dashboard/orders/shippingaddress_form.html:5
+msgid "Order"
+msgstr ""
+
+#: templates/dashboard/orders/shippingaddress_form.html:19
+msgid "Edit shipping address"
+msgstr ""
+
+#: templates/dashboard/orders/shippingaddress_form.html:24
+#, python-format
+msgid "Edit shipping address for order %(order.number)s"
+msgstr ""
+
+#: templates/dashboard/orders/shippingaddress_form.html:33
+msgid "Update address"
+msgstr ""
+
+#: templates/dashboard/orders/statistics.html:8
+msgid "Order statistics"
+msgstr ""
+
+#: templates/dashboard/orders/statistics.html:19
+msgid "Statistics"
+msgstr ""
+
+#: templates/dashboard/orders/statistics.html:32
+msgid "Filtering..."
+msgstr ""
+
+#: templates/dashboard/orders/statistics.html:32
+msgid "Filter result"
+msgstr ""
+
+#: templates/dashboard/orders/statistics.html:38
+msgid "Summary"
+msgstr ""
+
+#: templates/dashboard/orders/statistics.html:55
+msgid "Order status breakdown"
+msgstr ""
+
+#: templates/dashboard/pages/delete.html:7
+#: templates/dashboard/pages/delete.html:19
+#: templates/dashboard/pages/delete.html:24
+#, python-format
+msgid "Delete page '%(title)s'?"
+msgstr ""
+
+#: templates/dashboard/pages/delete.html:17
+#: templates/dashboard/pages/index.html:8
+#: templates/dashboard/pages/index.html:16
+#: templates/dashboard/pages/index.html:23
+#: templates/dashboard/pages/update.html:16
+msgid "Pages"
+msgstr ""
+
+#: templates/dashboard/pages/delete.html:29
+msgid "Delete page"
+msgstr ""
+
+#: templates/dashboard/pages/delete.html:34
+#, python-format
+msgid "Delete page <strong>%(title)s</strong> - are you sure?"
+msgstr ""
+
+#: templates/dashboard/pages/index.html:22
+msgid "Create new page"
+msgstr ""
+
+#: templates/dashboard/pages/index.html:50
+msgctxt "Page title"
+msgid "Title"
+msgstr ""
+
+#: templates/dashboard/pages/index.html:51
+#: templates/dashboard/promotions/pagepromotion_list.html:43
+msgid "URL"
+msgstr ""
+
+#: templates/dashboard/pages/index.html:83
+msgid "No pages found."
+msgstr ""
+
+#: templates/dashboard/pages/messages/saved.html:4
+#, python-format
+msgid ""
+"\n"
+"        Page <strong>%(title)s</strong> saved!\n"
+"    "
+msgstr ""
+
+#: templates/dashboard/partials/form_fields.html:5
+#: templates/partials/form_fields.html:5
+msgid "Oops! We found some errors"
+msgstr ""
+
+#: templates/dashboard/partials/form_fields.html:5
+#: templates/partials/form_fields.html:5
+msgid "please check the error messages below and try again"
+msgstr ""
+
+#: templates/dashboard/partials/pagination.html:8
+#: templates/partials/ellipses_pagination.html:9
+#: templates/partials/pagination.html:8
+msgid "previous"
+msgstr ""
+
+#: templates/dashboard/partials/pagination.html:11
+#: templates/partials/pagination.html:11
+#, python-format
+msgid ""
+"\n"
+"                Page %(page_num)s of %(total_pages)s\n"
+"            "
+msgstr ""
+
+#: templates/dashboard/partials/pagination.html:16
+#: templates/partials/ellipses_pagination.html:21
+#: templates/partials/pagination.html:16
+msgid "next"
+msgstr ""
+
+#: templates/dashboard/partners/messages/user_unlinked.html:2
+#, python-format
+msgid ""
+"\n"
+"User %(user_name)s was unlinked from %(partner_name)s.\n"
+msgstr ""
+
+#: templates/dashboard/partners/messages/user_unlinked.html:5
+msgid "Undo"
+msgstr ""
+
+#: templates/dashboard/partners/partner_delete.html:7
+#: templates/dashboard/partners/partner_list.html:93
+msgid "Delete partner"
+msgstr ""
+
+#: templates/dashboard/partners/partner_delete.html:7
+#: templates/dashboard/partners/partner_delete.html:16
+#: templates/dashboard/partners/partner_form.html:8
+#: templates/dashboard/partners/partner_form.html:17
+#: templates/dashboard/partners/partner_list.html:6
+#: templates/dashboard/partners/partner_list.html:14
+#: templates/dashboard/partners/partner_list.html:21
+#: templates/dashboard/partners/partner_manage.html:7
+#: templates/dashboard/partners/partner_manage.html:16
+#: templates/dashboard/partners/partner_user_form.html:8
+#: templates/dashboard/partners/partner_user_form.html:17
+#: templates/dashboard/partners/partner_user_list.html:6
+#: templates/dashboard/partners/partner_user_list.html:15
+#: templates/dashboard/partners/partner_user_select.html:6
+#: templates/dashboard/partners/partner_user_select.html:15
+msgid "Partners"
+msgstr ""
+
+#: templates/dashboard/partners/partner_delete.html:32
+msgid "Are you sure you want to delete this partner?"
+msgstr ""
+
+#: templates/dashboard/partners/partner_list.html:20
+msgid "Create new partner"
+msgstr ""
+
+#: templates/dashboard/partners/partner_list.html:45
+#: templates/dashboard/partners/partner_manage.html:36
+msgid "Users"
+msgstr ""
+
+#: templates/dashboard/partners/partner_list.html:46
+#: templates/dashboard/users/detail.html:107
+#: templates/dashboard/users/detail.html:148
+msgid "Addresses"
+msgstr ""
+
+#: templates/dashboard/partners/partner_list.html:60
+msgid "Edit the user's details"
+msgstr ""
+
+#: templates/dashboard/partners/partner_list.html:67
+msgid "No users associated."
+msgstr ""
+
+#: templates/dashboard/partners/partner_list.html:80
+msgid "No address associated."
+msgstr ""
+
+#: templates/dashboard/partners/partner_list.html:92
+msgid "Manage partner and users"
+msgstr ""
+
+#: templates/dashboard/partners/partner_list.html:94
+#: templates/dashboard/partners/partner_manage.html:68
+#: templates/dashboard/partners/partner_user_list.html:31
+#: templates/dashboard/partners/partner_user_select.html:6
+#: templates/dashboard/partners/partner_user_select.html:20
+#: templates/dashboard/partners/partner_user_select.html:25
+msgid "Link an existing user"
+msgstr ""
+
+#: templates/dashboard/partners/partner_list.html:95
+#: templates/dashboard/partners/partner_manage.html:67
+#: templates/dashboard/partners/partner_user_list.html:30
+msgid "Link a new user"
+msgstr ""
+
+#: templates/dashboard/partners/partner_list.html:103
+msgid "No partners found."
+msgstr ""
+
+#: templates/dashboard/partners/partner_manage.html:42
+#: templates/dashboard/partners/partner_user_list.html:44
+#: templates/dashboard/partners/partner_user_select.html:50
+msgid "First name"
+msgstr ""
+
+#: templates/dashboard/partners/partner_manage.html:43
+#: templates/dashboard/partners/partner_user_list.html:45
+#: templates/dashboard/partners/partner_user_select.html:51
+msgid "Last name"
+msgstr ""
+
+#: templates/dashboard/partners/partner_manage.html:56
+#: templates/dashboard/partners/partner_user_list.html:58
+msgid "Unlinking..."
+msgstr ""
+
+#: templates/dashboard/partners/partner_manage.html:56
+#: templates/dashboard/partners/partner_user_list.html:58
+msgid "Unlink user"
+msgstr ""
+
+#: templates/dashboard/partners/partner_manage.html:64
+#: templates/dashboard/partners/partner_user_list.html:66
+msgid "No users linked."
+msgstr ""
+
+#: templates/dashboard/partners/partner_user_list.html:26
+msgid "Link a user"
+msgstr ""
+
+#: templates/dashboard/partners/partner_user_list.html:34
+msgid "Manage users"
+msgstr ""
+
+#: templates/dashboard/partners/partner_user_list.html:70
+msgid "Update details"
+msgstr ""
+
+#: templates/dashboard/partners/partner_user_select.html:37
+msgid ""
+"A partial email address can be entered (eg '@example.com') to match multiple "
+"addresses."
+msgstr ""
+
+#: templates/dashboard/partners/partner_user_select.html:65
+#, python-format
+msgid ""
+"\n"
+"                                                User is already linked to "
+"%(name)s.\n"
+"                                            "
+msgstr ""
+
+#: templates/dashboard/partners/partner_user_select.html:71
+msgid "Linking..."
+msgstr ""
+
+#: templates/dashboard/partners/partner_user_select.html:71
+msgid "Link user"
+msgstr ""
+
+#: templates/dashboard/partners/partner_user_select.html:83
+msgid "No users found."
+msgstr ""
+
+#: templates/dashboard/promotions/delete.html:7
+#: templates/dashboard/promotions/delete.html:19
+#: templates/dashboard/promotions/delete.html:24
+#, python-format
+msgid "Delete content block '%(name)s'?\""
+msgstr ""
+
+#: templates/dashboard/promotions/delete.html:17
+#: templates/dashboard/promotions/delete_pagepromotion.html:12
+#: templates/dashboard/promotions/form.html:12
+#: templates/dashboard/promotions/page_detail.html:18
+#: templates/dashboard/promotions/pagepromotion_list.html:7
+#: templates/dashboard/promotions/pagepromotion_list.html:20
+#: templates/dashboard/promotions/promotion_list.html:7
+#: templates/dashboard/promotions/promotion_list.html:12
+#: templates/dashboard/promotions/promotion_list.html:21
+#: templates/dashboard/promotions/promotion_list.html:37
+msgid "Content blocks"
+msgstr ""
+
+#: templates/dashboard/promotions/delete.html:29
+msgid "Delete content block"
+msgstr ""
+
+#: templates/dashboard/promotions/delete.html:34
+#, python-format
+msgid ""
+"Delete %(object.type)s content block <strong>%(object.name)s</strong> - are "
+"you sure?"
+msgstr ""
+
+#: templates/dashboard/promotions/delete_pagepromotion.html:14
+#: templates/dashboard/promotions/delete_pagepromotion.html:19
+msgid "Remove promotion from page?"
+msgstr ""
+
+#: templates/dashboard/promotions/delete_pagepromotion.html:24
+msgid "Remove promotion"
+msgstr ""
+
+#: templates/dashboard/promotions/delete_pagepromotion.html:28
+#, python-format
+msgid ""
+"Remove %(object.content_object.type)s content block <strong>%(object.name)s</"
+"strong> from page <strong>%(object.page_url)s</strong> - are you sure?"
+msgstr ""
+
+#: templates/dashboard/promotions/form.html:26
+msgid "Content block"
+msgstr ""
+
+#: templates/dashboard/promotions/form.html:45
+msgid "Pages displaying this content blocks"
+msgstr ""
+
+#: templates/dashboard/promotions/form.html:49
+msgid "Page URL"
+msgstr ""
+
+#: templates/dashboard/promotions/form.html:50
+msgid "Position on page"
+msgstr ""
+
+#: templates/dashboard/promotions/form.html:64
+msgid "View all blocks on this page"
+msgstr ""
+
+#: templates/dashboard/promotions/form.html:65
+msgid "Remove from page"
+msgstr ""
+
+#: templates/dashboard/promotions/form.html:72
+msgid "This promotion is not displayed anywhere at the moment."
+msgstr ""
+
+#: templates/dashboard/promotions/form.html:76
+msgid "Add to a page"
+msgstr ""
+
+#: templates/dashboard/promotions/form.html:83
+msgid "Add to page"
+msgstr ""
+
+#: templates/dashboard/promotions/page_detail.html:9
+#: templates/dashboard/promotions/page_detail.html:25
+#, python-format
+msgid "Content blocks for page %(page_url)s"
+msgstr ""
+
+#: templates/dashboard/promotions/page_detail.html:20
+#, python-format
+msgid "Content blocks on page '%(page_url)s'"
+msgstr ""
+
+#: templates/dashboard/promotions/page_detail.html:32
+#, python-format
+msgid "Edit promotions in position '%(name)s'"
+msgstr ""
+
+#: templates/dashboard/promotions/page_detail.html:36
+msgid "Promotion Name"
+msgstr ""
+
+#: templates/dashboard/promotions/page_detail.html:58
+msgid "Change display order"
+msgstr ""
+
+#: templates/dashboard/promotions/page_detail.html:65
+msgid "No promotions in this position."
+msgstr ""
+
+#: templates/dashboard/promotions/pagepromotion_list.html:11
+msgid "Pages with content blocks"
+msgstr ""
+
+#: templates/dashboard/promotions/pagepromotion_list.html:22
+msgid "Content blocks by page"
+msgstr ""
+
+#: templates/dashboard/promotions/pagepromotion_list.html:28
+msgid "View by page"
+msgstr ""
+
+#: templates/dashboard/promotions/pagepromotion_list.html:31
+msgid "View all content blocks"
+msgstr ""
+
+#: templates/dashboard/promotions/pagepromotion_list.html:32
+msgid "View content blocks by page"
+msgstr ""
+
+#: templates/dashboard/promotions/pagepromotion_list.html:36
+msgid "Pages with content blocks on them"
+msgstr ""
+
+#: templates/dashboard/promotions/pagepromotion_list.html:44
+msgid "Number of content blocks"
+msgstr ""
+
+#: templates/dashboard/promotions/pagepromotion_list.html:61
+#: templates/dashboard/promotions/promotion_list.html:73
+msgid "No content blocks found."
+msgstr ""
+
+#: templates/dashboard/promotions/promotion_list.html:27
+msgid "Create a new content block"
+msgstr ""
+
+#: templates/dashboard/promotions/promotion_list.html:32
+msgid "Creating..."
+msgstr ""
+
+#: templates/dashboard/promotions/promotion_list.html:32
+msgid "Create block"
+msgstr ""
+
+#: templates/dashboard/promotions/promotion_list.html:43
+msgid "Number of times used"
+msgstr ""
+
+#: templates/dashboard/ranges/messages/range_products_saved.html:2
+#, python-format
+msgid ""
+"\n"
+"    <p>File <strong>%(filename)s</strong> processed.</p>\n"
+msgstr ""
+
+#: templates/dashboard/ranges/messages/range_products_saved.html:9
+#, python-format
+msgid ""
+"\n"
+"                <strong>%(n)s</strong> product added\n"
+"            "
+msgid_plural ""
+"\n"
+"                <strong>%(n)s</strong> products added\n"
+"            "
+msgstr[0] ""
+msgstr[1] ""
+
+#: templates/dashboard/ranges/messages/range_products_saved.html:18
+#, python-format
+msgid ""
+"\n"
+"                There was <strong>%(n)s</strong> duplicate product in the "
+"file\n"
+"            "
+msgid_plural ""
+"\n"
+"                There were <strong>%(n)s</strong> duplicate products in the "
+"file\n"
+"            "
+msgstr[0] ""
+msgstr[1] ""
+
+#: templates/dashboard/ranges/messages/range_products_saved.html:27
+#, python-format
+msgid ""
+"\n"
+"                There was <strong>%(n)s</strong> product in the file that "
+"couldn't be found in the catalogue\n"
+"            "
+msgid_plural ""
+"\n"
+"                There were <strong>%(n)s</strong> products in the file that "
+"couldn't be found in the catalogue\n"
+"            "
+msgstr[0] ""
+msgstr[1] ""
+
+#: templates/dashboard/ranges/messages/range_products_saved.html:36
+msgid "Edit range metadata"
+msgstr ""
+
+#: templates/dashboard/ranges/messages/range_products_saved.html:37
+msgid "Return to ranges homepage"
+msgstr ""
+
+#: templates/dashboard/ranges/messages/range_saved.html:2
+#, python-format
+msgid ""
+"\n"
+"<p>Range <strong>%(name)s</strong> saved.</p>\n"
+msgstr ""
+
+#: templates/dashboard/ranges/messages/range_saved.html:7
+msgid "Edit included products"
+msgstr ""
+
+#: templates/dashboard/ranges/range_delete.html:7
+#, python-format
+msgid "Delete range '%(name)s'?"
+msgstr ""
+
+#: templates/dashboard/ranges/range_delete.html:7
+#: templates/dashboard/ranges/range_delete.html:16
+#: templates/dashboard/ranges/range_form.html:7
+#: templates/dashboard/ranges/range_form.html:16
+#: templates/dashboard/ranges/range_list.html:5
+#: templates/dashboard/ranges/range_list.html:13
+#: templates/dashboard/ranges/range_list.html:20
+#: templates/dashboard/ranges/range_list.html:27
+#: templates/dashboard/ranges/range_product_list.html:16
+msgid "Ranges"
+msgstr ""
+
+#: templates/dashboard/ranges/range_delete.html:31
+msgid "Are you sure you want to delete this range?"
+msgstr ""
+
+#: templates/dashboard/ranges/range_form.html:27
+#: templates/dashboard/ranges/range_list.html:19
+msgid "Create new range"
+msgstr ""
+
+#: templates/dashboard/ranges/range_form.html:38
+msgid "Save and edit products"
+msgstr ""
+
+#: templates/dashboard/ranges/range_list.html:32
+msgid "Num products"
+msgstr ""
+
+#: templates/dashboard/ranges/range_list.html:33
+msgid "Is public?"
+msgstr ""
+
+#: templates/dashboard/ranges/range_list.html:71
+msgid "Edit products"
+msgstr ""
+
+#: templates/dashboard/ranges/range_list.html:86
+msgid "No ranges found."
+msgstr ""
+
+#: templates/dashboard/ranges/range_product_list.html:7
+#, python-format
+msgid "Products in range '%(name)s'"
+msgstr ""
+
+#: templates/dashboard/ranges/range_product_list.html:26
+msgid "products"
+msgstr ""
+
+#: templates/dashboard/ranges/range_product_list.html:32
+msgid ""
+"This range contains all products. To add products manually, please unselect "
+"the 'Includes All Products' option on the edit range page."
+msgstr ""
+
+#: templates/dashboard/ranges/range_product_list.html:36
+msgid "Add products"
+msgstr ""
+
+#: templates/dashboard/ranges/range_product_list.html:46
+msgid "Running..."
+msgstr ""
+
+#: templates/dashboard/ranges/range_product_list.html:53
+msgid "Upload history"
+msgstr ""
+
+#: templates/dashboard/ranges/range_product_list.html:58
+msgid "Filename"
+msgstr ""
+
+#: templates/dashboard/ranges/range_product_list.html:59
+msgid "New products"
+msgstr ""
+
+#: templates/dashboard/ranges/range_product_list.html:60
+msgid "Duplicate products"
+msgstr ""
+
+#: templates/dashboard/ranges/range_product_list.html:61
+msgid "Unknown products"
+msgstr ""
+
+#: templates/dashboard/ranges/range_product_list.html:62
+msgid "Date uploaded"
+msgstr ""
+
+#: templates/dashboard/ranges/range_product_list.html:85
+msgid "Products in range"
+msgstr ""
+
+#: templates/dashboard/ranges/range_product_list.html:88
+msgid "Remove selected products"
+msgstr ""
+
+#: templates/dashboard/ranges/range_product_list.html:96
+msgid "Is product discountable?"
+msgstr ""
+
+#: templates/dashboard/ranges/range_product_list.html:111
+msgid "Re-order"
+msgstr ""
+
+#: templates/dashboard/ranges/range_product_list.html:123
+msgid "Products in Range"
+msgstr ""
+
+#: templates/dashboard/ranges/range_product_list.html:133
+msgid "Edit range"
+msgstr ""
+
+#: templates/dashboard/ranges/range_product_list.html:134
+msgid "return to range list"
+msgstr ""
+
+#: templates/dashboard/reports/index.html:6
+msgid "Reports"
+msgstr ""
+
+#: templates/dashboard/reports/index.html:14
+msgid "Reporting Dashboard"
+msgstr ""
+
+#: templates/dashboard/reports/index.html:19
+#: templates/dashboard/reports/index.html:24
+msgid "Reporting dashboard"
+msgstr ""
+
+#: templates/dashboard/reports/index.html:30
+msgid "Generating..."
+msgstr ""
+
+#: templates/dashboard/reports/index.html:30
+msgid "Generate report"
+msgstr ""
+
+#: templates/dashboard/reports/partials/offer_report.html:9
+msgid "Offer"
+msgstr ""
+
+#: templates/dashboard/reports/partials/offer_report.html:10
+#: templates/dashboard/reports/partials/voucher_report.html:12
+#: templates/dashboard/vouchers/voucher_detail.html:48
+msgid "Total discount"
+msgstr ""
+
+#: templates/dashboard/reports/partials/offer_report.html:20
+#: templates/dashboard/reports/partials/order_report.html:35
+msgid "No results found."
+msgstr ""
+
+#: templates/dashboard/reports/partials/open_basket_report.html:10
+#: templates/dashboard/reports/partials/submitted_basket_report.html:10
+msgid "Num lines"
+msgstr ""
+
+#: templates/dashboard/reports/partials/open_basket_report.html:11
+#: templates/dashboard/reports/partials/submitted_basket_report.html:11
+#: templates/dashboard/users/detail.html:121
+msgid "Num items"
+msgstr ""
+
+#: templates/dashboard/reports/partials/open_basket_report.html:12
+msgid "Date of creation"
+msgstr ""
+
+#: templates/dashboard/reports/partials/open_basket_report.html:13
+msgid "Time since creation"
+msgstr ""
+
+#: templates/dashboard/reports/partials/order_report.html:12
+msgid "Total incl. tax"
+msgstr ""
+
+#: templates/dashboard/reports/partials/order_report.html:13
+#: templates/dashboard/users/detail.html:123
+#: templates/dashboard/vouchers/voucher_detail.html:64
+msgid "Date placed"
+msgstr ""
+
+#: templates/dashboard/reports/partials/product_report.html:9
+msgid "Views"
+msgstr ""
+
+#: templates/dashboard/reports/partials/product_report.html:10
+#: templates/dashboard/reports/partials/user_report.html:12
+msgid "Basket additions"
+msgstr ""
+
+#: templates/dashboard/reports/partials/product_report.html:11
+msgid "Purchases"
+msgstr ""
+
+#: templates/dashboard/reports/partials/submitted_basket_report.html:13
+msgid "Time between creation and submission"
+msgstr ""
+
+#: templates/dashboard/reports/partials/user_report.html:10
+msgid "Date registered"
+msgstr ""
+
+#: templates/dashboard/reports/partials/user_report.html:11
+msgid "Product views"
+msgstr ""
+
+#: templates/dashboard/reports/partials/user_report.html:14
+msgid "Order lines"
+msgstr ""
+
+#: templates/dashboard/reports/partials/user_report.html:15
+msgid "Order items"
+msgstr ""
+
+#: templates/dashboard/reports/partials/user_report.html:16
+#: templates/dashboard/users/detail.html:76
+msgid "Total spent"
+msgstr ""
+
+#: templates/dashboard/reports/partials/user_report.html:17
+msgid "Date of last order"
+msgstr ""
+
+#: templates/dashboard/reports/partials/voucher_report.html:9
+msgid "Voucher code"
+msgstr ""
+
+#: templates/dashboard/reports/partials/voucher_report.html:10
+msgid "Added to a basket"
+msgstr ""
+
+#: templates/dashboard/reports/partials/voucher_report.html:11
+msgid "Used in an order"
+msgstr ""
+
+#: templates/dashboard/reports/partials/voucher_report.html:23
+msgid "No vouchers were used in this period"
+msgstr ""
+
+#: templates/dashboard/reviews/review_delete.html:8
+#, python-format
+msgid "Delete review '%(title)s'?"
+msgstr ""
+
+#: templates/dashboard/reviews/review_delete.html:19
+#: templates/dashboard/reviews/review_delete.html:24
+#, python-format
+msgid "Delete review \"%(title)s\"?"
+msgstr ""
+
+#: templates/dashboard/reviews/review_delete.html:29
+msgid "Review"
+msgstr ""
+
+#: templates/dashboard/reviews/review_delete.html:36
+#: templates/dashboard/users/detail.html:180
+msgctxt "Product review title"
+msgid "Title"
+msgstr ""
+
+#: templates/dashboard/reviews/review_delete.html:39
+#: templates/dashboard/reviews/review_list.html:59
+#: templates/dashboard/users/detail.html:179
+msgid "Score"
+msgstr ""
+
+#: templates/dashboard/reviews/review_delete.html:40
+msgid "Votest"
+msgstr ""
+
+#: templates/dashboard/reviews/review_list.html:29
+msgid "Review Search"
+msgstr ""
+
+#: templates/dashboard/reviews/review_list.html:47
+msgid "Update status of selected reviews"
+msgstr ""
+
+#: templates/dashboard/reviews/review_list.html:56
+msgctxt "Review title"
+msgid "Title"
+msgstr ""
+
+#: templates/dashboard/reviews/review_list.html:60
+msgid "Votes"
+msgstr ""
+
+#: templates/dashboard/reviews/review_list.html:75
+msgid "[Product deleted]"
+msgstr ""
+
+#: templates/dashboard/reviews/review_list.html:125
+msgid "No reviews found."
+msgstr ""
+
+#: templates/dashboard/reviews/review_update.html:8
+msgid "Update review"
+msgstr ""
+
+#: templates/dashboard/reviews/review_update.html:19
+#: templates/dashboard/reviews/review_update.html:24
+#, python-format
+msgid "Review #%(review.id)s"
+msgstr ""
+
+#: templates/dashboard/reviews/review_update.html:31
+msgid "Review information"
+msgstr ""
+
+#: templates/dashboard/shipping/messages/band_created.html:3
+#, python-format
+msgid ""
+"\n"
+"    <p>A weight band has been added to the <strong>%(name)s</strong> "
+"shipping method.</p>\n"
+msgstr ""
+
+#: templates/dashboard/shipping/messages/band_deleted.html:3
+#, python-format
+msgid ""
+"\n"
+"    <p>Weight band deleted from the <strong>%(name)s</strong> shipping "
+"method \n"
+msgstr ""
+
+#: templates/dashboard/shipping/messages/band_updated.html:3
+msgid "Weight band updated"
+msgstr ""
+
+#: templates/dashboard/shipping/messages/method_created.html:3
+#, python-format
+msgid ""
+"\n"
+"<p>A shipping method <strong>%(name)s</strong> has been created.</p>\n"
+msgstr ""
+
+#: templates/dashboard/shipping/messages/method_deleted.html:3
+#, python-format
+msgid ""
+"\n"
+"    <p>The <strong>%(name)s</strong> shipping method has been deleted.</p>\n"
+msgstr ""
+
+#: templates/dashboard/shipping/messages/method_updated.html:3
+#, python-format
+msgid ""
+"\n"
+"    <p>The <strong>%(name)s</strong> shipping method has been updated.</p>\n"
+msgstr ""
+
+#: templates/dashboard/shipping/weight_band_delete.html:6
+#: templates/dashboard/shipping/weight_band_delete.html:22
+#: templates/dashboard/shipping/weight_band_delete.html:27
+msgid "Delete weight band?"
+msgstr ""
+
+#: templates/dashboard/shipping/weight_band_delete.html:17
+#: templates/dashboard/shipping/weight_band_form.html:17
+#: templates/dashboard/shipping/weight_based_delete.html:5
+#: templates/dashboard/shipping/weight_based_delete.html:14
+#: templates/dashboard/shipping/weight_based_detail.html:15
+#: templates/dashboard/shipping/weight_based_form.html:20
+#: templates/dashboard/shipping/weight_based_list.html:6
+#: templates/dashboard/shipping/weight_based_list.html:14
+#: templates/dashboard/shipping/weight_based_list.html:21
+#: templates/dashboard/shipping/weight_based_list.html:27
+msgid "Shipping methods"
+msgstr ""
+
+#: templates/dashboard/shipping/weight_band_delete.html:34
+#: templates/dashboard/shipping/weight_based_detail.html:67
+msgid "Weight range (kg)"
+msgstr ""
+
+#: templates/dashboard/shipping/weight_band_delete.html:35
+#: templates/dashboard/shipping/weight_based_detail.html:68
+msgid "Charge"
+msgstr ""
+
+#: templates/dashboard/shipping/weight_band_delete.html:46
+msgid "Are you sure you want to delete this weight band method?"
+msgstr ""
+
+#: templates/dashboard/shipping/weight_band_form.html:6
+#: templates/dashboard/shipping/weight_band_form.html:22
+#: templates/dashboard/shipping/weight_band_form.html:27
+msgid "Edit weight band"
+msgstr ""
+
+#: templates/dashboard/shipping/weight_based_delete.html:5
+#, python-format
+msgid "Delete shipping method '%(name)s'?"
+msgstr ""
+
+#: templates/dashboard/shipping/weight_based_delete.html:29
+msgid "Are you sure you want to delete this shipping method?"
+msgstr ""
+
+#: templates/dashboard/shipping/weight_based_detail.html:41
+msgid "Applies to countries"
+msgstr ""
+
+#: templates/dashboard/shipping/weight_based_detail.html:47
+msgid "Default product weight (kg)"
+msgstr ""
+
+#: templates/dashboard/shipping/weight_based_detail.html:55
+msgid "Edit shipping method"
+msgstr ""
+
+#: templates/dashboard/shipping/weight_based_detail.html:58
+msgid "Delete shipping method"
+msgstr ""
+
+#: templates/dashboard/shipping/weight_based_detail.html:62
+msgid "Weight bands"
+msgstr ""
+
+#: templates/dashboard/shipping/weight_based_detail.html:86
+msgid "No weight bands have been added yet."
+msgstr ""
+
+#: templates/dashboard/shipping/weight_based_detail.html:89
+msgid "Add a new weight band"
+msgstr ""
+
+#: templates/dashboard/shipping/weight_based_detail.html:93
+msgid "Add weight band"
+msgstr ""
+
+#: templates/dashboard/shipping/weight_based_form.html:9
+#: templates/dashboard/shipping/weight_based_form.html:28
+#: templates/dashboard/shipping/weight_based_form.html:37
+msgid "Create a new shipping method"
+msgstr ""
+
+#: templates/dashboard/shipping/weight_based_list.html:20
+msgid "Create new shipping charge"
+msgstr ""
+
+#: templates/dashboard/shipping/weight_based_list.html:32
+msgid "Number of weight bands"
+msgstr ""
+
+#: templates/dashboard/shipping/weight_based_list.html:33
+msgid "Default weight (kg)"
+msgstr ""
+
+#: templates/dashboard/shipping/weight_based_list.html:54
+msgid "No shipping methods found."
+msgstr ""
+
+#: templates/dashboard/users/alerts/delete.html:8
+#: templates/dashboard/users/alerts/delete.html:19
+#: templates/dashboard/users/alerts/update.html:18
+#, python-format
+msgid "Alert #%(id)s"
+msgstr ""
+
+#: templates/dashboard/users/alerts/delete.html:17
+#: templates/dashboard/users/alerts/list.html:8
+#: templates/dashboard/users/alerts/list.html:16
+#: templates/dashboard/users/alerts/list.html:21
+#: templates/dashboard/users/alerts/update.html:16
+msgid "Product alerts"
+msgstr ""
+
+#: templates/dashboard/users/alerts/delete.html:24
+#, python-format
+msgid "Delete alert #%(id)s?"
+msgstr ""
+
+#: templates/dashboard/users/alerts/delete.html:29
+#: templates/dashboard/users/alerts/update.html:23
+#: templates/dashboard/users/alerts/update.html:28
+#, python-format
+msgid "Product alert #%(id)s"
+msgstr ""
+
+#: templates/dashboard/users/alerts/delete.html:36
+msgid "Are you sure that you want to delete this alert?"
+msgstr ""
+
+#: templates/dashboard/users/alerts/list.html:26
+msgid "Search product alerts"
+msgstr ""
+
+#: templates/dashboard/users/alerts/list.html:33
+msgid "reset"
+msgstr ""
+
+#: templates/dashboard/users/alerts/list.html:48
+#: templates/dashboard/users/alerts/partials/alert.html:40
+msgid "Date alert sent"
+msgstr ""
+
+#: templates/dashboard/users/alerts/list.html:60
+msgid "(Anonymous)"
+msgstr ""
+
+#: templates/dashboard/users/alerts/list.html:92
+msgid "No alerts found."
+msgstr ""
+
+#: templates/dashboard/users/alerts/partials/alert.html:29
+msgid "Date confirmed"
+msgstr ""
+
+#: templates/dashboard/users/alerts/partials/alert.html:35
+msgid "Date cancelled"
+msgstr ""
+
+#: templates/dashboard/users/alerts/update.html:7
+#, python-format
+msgid "Update alert #%(id)s"
+msgstr ""
+
+#: templates/dashboard/users/detail.html:28
+msgid "General"
+msgstr ""
+
+#: templates/dashboard/users/detail.html:40
+#: templates/dashboard/vouchers/voucher_list.html:66
+msgid "Active"
+msgstr ""
+
+#: templates/dashboard/users/detail.html:42
+msgid "Yes,No"
+msgstr ""
+
+#: templates/dashboard/users/detail.html:46
+msgid "Superuser"
+msgstr ""
+
+#: templates/dashboard/users/detail.html:47
+#: templates/dashboard/users/detail.html:51
+msgid "True,False"
+msgstr ""
+
+#: templates/dashboard/users/detail.html:50
+msgid "Staff"
+msgstr ""
+
+#: templates/dashboard/users/detail.html:54
+msgid "Last login"
+msgstr ""
+
+#: templates/dashboard/users/detail.html:58
+msgid "Date joined"
+msgstr ""
+
+#: templates/dashboard/users/detail.html:64
+msgid "Products viewed"
+msgstr ""
+
+#: templates/dashboard/users/detail.html:68
+#: templates/dashboard/vouchers/voucher_detail.html:47
+msgid "Number of orders"
+msgstr ""
+
+#: templates/dashboard/users/detail.html:72
+msgid "Number of ordered items"
+msgstr ""
+
+#: templates/dashboard/users/detail.html:82
+msgid "Reviews written"
+msgstr ""
+
+#: templates/dashboard/users/detail.html:92
+msgid "Send password reset email"
+msgstr ""
+
+#: templates/dashboard/users/detail.html:120
+msgid "Order Number"
+msgstr ""
+
+#: templates/dashboard/users/detail.html:122
+msgid "Total value"
+msgstr ""
+
+#: templates/dashboard/users/detail.html:138
+msgid "This customer has not placed any orders yet."
+msgstr ""
+
+#: templates/dashboard/users/detail.html:166
+msgid "This customer has not saved any addresses."
+msgstr ""
+
+#: templates/dashboard/users/detail.html:178
+msgid "Product ID"
+msgstr ""
+
+#: templates/dashboard/users/detail.html:181
+msgid "Body"
+msgstr ""
+
+#: templates/dashboard/users/detail.html:194
+msgid "This customer has not written any reviews yet."
+msgstr ""
+
+#: templates/dashboard/users/index.html:48
+msgid "No customers found."
+msgstr ""
+
+#: templates/dashboard/users/table.html:8
+msgid "Bulk Actions"
+msgstr ""
+
+#: templates/dashboard/users/table.html:9
+msgid "With selected customers:"
+msgstr ""
+
+#: templates/dashboard/users/table.html:11
+msgid "Make active"
+msgstr ""
+
+#: templates/dashboard/users/table.html:14
+msgid "Make inactive"
+msgstr ""
+
+#: templates/dashboard/vouchers/voucher_delete.html:8
+#: templates/dashboard/vouchers/voucher_delete.html:27
+#, python-format
+msgid "Delete voucher '%(name)s'?"
+msgstr ""
+
+#: templates/dashboard/vouchers/voucher_delete.html:32
+#: templates/dashboard/vouchers/voucher_detail.html:28
+msgid "Voucher details"
+msgstr ""
+
+#: templates/dashboard/vouchers/voucher_delete.html:39
+#: templates/dashboard/vouchers/voucher_detail.html:34
+msgid "Start datetime"
+msgstr ""
+
+#: templates/dashboard/vouchers/voucher_delete.html:40
+#: templates/dashboard/vouchers/voucher_detail.html:35
+msgid "End datetime"
+msgstr ""
+
+#: templates/dashboard/vouchers/voucher_delete.html:41
+#: templates/dashboard/vouchers/voucher_detail.html:36
+msgid "Usage"
+msgstr ""
+
+#: templates/dashboard/vouchers/voucher_detail.html:42
+msgid "Voucher performance"
+msgstr ""
+
+#: templates/dashboard/vouchers/voucher_detail.html:46
+msgid "Number of basket additions"
+msgstr ""
+
+#: templates/dashboard/vouchers/voucher_detail.html:53
+msgid "Recent orders"
+msgstr ""
+
+#: templates/dashboard/vouchers/voucher_detail.html:58
+msgid "No orders have been placed that use this voucher."
+msgstr ""
+
+#: templates/dashboard/vouchers/voucher_form.html:34
+msgid "Edit voucher"
+msgstr ""
+
+#: templates/dashboard/vouchers/voucher_form.html:36
+msgid "Create voucher"
+msgstr ""
+
+#: templates/dashboard/vouchers/voucher_list.html:26
+msgid "Create new voucher"
+msgstr ""
+
+#: templates/dashboard/vouchers/voucher_list.html:53
+msgid "Num baskets"
+msgstr ""
+
+#: templates/dashboard/vouchers/voucher_list.html:54
+msgid "Num orders"
+msgstr ""
+
+#: templates/dashboard/vouchers/voucher_list.html:68
+msgid "Inactive"
+msgstr ""
+
+#: templates/dashboard/vouchers/voucher_list.html:92
+msgid "No vouchers found."
+msgstr ""
+
+#: templates/layout.html:41
+msgid "Phones"
+msgstr ""
+
+#: templates/layout.html:71
+msgid "Company"
+msgstr ""
+
+#: templates/layout.html:75
+msgid "Contacts"
+msgstr ""
+
+#: templates/layout.html:77
+msgid "For buyers"
+msgstr ""
+
+#: templates/layout.html:85
+msgid "You are looking for something"
+msgstr ""
+
+#: templates/layout.html:199
+msgid "Хочу"
+msgstr ""
+
+#: templates/layout.html:249
+msgid "Questions?"
+msgstr ""
+
+#: templates/layout.html:293
+msgid "Information"
+msgstr ""
+
+#: templates/layout.html:300
+msgid "Special offers"
+msgstr "Специальные предложения"
+
+#: templates/layout.html:300
+msgid "Sales"
+msgstr "Распродажа"
+
+#: templates/layout.html:303
+msgid "Support service"
+msgstr "Сервис поддержки"
+
+#: templates/layout.html:305
+msgid "Contact us"
+msgstr ""
+
+#: templates/layout.html:306
+msgid "Return purchase "
+msgstr ""
+
+#: templates/layout.html:307
+msgid "Site Map"
+msgstr ""
+
+#: templates/layout.html:312 templates/layout.html.py:314
+msgid "Personal office"
+msgstr ""
+
+#: templates/layout.html:315
+msgid "Orders history"
+msgstr ""
+
+#: templates/layout.html:316
+msgid "Notes (0)"
+msgstr ""
+
+#: templates/layout.html:323
+msgid "Sign up for discounts!"
+msgstr ""
+
+#: templates/layout.html:336
+msgid "Subscribe"
+msgstr ""
+
+#: templates/layout.html:346
+msgid "WE ARE IN SOCIAL NETWORKS JOIN US!"
+msgstr ""
+
+#: templates/partials/image_input_widget.html:7
+#: templates/partials/image_input_widget.html:9
+msgid "thumbnail"
+msgstr ""
+
+#: templates/partials/image_input_widget.html:11
+msgid "Unrecognized image type!"
+msgstr ""
+
+#: templates/partials/image_input_widget.html:12
+msgid "Upload Image"
+msgstr ""
+
+#: templates/partials/nav_accounts.html:49
+msgid "Logout"
+msgstr ""
+
+#: templates/partials/nav_accounts.html:51
+msgid "Login or register"
+msgstr ""
+
+#: templates/partials/nav_primary.html:23
+#: templates/partials/nav_primary.html:27
+#, python-format
+msgid ""
+"\n"
+"                        Total: %(total)s\n"
+"                    "
+msgstr ""
+
+#: templates/partials/nav_primary.html:40
+msgid "Browse store"
+msgstr ""
+
+#: templates/promotions/home.html:34
+msgid "Новинки"
+msgstr ""
+
+#: templates/promotions/home.html:37
+msgid "Хиты продаж"
+msgstr ""
+
+#: templates/promotions/home.html:40
+msgid "Акции"
+msgstr ""
+
+#: templates/promotions/home.html:43
+msgid "Рекомендуем"
+msgstr ""
+
+#: templates/promotions/multiimage.html:30
+#: templates/promotions/multiimage.html:33
+msgid "Previous"
+msgstr ""
+
+#: templates/promotions/multiimage.html:35
+#: templates/promotions/multiimage.html:38
+msgid "Next"
+msgstr ""
+
+#: templates/search/results.html:25
+#, python-format
+msgid ""
+"\n"
+"        Products matching \"%(q)s\"\n"
+"    "
+msgstr ""
+
+#: templates/sitemap/sitemap.html:13 templates/sitemap/sitemap.html.py:17
+msgid "Site map"
+msgstr ""
+
+#: templates/subscribe/subscribe.html:3
+msgid "Subscribe date:"
+msgstr ""
+
+#: templates/subscribe/subscribe.html:9
+msgid "City:"
+msgstr ""

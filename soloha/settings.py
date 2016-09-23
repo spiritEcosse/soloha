@@ -118,6 +118,11 @@ TEMPLATES = [
     },
 ]
 
+LOCALE_PATHS = (
+    os.path.join(BASE_DIR, 'locale'),
+)
+
+
 WSGI_APPLICATION = 'soloha.wsgi.application'
 
 RECOMMENDED_PRODUCTS = 20
@@ -129,7 +134,7 @@ DATABASES = settings_local.DATABASES
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'ru'
 
 TIME_ZONE = 'UTC'
 
@@ -142,10 +147,6 @@ USE_TZ = True
 LANGUAGES = (
     ('ru', _('Russia')),
 )
-
-# LANGUAGES = (
-#     ('en', _('England')),
-# )
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.8/howto/static-files/

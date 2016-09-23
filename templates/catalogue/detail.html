@@ -96,15 +96,15 @@
                                     {% include "catalogue/reviews/partials/review_stars.html" %}
                                 </p>
                             {% endiffeature %}
-                            <div class="social">{% trans 'Share' %}:</div>
+{#                            <div class="social">{% trans 'Share' %}:</div>#}
                         </div>
-                        <div class="defer pull-right">
-                            {% iffeature "wishlists" %}
-                                {% include "catalogue/partials/add_to_wishlist.html" %}
-                            {% endiffeature %}
-
-                            <a class="compare" href="#">{% trans 'Compare' %}</a>
-                        </div>
+{#                        <div class="defer pull-right">#}
+{#                            {% iffeature "wishlists" %}#}
+{#                                {% include "catalogue/partials/add_to_wishlist.html" %}#}
+{#                            {% endiffeature %}#}
+{##}
+{#                            <a class="compare" href="#">{% trans 'Compare' %}</a>#}
+{#                        </div>#}
                     </div>
                     <div class="row liner">
                         <div class="col-xs-22">
@@ -138,7 +138,7 @@
 
                     {% if attributes %}
                         <div class="col-xs-24 col-sm-24 col-md-14 options">
-                            <span class="relation">{% trans "*The price depends on the selected parameters:" %}</span>
+                            <span class="relation">* {% trans "The price depends on the selected parameters" %}:</span>
 
                             <div class="list_attr" ng-if="!attributes">
                                 {% for attribute in attributes %}
@@ -186,7 +186,7 @@
                 {% endblock %}
 
                 <div class="panel panel-default reviews" id="reviews">
-                    <div class="panel-heading text-center">{% trans "Reviews:" %}</div>
+                    <div class="panel-heading text-center">{% trans "Reviews" %}</div>
                     <div class="panel-body">
                         <div class="write">
                             {% url 'catalogue:reviews-add' product_slug=product.slug product_pk=product.id as add_review_url %}

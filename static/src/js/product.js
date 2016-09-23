@@ -23,7 +23,7 @@ $(document).ready(function() {
         $('#primary_info').affix({
             offset: {
                 top: $('#primary_info').offset().top,
-                bottom: ($('#items').outerHeight(true)) + 504
+                bottom: ($('#items').outerHeight(true)) + $('footer').outerHeight(true)
             }
         });
     }

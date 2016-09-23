@@ -297,7 +297,14 @@
                                 {% endfor %}
                             </ul>
                         {% endif %}
-                        <div class="col-xs-24 special line-top"><a href="#">{% trans "Special offers" %}</a>/<a href="#">{% trans "Sales" %}</a></div>
+{#                        <div class="col-xs-24 special line-top">#}
+{#                            <a href="#">#}
+{#                                {% trans "Special offers" %}</a>#}
+{#                            /#}
+{#                            <a href="#">#}
+{#                                {% trans "Sales" %}#}
+{#                            </a>#}
+{#                        </div>#}
                     </div>
                     <div class="col-xs-24 col-sm-6 column">
                         <div class="title line-bottom">{% trans "Support service" %}</div>
@@ -307,46 +314,46 @@
                             <li class="list-group-item"><a href="#">{% trans "Site Map" %}</a></li>
                         </ul>
                     </div>
-                    <div class="col-xs-24 col-sm-6 column account">
-                        <div class="row">
-                            <div class="title line-bottom">{% trans "Personal office" %}</div>
-                            <ul class="list-group">
-                                <li class="list-group-item"><a href="#">{% trans "Personal office" %}</a></li>
-                                <li class="list-group-item"><a href="#">{% trans "Orders history" %}</a></li>
-                                <li class="list-group-item"><a href="#">{% trans "Notes (0)" %}</a></li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="col-xs-24 col-sm-12 text-center subscribe" ng-controller="Subscribe">
-                        <div class="row">
-                            <div class="title line-top">
-                                {% trans "Sign up for discounts!" %}
-                            </div>
-                            <div class="input-group">
-                                <form name="{{ form.form_name }}" method="post" ng-hide="send_form" novalidate>
-                                    {% csrf_token %}
-                                    {% for field in form %}
-                                        <div class="col-xs-6 element">
-                                            {{ field.label_tag }}
-                                            {{ field }}
-                                            {{ field.errors }}
-                                        </div>
-                                    {% endfor %}
-                                    <div class="col-xs-6 element">
-                                        <button type="button" ng-disabled="{{ form.form_name }}.$invalid" ng-click="subscribe()" class="btn btn-danger btn-block">{% trans "Subscribe" %}</button>
-                                    </div>
-                                </form>
-                                {% verbatim %}
-                                <div class="alert alert-{{ alert_mode }}" role="alert" ng-show="send_form">
-                                    {% endverbatim %}
-                                    {{ answer }}
-                                </div>
-                            </div>
-                            <div class="social">
-                                <div class="title">{% trans "WE ARE IN SOCIAL NETWORKS JOIN US!" %}</div>
-                            </div>
-                        </div>
-                    </div>
+{#                    <div class="col-xs-24 col-sm-6 column account">#}
+{#                        <div class="row">#}
+{#                            <div class="title line-bottom">{% trans "Personal office" %}</div>#}
+{#                            <ul class="list-group">#}
+{#                                <li class="list-group-item"><a href="#">{% trans "Personal office" %}</a></li>#}
+{#                                <li class="list-group-item"><a href="#">{% trans "Orders history" %}</a></li>#}
+{#                                <li class="list-group-item"><a href="#">{% trans "Notes (0)" %}</a></li>#}
+{#                            </ul>#}
+{#                        </div>#}
+{#                    </div>#}
+{#                    <div class="col-xs-24 col-sm-12 text-center subscribe" ng-controller="Subscribe">#}
+{#                        <div class="row">#}
+{#                            <div class="title line-top">#}
+{#                                {% trans "Sign up for discounts!" %}#}
+{#                            </div>#}
+{#                            <div class="input-group">#}
+{#                                <form name="{{ form.form_name }}" method="post" ng-hide="send_form" novalidate>#}
+{#                                    {% csrf_token %}#}
+{#                                    {% for field in form %}#}
+{#                                        <div class="col-xs-6 element">#}
+{#                                            {{ field.label_tag }}#}
+{#                                            {{ field }}#}
+{#                                            {{ field.errors }}#}
+{#                                        </div>#}
+{#                                    {% endfor %}#}
+{#                                    <div class="col-xs-6 element">#}
+{#                                        <button type="button" ng-disabled="{{ form.form_name }}.$invalid" ng-click="subscribe()" class="btn btn-danger btn-block">{% trans "Subscribe" %}</button>#}
+{#                                    </div>#}
+{#                                </form>#}
+{#                                {% verbatim %}#}
+{#                                <div class="alert alert-{{ alert_mode }}" role="alert" ng-show="send_form">#}
+{#                                    {% endverbatim %}#}
+{#                                    {{ answer }}#}
+{#                                </div>#}
+{#                            </div>#}
+{#                            <div class="social">#}
+{#                                <div class="title">{% trans "WE ARE IN SOCIAL NETWORKS JOIN US!" %}</div>#}
+{#                            </div>#}
+{#                        </div>#}
+{#                    </div>#}
                 </div>
                 <div class="row bottom">
                     <div class="col-xs-24 text-center text-white">
