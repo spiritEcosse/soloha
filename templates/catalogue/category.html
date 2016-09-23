@@ -10,13 +10,6 @@
 {% load i18n %}
 {% load filters_concatenation %}
 
-{% block meta_robots %}
-    {{ block.super }}
-    {% if page or url_extra_kwargs.sort %}
-        , noindex, nofollow
-    {% endif %}
-{% endblock %}
-
 {#{% block ngController %}ng-controller="" {% endblock ngController %}#}
 {% block ngController%}ng-controller="More_goods"{% endblock ngController %}
 

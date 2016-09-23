@@ -9,7 +9,7 @@
                 {% if not ng %}
                     {% assign selected_val attribute.selected_val.0 %}
                     {% if selected_val %}
-                        {{ selected_val.title }}
+                        {{ selected_val.title|truncatechars:truncatechars_attribute_title }}
                     {% else %}
                         {{ not_selected }}
                     {% endif %}

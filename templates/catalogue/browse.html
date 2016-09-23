@@ -8,6 +8,13 @@
 {% load catalogue %}
 {% load i18n %}
 
+{% block meta_robots %}
+    {{ block.super }}
+    {% if page or url_extra_kwargs.sort %}
+        , noindex, nofollow
+    {% endif %}
+{% endblock %}
+
 {% block title %}
     {% if summary %}{{ summary }} |{% endif %} {{ block.super }}
 {% endblock %}

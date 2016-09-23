@@ -11,7 +11,7 @@
         <div class="panel-heading">
             <div class="row option">
                 <div class="col-xs-14 name" {% if ng %} ng-bind="attribute.title" {% endif %}>
-                    {% if not ng %}{{ attribute.title }}{% endif %}
+                    {% if not ng %}{{ attribute.title|truncatechars:truncatechars_attribute }}{% endif %}
                 </div>
                 {% if ng %}
                     <div class="col-xs-10 pull-right values" ng-if="attribute.values.length">

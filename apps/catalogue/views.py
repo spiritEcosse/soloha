@@ -28,6 +28,7 @@ from itertools import groupby
 from oscar.apps.partner import prices
 from oscar.templatetags.currency_filters import currency
 from django.utils.functional import cached_property
+from django.template.defaultfilters import truncatechars
 
 logger = logging.getLogger(__name__)
 
@@ -49,6 +50,9 @@ ANSWER = str(_('Your message has been sent. We will contact you on the specified
 
 
 Order = namedtuple('Order', ['title', 'column', 'argument'])
+
+TRUNCATECHARS_ATTRIBUTE = 60
+TRUNCATECHARS_ATTRIBUTE_TITLE = 15
 
 
 class Filter(object):
@@ -434,11 +438,11 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
                     'parent': attr.pk,
                     'products': [],
                     'images': images,
-                    'title': selected_val.title
+                    'title': truncatechars(selected_val.title, TRUNCATECHARS_ATTRIBUTE_TITLE)
                 }
 
             context['attributes'].append({
-                'pk': attr.pk, 'title': attr.title, 'values': values,
+                'pk': attr.pk, 'title': truncatechars(attr.title, TRUNCATECHARS_ATTRIBUTE), 'values': values,
                 'non_standard': non_standard, 'bottom_line': attr.bottom_line,
                 'top_line': attr.top_line,
                 'selected_val': selected_val
@@ -535,6 +539,8 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
             sites__domain=get_current_site(self.request).domain, info__enable=True
         ).filter(Q(url='delivery') | Q(url='payment') | Q(url='manager'))
         context['pages_delivery_and_pay'] = context['flatpages'].exclude(url='manager')
+        context['truncatechars_attribute'] = TRUNCATECHARS_ATTRIBUTE
+        context['truncatechars_attribute_title'] = TRUNCATECHARS_ATTRIBUTE_TITLE
         return context
 
     def filter_stockrecord(self):
