@@ -11,11 +11,11 @@ StockRecord = get_model('partner', 'StockRecord')
 
 class StockRecordResource(resources.ModelResource):
     product = fields.Field(
-        attribute='product', column_name=_('Product title'),
+        attribute='product', column_name='Product title',
         widget=widgets.ForeignKeyWidget(model=Product, field='slug')
     )
     attributes = fields.Field(
-        attribute='attributes', column_name=_('Attributes'),
+        attribute='attributes', column_name='Attributes',
         widget=widgets.ManyToManyWidget(model=Feature, field='slug')
     )
 

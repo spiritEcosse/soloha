@@ -117,7 +117,7 @@ class Field(fields.Field):
 
 class ModelResource(resources.ModelResource):
     delete = fields.Field(
-        column_name=_('Delete this object ? (set 1 if True)'),
+        column_name='Delete this object ? (set 1 if True)',
         widget=import_export_widgets.BooleanWidget()
     )
     prefix = 'rel_'
