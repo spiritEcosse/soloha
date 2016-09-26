@@ -45,7 +45,7 @@ QuickOrder = get_model('order', 'QuickOrder')
 WishList = get_model('wishlists', 'WishList')
 FlatPage = get_model('flatpages', 'FlatPage')
 
-NOT_SELECTED = str(_('Not selected'))
+NOT_SELECTED = unicode(_('Not selected'))
 ANSWER = str(_('Your message has been sent. We will contact you on the specified details.'))
 
 
