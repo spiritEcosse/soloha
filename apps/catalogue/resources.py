@@ -117,7 +117,7 @@ class Field(fields.Field):
 
 class ModelResource(resources.ModelResource):
     delete = fields.Field(
-        column_name='delete',
+        column_name='Delete this object ? (set 1 if True)',
         widget=import_export_widgets.BooleanWidget()
     )
     prefix = 'rel_'
@@ -285,25 +285,6 @@ class ModelResource(resources.ModelResource):
                         and not isinstance(field.widget, widgets.IntermediateModelManyToManyWidget):
                     continue
                 self.import_field(field, obj, data)
-
-    def import_obj(self, obj, data, dry_run):
-        """
-        Traverses every field in this Resource and calls
-        :meth:`~import_export.resources.Resource.import_field`.
-        """
-        for field in self.get_fields():
-            if isinstance(field.widget, widgets.ManyToManyWidget):
-                continue
-            self.import_field(field, obj, data)
-
-    def import_field(self, field, obj, data):
-        """
-        Calls :meth:`import_export.fields.Field.save` if ``Field.attribute``
-        and ``Field.column_name`` are found in ``data``.
-        """
-        if field.attribute and field.column_name in data:
-            field.save(obj, data)
-            print getattr(obj, field.attribute)
 
 
 class FeatureResource(ModelResource):
