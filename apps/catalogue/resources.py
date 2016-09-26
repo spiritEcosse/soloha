@@ -287,7 +287,7 @@ class ModelResource(resources.ModelResource):
 
     def save_instance(self, instance, dry_run=False):
         print 'instance.product', instance.product
-        super(ModelResource).save_instance(instance, dry_run=dry_run)
+        super(ModelResource, self).save_instance(instance, dry_run=dry_run)
 
 
 class FeatureResource(ModelResource):
