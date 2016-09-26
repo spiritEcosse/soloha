@@ -10,7 +10,7 @@ StockRecord = get_model('partner', 'StockRecord')
 
 
 class StockRecordResource(resources.ModelResource):
-    product = fields.Field(
+    product_slug = fields.Field(
         attribute='product', column_name='Product title',
         widget=widgets.ForeignKeyWidget(model=Product, field='slug')
     )
@@ -21,6 +21,6 @@ class StockRecordResource(resources.ModelResource):
 
     class Meta:
         model = StockRecord
-        fields = ('id', 'delete', 'product', 'price_excl_tax', 'price_retail', 'cost_price', 'attributes',
+        fields = ('id', 'delete', 'product_slug', 'price_excl_tax', 'price_retail', 'cost_price', 'attributes',
                   'num_in_stock', 'num_allocated', 'low_stock_threshold', )
         export_order = fields
