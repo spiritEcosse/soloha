@@ -22,7 +22,7 @@ class AbstractStockRecord(models.Model, CommonFeatureProduct):
     """
     product = models.ForeignKey('catalogue.Product', related_name="stockrecords", verbose_name=_("Product"))
     attributes = models.ManyToManyField(
-        'catalogue.Feature', verbose_name=_('Attributes'), related_name='stockrecords'
+        'catalogue.Feature', verbose_name=_('Attributes'), related_name='stockrecords', blank=True
     )
 
     # ToDo delete this field
