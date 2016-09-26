@@ -259,6 +259,7 @@ class AbstractProduct(models.Model, CommonFeatureProduct):
         Because the validation logic is quite complex, validation is delegated
         to the sub method appropriate for the product's structure.
         """
+        super(AbstractProduct, self).clean()
         getattr(self, '_clean_%s' % self.structure)()
         # if not self.is_parent:
         #     self.attr.validate_attributes()
@@ -269,7 +270,7 @@ class AbstractProduct(models.Model, CommonFeatureProduct):
         """
         if not self.title:
             raise ValidationError(_("Your product must have a title."))
-        if not self.product_class:
+        if not getattr(self, 'product_class', False):
             raise ValidationError(_("Your product must have a product class."))
         if self.parent_id:
             raise ValidationError(_("Only child products can have a parent."))
