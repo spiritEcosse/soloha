@@ -285,9 +285,9 @@ class ModelResource(resources.ModelResource):
                     continue
                 self.import_field(field, obj, data)
 
-    # def save_instance(self, instance, dry_run=False):
-    #     print 'save_instance',
-    #     super(ModelResource, self).save_instance(instance, dry_run=dry_run)
+    def save_instance(self, instance, dry_run=False):
+        print 'save_instance', instance.product
+        super(ModelResource, self).save_instance(instance, dry_run=dry_run)
 
 
 class FeatureResource(ModelResource):
