@@ -117,7 +117,7 @@ class Field(fields.Field):
 
 class ModelResource(resources.ModelResource):
     delete = fields.Field(
-        column_name='Delete this object ? (set 1 if True)',
+        column_name='delete',
         widget=import_export_widgets.BooleanWidget()
     )
     prefix = 'rel_'
@@ -291,8 +291,6 @@ class ModelResource(resources.ModelResource):
         Traverses every field in this Resource and calls
         :meth:`~import_export.resources.Resource.import_field`.
         """
-        raise Exception(self.get_fields())
-        
         for field in self.get_fields():
             if isinstance(field.widget, widgets.ManyToManyWidget):
                 continue
