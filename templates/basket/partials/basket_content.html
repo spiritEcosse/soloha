@@ -65,7 +65,7 @@
                                         <div class="input-group  {% if form.errors %}error{% endif %}">
                                             <input class="form-control" id="id_form-{{ forloop.counter0 }}-quantity" min="0" name="form-{{ forloop.counter0 }}-quantity" ng-model="quantity_{{ line.id }}" type="number" value="{{ form.quantity.value }}">
                                             <span class="input-group-btn">
-                                                <button class="btn btn-default" type="submit" data-loading-text="{% trans 'Updating...' %}">{% trans "Update" %}</button>
+                                                <button class="btn btn-default" type="submit" data-loading-text="{% trans 'Updating...' %}">{% trans "Update quantity" %}</button>
                                             </span>
                                         </div>
                                     </div>
