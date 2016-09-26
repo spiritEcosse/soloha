@@ -291,6 +291,8 @@ class ModelResource(resources.ModelResource):
         Traverses every field in this Resource and calls
         :meth:`~import_export.resources.Resource.import_field`.
         """
+        raise Exception(self.get_fields())
+        
         for field in self.get_fields():
             if isinstance(field.widget, widgets.ManyToManyWidget):
                 continue
@@ -303,7 +305,7 @@ class ModelResource(resources.ModelResource):
         """
         if field.attribute and field.column_name in data:
             field.save(obj, data)
-            print field.attribute
+            print getattr(obj, field.attribute)
 
 
 class FeatureResource(ModelResource):
