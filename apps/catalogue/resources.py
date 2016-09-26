@@ -125,10 +125,6 @@ class ModelResource(resources.ModelResource):
     def for_delete(self, row, instance):
         return self.fields['delete'].clean(row)
 
-    def save_instance(self, instance, dry_run=False):
-        print 'instance.product', instance.product
-        super(ModelResource, self).save_instance(instance, dry_run=dry_run)
-
 
 class FeatureResource(ModelResource):
     title = fields.Field(column_name='title', attribute='title', widget=widgets.CharWidget())
