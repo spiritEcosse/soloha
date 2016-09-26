@@ -10,7 +10,7 @@ from oscar.apps.partner.exceptions import InvalidStockAdjustment
 from apps.catalogue.abstract_models import CommonFeatureProduct
 
 
-class AbstractStockRecord(models.Model):
+class AbstractStockRecord(models.Model, CommonFeatureProduct):
     """
     A stock record.
 

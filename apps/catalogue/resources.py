@@ -285,6 +285,10 @@ class ModelResource(resources.ModelResource):
                     continue
                 self.import_field(field, obj, data)
 
+    def save_instance(self, instance, dry_run=False):
+        print 'instance.product', instance.product
+        super(ModelResource).save_instance(instance, dry_run=dry_run)
+
 
 class FeatureResource(ModelResource):
     title = fields.Field(column_name='title', attribute='title', widget=widgets.CharWidget())
