@@ -233,7 +233,6 @@ class CharWidget(import_export_widgets.Widget):
 
 class ForeignKeyWidget(import_export_widgets.ForeignKeyWidget):
     def clean(self, value):
-        print self.model.objects.get(**{self.field: value})
         return super(ForeignKeyWidget, self).clean(value.strip())
 
 

@@ -10,4 +10,5 @@ class StockRecordForm(forms.ModelForm):
             'product': autocomplete.ModelSelect2(url='product-autocomplete'),
             'attributes': autocomplete.ModelSelect2Multiple(url='feature-autocomplete')
         }
-        exclude = ('partner', 'partner_sku', )
+        fields = '__all__'
+        # exclude = ('partner', 'partner_sku', )
