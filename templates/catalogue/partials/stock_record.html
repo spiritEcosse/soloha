@@ -15,8 +15,8 @@
     {% if session.price.exists %}
         {% if session.price.excl_tax == 0 %}
             {% trans "Free" %}
-        {% elif session.price.is_tax_known %}
-            {{ session.price.incl_tax|currency:session.price.currency }}
+{#        {% elif session.price.is_tax_known %}#}
+{#            {{ session.price.incl_tax|currency:session.price.currency }}#}
         {% else %}
             {{ session.price.excl_tax|currency:session.price.currency }}
         {% endif %}
