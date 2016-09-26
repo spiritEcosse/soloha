@@ -353,13 +353,12 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
     only = ['title', 'pk']
     lookup_parent = '__parent'
 
-    #Todo remove else statement, because this not have mind
     def get_object(self, queryset=None):
         if hasattr(self, 'object'):
             return self.object
-        else:
-            self.kwargs['slug'] = self.kwargs['product_slug']
-            return super(ProductDetailView, self).get_object(queryset)
+
+        self.kwargs['slug'] = self.kwargs['product_slug']
+        return super(ProductDetailView, self).get_object(queryset)
 
     def redirect_if_necessary(self, current_path, product):
         if self.enforce_paths:
@@ -369,7 +368,7 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
 
     def get_queryset(self):
         queryset = super(ProductDetailView, self).get_queryset()
-        return queryset.prefetch_related(
+        return queryset.filter(enable=True).prefetch_related(
             Prefetch('reviews', queryset=ProductReview.objects.filter(status=ProductReview.APPROVED), to_attr='reviews_approved'),
             Prefetch('options', queryset=Feature.objects.filter(level=0), to_attr='options_enabled'),
             Prefetch('images', queryset=ProductImage.objects.only('original', 'product')),

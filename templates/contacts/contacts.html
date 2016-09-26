@@ -3,589 +3,466 @@
 {% block ngController%}ng-controller="Contacts"{% endblock ngController %}
 
 
-{% block main %}
-    <div class="container page">
-        <div class="row main">
-            <div class="col-xs-24 col-sm-6 left-group">
-                <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
-                    <div class="panel panel-default">
-                        <div class="panel-heading" role="tab" id="headingOne">
-                            <h4 class="panel-title">
-                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                                    Информация
-                                </a>
-                            </h4>
-                        </div>
-                        <div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
-                            <div class="panel-body"></div>
-                        </div>
-                    </div>
-                    <div class="panel panel-default">
-                        <div class="panel-heading" role="tab" id="headingTwo">
-                            <h4 class="panel-title">
-                                <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                                    Служба поддержки
-                                </a>
-                            </h4>
-                        </div>
-                        <div id="collapseTwo" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingTwo">
-                            <div class="panel-body">
-                                <ul class="list-group">
-                                    <li class="list-group-item">
-                                        <a href="contacts.html">
-                                            Связаться с нами
-                                            <span class="glyphicon glyphicon glyphicon-menu-right pull-right"></span>
-                                        </a>
-                                    </li>
-                                    <li class="list-group-item">
-                                        <a href="contacts.html">
-                                            Возврат товара
-                                            <span class="glyphicon glyphicon glyphicon-menu-right pull-right"></span>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="panel panel-default">
-                        <div class="panel-heading" role="tab" id="headingThree">
-                            <h4 class="panel-title">
-                                <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-                                    Личный кабинет
-                                </a>
-                            </h4>
-                        </div>
-                        <div id="collapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
-                            <div class="panel-body">
-                                Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="series items">
-                    <ul class="nav nav-pills nav-justified">
-                        <li class="active"><a data-toggle="tab" role="tab" href="#sectionNews" class="icon sectionNews"></a></li>
-                        <li><a data-toggle="tab" role="tab" href="#hits" class="icon hits"></a></li>
-                        <li><a data-toggle="tab" role="tab" href="#special" class="icon special"></a></li>
-                        <li><a data-toggle="tab" role="tab" href="#recommended" class="icon recommended"></a></li>
+{% block left-bar %}
+    <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+        <div class="panel panel-default">
+            <div class="panel-heading" role="tab" id="headingOne">
+                <h4 class="panel-title">
+                    <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                        Информация
+                    </a>
+                </h4>
+            </div>
+            <div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
+                <div class="panel-body"></div>
+            </div>
+        </div>
+        <div class="panel panel-default">
+            <div class="panel-heading" role="tab" id="headingTwo">
+                <h4 class="panel-title">
+                    <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                        Служба поддержки
+                    </a>
+                </h4>
+            </div>
+            <div id="collapseTwo" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingTwo">
+                <div class="panel-body">
+                    <ul class="list-group">
+                        <li class="list-group-item">
+                            <a href="contacts.html">
+                                Связаться с нами
+                                <span class="glyphicon glyphicon glyphicon-menu-right pull-right"></span>
+                            </a>
+                        </li>
+                        <li class="list-group-item">
+                            <a href="contacts.html">
+                                Возврат товара
+                                <span class="glyphicon glyphicon glyphicon-menu-right pull-right"></span>
+                            </a>
+                        </li>
                     </ul>
-
-                    <div class="tab-content">
-                        <div id="sectionNews" class="tab-pane fade in active">
-                            <div class="lightSlider">
-                                <div class="col-sm-6 col-md-6">
-                                    <div class="thumbnail text-center">
-                                        <div class="caption">
-                                            <div class="title">
-                                                <a href="#">Кровать АйПИ групп "Европа 4", без матраса Кровать АйПИ групп "Европа 4", без матраса</a>
-                                            </div>
-                                            <a href="#" class="image"><img src="../../static/image/banner_image.png" class="img-responsive" alt="..."/></a>
-                                            <div class="model">Артикул 1111</div>
-                                            <div class="price"><strong>Цена:</strong>5555</div>
-                                            <p><a href="#" class="btn btn-primary" role="button">Купить</a></p>
-                                        </div>
-                                        <div class="mask">
-                                            <div class="title">
-                                                <a href="#">Кровать АйПИ групп "Европа 4", без матраса Кровать АйПИ групп "Европа 4", без матраса</a>
-                                            </div>
-                                            <div class="filters">
-                                                <div class="rows">
-                                                    <div class="option_name">
-                                                        <span>По типу:</span>
-                                                    </div>
-
-                                                    <div class="option_value"><span>Кровати с мягким изголовьем</span></div>
-                                                </div>
-                                                <div class="rows">
-                                                    <div class="option_name">
-                                                        <span>По размеру:</span>
-                                                    </div>
-                                                    <div class="option_value"><span>Полуторные,Двухспальные</span></div>
-                                                </div>
-                                                <div class="rows">
-                                                    <div class="option_name">
-                                                        <span>Каркас:</span>
-                                                    </div>
-
-                                                    <div class="option_value"><span>Металлический</span></div>
-                                                </div>
-                                                <div class="rows">
-                                                    <div class="option_name">
-                                                        <span>Подъёмный механизм:</span>
-                                                    </div>
-
-                                                    <div class="option_value"><span>нет</span></div>
-                                                </div>
-                                                <div class="rows">
-                                                    <div class="option_name"><span>Ящики:</span></div>
-                                                    <div class="option_value"><span>нет</span></div>
-                                                </div>
-                                            </div>
-                                            <a href="#">Смотреть все характеристики</a>
-                                            <div class="btn-block">
-                                                <a href="#" class="btn btn-primary" role="button">Купить</a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-sm-6 col-md-6">
-                                    <div class="thumbnail text-center">
-                                        <div class="caption">
-                                            <div class="title">
-                                                <a href="#">Кровать АйПИ групп "Европа 4", без матраса Кровать АйПИ групп "Европа 4", без матраса</a>
-                                            </div>
-                                            <a href="#" class="image"><img src="../../static/image/banner_image.png" class="img-responsive" alt="..."/></a>
-                                            <div class="model">Артикул 1111</div>
-                                            <div class="price"><strong>Цена:</strong>5555</div>
-                                            <p><a href="#" class="btn btn-primary" role="button">Купить</a></p>
-                                        </div>
-                                        <div class="mask">
-                                            <div class="title">
-                                                <a href="#">Кровать АйПИ групп "Европа 4", без матраса Кровать АйПИ групп "Европа 4", без матраса</a>
-                                            </div>
-                                            <div class="filters">
-                                                <div class="rows">
-                                                    <div class="option_name">
-                                                        <span>По типу:</span>
-                                                    </div>
-
-                                                    <div class="option_value"><span>Кровати с мягким изголовьем</span></div>
-                                                </div>
-                                                <div class="rows">
-                                                    <div class="option_name">
-                                                        <span>По размеру:</span>
-                                                    </div>
-                                                    <div class="option_value"><span>Полуторные,Двухспальные</span></div>
-                                                </div>
-                                                <div class="rows">
-                                                    <div class="option_name">
-                                                        <span>Каркас:</span>
-                                                    </div>
-
-                                                    <div class="option_value"><span>Металлический</span></div>
-                                                </div>
-                                                <div class="rows">
-                                                    <div class="option_name">
-                                                        <span>Подъёмный механизм:</span>
-                                                    </div>
-
-                                                    <div class="option_value"><span>нет</span></div>
-                                                </div>
-                                                <div class="rows">
-                                                    <div class="option_name"><span>Ящики:</span></div>
-                                                    <div class="option_value"><span>нет</span></div>
-                                                </div>
-                                            </div>
-                                            <a href="#">Смотреть все характеристики</a>
-                                            <div class="btn-block">
-                                                <a href="#" class="btn btn-primary" role="button">Купить</a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-sm-6 col-md-6">
-                                    <div class="thumbnail text-center">
-                                        <div class="caption">
-                                            <div class="title">
-                                                <a href="#">Кровать АйПИ групп "Европа 4", без матраса Кровать АйПИ групп "Европа 4", без матраса</a>
-                                            </div>
-                                            <a href="#" class="image"><img src="../../static/image/banner_image.png" class="img-responsive" alt="..."/></a>
-                                            <div class="model">Артикул 1111</div>
-                                            <div class="price"><strong>Цена:</strong>5555</div>
-                                            <p><a href="#" class="btn btn-primary" role="button">Купить</a></p>
-                                        </div>
-                                        <div class="mask">
-                                            <div class="title">
-                                                <a href="#">Кровать АйПИ групп "Европа 4", без матраса Кровать АйПИ групп "Европа 4", без матраса</a>
-                                            </div>
-                                            <div class="filters">
-                                                <div class="rows">
-                                                    <div class="option_name">
-                                                        <span>По типу:</span>
-                                                    </div>
-
-                                                    <div class="option_value"><span>Кровати с мягким изголовьем</span></div>
-                                                </div>
-                                                <div class="rows">
-                                                    <div class="option_name">
-                                                        <span>По размеру:</span>
-                                                    </div>
-                                                    <div class="option_value"><span>Полуторные,Двухспальные</span></div>
-                                                </div>
-                                                <div class="rows">
-                                                    <div class="option_name">
-                                                        <span>Каркас:</span>
-                                                    </div>
-
-                                                    <div class="option_value"><span>Металлический</span></div>
-                                                </div>
-                                                <div class="rows">
-                                                    <div class="option_name">
-                                                        <span>Подъёмный механизм:</span>
-                                                    </div>
-
-                                                    <div class="option_value"><span>нет</span></div>
-                                                </div>
-                                                <div class="rows">
-                                                    <div class="option_name"><span>Ящики:</span></div>
-                                                    <div class="option_value"><span>нет</span></div>
-                                                </div>
-                                            </div>
-                                            <a href="#">Смотреть все характеристики</a>
-                                            <div class="btn-block">
-                                                <a href="#" class="btn btn-primary" role="button">Купить</a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-sm-6 col-md-6">
-                                    <div class="thumbnail text-center">
-                                        <div class="caption">
-                                            <div class="title">
-                                                <a href="#">Кровать АйПИ групп "Европа 4", без матраса Кровать АйПИ групп "Европа 4", без матраса</a>
-                                            </div>
-                                            <a href="#" class="image"><img src="../../static/image/banner_image.png" class="img-responsive" alt="..."/></a>
-                                            <div class="model">Артикул 1111</div>
-                                            <div class="price"><strong>Цена:</strong>5555</div>
-                                            <p><a href="#" class="btn btn-primary" role="button">Купить</a></p>
-                                        </div>
-                                        <div class="mask">
-                                            <div class="title">
-                                                <a href="#">Кровать АйПИ групп "Европа 4", без матраса Кровать АйПИ групп "Европа 4", без матраса</a>
-                                            </div>
-                                            <div class="filters">
-                                                <div class="rows">
-                                                    <div class="option_name">
-                                                        <span>По типу:</span>
-                                                    </div>
-
-                                                    <div class="option_value"><span>Кровати с мягким изголовьем</span></div>
-                                                </div>
-                                                <div class="rows">
-                                                    <div class="option_name">
-                                                        <span>По размеру:</span>
-                                                    </div>
-                                                    <div class="option_value"><span>Полуторные,Двухспальные</span></div>
-                                                </div>
-                                                <div class="rows">
-                                                    <div class="option_name">
-                                                        <span>Каркас:</span>
-                                                    </div>
-
-                                                    <div class="option_value"><span>Металлический</span></div>
-                                                </div>
-                                                <div class="rows">
-                                                    <div class="option_name">
-                                                        <span>Подъёмный механизм:</span>
-                                                    </div>
-
-                                                    <div class="option_value"><span>нет</span></div>
-                                                </div>
-                                                <div class="rows">
-                                                    <div class="option_name"><span>Ящики:</span></div>
-                                                    <div class="option_value"><span>нет</span></div>
-                                                </div>
-                                            </div>
-                                            <a href="#">Смотреть все характеристики</a>
-                                            <div class="btn-block">
-                                                <a href="#" class="btn btn-primary" role="button">Купить</a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-sm-6 col-md-6">
-                                    <div class="thumbnail text-center">
-                                        <div class="caption">
-                                            <div class="title">
-                                                <a href="#">Кровать АйПИ групп "Европа 4", без матраса Кровать АйПИ групп "Европа 4", без матраса</a>
-                                            </div>
-                                            <a href="#" class="image"><img src="../../static/image/banner_image.png" class="img-responsive" alt="..."/></a>
-                                            <div class="model">Артикул 1111</div>
-                                            <div class="price"><strong>Цена:</strong>5555</div>
-                                            <p><a href="#" class="btn btn-primary" role="button">Купить</a></p>
-                                        </div>
-                                        <div class="mask">
-                                            <div class="title">
-                                                <a href="#">Кровать АйПИ групп "Европа 4", без матраса Кровать АйПИ групп "Европа 4", без матраса</a>
-                                            </div>
-                                            <div class="filters">
-                                                <div class="rows">
-                                                    <div class="option_name">
-                                                        <span>По типу:</span>
-                                                    </div>
-
-                                                    <div class="option_value"><span>Кровати с мягким изголовьем</span></div>
-                                                </div>
-                                                <div class="rows">
-                                                    <div class="option_name">
-                                                        <span>По размеру:</span>
-                                                    </div>
-                                                    <div class="option_value"><span>Полуторные,Двухспальные</span></div>
-                                                </div>
-                                                <div class="rows">
-                                                    <div class="option_name">
-                                                        <span>Каркас:</span>
-                                                    </div>
-
-                                                    <div class="option_value"><span>Металлический</span></div>
-                                                </div>
-                                                <div class="rows">
-                                                    <div class="option_name">
-                                                        <span>Подъёмный механизм:</span>
-                                                    </div>
-
-                                                    <div class="option_value"><span>нет</span></div>
-                                                </div>
-                                                <div class="rows">
-                                                    <div class="option_name"><span>Ящики:</span></div>
-                                                    <div class="option_value"><span>нет</span></div>
-                                                </div>
-                                            </div>
-                                            <a href="#">Смотреть все характеристики</a>
-                                            <div class="btn-block">
-                                                <a href="#" class="btn btn-primary" role="button">Купить</a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-sm-6 col-md-6">
-                                    <div class="thumbnail text-center">
-                                        <div class="caption">
-                                            <div class="title">
-                                                <a href="#">Кровать АйПИ групп "Европа 4", без матраса Кровать АйПИ групп "Европа 4", без матраса</a>
-                                            </div>
-                                            <a href="#" class="image"><img src="../../static/image/banner_image.png" class="img-responsive" alt="..."/></a>
-                                            <div class="model">Артикул 1111</div>
-                                            <div class="price"><strong>Цена:</strong>5555</div>
-                                            <p><a href="#" class="btn btn-primary" role="button">Купить</a></p>
-                                        </div>
-                                        <div class="mask">
-                                            <div class="title">
-                                                <a href="#">Кровать АйПИ групп "Европа 4", без матраса Кровать АйПИ групп "Европа 4", без матраса</a>
-                                            </div>
-                                            <div class="filters">
-                                                <div class="rows">
-                                                    <div class="option_name">
-                                                        <span>По типу:</span>
-                                                    </div>
-
-                                                    <div class="option_value"><span>Кровати с мягким изголовьем</span></div>
-                                                </div>
-                                                <div class="rows">
-                                                    <div class="option_name">
-                                                        <span>По размеру:</span>
-                                                    </div>
-                                                    <div class="option_value"><span>Полуторные,Двухспальные</span></div>
-                                                </div>
-                                                <div class="rows">
-                                                    <div class="option_name">
-                                                        <span>Каркас:</span>
-                                                    </div>
-
-                                                    <div class="option_value"><span>Металлический</span></div>
-                                                </div>
-                                                <div class="rows">
-                                                    <div class="option_name">
-                                                        <span>Подъёмный механизм:</span>
-                                                    </div>
-
-                                                    <div class="option_value"><span>нет</span></div>
-                                                </div>
-                                                <div class="rows">
-                                                    <div class="option_name"><span>Ящики:</span></div>
-                                                    <div class="option_value"><span>нет</span></div>
-                                                </div>
-                                            </div>
-                                            <a href="#">Смотреть все характеристики</a>
-                                            <div class="btn-block">
-                                                <a href="#" class="btn btn-primary" role="button">Купить</a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-sm-6 col-md-6">
-                                    <div class="thumbnail text-center">
-                                        <div class="caption">
-                                            <div class="title">
-                                                <a href="#">Кровать АйПИ групп "Европа 4", без матраса Кровать АйПИ групп "Европа 4", без матраса</a>
-                                            </div>
-                                            <a href="#" class="image"><img src="../../static/image/banner_image.png" class="img-responsive" alt="..."/></a>
-                                            <div class="model">Артикул 1111</div>
-                                            <div class="price"><strong>Цена:</strong>5555</div>
-                                            <p><a href="#" class="btn btn-primary" role="button">Купить</a></p>
-                                        </div>
-                                        <div class="mask">
-                                            <div class="title">
-                                                <a href="#">Кровать АйПИ групп "Европа 4", без матраса Кровать АйПИ групп "Европа 4", без матраса</a>
-                                            </div>
-                                            <div class="filters">
-                                                <div class="rows">
-                                                    <div class="option_name">
-                                                        <span>По типу:</span>
-                                                    </div>
-
-                                                    <div class="option_value"><span>Кровати с мягким изголовьем</span></div>
-                                                </div>
-                                                <div class="rows">
-                                                    <div class="option_name">
-                                                        <span>По размеру:</span>
-                                                    </div>
-                                                    <div class="option_value"><span>Полуторные,Двухспальные</span></div>
-                                                </div>
-                                                <div class="rows">
-                                                    <div class="option_name">
-                                                        <span>Каркас:</span>
-                                                    </div>
-
-                                                    <div class="option_value"><span>Металлический</span></div>
-                                                </div>
-                                                <div class="rows">
-                                                    <div class="option_name">
-                                                        <span>Подъёмный механизм:</span>
-                                                    </div>
-
-                                                    <div class="option_value"><span>нет</span></div>
-                                                </div>
-                                                <div class="rows">
-                                                    <div class="option_name"><span>Ящики:</span></div>
-                                                    <div class="option_value"><span>нет</span></div>
-                                                </div>
-                                            </div>
-                                            <a href="#">Смотреть все характеристики</a>
-                                            <div class="btn-block">
-                                                <a href="#" class="btn btn-primary" role="button">Купить</a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div id="hits" class="tab-pane fade"></div>
-                        <div id="special" class="tab-pane fade"></div>
-                        <div id="recommended" class="tab-pane fade"></div>
-                    </div>
                 </div>
             </div>
-            <div class="col-xs-24 col-sm-18 content-group">
-                <div class="contacts col-xs-24">
-                    <ol class="breadcrumb">
-                        <li><a href="index.html">Интернет-магазин Soloha</a></li>
-                        <li><a href="#">Служба поддержки</a></li>
-                        <li class="active">Деревянные кровати</li>
-                    </ol>
-                    <h1 class="line-bottom row">Связаться с нами</h1>
-
-                    <div class="row">
-                        <div class="col-xs-24 col-md-12 form">
-                            {% verbatim alerts %}
-                                <div id="alerts" ng-cloak="">
-                                    <alert ng-repeat="alert in alerts" type="{{alert.type}}" close="closeAlert($index)">{{alert.msg}}</alert>
-                                </div>
-                            {% endverbatim alerts %}
-
-                            <div class="heading">Обратная связь</div>
-                            <form name="{{ form.form_name }}" method="post" novalidate action=".">
-                                {% csrf_token %}
-                                {{ form.as_div }}
-                                <div class="cBtn" >
-                                    <button type="button" id="comment_form" ng-disabled="{{ form.form_name }}.$invalid" ng-click="submit()" class="btn btn-orange" >
-                                        Отправить
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
-                        <div class="col-xs-24 col-md-12">
-                            <div class="row question">
-                                <div class="heading">Контакты</div>
-                                <div class="row item">
-                                    <div class="col-xs-4 row icon">
-                                        <span class="glyphicon glyphicon-time"></span>
-                                    </div>
-                                    <div class="col-xs-20 text">
-                                        {{ work_time }}
-                                    </div>
-                                </div>
-                                <div class="row item">
-                                    <div class="col-xs-4 row icon">
-                                        <span class="glyphicon glyphicon-map-marker"></span>
-                                    </div>
-                                    <div class="col-xs-20 text">
-                                        {{ address }}
-                                    </div>
-                                </div>
-                                <div class="row item">
-                                    <div class="col-xs-4 row icon">
-                                        <span class="glyphicon glyphicon-phone-alt"></span>
-                                    </div>
-                                    <div class="col-xs-20 text">
-                                            {{ phone_number }} <br/>
-                                    </div>
-                                </div>
-                                <div class="row item">
-                                    <div class="col-xs-4 row icon">
-                                        <span class="glyphicon glyphicon-envelope"></span>
-                                    </div>
-                                    <div class="col-xs-20 text">{{ email }}</div>
-                                </div>
-                            </div>
-
-                            <div class="col-xs-24 info-position">
-                                <div class="heading">Как к нам проехать</div>
-                                <div class="row item">
-                                    <div class="col-xs-4 wrapper-icon"><span class="icon"></span></div>
-                                    <div class="col-xs-20 col-xs-offset-3">
-                                        <div>От метро Дарница или Харьковская:</div>
-                                        <strong>на 45 маршрутке до остановки универмаг Дарница.</strong>
-                                    </div>
-                                </div>
-                                <div class="row item">
-                                    <div class="col-xs-4 wrapper-icon"><span class="icon"></span></div>
-                                    <div class="col-xs-20 col-xs-offset-3">
-                                        <div>От метро Дружбы Народов:</div>
-                                        <strong>любым транспортом до Ленинградской площади.</strong>
-                                    </div>
-                                </div>
-                                <div class="row item">
-                                    <div class="col-xs-4 wrapper-icon"><span class="icon"></span></div>
-                                    <div class="col-xs-20 col-xs-offset-3">
-                                        <div>От метро Черниговская:</div>
-                                        <strong>на 416, 590, 414, 529 до Ленинградской площади.</strong>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-xs-24 map">
-                            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2540.8781161968514!2d30.62056105083814!3d50.44337089565597!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x40d4c55ba305bd51%3A0x57f12e2dea8428fe!2z0L_RgNC-0YHQvy4g0JzQuNGA0YMsIDQsINCa0LjRl9CyLCDQo9C60YDQsNC40L3QsA!5e0!3m2!1sru!2sru!4v1454477714480" width="100%" height="450" frameborder="0" style="border:0" allowfullscreen></iframe>
-                        </div>
-                        <div class="col-xs-24 social text-center">
-                            <div class="text">Мы всегда рады ответить на вопросы в социальных сетях!</div>
-                        </div>
-                    </div>
+        </div>
+        <div class="panel panel-default">
+            <div class="panel-heading" role="tab" id="headingThree">
+                <h4 class="panel-title">
+                    <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                        Личный кабинет
+                    </a>
+                </h4>
+            </div>
+            <div id="collapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
+                <div class="panel-body">
+                    Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.
                 </div>
             </div>
         </div>
     </div>
 {% endblock %}
 
-<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-<script src="../../static/bower_components/jquery/dist/jquery.min.js"></script>
-<!-- Include all compiled plugins (below), or include individual files as needed -->
-<script src="../../static/bower_components/lightslider/dist/js/lightslider.js"></script>
-<script src="../../static/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+{% block content %}
+    <div class="series items">
+        <ul class="nav nav-pills nav-justified">
+            <li class="active"><a data-toggle="tab" role="tab" href="#sectionNews" class="icon sectionNews"></a></li>
+            <li><a data-toggle="tab" role="tab" href="#hits" class="icon hits"></a></li>
+            <li><a data-toggle="tab" role="tab" href="#special" class="icon special"></a></li>
+            <li><a data-toggle="tab" role="tab" href="#recommended" class="icon recommended"></a></li>
+        </ul>
 
-<script type="text/javascript">
-    $(document).ready(function() {
-        $('.lightSlider').lightSlider({
-            item:2,
-            vertical:true,
-            verticalHeight:780,
-            pager:false,
-        });
+        <div class="tab-content">
+            <div id="sectionNews" class="tab-pane fade in active">
+                <div class="lightSlider">
+                    <div class="col-sm-6 col-md-6">
+                        <div class="thumbnail text-center">
+                            <div class="caption">
+                                <div class="title">
+                                    <a href="#">Кровать АйПИ групп "Европа 4", без матраса Кровать АйПИ групп "Европа 4", без матраса</a>
+                                </div>
+                                <a href="#" class="image"><img src="../../static/image/banner_image.png" class="img-responsive" alt="..."/></a>
+                                <div class="model">Артикул 1111</div>
+                                <div class="price"><strong>Цена:</strong>5555</div>
+                                <p><a href="#" class="btn btn-primary" role="button">Купить</a></p>
+                            </div>
+                            <div class="mask">
+                                <div class="title">
+                                    <a href="#">Кровать АйПИ групп "Европа 4", без матраса Кровать АйПИ групп "Европа 4", без матраса</a>
+                                </div>
+                                <div class="filters">
+                                    <div class="rows">
+                                        <div class="option_name">
+                                            <span>По типу:</span>
+                                        </div>
 
-        $('.dropdown-menu').click(function(event){
-            event.stopPropagation();
-        });
-    });
-</script>
-</body>
-</html>
+                                        <div class="option_value"><span>Кровати с мягким изголовьем</span></div>
+                                    </div>
+                                    <div class="rows">
+                                        <div class="option_name">
+                                            <span>По размеру:</span>
+                                        </div>
+                                        <div class="option_value"><span>Полуторные,Двухспальные</span></div>
+                                    </div>
+                                    <div class="rows">
+                                        <div class="option_name">
+                                            <span>Каркас:</span>
+                                        </div>
+
+                                        <div class="option_value"><span>Металлический</span></div>
+                                    </div>
+                                    <div class="rows">
+                                        <div class="option_name">
+                                            <span>Подъёмный механизм:</span>
+                                        </div>
+
+                                        <div class="option_value"><span>нет</span></div>
+                                    </div>
+                                    <div class="rows">
+                                        <div class="option_name"><span>Ящики:</span></div>
+                                        <div class="option_value"><span>нет</span></div>
+                                    </div>
+                                </div>
+                                <a href="#">Смотреть все характеристики</a>
+                                <div class="btn-block">
+                                    <a href="#" class="btn btn-primary" role="button">Купить</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-md-6">
+                        <div class="thumbnail text-center">
+                            <div class="caption">
+                                <div class="title">
+                                    <a href="#">Кровать АйПИ групп "Европа 4", без матраса Кровать АйПИ групп "Европа 4", без матраса</a>
+                                </div>
+                                <a href="#" class="image"><img src="../../static/image/banner_image.png" class="img-responsive" alt="..."/></a>
+                                <div class="model">Артикул 1111</div>
+                                <div class="price"><strong>Цена:</strong>5555</div>
+                                <p><a href="#" class="btn btn-primary" role="button">Купить</a></p>
+                            </div>
+                            <div class="mask">
+                                <div class="title">
+                                    <a href="#">Кровать АйПИ групп "Европа 4", без матраса Кровать АйПИ групп "Европа 4", без матраса</a>
+                                </div>
+                                <div class="filters">
+                                    <div class="rows">
+                                        <div class="option_name">
+                                            <span>По типу:</span>
+                                        </div>
+
+                                        <div class="option_value"><span>Кровати с мягким изголовьем</span></div>
+                                    </div>
+                                    <div class="rows">
+                                        <div class="option_name">
+                                            <span>По размеру:</span>
+                                        </div>
+                                        <div class="option_value"><span>Полуторные,Двухспальные</span></div>
+                                    </div>
+                                    <div class="rows">
+                                        <div class="option_name">
+                                            <span>Каркас:</span>
+                                        </div>
+
+                                        <div class="option_value"><span>Металлический</span></div>
+                                    </div>
+                                    <div class="rows">
+                                        <div class="option_name">
+                                            <span>Подъёмный механизм:</span>
+                                        </div>
+
+                                        <div class="option_value"><span>нет</span></div>
+                                    </div>
+                                    <div class="rows">
+                                        <div class="option_name"><span>Ящики:</span></div>
+                                        <div class="option_value"><span>нет</span></div>
+                                    </div>
+                                </div>
+                                <a href="#">Смотреть все характеристики</a>
+                                <div class="btn-block">
+                                    <a href="#" class="btn btn-primary" role="button">Купить</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-md-6">
+                        <div class="thumbnail text-center">
+                            <div class="caption">
+                                <div class="title">
+                                    <a href="#">Кровать АйПИ групп "Европа 4", без матраса Кровать АйПИ групп "Европа 4", без матраса</a>
+                                </div>
+                                <a href="#" class="image"><img src="../../static/image/banner_image.png" class="img-responsive" alt="..."/></a>
+                                <div class="model">Артикул 1111</div>
+                                <div class="price"><strong>Цена:</strong>5555</div>
+                                <p><a href="#" class="btn btn-primary" role="button">Купить</a></p>
+                            </div>
+                            <div class="mask">
+                                <div class="title">
+                                    <a href="#">Кровать АйПИ групп "Европа 4", без матраса Кровать АйПИ групп "Европа 4", без матраса</a>
+                                </div>
+                                <div class="filters">
+                                    <div class="rows">
+                                        <div class="option_name">
+                                            <span>По типу:</span>
+                                        </div>
+
+                                        <div class="option_value"><span>Кровати с мягким изголовьем</span></div>
+                                    </div>
+                                    <div class="rows">
+                                        <div class="option_name">
+                                            <span>По размеру:</span>
+                                        </div>
+                                        <div class="option_value"><span>Полуторные,Двухспальные</span></div>
+                                    </div>
+                                    <div class="rows">
+                                        <div class="option_name">
+                                            <span>Каркас:</span>
+                                        </div>
+
+                                        <div class="option_value"><span>Металлический</span></div>
+                                    </div>
+                                    <div class="rows">
+                                        <div class="option_name">
+                                            <span>Подъёмный механизм:</span>
+                                        </div>
+
+                                        <div class="option_value"><span>нет</span></div>
+                                    </div>
+                                    <div class="rows">
+                                        <div class="option_name"><span>Ящики:</span></div>
+                                        <div class="option_value"><span>нет</span></div>
+                                    </div>
+                                </div>
+                                <a href="#">Смотреть все характеристики</a>
+                                <div class="btn-block">
+                                    <a href="#" class="btn btn-primary" role="button">Купить</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-md-6">
+                        <div class="thumbnail text-center">
+                            <div class="caption">
+                                <div class="title">
+                                    <a href="#">Кровать АйПИ групп "Европа 4", без матраса Кровать АйПИ групп "Европа 4", без матраса</a>
+                                </div>
+                                <a href="#" class="image"><img src="../../static/image/banner_image.png" class="img-responsive" alt="..."/></a>
+                                <div class="model">Артикул 1111</div>
+                                <div class="price"><strong>Цена:</strong>5555</div>
+                                <p><a href="#" class="btn btn-primary" role="button">Купить</a></p>
+                            </div>
+                            <div class="mask">
+                                <div class="title">
+                                    <a href="#">Кровать АйПИ групп "Европа 4", без матраса Кровать АйПИ групп "Европа 4", без матраса</a>
+                                </div>
+                                <div class="filters">
+                                    <div class="rows">
+                                        <div class="option_name">
+                                            <span>По типу:</span>
+                                        </div>
+
+                                        <div class="option_value"><span>Кровати с мягким изголовьем</span></div>
+                                    </div>
+                                    <div class="rows">
+                                        <div class="option_name">
+                                            <span>По размеру:</span>
+                                        </div>
+                                        <div class="option_value"><span>Полуторные,Двухспальные</span></div>
+                                    </div>
+                                    <div class="rows">
+                                        <div class="option_name">
+                                            <span>Каркас:</span>
+                                        </div>
+
+                                        <div class="option_value"><span>Металлический</span></div>
+                                    </div>
+                                    <div class="rows">
+                                        <div class="option_name">
+                                            <span>Подъёмный механизм:</span>
+                                        </div>
+
+                                        <div class="option_value"><span>нет</span></div>
+                                    </div>
+                                    <div class="rows">
+                                        <div class="option_name"><span>Ящики:</span></div>
+                                        <div class="option_value"><span>нет</span></div>
+                                    </div>
+                                </div>
+                                <a href="#">Смотреть все характеристики</a>
+                                <div class="btn-block">
+                                    <a href="#" class="btn btn-primary" role="button">Купить</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-md-6">
+                        <div class="thumbnail text-center">
+                            <div class="caption">
+                                <div class="title">
+                                    <a href="#">Кровать АйПИ групп "Европа 4", без матраса Кровать АйПИ групп "Европа 4", без матраса</a>
+                                </div>
+                                <a href="#" class="image"><img src="../../static/image/banner_image.png" class="img-responsive" alt="..."/></a>
+                                <div class="model">Артикул 1111</div>
+                                <div class="price"><strong>Цена:</strong>5555</div>
+                                <p><a href="#" class="btn btn-primary" role="button">Купить</a></p>
+                            </div>
+                            <div class="mask">
+                                <div class="title">
+                                    <a href="#">Кровать АйПИ групп "Европа 4", без матраса Кровать АйПИ групп "Европа 4", без матраса</a>
+                                </div>
+                                <div class="filters">
+                                    <div class="rows">
+                                        <div class="option_name">
+                                            <span>По типу:</span>
+                                        </div>
+
+                                        <div class="option_value"><span>Кровати с мягким изголовьем</span></div>
+                                    </div>
+                                    <div class="rows">
+                                        <div class="option_name">
+                                            <span>По размеру:</span>
+                                        </div>
+                                        <div class="option_value"><span>Полуторные,Двухспальные</span></div>
+                                    </div>
+                                    <div class="rows">
+                                        <div class="option_name">
+                                            <span>Каркас:</span>
+                                        </div>
+
+                                        <div class="option_value"><span>Металлический</span></div>
+                                    </div>
+                                    <div class="rows">
+                                        <div class="option_name">
+                                            <span>Подъёмный механизм:</span>
+                                        </div>
+
+                                        <div class="option_value"><span>нет</span></div>
+                                    </div>
+                                    <div class="rows">
+                                        <div class="option_name"><span>Ящики:</span></div>
+                                        <div class="option_value"><span>нет</span></div>
+                                    </div>
+                                </div>
+                                <a href="#">Смотреть все характеристики</a>
+                                <div class="btn-block">
+                                    <a href="#" class="btn btn-primary" role="button">Купить</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-md-6">
+                        <div class="thumbnail text-center">
+                            <div class="caption">
+                                <div class="title">
+                                    <a href="#">Кровать АйПИ групп "Европа 4", без матраса Кровать АйПИ групп "Европа 4", без матраса</a>
+                                </div>
+                                <a href="#" class="image"><img src="../../static/image/banner_image.png" class="img-responsive" alt="..."/></a>
+                                <div class="model">Артикул 1111</div>
+                                <div class="price"><strong>Цена:</strong>5555</div>
+                                <p><a href="#" class="btn btn-primary" role="button">Купить</a></p>
+                            </div>
+                            <div class="mask">
+                                <div class="title">
+                                    <a href="#">Кровать АйПИ групп "Европа 4", без матраса Кровать АйПИ групп "Европа 4", без матраса</a>
+                                </div>
+                                <div class="filters">
+                                    <div class="rows">
+                                        <div class="option_name">
+                                            <span>По типу:</span>
+                                        </div>
+
+                                        <div class="option_value"><span>Кровати с мягким изголовьем</span></div>
+                                    </div>
+                                    <div class="rows">
+                                        <div class="option_name">
+                                            <span>По размеру:</span>
+                                        </div>
+                                        <div class="option_value"><span>Полуторные,Двухспальные</span></div>
+                                    </div>
+                                    <div class="rows">
+                                        <div class="option_name">
+                                            <span>Каркас:</span>
+                                        </div>
+
+                                        <div class="option_value"><span>Металлический</span></div>
+                                    </div>
+                                    <div class="rows">
+                                        <div class="option_name">
+                                            <span>Подъёмный механизм:</span>
+                                        </div>
+
+                                        <div class="option_value"><span>нет</span></div>
+                                    </div>
+                                    <div class="rows">
+                                        <div class="option_name"><span>Ящики:</span></div>
+                                        <div class="option_value"><span>нет</span></div>
+                                    </div>
+                                </div>
+                                <a href="#">Смотреть все характеристики</a>
+                                <div class="btn-block">
+                                    <a href="#" class="btn btn-primary" role="button">Купить</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-md-6">
+                        <div class="thumbnail text-center">
+                            <div class="caption">
+                                <div class="title">
+                                    <a href="#">Кровать АйПИ групп "Европа 4", без матраса Кровать АйПИ групп "Европа 4", без матраса</a>
+                                </div>
+                                <a href="#" class="image"><img src="../../static/image/banner_image.png" class="img-responsive" alt="..."/></a>
+                                <div class="model">Артикул 1111</div>
+                                <div class="price"><strong>Цена:</strong>5555</div>
+                                <p><a href="#" class="btn btn-primary" role="button">Купить</a></p>
+                            </div>
+                            <div class="mask">
+                                <div class="title">
+                                    <a href="#">Кровать АйПИ групп "Европа 4", без матраса Кровать АйПИ групп "Европа 4", без матраса</a>
+                                </div>
+                                <div class="filters">
+                                    <div class="rows">
+                                        <div class="option_name">
+                                            <span>По типу:</span>
+                                        </div>
+
+                                        <div class="option_value"><span>Кровати с мягким изголовьем</span></div>
+                                    </div>
+                                    <div class="rows">
+                                        <div class="option_name">
+                                            <span>По размеру:</span>
+                                        </div>
+                                        <div class="option_value"><span>Полуторные,Двухспальные</span></div>
+                                    </div>
+                                    <div class="rows">
+                                        <div class="option_name">
+                                            <span>Каркас:</span>
+                                        </div>
+
+                                        <div class="option_value"><span>Металлический</span></div>
+                                    </div>
+                                    <div class="rows">
+                                        <div class="option_name">
+                                            <span>Подъёмный механизм:</span>
+                                        </div>
+
+                                        <div class="option_value"><span>нет</span></div>
+                                    </div>
+                                    <div class="rows">
+                                        <div class="option_name"><span>Ящики:</span></div>
+                                        <div class="option_value"><span>нет</span></div>
+                                    </div>
+                                </div>
+                                <a href="#">Смотреть все характеристики</a>
+                                <div class="btn-block">
+                                    <a href="#" class="btn btn-primary" role="button">Купить</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="hits" class="tab-pane fade"></div>
+            <div id="special" class="tab-pane fade"></div>
+            <div id="recommended" class="tab-pane fade"></div>
+        </div>
+    </div>
+{% endblock %}
