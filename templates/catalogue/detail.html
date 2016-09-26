@@ -136,7 +136,7 @@
                         {% include "catalogue/partials/price.html" with ng=0 %}
                     </div>
 
-                    {% if attributes %}
+                    {% if attributes.exists %}
                         <div class="col-xs-24 col-sm-24 col-md-14 options">
                             <span class="relation">* {% trans "The price depends on the selected parameters" %}:</span>
 

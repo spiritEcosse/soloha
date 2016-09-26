@@ -376,18 +376,18 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
             Prefetch('categories__parent__parent'),
             Prefetch('stockrecords'),
         )
-            # .select_related('product_class').prefetch_related(
-            # Prefetch('images', queryset=ProductImage.objects.only('original', 'product')),
-            # Prefetch('images__original'),
-            # Prefetch('attributes'),
-            # Prefetch('categories__parent__parent'),
-            # Prefetch('filters'),
-            # Prefetch('reviews'),
-            # Prefetch('children__categories__parent__parent'),
-            # Prefetch('children__characteristics'),
-            # Prefetch('children__images'),
-            # Prefetch('stockrecords__partner'),
-            # Prefetch('characteristics'),
+        # .select_related('product_class').prefetch_related(
+        # Prefetch('images', queryset=ProductImage.objects.only('original', 'product')),
+        # Prefetch('images__original'),
+        # Prefetch('attributes'),
+        # Prefetch('categories__parent__parent'),
+        # Prefetch('filters'),
+        # Prefetch('reviews'),
+        # Prefetch('children__categories__parent__parent'),
+        # Prefetch('children__characteristics'),
+        # Prefetch('children__images'),
+        # Prefetch('stockrecords__partner'),
+        # Prefetch('characteristics'),
         # )
 
     def post(self, request, *args, **kwargs):
@@ -608,6 +608,17 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
         return filter_kw
 
     def get_attributes(self):
+        stockrecord = self.object.get_stockrecord(self.request)
+
+        if stockrecord:
+            stockrecord = stockrecord.attributes.prefetch_related(
+                Prefetch(
+                    'product_features',
+                    queryset=ProductFeature.objects.filter(**self.filter_feature_parent()),
+                    to_attr='features_by_product'
+                )
+            )
+
         attributes = Feature.objects.only(*self.only).filter(**self.filter_feature()).prefetch_related(
             Prefetch('children', queryset=Feature.objects.only(*self.only).filter(
                 **self.filter_feature_children()
@@ -615,16 +626,8 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
                 price=Min('stockrecords__price_excl_tax')
             ).order_by('price', 'title', 'pk'), to_attr='values'),
             Prefetch(
-                'children',
-                queryset=StockRecord.objects.filter(
-                    **self.filter_product_stockrecord()
-                ).order_by('price_excl_tax').first().attributes.all().prefetch_related(
-                    Prefetch(
-                        'product_features',
-                        queryset=ProductFeature.objects.filter(**self.filter_feature_parent()),
-                        to_attr='features_by_product'
-                    )
-                ), to_attr='selected_val'),
+                'children', queryset=stockrecord, to_attr='selected_val'
+            ),
             Prefetch(
                 'product_features',
                 queryset=ProductFeature.objects.filter(

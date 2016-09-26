@@ -224,10 +224,6 @@ class AbstractProduct(models.Model, CommonFeatureProduct):
 
         return reverse('catalogue:detail', kwargs=dict_values)
 
-    def get_first_attributes(self):
-        first = self.versions.order_by('stockrecord__price_excl_tax').first()
-        return first.attributes.all() if first else []
-
     def categories_to_str(self):
         return self.separator.join([category.name for category in self.get_categories().all()])
     categories_to_str.short_description = _("Categories")
@@ -342,6 +338,16 @@ class AbstractProduct(models.Model, CommonFeatureProduct):
     @property
     def is_shipping_required(self):
         return self.get_product_class().requires_shipping
+
+    def get_stockrecord(self, request):
+        stockrecord = request.strategy
+
+        if self.is_parent:
+            obj, stockrecord = stockrecord.select_children_stockrecords(self)[0]
+        else:
+            stockrecord = stockrecord.select_stockrecord(self)
+
+        return stockrecord
 
     @property
     def has_stockrecords(self):
