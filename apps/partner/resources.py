@@ -11,8 +11,8 @@ StockRecord = get_model('partner', 'StockRecord')
 
 class StockRecordResource(resources.ModelResource):
     product = fields.Field(
-        attribute='product', column_name='product',
-        widget=widgets.ForeignKeyWidget(model=Product, field='slug')
+        attribute='product', column_name='Product slug',
+        widget=import_export_widgets.ForeignKeyWidget(model=Product, field='slug')
     )
     attributes = fields.Field(
         attribute='attributes', column_name='Attributes',
