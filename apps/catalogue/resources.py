@@ -295,13 +295,14 @@ class ModelResource(resources.ModelResource):
             if isinstance(field.widget, widgets.ManyToManyWidget):
                 continue
             self.import_field(field, obj, data)
-            print getattr(obj, str(field))
 
     def import_field(self, field, obj, data):
         """
         Calls :meth:`import_export.fields.Field.save` if ``Field.attribute``
         and ``Field.column_name`` are found in ``data``.
         """
+        print field
+
         if field.attribute and field.column_name in data:
             print field.attribute and field.column_name in data
             field.save(obj, data)
