@@ -301,11 +301,9 @@ class ModelResource(resources.ModelResource):
         Calls :meth:`import_export.fields.Field.save` if ``Field.attribute``
         and ``Field.column_name`` are found in ``data``.
         """
-        print field
-
         if field.attribute and field.column_name in data:
-            print field.attribute and field.column_name in data
             field.save(obj, data)
+            print field.attribute
 
 
 class FeatureResource(ModelResource):
