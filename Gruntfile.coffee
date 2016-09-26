@@ -13,12 +13,12 @@ module.exports = (grunt) ->
                     paths: ["assets/css"],
                     sourceMap: true
                 files:
-                    "static/build/css/main.css": "static/src/less/main.less",
+                    "static/src/css/main.css": "static/src/less/main.less",
                     "static/oscar/css/styles.css": "static/oscar/less/styles.less",
         cssmin:
             dist:
                 files:
-                    'static/build/css/style.css': ['static/bower_components/lightslider/dist/css/lightslider.css',
+                    'static/build/css/style.min.css': ['static/bower_components/lightslider/dist/css/lightslider.css',
                         'static/bower_components/yamm/assets/css/yamm.css',
                         "static/djangular/css/bootstrap3.css",
                         "static/djangular/css/styles.css",
