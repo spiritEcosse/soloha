@@ -270,16 +270,18 @@
         var exist_selected_attr, selected_attributes;
         selected_attributes = [];
         attributes = $filter('orderBy')($scope.attributes, 'pk');
-        angular.forEach(attributes, function(attribute) {
-          if (attribute.selected_val.pk !== 0) {
-            return selected_attributes.push(attribute.selected_val.pk);
+        if (attributes.length) {
+          angular.forEach(attributes, function(attribute) {
+            if (attribute.selected_val.pk !== 0) {
+              return selected_attributes.push(attribute.selected_val.pk);
+            }
+          });
+          exist_selected_attr = clone_data.stockrecords[selected_attributes.toString()];
+          if (exist_selected_attr) {
+            $scope.price = exist_selected_attr.price;
+            $scope.stockrecord = exist_selected_attr.stockrecord_id;
+            return exist_selected_attr.price;
           }
-        });
-        exist_selected_attr = clone_data.stockrecords[selected_attributes.toString()];
-        if (exist_selected_attr) {
-          $scope.price = exist_selected_attr.price;
-          $scope.stockrecord = exist_selected_attr.stockrecord_id;
-          return exist_selected_attr.price;
         }
         return false;
       };

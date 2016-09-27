@@ -155,17 +155,18 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
 
         attributes = $filter('orderBy')($scope.attributes, 'pk')
 
-        angular.forEach attributes, (attribute) ->
-            if attribute.selected_val.pk != 0
-                selected_attributes.push(attribute.selected_val.pk)
-        #    Todo igor: if selected_attributes is empty - message select - attribute for display price
+        if attributes.length
+            angular.forEach attributes, (attribute) ->
+                if attribute.selected_val.pk != 0
+                    selected_attributes.push(attribute.selected_val.pk)
+            #    Todo igor: if selected_attributes is empty - message select - attribute for display price
 
-        exist_selected_attr = clone_data.stockrecords[selected_attributes.toString()]
+            exist_selected_attr = clone_data.stockrecords[selected_attributes.toString()]
 
-        if exist_selected_attr
-            $scope.price = exist_selected_attr.price
-            $scope.stockrecord = exist_selected_attr.stockrecord_id
-            return exist_selected_attr.price
+            if exist_selected_attr
+                $scope.price = exist_selected_attr.price
+                $scope.stockrecord = exist_selected_attr.stockrecord_id
+                return exist_selected_attr.price
 
         return false
 

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-09-26 15:25+0000\n"
+"POT-Creation-Date: 2016-09-27 12:11+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -72,11 +72,12 @@ msgstr ""
 "валюты других товаров в вашей корзине"
 
 #: apps/basket/models.py:180 apps/catalogue/abstract_models.py:603
-#: apps/catalogue/abstract_models.py:1028
+#: apps/catalogue/abstract_models.py:1028 apps/order/models.py:30
 msgid "Feature"
 msgstr "Особенности"
 
 #: apps/basket/models.py:184 apps/catalogue/abstract_models.py:671
+#: apps/order/models.py:35
 msgid "Product images"
 msgstr "Изображения товара"
 
@@ -518,6 +519,24 @@ msgid ""
 msgstr ""
 "Ваше сообщение было отправлено. Мы свяжемся с Вами по указанным реквизитам."
 
+#: apps/catalogue/views.py:76
+#, fuzzy
+#| msgid "By popularity"
+msgid "Popularity"
+msgstr "По популярности"
+
+#: apps/catalogue/views.py:77
+#, fuzzy
+#| msgid "By price ascending"
+msgid "Price ascending"
+msgstr "По возрастанию цены"
+
+#: apps/catalogue/views.py:78
+#, fuzzy
+#| msgid "By price descending"
+msgid "Price descending"
+msgstr "По убыванию цены"
+
 #: apps/catalogue/views.py:114 templates/partials/nav_primary.html:45
 msgid "All products"
 msgstr ""
@@ -574,6 +593,126 @@ msgstr "Ваше сообщение отправлено!"
 msgid "You received a letter from the site %s"
 msgstr ""
 
+#: apps/customer/forms.py:101 apps/customer/forms.py:146
+#: templates/dashboard/orders/order_detail.html:39
+#: templates/dashboard/orders/order_detail.html:45
+msgid "Email address"
+msgstr ""
+
+#: apps/customer/forms.py:107 apps/customer/forms.py:130
+#: apps/customer/forms.py:152
+msgid "Password"
+msgstr ""
+
+#: apps/customer/forms.py:140
+msgid "The entered password is not valid!"
+msgstr ""
+
+#: apps/customer/forms.py:159
+msgid "Confirm password"
+msgstr ""
+
+#: apps/customer/forms.py:182
+msgid "A user with that email address already exists"
+msgstr ""
+
+#: apps/customer/forms.py:190
+msgid "The two password fields didn't match."
+msgstr ""
+
+#: apps/customer/forms.py:212
+msgctxt "start date"
+msgid "From"
+msgstr ""
+
+#: apps/customer/forms.py:214
+msgctxt "end date"
+msgid "To"
+msgstr ""
+
+#: apps/customer/forms.py:215 templates/dashboard/comms/detail.html:65
+#: templates/dashboard/offers/offer_detail.html:105
+#: templates/dashboard/orders/order_list.html:117
+#: templates/dashboard/reports/partials/order_report.html:9
+#: templates/dashboard/vouchers/voucher_detail.html:61
+msgid "Order number"
+msgstr ""
+
+#: apps/customer/forms.py:221
+#, fuzzy
+#| msgid "This field required."
+msgid "At least one field is required."
+msgstr "Это поле обязательно."
+
+#: apps/customer/forms.py:230
+#, fuzzy
+#| msgid "By order"
+msgid "All orders"
+msgstr "Под заказ"
+
+#: apps/customer/forms.py:240
+#, python-format
+msgid ""
+"Orders placed between %(date_from)s and %(date_to)s and order number "
+"containing %(order_number)s"
+msgstr ""
+
+#: apps/customer/forms.py:244
+#, python-format
+msgid "Orders placed between %(date_from)s and %(date_to)s"
+msgstr ""
+
+#: apps/customer/forms.py:248
+#, python-format
+msgid ""
+"Orders placed since %(date_from)s and order number containing "
+"%(order_number)s"
+msgstr ""
+
+#: apps/customer/forms.py:251
+#, python-format
+msgid "Orders placed since %(date_from)s"
+msgstr ""
+
+#: apps/customer/forms.py:254
+#, python-format
+msgid ""
+"Orders placed until %(date_to)s and order number containing %(order_number)s"
+msgstr ""
+
+#: apps/customer/forms.py:257
+#, python-format
+msgid "Orders placed until %(date_to)s"
+msgstr ""
+
+#: apps/customer/forms.py:259
+#, python-format
+msgid "Orders with order number containing %(order_number)s"
+msgstr ""
+
+#: apps/customer/forms.py:305 apps/customer/forms.py:369
+msgid "A user with this email address already exists"
+msgstr ""
+
+#: apps/customer/forms.py:388
+msgid "Send notification to"
+msgstr ""
+
+#: apps/customer/forms.py:390
+#, fuzzy
+#| msgid "Please enter your email."
+msgid "Enter your email"
+msgstr "Пожалуйста, введите свой email."
+
+#: apps/customer/forms.py:424
+#, python-format
+msgid "There is already an active stock alert for %s"
+msgstr ""
+
+#: apps/customer/forms.py:434
+msgid "You already have an active alert for this product"
+msgstr ""
+
 #: apps/ex_sites/models.py:12
 msgid "Work time"
 msgstr "Рабочее время"
@@ -606,8 +745,8 @@ msgstr "Email клиента"
 msgid "Comment client"
 msgstr "Комменатрий клиента"
 
-#: apps/order/models.py:25 templates/catalogue/partials/price.html:44
-#: templates/catalogue/partials/price.html:53
+#: apps/order/models.py:25 templates/catalogue/partials/price.html:43
+#: templates/catalogue/partials/price.html:52
 msgid "Quick order"
 msgstr "Быстрый заказ"
 
@@ -708,7 +847,7 @@ msgstr ""
 #: templates/basket/basket.html:22
 #: templates/basket/partials/basket_totals.html:9
 #: templates/basket/partials/basket_totals.html:164
-#: templates/checkout/thank_you.html:176 templates/partials/nav_primary.html:20
+#: templates/checkout/thank_you.html:177 templates/partials/nav_primary.html:20
 msgid "Basket"
 msgstr ""
 
@@ -717,6 +856,7 @@ msgstr ""
 #: templates/catalogue/reviews/review_detail.html:13
 #: templates/catalogue/reviews/review_list.html:15
 #: templates/customer/baseaccountpage.html:14
+#: templates/customer/login_registration.html:11
 #: templates/customer/wishlists/wishlists_delete.html:7
 #: templates/customer/wishlists/wishlists_delete_product.html:7
 #: templates/customer/wishlists/wishlists_detail.html:10
@@ -750,13 +890,12 @@ msgstr ""
 
 #: templates/basket/partials/basket_content.html:32
 #: templates/basket/partials/basket_content.html:172
-#: templates/basket/partials/basket_quick.html:32
 msgid "Price"
 msgstr ""
 
 #: templates/basket/partials/basket_content.html:33
-#: templates/basket/partials/basket_quick.html:43
-#: templates/basket/partials/basket_quick.html:45
+#: templates/basket/partials/basket_quick.html:42
+#: templates/basket/partials/basket_quick.html:44
 #: templates/checkout/checkout.html:111 templates/checkout/thank_you.html:121
 msgid "Total"
 msgstr ""
@@ -895,7 +1034,7 @@ msgid "cancel"
 msgstr ""
 
 #: templates/basket/partials/basket_content.html:142
-#: templates/checkout/checkout.html:154 templates/checkout/thank_you.html:170
+#: templates/checkout/checkout.html:154 templates/checkout/thank_you.html:171
 msgid "Totals"
 msgstr ""
 
@@ -904,12 +1043,12 @@ msgid "Proceed to checkout"
 msgstr ""
 
 #: templates/basket/partials/basket_content.html:160
-#: templates/basket/partials/basket_quick.html:56
+#: templates/basket/partials/basket_quick.html:55
 msgid "Your basket is empty."
 msgstr ""
 
 #: templates/basket/partials/basket_content.html:161
-#: templates/checkout/thank_you.html:320
+#: templates/checkout/thank_you.html:321
 msgid "Continue shopping"
 msgstr ""
 
@@ -929,23 +1068,23 @@ msgstr ""
 msgid "Qty"
 msgstr ""
 
-#: templates/basket/partials/basket_quick.html:49
+#: templates/basket/partials/basket_quick.html:48
 msgid "View basket"
 msgstr ""
 
-#: templates/basket/partials/basket_quick.html:52
+#: templates/basket/partials/basket_quick.html:51
 #: templates/checkout/checkout.html:9
 msgid "Checkout"
 msgstr ""
 
 #: templates/basket/partials/basket_totals.html:16
-#: templates/checkout/thank_you.html:182
+#: templates/checkout/thank_you.html:183
 msgid "Basket total (before discounts)"
 msgstr ""
 
 #: templates/basket/partials/basket_totals.html:28
 #: templates/basket/partials/basket_totals.html:134
-#: templates/checkout/thank_you.html:187 templates/checkout/thank_you.html:234
+#: templates/checkout/thank_you.html:188 templates/checkout/thank_you.html:235
 #: templates/dashboard/orders/order_detail.html:159
 #: templates/dashboard/orders/order_detail.html:177
 #: templates/dashboard/orders/order_detail.html:215
@@ -968,12 +1107,12 @@ msgid "Vouchers"
 msgstr ""
 
 #: templates/basket/partials/basket_totals.html:62
-#: templates/checkout/thank_you.html:197
+#: templates/checkout/thank_you.html:198
 msgid "Basket total (after discounts)"
 msgstr ""
 
 #: templates/basket/partials/basket_totals.html:74
-#: templates/checkout/thank_you.html:202
+#: templates/checkout/thank_you.html:203
 #: templates/dashboard/orders/order_detail.html:195
 #: templates/partials/mini_basket.html:8
 msgid "Basket total"
@@ -982,7 +1121,7 @@ msgstr ""
 #: templates/basket/partials/basket_totals.html:95
 #: templates/basket/partials/basket_totals.html:170
 #: templates/checkout/checkout.html:28 templates/checkout/thank_you.html:37
-#: templates/checkout/thank_you.html:221
+#: templates/checkout/thank_you.html:222
 #: templates/dashboard/orders/order_detail.html:87
 #: templates/dashboard/orders/order_detail.html:425
 msgid "Shipping"
@@ -996,7 +1135,7 @@ msgstr ""
 #: templates/checkout/checkout.html:68
 #: templates/checkout/shipping_methods.html:8
 #: templates/checkout/shipping_methods.html:15
-#: templates/checkout/thank_you.html:68 templates/checkout/thank_you.html:224
+#: templates/checkout/thank_you.html:68 templates/checkout/thank_you.html:225
 #: templates/dashboard/shipping/weight_based_detail.html:27
 msgid "Shipping method"
 msgstr ""
@@ -1014,7 +1153,7 @@ msgid "Tax"
 msgstr ""
 
 #: templates/basket/partials/basket_totals.html:185
-#: templates/checkout/thank_you.html:275
+#: templates/checkout/thank_you.html:276
 msgid "Post order actions"
 msgstr ""
 
@@ -1023,7 +1162,7 @@ msgid "These will be applied once your order is placed."
 msgstr ""
 
 #: templates/basket/partials/basket_totals.html:205
-#: templates/checkout/thank_you.html:291
+#: templates/checkout/thank_you.html:292
 #: templates/dashboard/offers/offer_detail.html:107
 #: templates/dashboard/orders/order_detail.html:242
 #: templates/dashboard/vouchers/voucher_detail.html:62
@@ -1104,10 +1243,6 @@ msgstr ""
 
 #: templates/catalogue/detail.html:76
 msgid "Edit this product"
-msgstr ""
-
-#: templates/catalogue/detail.html:91
-msgid "reviews"
 msgstr ""
 
 #: templates/catalogue/detail.html:112
@@ -1238,10 +1373,10 @@ msgstr "Артикул"
 msgid "By order"
 msgstr "Под заказ"
 
-#: templates/catalogue/partials/price.html:50
-#: templates/catalogue/partials/price.html:72
-#: templates/catalogue/partials/price.html:96
-#: templates/catalogue/partials/price.html:106
+#: templates/catalogue/partials/price.html:49
+#: templates/catalogue/partials/price.html:71
+#: templates/catalogue/partials/price.html:94
+#: templates/catalogue/partials/price.html:104
 #: templates/catalogue/product/attributes/attribute_modal.html:11
 #: templates/catalogue/product/attributes/attribute_modal.html:12
 #: templates/catalogue/product/attributes/attribute_modal.html:30
@@ -1251,19 +1386,19 @@ msgstr "Под заказ"
 msgid "Close"
 msgstr ""
 
-#: templates/catalogue/partials/price.html:60
+#: templates/catalogue/partials/price.html:59
 msgid "Submit"
 msgstr ""
 
-#: templates/catalogue/partials/price.html:67
+#: templates/catalogue/partials/price.html:66
 msgid "The form is submitted successfully"
 msgstr ""
 
-#: templates/catalogue/partials/price.html:86
+#: templates/catalogue/partials/price.html:84
 msgid "Click to open - "
 msgstr ""
 
-#: templates/catalogue/partials/price.html:102
+#: templates/catalogue/partials/price.html:100
 msgid "View on page."
 msgstr ""
 
@@ -1703,8 +1838,8 @@ msgid ""
 "            "
 msgstr ""
 "\n"
-"                Ваш заказ был размещен и подтверждение по электронной почте было "
-"отправлено - ваш номер заказа\n"
+"                Ваш заказ был размещен и подтверждение по электронной почте "
+"было отправлено - ваш номер заказа\n"
 "                <strong>%(number)s</strong>.\n"
 "            "
 
@@ -1759,35 +1894,35 @@ msgid ""
 "                                "
 msgstr ""
 
-#: templates/checkout/thank_you.html:229
+#: templates/checkout/thank_you.html:230
 msgid "Shipping charge (before discounts)"
 msgstr ""
 
-#: templates/checkout/thank_you.html:239
+#: templates/checkout/thank_you.html:240
 msgid "Shipping charge (after discounts)"
 msgstr ""
 
-#: templates/checkout/thank_you.html:244
+#: templates/checkout/thank_you.html:245
 msgid "Shipping charge"
 msgstr ""
 
-#: templates/checkout/thank_you.html:261
+#: templates/checkout/thank_you.html:262
 msgid "Order tax"
 msgstr ""
 
-#: templates/checkout/thank_you.html:304
+#: templates/checkout/thank_you.html:305
 msgid "Tracking your order"
 msgstr ""
 
-#: templates/checkout/thank_you.html:306
+#: templates/checkout/thank_you.html:307
 msgid "You can track the status of your order"
 msgstr ""
 
-#: templates/checkout/thank_you.html:308
+#: templates/checkout/thank_you.html:309
 msgid "View order status"
 msgstr ""
 
-#: templates/checkout/thank_you.html:317
+#: templates/checkout/thank_you.html:318
 msgid "Print this page"
 msgstr ""
 
@@ -1868,6 +2003,34 @@ msgstr ""
 
 #: templates/customer/history/recently_viewed_products.html:7
 msgid "Products you recently viewed"
+msgstr ""
+
+#: templates/customer/login_registration.html:5
+#: templates/customer/login_registration.html:13
+#: templates/partials/nav_accounts.html:51
+msgid "Login or register"
+msgstr ""
+
+#: templates/customer/login_registration.html:22
+#: templates/customer/login_registration.html:26
+msgid "Log In"
+msgstr ""
+
+#: templates/customer/login_registration.html:25
+msgid "I've forgotten my password"
+msgstr ""
+
+#: templates/customer/login_registration.html:26
+msgid "Logging in..."
+msgstr ""
+
+#: templates/customer/login_registration.html:31
+#: templates/customer/login_registration.html:34
+msgid "Register"
+msgstr ""
+
+#: templates/customer/login_registration.html:34
+msgid "Registering..."
 msgstr ""
 
 #: templates/customer/wishlists/wishlists_delete.html:18
@@ -2573,14 +2736,6 @@ msgstr ""
 msgid "The name of the site (eg example.com)"
 msgstr ""
 
-#: templates/dashboard/comms/detail.html:65
-#: templates/dashboard/offers/offer_detail.html:105
-#: templates/dashboard/orders/order_list.html:117
-#: templates/dashboard/reports/partials/order_report.html:9
-#: templates/dashboard/vouchers/voucher_detail.html:61
-msgid "Order number"
-msgstr ""
-
 #: templates/dashboard/comms/detail.html:77
 msgid "View a preview of this email using order:"
 msgstr ""
@@ -3088,11 +3243,6 @@ msgstr ""
 
 #: templates/dashboard/orders/order_detail.html:35
 msgid "Customer checked out as a guest."
-msgstr ""
-
-#: templates/dashboard/orders/order_detail.html:39
-#: templates/dashboard/orders/order_detail.html:45
-msgid "Email address"
 msgstr ""
 
 #: templates/dashboard/orders/order_detail.html:52
@@ -4682,10 +4832,6 @@ msgstr ""
 
 #: templates/partials/nav_accounts.html:49
 msgid "Logout"
-msgstr ""
-
-#: templates/partials/nav_accounts.html:51
-msgid "Login or register"
 msgstr ""
 
 #: templates/partials/nav_primary.html:23

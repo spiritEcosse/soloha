@@ -9,7 +9,7 @@ from django.http import HttpResponsePermanentRedirect, HttpResponse, Http404
 from django.utils.http import urlquote
 from soloha.settings import OSCAR_PRODUCTS_PER_PAGE
 import json
-from django.db.models import Min, Q, Prefetch, BooleanField, Case, When, Count
+from django.db.models import Min, Q, Prefetch, BooleanField, Case, When, Count, Max
 import operator
 import functools
 import logging
@@ -73,9 +73,9 @@ class BaseCatalogue(ContextMixin):
     url_view_name = 'catalogue:index'
     use_keys = ('sort', )
     orders = (
-        Order(title=_('By popularity'), column='-views_count', argument='popularity'),
-        Order(title=_('By price ascending'), column='stockrecords__price_excl_tax', argument='price_ascending'),
-        Order(title=_('By price descending'), column='-stockrecords__price_excl_tax', argument='price_descending'),
+        Order(title=_('Popularity'), column='-views_count', argument='popularity'),
+        Order(title=_('Price ascending'), column='stockrecords__price_excl_tax', argument='price_ascending'),
+        Order(title=_('Price descending'), column='stockrecords__price_excl_tax', argument='price_descending'),
     )
 
     def get_context_data(self, **kwargs):
@@ -219,7 +219,18 @@ class ProductCategoryView(BaseCatalogue, views.JSONResponseMixin, views.AjaxResp
             Prefetch('product_class__options'),
             Prefetch('stockrecords'),
             Prefetch('categories__parent__parent'),
-        ).order_by(sort.column)
+        )
+
+        order = sort.column
+
+        if sort.argument == 'price_ascending' or sort.argument == 'price_descending':
+            queryset = queryset.annotate(
+                order=Min(sort.column)
+            )
+
+            order = 'order' if sort.argument == 'price_ascending' else '-order'
+
+        queryset = queryset.order_by(order)
         return queryset
 
     def get_products(self, **kwargs):
