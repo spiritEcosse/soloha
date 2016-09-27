@@ -1575,7 +1575,7 @@ msgstr ""
 
 #: templates/checkout/payment_details.html:22
 msgid "Cash on delivery."
-msgstr ""
+msgstr "Оплата при доставке."
 
 #: templates/checkout/preview.html:5
 msgid "Order preview"
@@ -1702,6 +1702,11 @@ msgid ""
 "                <strong>%(number)s</strong>.\n"
 "            "
 msgstr ""
+"\n"
+"                Ваш заказ был размещен и подтверждение по электронной почте было "
+"отправлено - ваш номер заказа\n"
+"                <strong>%(number)s</strong>.\n"
+"            "
 
 #: templates/checkout/thank_you.html:30
 msgid ""

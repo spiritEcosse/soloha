@@ -130,8 +130,8 @@
                             <a href="{{ line.product.get_absolute_url }}">
                                 <img class="thumbnail img-responsive"
                                      src="{{ line.product.primary_image.original|thumbnail_url:'checkout' }}"
-                                     alt="{{ product.get_title }}"
-                                     title="{{ product.get_title }}" >
+                                     alt="{{ line.product.get_title }}"
+                                     title="{{ line.product.get_title }}" >
                             </a>
                         </div>
                     </div>
@@ -145,6 +145,7 @@
                                 {% endblocktrans %}
                             {% endif %}
                         </p>
+                        {% include 'basket/partials/basket_line_attributes.html' %}
                     </div>
                     <div class="col-sm-2 text-center">
                         {{ line.quantity }}

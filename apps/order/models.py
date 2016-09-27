@@ -25,3 +25,17 @@ class QuickOrder(models.Model):
         verbose_name = _('Quick order')
         verbose_name_plural = _('Quick orders')
 
+
+feature = models.ForeignKey(
+    'catalogue.Feature', verbose_name=_('Feature'), related_name='lines_attributes', null=True, blank=True
+)
+feature.contribute_to_class(LineAttribute, "feature")
+
+product_images = models.ManyToManyField(
+    'catalogue.ProductImage', blank=True, related_name='lines_attributes', verbose_name=_('Product images')
+)
+product_images.contribute_to_class(LineAttribute, "product_images")
+
+LineAttribute._meta.get_field('option').blank = True
+LineAttribute._meta.get_field('value').blank = True
+LineAttribute._meta.get_field('type').blank = True

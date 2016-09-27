@@ -15,8 +15,7 @@ class OrderCreator(CoreOrderCreator):
         Creates the batch line attributes.
         """
         for attr in basket_line.attributes.all():
-            order_line.attributes.create(
-                option=attr.option,
-                type=attr.option.code,
-                value=attr.value
-            )
+            line_attributes = order_line.attributes.create(feature=attr.feature)
+
+            if getattr(attr, 'product_images', None):
+                line_attributes.product_images.add(*attr.product_images.all())
