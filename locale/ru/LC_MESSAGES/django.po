@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-09-27 12:11+0000\n"
+"POT-Creation-Date: 2016-09-27 13:44+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -520,37 +520,31 @@ msgstr ""
 "Ваше сообщение было отправлено. Мы свяжемся с Вами по указанным реквизитам."
 
 #: apps/catalogue/views.py:76
-#, fuzzy
-#| msgid "By popularity"
 msgid "Popularity"
-msgstr "По популярности"
+msgstr "Популярности"
 
 #: apps/catalogue/views.py:77
-#, fuzzy
-#| msgid "By price ascending"
 msgid "Price ascending"
-msgstr "По возрастанию цены"
+msgstr "Возрастанию цены"
 
 #: apps/catalogue/views.py:78
-#, fuzzy
-#| msgid "By price descending"
 msgid "Price descending"
-msgstr "По убыванию цены"
+msgstr "Убыванию цены"
 
 #: apps/catalogue/views.py:114 templates/partials/nav_primary.html:45
 msgid "All products"
 msgstr ""
 
-#: apps/catalogue/views.py:331 apps/subscribe/views.py:46
+#: apps/catalogue/views.py:342 apps/subscribe/views.py:46
 #, python-format
 msgid "Order online %s"
 msgstr ""
 
-#: apps/catalogue/views.py:687
+#: apps/catalogue/views.py:698
 msgid "Please, enter number."
 msgstr "Пожалуйста, введите номер."
 
-#: apps/catalogue/views.py:720
+#: apps/catalogue/views.py:731
 msgid "Available size limits: min - \"{}\", max - \"{}\""
 msgstr ""
 
@@ -798,6 +792,14 @@ msgstr ""
 
 #: apps/partner/abstract_models.py:143
 msgid "Invalid stock consumption request"
+msgstr ""
+
+#: apps/partner/models.py:20
+msgid "Mark-up on goods this partner"
+msgstr ""
+
+#: apps/partner/models.py:25
+msgid "Rate on goods this partner"
 msgstr ""
 
 #: apps/subscribe/forms.py:22
