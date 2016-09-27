@@ -73,9 +73,9 @@ class BaseCatalogue(ContextMixin):
     url_view_name = 'catalogue:index'
     use_keys = ('sort', )
     orders = (
-        Order(title='By popularity', column='-views_count', argument='popularity'),
-        Order(title='By price ascending', column='stockrecords__price_excl_tax', argument='price_ascending'),
-        Order(title='By price descending', column='-stockrecords__price_excl_tax', argument='price_descending'),
+        Order(title=_('By popularity'), column='-views_count', argument='popularity'),
+        Order(title=_('By price ascending'), column='stockrecords__price_excl_tax', argument='price_ascending'),
+        Order(title=_('By price descending'), column='-stockrecords__price_excl_tax', argument='price_descending'),
     )
 
     def get_context_data(self, **kwargs):

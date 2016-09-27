@@ -38,7 +38,7 @@
     {% endif %}
 {% endblock %}
 
-{% block left-bar %}
+{% block column_left %}
     {% if filters.exists %}
         {% assign trancate_filter 32 %}
         {% assign trancate_filter_value 23 %}
@@ -126,7 +126,7 @@
             {% endfor %}
         </div>
     {% endif %}
-{% endblock left-bar %}
+{% endblock %}
 
 {% block breadcrumbs %}
     <ol class="breadcrumb">
@@ -145,15 +145,21 @@
 {% block headertext %}{{ category.get_h1 }}{% endblock %}
 
 {% block post_content %}
+    {#    <div class="row">#}
+    {#        <div class="col-xs-24 category">#}
+    {#            <div class="description">#}
+    {#                {{ category.description|default:""|striptags }}#}
+    {#                <div class="gradientback"></div>#}
+    {#            </div>#}
+    {#            <div class="text-right">#}
+    {#                <a href="#" class="more">Читать полностью --></a>#}
+    {#            </div>#}
+    {#        </div>#}
+    {#    </div>#}
+
     <div class="row">
         <div class="col-xs-24 category">
-            <div class="description">
-                {{ category.description|default:""|striptags }}
-                <div class="gradientback"></div>
-            </div>
-            <div class="text-right">
-                <a href="#" class="more">Читать полностью --></a>
-            </div>
+            {{ category.description|safe }}
         </div>
     </div>
 {% endblock %}

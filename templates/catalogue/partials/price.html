@@ -16,23 +16,22 @@
                 <div class="pull-right">{% trans 'By order' %}</div>
             </div>
             <div class="panel-body">
-                {% with class_price="price_color"  %}
                     <div class="text-center wrapper-number" >
-                        {% if session.price.exists %}
-                            {% assign price session.price.excl_tax|currency:session.price.currency %}
+                        <div {% if ng %} ng-bind="price" {% endif %} class="price_color" >
+                            {% if session.price.exists %}
+                                {% assign price session.price.excl_tax|currency:session.price.currency %}
 
-                            <div {% if ng %} ng-class="'{{ class_price }}'" ng-bind="price" {% endif %} class="{{ class_price }}" >
                                 {% if not ng %}
                                     {{ price }}
                                 {% endif %}
-                            </div>
-                        {% else %}
-                            {% if verbose %}
-                                {{ session.availability.message }}
                             {% else %}
-                                {{ session.availability.short_message }}
+                                {% if verbose %}
+                                    {{ session.availability.message }}
+                                {% else %}
+                                    {{ session.availability.short_message }}
+                                {% endif %}
                             {% endif %}
-                        {% endif %}
+                        </div>
                     </div>
                     <div class="row">
                         {% block product_basket_form %}
@@ -76,7 +75,6 @@
                             </div>
                         </div>
                     </div>
-                {% endwith %}
             </div>
             {% if flatpages %}
                 <div class="panel-footer">

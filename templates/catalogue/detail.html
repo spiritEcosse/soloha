@@ -84,20 +84,20 @@
                     {% endblock %}
 
                     <div class="wrapper">
-                        <div class="reviews pull-left">
-                            <a href="#" class="pull-left">
-                                {% iffeature "reviews" %}
-                                    {{ product.num_approved_reviews }}
-                                    {% trans "reviews" %}
-                                {% endiffeature %}
-                            </a>
-                            {% iffeature "reviews" %}
-                                <p class="star-rating Four pull-left">
-                                    {% include "catalogue/reviews/partials/review_stars.html" %}
-                                </p>
-                            {% endiffeature %}
+{#                        <div class="reviews pull-left">#}
+{#                            <a href="#" class="pull-left">#}
+{#                                {% iffeature "reviews" %}#}
+{#                                    {{ product.num_approved_reviews }}#}
+{#                                    {% trans "reviews" %}#}
+{#                                {% endiffeature %}#}
+{#                            </a>#}
+{#                            {% iffeature "reviews" %}#}
+{#                                <p class="star-rating Four pull-left">#}
+{#                                    {% include "catalogue/reviews/partials/review_stars.html" %}#}
+{#                                </p>#}
+{#                            {% endiffeature %}#}
 {#                            <div class="social">{% trans 'Share' %}:</div>#}
-                        </div>
+{#                        </div>#}
 {#                        <div class="defer pull-right">#}
 {#                            {% iffeature "wishlists" %}#}
 {#                                {% include "catalogue/partials/add_to_wishlist.html" %}#}

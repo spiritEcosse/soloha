@@ -26,7 +26,7 @@
         Products matching "{{ q }}"
     {% endblocktrans %}
 {% endblock %}
-{% block left-bar %}
+{% block column_left %}
     {% if filters %}
         <div class="heading">Подбор по параметрам</div>
         <div class="filter">
@@ -60,7 +60,7 @@
             {% endfor %}
         </div>
     {% endif %}
-{% endblock left-bar %}
+{% endblock column_left %}
 
 {% block content %}
         <div class="row sort">

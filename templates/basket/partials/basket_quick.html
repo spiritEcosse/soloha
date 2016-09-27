@@ -18,7 +18,7 @@
                              class="img-responsive img-thumbnail"/>
                     </a>
                 </div>
-                <div class="col-xs-13">
+                <div class="col-xs-10">
                     <div class="title">
                         <a href="{{ line.product.get_absolute_url }}" title="{{ line.product.title }}">{{ line.product.title }}</a>
                     </div>
@@ -26,10 +26,9 @@
                         <small>{% include 'basket/partials/basket_line_attributes.html' %}</small>
                     </div>
                 </div>
-                <div class="col-xs-6">
+                <div class="col-xs-9">
                     <div class="align-right"><strong>{% trans "Qty" %}:</strong> {{ line.quantity }}</div>
                     <div class="price_color align-right">
-                        <strong>{% trans 'Price' %}:</strong>
                         {{ line.unit_price_excl_tax|currency:request.basket.currency }}
                     </div>
                 </div>
@@ -38,7 +37,7 @@
     {% endfor %}
 
     <div class="col-xs-24 text-right">
-        <p class="align-right">
+        <p class="price_color align-right">
             {% if request.basket.is_tax_known %}
                 <strong>{% trans "Total" %}:</strong> {{ request.basket.total_incl_tax|currency:request.basket.currency }}
             {% else %}
