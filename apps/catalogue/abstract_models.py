@@ -586,7 +586,7 @@ class AbstractProduct(models.Model, CommonFeatureProduct):
 @python_2_unicode_compatible
 class AbstractFeature(MPTTModel):
     title = models.CharField(max_length=255)
-    slug = models.SlugField(verbose_name=_('Slug'), max_length=255, unique=True)
+    slug = models.SlugField(verbose_name=_('Slug'), max_length=255, unique=True, blank=True, db_index=True)
     parent = TreeForeignKey('self', verbose_name=_('Parent'), related_name='children', blank=True, null=True, db_index=True)
     sort = models.IntegerField(blank=True, null=True, default=0)
     created = models.DateTimeField(auto_now_add=True)
