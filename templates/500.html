@@ -5,6 +5,10 @@
     {% trans 'Server error!' %} | {{ block.super }}
 {% endblock %}
 
+{% block headertext %}
+    {% trans "Server error!" %}
+{% endblock %}
+
 {% block error_heading %}
     {% trans "Server error!" %}
 {% endblock %}

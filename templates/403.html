@@ -5,6 +5,10 @@
     {% trans 'Permission denied!' %} | {{ block.super }}
 {% endblock %}
 
+{% block headertext %}
+    {% trans "Permission denied!" %}
+{% endblock %}
+
 {% block error_heading %}
     {% trans "Permission denied!" %}
 {% endblock %}
