@@ -9059,12 +9059,11 @@ header .bottom .navbar .nav > li .yamm-content .image .btn-menu {
 .main .items .thumbnail .mask .title a {
   color: #fff;
 }
-.main .items .thumbnail .title,
 .main .items .thumbnail .filters {
   padding: 4px;
 }
 .main .items .thumbnail .title {
-  height: 60px;
+  height: 54px;
   overflow: hidden;
 }
 .main .items .thumbnail .model {

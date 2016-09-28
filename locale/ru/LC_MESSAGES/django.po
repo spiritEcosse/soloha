@@ -1228,7 +1228,7 @@ msgstr ""
 
 #: templates/catalogue/category.html:49
 msgid "Selected"
-msgstr ""
+msgstr "Выбранные"
 
 #: templates/catalogue/category.html:61 templates/catalogue/category.html:103
 msgid "Clear"
@@ -1236,7 +1236,7 @@ msgstr ""
 
 #: templates/catalogue/category.html:78
 msgid "Selection of parameters"
-msgstr "Выбранные параметры"
+msgstr "Выбрать параметры"
 
 #: templates/catalogue/category.html:106
 #: templates/catalogue/product/attributes/attribute_products_modal.html:42
