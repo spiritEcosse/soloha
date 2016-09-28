@@ -1,0 +1,16 @@
+{% extends "error.html" %}
+{% load i18n %}
+
+{% block title %}
+    {% trans 'Method Not Allowed!' %} | {{ block.super }}
+{% endblock %}
+
+{% block headertext %}
+    {% trans "Method Not Allowed!" %}
+{% endblock %}
+
+{% block error_heading %}
+    {% trans "Method Not Allowed!" %}
+{% endblock %}
+
+{% block error_message %}{% endblock %}

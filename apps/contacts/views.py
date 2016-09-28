@@ -21,6 +21,10 @@ class ContactsView(FormView, ContextMixin):
     template_name = 'contacts/contacts.html'
     form_class = FeedbackForm
 
+    def get(self, request, *args, **kwargs):
+        from django.http import HttpResponseForbidden, HttpResponseServerError
+        return HttpResponseServerError()
+
     def post(self, request, **kwargs):
         if request.is_ajax():
             return self.ajax(request)

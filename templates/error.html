@@ -1,6 +1,14 @@
 {% extends "layout.html" %}
 {% load i18n %}
 
+{% block title %}
+    {% trans 'Sorry!' %} | {{ block.super }}
+{% endblock %}
+
+{% block headertext %}
+    {% trans "Sorry!" %}
+{% endblock %}
+
 {% block error_heading %}{% trans 'Sorry!' %}{% endblock %}
 {% block error_message %}{% endblock %}
 
