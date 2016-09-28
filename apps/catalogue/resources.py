@@ -381,6 +381,6 @@ class ProductResource(ModelResource):
     class Meta:
         model = Product
         fields = ('id', 'delete', 'title', 'slug', 'enable', 'structure', 'parent', 'h1', 'meta_title',
-                  'meta_description', 'meta_keywords', 'description', 'categories_slug', 'filters_slug', 'characteristics_slug',
+                  'meta_description', 'meta_keywords', 'categories_slug', 'filters_slug', 'characteristics_slug',
                   'product_class', )
         export_order = fields
