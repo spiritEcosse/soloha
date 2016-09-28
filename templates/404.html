@@ -1,14 +1,51 @@
 {% extends "error.html" %}
 {% load i18n %}
+{% load staticfiles %}
 
 {% block title %}
-{% trans 'Page not found' %} | {{ block.super }}
+    {% trans 'Page not found' %} | {{ block.super }}
 {% endblock %}
 
 {% block error_heading %}
-{% trans "Page not found!" %}
+    {% trans 'Page not found' %}
 {% endblock %}
 
 {% block error_message %}
-<p>{% trans "We're sorry but the page you are looking for can't be found." %}</p>
+    <p>{% trans "We're sorry but the page you are looking for can't be found." %}</p>
+{% endblock %}
+
+{% block headertext %}
+    {% blocktrans %}
+        Unfortunately, the page is lost ... We earnestly seek it.
+    {% endblocktrans %}
+{% endblock %}
+
+{% block content %}
+    <div class="col-xs-24 text-center not-found">
+        <div class="row">
+            <div class="col-xs-24 col-md-12 col-md-push-12">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <div class="image">
+                            <img src="{% static "image/404-1.png" %}" alt="{% trans 'Page not found' %}"
+                                 title="{% trans 'Page not found' %}" />
+                            <div class="substrate"></div>
+                        </div>
+                        <div class="text">
+                            {% blocktrans %}
+                                This sometimes happens. The most likely reasons for this - an outdated link
+                                or the page has been removed by the author.
+                            {% endblocktrans %}
+                        </div>
+                        <a class="btn btn-primary btn-lg" onclick="javascript:history.go(-1);">{% trans 'Return to previous page' %}</a>
+                        <a class="btn btn-primary btn-lg" href="{{ homepage_url }}">{% trans "Go to homepage" %}</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-24 col-md-12 col-md-pull-12">
+                <img src="{% static "image/404.png" %}" class="img-responsive"
+                     alt="{% trans 'Page not found' %}" title="{% trans 'Page not found' %}"/>
+            </div>
+        </div>
+    </div>
 {% endblock %}

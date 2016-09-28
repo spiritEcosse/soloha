@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-09-27 13:44+0000\n"
+"POT-Creation-Date: 2016-09-28 14:24+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -71,12 +71,12 @@ msgstr ""
 "Этот товар невозможно добавить в корзину, так как валюта цены отличается от "
 "валюты других товаров в вашей корзине"
 
-#: apps/basket/models.py:180 apps/catalogue/abstract_models.py:603
-#: apps/catalogue/abstract_models.py:1028 apps/order/models.py:30
+#: apps/basket/models.py:180 apps/catalogue/abstract_models.py:604
+#: apps/catalogue/abstract_models.py:1029 apps/order/models.py:30
 msgid "Feature"
 msgstr "Особенности"
 
-#: apps/basket/models.py:184 apps/catalogue/abstract_models.py:671
+#: apps/basket/models.py:184 apps/catalogue/abstract_models.py:672
 #: apps/order/models.py:35
 msgid "Product images"
 msgstr "Изображения товара"
@@ -86,8 +86,8 @@ msgid "Enable product"
 msgstr "Включенные товары"
 
 #: apps/catalogue/abstract_models.py:38 apps/catalogue/abstract_models.py:161
-#: apps/catalogue/abstract_models.py:229 apps/catalogue/abstract_models.py:470
-#: apps/catalogue/abstract_models.py:755
+#: apps/catalogue/abstract_models.py:229 apps/catalogue/abstract_models.py:471
+#: apps/catalogue/abstract_models.py:756
 #: templates/dashboard/catalogue/category_delete.html:12
 #: templates/dashboard/catalogue/category_form.html:8
 #: templates/dashboard/catalogue/category_form.html:17
@@ -110,44 +110,44 @@ msgstr "Картинка товара"
 msgid "Product date updated"
 msgstr "Дата обновления товара"
 
-#: apps/catalogue/abstract_models.py:119 apps/catalogue/abstract_models.py:440
+#: apps/catalogue/abstract_models.py:119 apps/catalogue/abstract_models.py:441
 #: templates/dashboard/orders/line_detail.html:37
 #: templates/dashboard/ranges/range_product_list.html:95
 msgctxt "Product title"
 msgid "Title"
 msgstr "Наименование"
 
-#: apps/catalogue/abstract_models.py:120 apps/catalogue/abstract_models.py:588
-#: apps/catalogue/abstract_models.py:726
+#: apps/catalogue/abstract_models.py:120 apps/catalogue/abstract_models.py:589
+#: apps/catalogue/abstract_models.py:727
 msgid "Slug"
 msgstr "Имя в url"
 
-#: apps/catalogue/abstract_models.py:121 apps/catalogue/abstract_models.py:727
+#: apps/catalogue/abstract_models.py:121 apps/catalogue/abstract_models.py:728
 #: apps/ex_flatpages/models.py:14
 msgid "Enable"
 msgstr "Включенный"
 
-#: apps/catalogue/abstract_models.py:122 apps/catalogue/abstract_models.py:729
+#: apps/catalogue/abstract_models.py:122 apps/catalogue/abstract_models.py:730
 #: apps/ex_flatpages/models.py:15
 msgid "h1"
 msgstr ""
 
-#: apps/catalogue/abstract_models.py:123 apps/catalogue/abstract_models.py:730
+#: apps/catalogue/abstract_models.py:123 apps/catalogue/abstract_models.py:731
 #: apps/ex_flatpages/models.py:16
 msgid "Meta tag: title"
 msgstr "Мета тег: title"
 
-#: apps/catalogue/abstract_models.py:124 apps/catalogue/abstract_models.py:731
+#: apps/catalogue/abstract_models.py:124 apps/catalogue/abstract_models.py:732
 #: apps/ex_flatpages/models.py:17
 msgid "Meta tag: description"
 msgstr "Мета тег: description"
 
-#: apps/catalogue/abstract_models.py:125 apps/catalogue/abstract_models.py:732
+#: apps/catalogue/abstract_models.py:125 apps/catalogue/abstract_models.py:733
 #: apps/ex_flatpages/models.py:18
 msgid "Meta tag: keywords"
 msgstr "Мета тег: keywords"
 
-#: apps/catalogue/abstract_models.py:126 apps/catalogue/abstract_models.py:736
+#: apps/catalogue/abstract_models.py:126 apps/catalogue/abstract_models.py:737
 #: templates/catalogue/detail.html:119
 #: templates/dashboard/offers/offer_detail.html:67
 #: templates/dashboard/offers/summary.html:12
@@ -199,7 +199,7 @@ msgid ""
 "a stand-alone product (i.e. there is only one version of this product)."
 msgstr ""
 
-#: apps/catalogue/abstract_models.py:155 apps/catalogue/abstract_models.py:661
+#: apps/catalogue/abstract_models.py:155 apps/catalogue/abstract_models.py:662
 #: apps/partner/abstract_models.py:81
 #: templates/dashboard/promotions/promotion_list.html:44
 #: templates/dashboard/ranges/range_list.html:34
@@ -263,8 +263,8 @@ msgstr ""
 msgid "This flag indicates if this product can be used in an offer or not"
 msgstr ""
 
-#: apps/catalogue/abstract_models.py:205 apps/catalogue/abstract_models.py:654
-#: apps/catalogue/abstract_models.py:1026 apps/partner/abstract_models.py:23
+#: apps/catalogue/abstract_models.py:205 apps/catalogue/abstract_models.py:655
+#: apps/catalogue/abstract_models.py:1027 apps/partner/abstract_models.py:23
 #: templates/customer/wishlists/wishlists_detail.html:32
 #: templates/dashboard/catalogue/stockalert_list.html:48
 #: templates/dashboard/orders/order_detail.html:109
@@ -308,56 +308,56 @@ msgstr ""
 msgid "You can only assign child products to parent products."
 msgstr ""
 
-#: apps/catalogue/abstract_models.py:320
+#: apps/catalogue/abstract_models.py:321
 msgid "The specified parent product is a child product."
 msgstr ""
 
-#: apps/catalogue/abstract_models.py:323
+#: apps/catalogue/abstract_models.py:324
 msgid "One can't add a child product to a product with stock records."
 msgstr ""
 
-#: apps/catalogue/abstract_models.py:450
+#: apps/catalogue/abstract_models.py:451
 msgid "Product class"
 msgstr "Класс товара"
 
-#: apps/catalogue/abstract_models.py:589 apps/catalogue/abstract_models.py:728
+#: apps/catalogue/abstract_models.py:590 apps/catalogue/abstract_models.py:729
 msgid "Parent"
 msgstr "Родитель"
 
-#: apps/catalogue/abstract_models.py:592
+#: apps/catalogue/abstract_models.py:593
 msgid "Bottom line size"
 msgstr "Верхняя граница"
 
-#: apps/catalogue/abstract_models.py:593
+#: apps/catalogue/abstract_models.py:594
 msgid "Top line size"
 msgstr "Нижняя граница"
 
-#: apps/catalogue/abstract_models.py:604
+#: apps/catalogue/abstract_models.py:605
 msgid "Features"
 msgstr "Особенности"
 
-#: apps/catalogue/abstract_models.py:655
+#: apps/catalogue/abstract_models.py:656
 msgid "Original"
 msgstr ""
 
-#: apps/catalogue/abstract_models.py:656
+#: apps/catalogue/abstract_models.py:657
 msgid "Caption"
 msgstr ""
 
-#: apps/catalogue/abstract_models.py:659
+#: apps/catalogue/abstract_models.py:660
 msgid "Display order"
 msgstr "Отобразить в порядке"
 
-#: apps/catalogue/abstract_models.py:660
+#: apps/catalogue/abstract_models.py:661
 msgid ""
 "An image with a display order of zero will be the primary image for a product"
 msgstr ""
 
-#: apps/catalogue/abstract_models.py:670
+#: apps/catalogue/abstract_models.py:671
 msgid "Product image"
 msgstr "Картинка товара"
 
-#: apps/catalogue/abstract_models.py:725 apps/contacts/forms.py:10
+#: apps/catalogue/abstract_models.py:726 apps/contacts/forms.py:10
 #: templates/customer/wishlists/wishlists_list.html:9
 #: templates/dashboard/catalogue/product_class_form.html:97
 #: templates/dashboard/catalogue/product_class_list.html:27
@@ -382,85 +382,85 @@ msgstr "Картинка товара"
 msgid "Name"
 msgstr "Имя"
 
-#: apps/catalogue/abstract_models.py:735
+#: apps/catalogue/abstract_models.py:736
 msgid "Link banner"
 msgstr "Ссылка на баннер"
 
-#: apps/catalogue/abstract_models.py:737
+#: apps/catalogue/abstract_models.py:738
 msgid "Image banner"
 msgstr "Картирка баннера"
 
-#: apps/catalogue/abstract_models.py:739
+#: apps/catalogue/abstract_models.py:740
 msgid "Icon"
 msgstr "Иконка"
 
-#: apps/catalogue/abstract_models.py:740 apps/catalogue/abstract_models.py:1031
+#: apps/catalogue/abstract_models.py:741 apps/catalogue/abstract_models.py:1032
 msgid "Image"
 msgstr "Картинка"
 
-#: apps/catalogue/abstract_models.py:754
+#: apps/catalogue/abstract_models.py:755
 #: templates/dashboard/catalogue/product_update.html:124
 #: templates/dashboard/comms/list.html:33
 msgid "Category"
 msgstr "Категория"
 
-#: apps/catalogue/abstract_models.py:1024
+#: apps/catalogue/abstract_models.py:1025
 msgid "Sort"
 msgstr "Сортировка"
 
-#: apps/catalogue/abstract_models.py:1025
+#: apps/catalogue/abstract_models.py:1026
 msgid "Block info"
 msgstr "Блок информация"
 
-#: apps/catalogue/abstract_models.py:1030
+#: apps/catalogue/abstract_models.py:1031
 msgid "Available non standard size for this feature"
 msgstr "Доступен не стандартный размер для этой функции"
 
-#: apps/catalogue/abstract_models.py:1032
+#: apps/catalogue/abstract_models.py:1033
 msgid "Product with images."
 msgstr "Продукт с изображениями."
 
-#: apps/catalogue/abstract_models.py:1040
+#: apps/catalogue/abstract_models.py:1041
 msgid "Product feature"
 msgstr "Особенность товара"
 
-#: apps/catalogue/abstract_models.py:1041
+#: apps/catalogue/abstract_models.py:1042
 msgid "Product features"
 msgstr "Особенности товара"
 
-#: apps/catalogue/abstract_models.py:1049
+#: apps/catalogue/abstract_models.py:1050
 msgid "For this feature not specified bottom_line."
 msgstr "Для этой функции не указана верхняя граница."
 
-#: apps/catalogue/abstract_models.py:1052
+#: apps/catalogue/abstract_models.py:1053
 msgid "For this feature not specified top_line."
 msgstr "Для этой функции не указан нижняя граница."
 
-#: apps/catalogue/abstract_models.py:1055
+#: apps/catalogue/abstract_models.py:1056
 msgid "For this product set non_standard_price_retail to 0."
 msgstr "Для этого продукта установить non_standard_price_retail к 0."
 
-#: apps/catalogue/abstract_models.py:1075
+#: apps/catalogue/abstract_models.py:1076
 msgid "Plus on price"
 msgstr "Плюс к цене"
 
-#: apps/catalogue/abstract_models.py:1076
+#: apps/catalogue/abstract_models.py:1077
 msgid "Percent"
 msgstr "Процент"
 
-#: apps/catalogue/abstract_models.py:1077 apps/partner/abstract_models.py:55
+#: apps/catalogue/abstract_models.py:1078 apps/partner/abstract_models.py:55
 msgid "Price (retail)"
 msgstr "Рекомендованная цена от производителя"
 
-#: apps/catalogue/abstract_models.py:1078 apps/partner/abstract_models.py:62
+#: apps/catalogue/abstract_models.py:1079 apps/partner/abstract_models.py:62
 msgid "Cost Price"
 msgstr "Себестоимость"
 
-#: apps/catalogue/abstract_models.py:1084
+#: apps/catalogue/abstract_models.py:1085
 msgid "Product option"
 msgstr "Опция товара"
 
-#: apps/catalogue/abstract_models.py:1085
+#: apps/catalogue/abstract_models.py:1086
 msgid "Product options"
 msgstr "Опции товара"
 
@@ -835,6 +835,71 @@ msgstr ""
 
 #: soloha/settings.py:148
 msgid "Russia"
+msgstr ""
+
+#: templates/403.html:5 templates/403.html.py:9
+msgid "Permission denied!"
+msgstr ""
+
+#: templates/403.html:13
+msgid "We're sorry but you are not permitted to access this page."
+msgstr ""
+
+#: templates/404.html:6 templates/404.html.py:10 templates/404.html.py:30
+#: templates/404.html:31 templates/404.html.py:47
+msgid "Page not found"
+msgstr ""
+
+#: templates/404.html:14
+msgid "We're sorry but the page you are looking for can't be found."
+msgstr ""
+
+#: templates/404.html:18
+msgid ""
+"\n"
+"        Unfortunately, the page is lost ... We earnestly seek it.\n"
+"    "
+msgstr ""
+"\n"
+"            К сожалению, страница потерялась ... Мы усердно ищем ее.\n"
+"        "
+
+#: templates/404.html:35
+msgid ""
+"\n"
+"                                This sometimes happens. The most likely "
+"reasons for this - an outdated link\n"
+"                                or the page has been removed by the author.\n"
+"                            "
+msgstr ""
+"\n"
+"                                    Такое иногда случается. Самые вероятные "
+"причины - устаревшая ссылка \n"
+"                                    или страница была удалена автором.\n"
+"                                "
+
+#: templates/404.html:40 templates/error.html:10
+msgid "Return to previous page"
+msgstr ""
+
+#: templates/404.html:41 templates/error.html:11
+msgid "Go to homepage"
+msgstr ""
+
+#: templates/500.html:5 templates/500.html.py:9
+msgid "Server error!"
+msgstr ""
+
+#: templates/500.html:13
+msgid ""
+"We're sorry but something went terribly wrong and we've been unable to "
+"generate the page you requested."
+msgstr ""
+
+#: templates/500.html:14
+msgid ""
+"This incident has been logged and will be addressed by an engineer as soon "
+"as possible."
 msgstr ""
 
 #: templates/base.html:14
@@ -4769,6 +4834,10 @@ msgstr ""
 
 #: templates/dashboard/vouchers/voucher_list.html:92
 msgid "No vouchers found."
+msgstr ""
+
+#: templates/error.html:7
+msgid "Sorry!"
 msgstr ""
 
 #: templates/layout.html:41
