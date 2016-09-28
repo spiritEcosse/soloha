@@ -113,3 +113,9 @@ class ProductForm(forms.ModelForm):
             'characteristics': autocomplete.ModelSelect2Multiple(url='feature-autocomplete'),
         }
 
+    def clean(self):
+        super(ProductForm, self).clean()
+        characteristics = list(self.cleaned_data['characteristics'])
+        characteristics.extend(self.cleaned_data['filters'])
+        self.cleaned_data['characteristics'] = characteristics
+        return self.cleaned_data

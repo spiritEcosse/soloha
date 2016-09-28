@@ -259,8 +259,8 @@ class AbstractProduct(models.Model, CommonFeatureProduct):
         Because the validation logic is quite complex, validation is delegated
         to the sub method appropriate for the product's structure.
         """
-        super(AbstractProduct, self).clean()
         getattr(self, '_clean_%s' % self.structure)()
+
         # if not self.is_parent:
         #     self.attr.validate_attributes()
 
@@ -294,8 +294,9 @@ class AbstractProduct(models.Model, CommonFeatureProduct):
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(self.get_title())
+
+        self.characteristics.add(*self.filters.all())
         super(AbstractProduct, self).save(*args, **kwargs)
-        # self.attr.save()
 
     # Properties
 
