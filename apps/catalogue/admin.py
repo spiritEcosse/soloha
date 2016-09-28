@@ -154,7 +154,6 @@ class ProductImageAdmin(ImportExportMixin, ImportExportActionModelAdmin):
 class FeatureAdmin(ImportExportMixin, ImportExportActionModelAdmin, DraggableMPTTAdmin):
     list_display = ('pk', 'indented_title', 'slug', 'parent', )
     list_filter = ('created', )
-    prepopulated_fields = {"slug": ("title",)}
     search_fields = ('title', 'slug', )
     resource_class = resources.FeatureResource
     form = catalogue_forms.FeatureForm
