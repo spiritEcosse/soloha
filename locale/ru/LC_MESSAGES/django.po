@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-09-28 18:22+0000\n"
+"POT-Creation-Date: 2016-09-29 08:53+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -552,7 +552,7 @@ msgstr ""
 msgid "Enter a valid phone number"
 msgstr "Введите действительный номер телефона."
 
-#: apps/contacts/forms.py:13 apps/ex_sites/models.py:15
+#: apps/contacts/forms.py:13 apps/ex_sites/models.py:14
 #: templates/checkout/checkout.html:49 templates/checkout/thank_you.html:53
 #: templates/dashboard/partners/partner_manage.html:41
 #: templates/dashboard/partners/partner_user_list.html:43
@@ -707,21 +707,32 @@ msgstr ""
 msgid "You already have an active alert for this product"
 msgstr ""
 
-#: apps/ex_sites/models.py:12
+#: apps/ex_sites/models.py:11
 msgid "Work time"
 msgstr "Рабочее время"
 
-#: apps/ex_sites/models.py:13
+#: apps/ex_sites/models.py:12
 msgid "Actual address"
 msgstr "Фактический адрес"
 
-#: apps/ex_sites/models.py:14
-msgid "Phone number"
+#: apps/ex_sites/models.py:13
+#, fuzzy
+#| msgid "Phone number"
+msgid "Phone numbers"
 msgstr "Номер телефона"
 
-#: apps/ex_sites/models.py:16
+#: apps/ex_sites/models.py:15
 msgid "Short description of shop"
 msgstr "Краткое описание магазина"
+
+#: apps/ex_sites/models.py:22 apps/ex_sites/models.py:23
+#: templates/layout.html:304
+msgid "Information"
+msgstr ""
+
+#: apps/ex_sites/models.py:30
+msgid "Phone number"
+msgstr "Номер телефона"
 
 #: apps/order/models.py:11
 msgid "Name client"
@@ -933,7 +944,7 @@ msgstr ""
 #: templates/customer/wishlists/wishlists_detail.html:10
 #: templates/customer/wishlists/wishlists_form.html:7
 #: templates/dashboard/catalogue/category_list.html:31
-#: templates/layout.html:136 templates/search/results.html:15
+#: templates/layout.html:147 templates/search/results.html:15
 #: templates/sitemap/sitemap.html:11
 msgid "Home"
 msgstr ""
@@ -1344,7 +1355,7 @@ msgid "Reviews"
 msgstr ""
 
 #: templates/catalogue/detail.html:123 templates/catalogue/detail.html:243
-#: templates/layout.html:76
+#: templates/layout.html:87
 msgid "Shipping and payment"
 msgstr ""
 
@@ -4844,51 +4855,47 @@ msgstr ""
 msgid "Sorry!"
 msgstr ""
 
-#: templates/layout.html:41
+#: templates/layout.html:40
 msgid "Phones"
-msgstr ""
+msgstr "Телефоны"
 
-#: templates/layout.html:71
+#: templates/layout.html:82
 msgid "Company"
 msgstr ""
 
-#: templates/layout.html:75
+#: templates/layout.html:86
 msgid "Contacts"
 msgstr ""
 
-#: templates/layout.html:77
+#: templates/layout.html:88
 msgid "For buyers"
 msgstr ""
 
-#: templates/layout.html:85
+#: templates/layout.html:96
 msgid "You are looking for something"
 msgstr ""
 
-#: templates/layout.html:199
+#: templates/layout.html:210
 msgid "Хочу"
 msgstr ""
 
-#: templates/layout.html:249
+#: templates/layout.html:260
 msgid "Questions?"
 msgstr ""
 
-#: templates/layout.html:293
-msgid "Information"
-msgstr ""
-
-#: templates/layout.html:310
+#: templates/layout.html:321
 msgid "Support service"
 msgstr "Сервис поддержки"
 
-#: templates/layout.html:312
+#: templates/layout.html:323
 msgid "Contact us"
 msgstr ""
 
-#: templates/layout.html:313
+#: templates/layout.html:324
 msgid "Return purchase "
 msgstr ""
 
-#: templates/layout.html:314
+#: templates/layout.html:325
 msgid "Site Map"
 msgstr ""
 

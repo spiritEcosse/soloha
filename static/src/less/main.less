@@ -36,6 +36,10 @@ h4, .h4 {
     background-color: #dff0d8;
     border-color: #d6e9c6;
 }
+.navbar-transparent {
+    background: transparent;
+    border-color: transparent;
+}
 .navbar-primary {
     .navbar-toggle {
         .btn-orange();
@@ -259,10 +263,20 @@ header {
             color: #fdfcfb;
             font-size: @phones_font_size;
             font-weight: @phones_font_weight;
-            text-align: center;
             border-right: 1px solid #ffae42;
             border-left: 1px solid #ffae42;
+            height: inherit;
 
+            .navbar-brand {
+                padding: 9px;
+                height: inherit;
+                .text-white();
+            }
+
+            .navbar-default .navbar-nav > li > a {
+                padding: 9px;
+                .text-white();
+            }
             span {
                 font-size-adjust: 0.38;
             }

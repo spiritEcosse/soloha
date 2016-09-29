@@ -8346,6 +8346,10 @@ h4,
   background-color: #dff0d8;
   border-color: #d6e9c6;
 }
+.navbar-transparent {
+  background: transparent;
+  border-color: transparent;
+}
 .navbar-primary .navbar-toggle {
   color: white;
   font-size: 17px;
@@ -8561,11 +8565,28 @@ header .top {
 }
 header .top .phones {
   color: #fdfcfb;
-  font-size: 21px;
+  font-size: 20px;
   font-weight: 700;
-  text-align: center;
   border-right: 1px solid #ffae42;
   border-left: 1px solid #ffae42;
+  height: inherit;
+}
+header .top .phones .navbar-brand {
+  padding: 9px;
+  height: inherit;
+  color: white;
+}
+header .top .phones .navbar-brand:focus,
+header .top .phones .navbar-brand:hover {
+  color: white;
+}
+header .top .phones .navbar-default .navbar-nav > li > a {
+  padding: 9px;
+  color: white;
+}
+header .top .phones .navbar-default .navbar-nav > li > a:focus,
+header .top .phones .navbar-default .navbar-nav > li > a:hover {
+  color: white;
 }
 header .top .phones span {
   font-size-adjust: 0.38;
