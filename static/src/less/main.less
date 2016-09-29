@@ -252,16 +252,38 @@ a, span, div {
 .alert-error {
     .alert-danger();
 }
+.btn-inline-block {
+    display: inline-block;
+}
 header {
     .top {
         line-height: @header_top;
 
-        .cart {
-            .dropdown-menu.full-width {
-                width: 600px;
-                margin-top: 0;
-            }
+        @media (min-width: @screen-md-min) {
+            .cart {
+                float: right !important;
 
+                .dropdown-menu {
+                    .pull-right>.dropdown-menu();
+                }
+
+                .dropdown-menu.full-width {
+                    width: 600px;
+                    margin-top: 0;
+                }
+            }
+        }
+
+        @media (max-width: @screen-md-min) {
+            .cart {
+                .dropdown-menu {
+                    background: white;
+                    overflow: hidden;
+                }
+            }
+        }
+
+        .cart {
             .text {
                 float: left;
                 padding-right: @cart_padding_left_right;

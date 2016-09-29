@@ -1,23 +1,24 @@
 {% load currency_filters %}
 {% load i18n %}
 
-<div class="dropdown pull-right cart">
-    <button class="btn btn-sm btn-default dropdown-toggle" type="button" id="cart-show" data-toggle="dropdown"
-            aria-haspopup="true" aria-expanded="false">
-        <span class="glyphicon glyphicon-shopping-cart" aria-hidden="true"></span>
-        {% trans "Basket total" %}:
+<ul class="nav navbar-nav cart">
+    <li class="dropdown">
+        <button class="btn btn-sm btn-default btn-inline-block btn-block dropdown-toggle" type="button" id="cart-show" data-toggle="dropdown"
+                aria-haspopup="true" aria-expanded="false">
+            <span class="glyphicon glyphicon-shopping-cart" aria-hidden="true"></span>
+            {% trans "Basket total" %}:
 
-        {% if request.basket.is_tax_known %}
-            {{ request.basket.total_incl_tax|currency:request.basket.currency }}
-        {% else %}
-            {{ request.basket.total_excl_tax|currency:request.basket.currency }}
-        {% endif %}
+            {% if request.basket.is_tax_known %}
+                {{ request.basket.total_incl_tax|currency:request.basket.currency }}
+            {% else %}
+                {{ request.basket.total_excl_tax|currency:request.basket.currency }}
+            {% endif %}
 
-        <span class="caret"></span>
-    </button>
+            <span class="caret"></span>
+        </button>
 
-    <div class="dropdown-menu stop-propagation{% if request.basket.num_lines %} full-width{% endif %}" aria-labelledby="cart-show">
-        {% include "basket/partials/basket_quick.html" %}
-    </div>
-</div>
-
+        <div class="dropdown-menu stop-propagation{% if request.basket.num_lines %} full-width{% endif %}" aria-labelledby="cart-show">
+            {% include "basket/partials/basket_quick.html" %}
+        </div>
+    </li>
+</ul>
