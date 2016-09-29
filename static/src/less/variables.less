@@ -16,9 +16,17 @@
 @grid-float-breakpoint:@screen-md-max;
 @factor: 1;
 
-@header_top: 40px / @factor;
+@header_top: @navbar-height / @factor;
 @header_margin_bottom: 20px;
 @header_font_size: 20px;
+
+@navbar-default-bg: @brand-primary;
+@navbar-default-link-color: white;
+@navbar-default-link-hover-color: darken(@navbar-default-link-color, 6.5%);
+@navbar-default-link-active-color: @navbar-default-link-hover-color;
+@navbar-default-toggle-hover-bg: white;
+@navbar-default-toggle-border-color: @navbar-default-toggle-hover-bg;
+@navbar-default-toggle-icon-bar-bg: @navbar-default-toggle-hover-bg;
 
 @phones_font_size: @header_font_size / @factor;
 @phones_font_weight: 700;

@@ -40,14 +40,15 @@ h4, .h4 {
     background: transparent;
     border-color: transparent;
 }
-.navbar-primary {
-    .navbar-toggle {
-        .btn-orange();
-        .icon-bar {
-            background-color: white;
-        }
-    }
-}
+//.navbar-primary {
+//    .navbar-toggle {
+//        .btn-orange();
+//        .icon-bar {
+//            background-color: white;
+//        }
+//    }
+//}
+
 .star-rating.One .glyphicon-star:first-child {
     color: @brand-primary;
 }
@@ -253,136 +254,80 @@ a, span, div {
 }
 header {
     .top {
-        height: @header_top;
-        background-color: @brand-primary;
         line-height: @header_top;
-        white-space: nowrap;
-        margin-bottom: @header_margin_bottom;
-
-        .phones {
-            color: #fdfcfb;
-            font-size: @phones_font_size;
-            font-weight: @phones_font_weight;
-            border-right: 1px solid #ffae42;
-            border-left: 1px solid #ffae42;
-            height: inherit;
-
-            .navbar-brand {
-                padding: 9px;
-                height: inherit;
-                .text-white();
-            }
-
-            .navbar-default .navbar-nav > li > a {
-                padding: 9px;
-                .text-white();
-            }
-            span {
-                font-size-adjust: 0.38;
-            }
-        }
 
         .cart {
-            //padding-right: 0;
+            .dropdown-menu.full-width {
+                width: 600px;
+                margin-top: 0;
+            }
 
-            .dropdown {
-                //background: url("../../image/cart.png") left center no-repeat;
-                //background-size: @cart_width @cart_height;
-                //height: inherit;
+            .text {
+                float: left;
+                padding-right: @cart_padding_left_right;
+                color: black;
+                font-size: @cart_font_size;
+                font-weight: @cart_font_weight;
+            }
 
-                //&:hover {
-                //    .text {
-                //        color: #fffefe;
-                //    }
-                //}
+            .item {
+                padding-bottom: 10px;
+                margin-bottom: 10px;
+                border-bottom: 1px solid #c2c2c2;
 
-                .dropdown-menu.full-width {
-                    width: 600px;
+                .image {
+                    position: absolute;
+                    top: 50%;
+                    transform: translateY(-50%);
                 }
 
-                //> .btn {
-                //padding: 11px 0 9px 12px;
-                //
-                //&:hover, &:focus {
-                //    color: white;
-                //}
-                //}
+                .title {
+                    line-height: 18px;
 
-                .text {
-                    float: left;
-                    padding-right: @cart_padding_left_right;
-                    color: black;
-                    font-size: @cart_font_size;
-                    font-weight: @cart_font_weight;
-                }
-
-                .arrow {
-                    background: url("../../image/cart_arrow.png") center no-repeat;
-                    background-size: @cart_arrow_width @cart_arrow_height;
-                    height: inherit;
-                    width: @cart_arrow_width;
-                    float: left;
-                }
-
-                .item {
-                    padding-bottom: 10px;
-                    margin-bottom: 10px;
-                    border-bottom: 1px solid #c2c2c2;
-
-                    .image {
-                        position: absolute;
-                        top: 50%;
-                        transform: translateY(-50%);
-                    }
-
-                    .title {
-                        line-height: 18px;
-
-                        a {
-                            font-size: 14px;
-                            font-weight: 400;
-                            color: @brand-primary;
-                            text-decoration: underline;
-                        }
-                    }
-
-                    .price {
-                        color: #6f6f6f;
-                        font-weight: 400;
-                        font-size: 18px;
-                        position: absolute;
-                        top: 50%;
-                        transform: translateY(-50%);
-                        right: 10px;
-
-                        .glyphicon-remove {
-                            cursor: pointer;
-                            color: @brand-primary;
-                        }
-                        .currency {
-                            font-size: 14px;
-                        }
-                    }
-
-                    .short-desc {
+                    a {
                         font-size: 14px;
-                        white-space: normal;
-                        color: #6f6f6f;
-                        line-height: 18px;
+                        font-weight: 400;
+                        color: @brand-primary;
+                        text-decoration: underline;
                     }
                 }
 
-                .total {
+                .price {
                     color: #6f6f6f;
                     font-weight: 400;
+                    font-size: 18px;
+                    position: absolute;
+                    top: 50%;
+                    transform: translateY(-50%);
+                    right: 10px;
 
-                    .all, .currency {
+                    .glyphicon-remove {
+                        cursor: pointer;
+                        color: @brand-primary;
+                    }
+                    .currency {
                         font-size: 14px;
                     }
+                }
 
-                    .number {
-                        font-size: 18px;
-                    }
+                .short-desc {
+                    font-size: 14px;
+                    white-space: normal;
+                    color: #6f6f6f;
+                    line-height: 18px;
+                }
+            }
+
+            .total {
+                color: #6f6f6f;
+                font-weight: 400;
+
+                .all, .currency {
+                    font-size: 14px;
+                }
+
+                .number {
+                    font-size: 18px;
                 }
             }
         }

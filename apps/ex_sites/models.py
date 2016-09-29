@@ -23,7 +23,7 @@ class Info(models.Model):
         verbose_name_plural = _('Information')
 
     def phone_numbers_slice(self):
-        return self.phone_numbers.all()[:self.phone_numbers.count() - 2]
+        return self.phone_numbers.all()[:4]
 
 
 class PhoneNumber(models.Model):

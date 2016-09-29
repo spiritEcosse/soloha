@@ -24,58 +24,48 @@
         {# Site logo/title, mini-basket, browse dropdown and searchbox #}
         <header ng-controller="Header">
             <div class="row top">
-                <div class="col-xs-4 hidden-xs">
-                    {% include "partials/brand.html" %}
-                </div>
-                {% if current_site.info.phone_numbers.exists %}
-                    <div class="col-xs-12 col-sm-13 col-md-14 phones">
-                        {% with count_phone_numbers=current_site.info.phone_numbers.count phone_numbers_slice=current_site.info.phone_numbers.all|slice:"3:" %}
-                            <div class="row">
-                                <nav class="navbar navbar-default navbar-primary">
-                                    <div class="container-fluid">
-                                        <div class="navbar-header">
-                                            <button aria-expanded="false" class="collapsed navbar-toggle" data-target="#bs-example-navbar-collapse-7" data-toggle="collapse" type="button">
-                                            <span class="sr-only">
-                                             Toggle navigation
-                                            </span>
-                                                <span class="icon-bar"></span>
-                                                <span class="icon-bar"></span>
-                                                <span class="icon-bar"></span>
-                                            </button>
-                                            <a class="navbar-brand" href="#">
-                                                {% trans 'Phones' %}
-                                            </a>
-                                        </div>
-                                        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-7">
-                                            <ul class="nav navbar-nav">
-                                                {% for phone in current_site.info.phone_numbers_slice %}
-                                                    <li><a href="tel:{{ phone.phone_number }}">{{ phone.phone_number.as_international }}</a></li>
-                                                {% endfor %}
-                                            </ul>
-                                            <div class="dropdown pull-right hidden-sm hidden-xs">
-                                                {% if phone_numbers_slice %}
-                                                    <button type="button" class="btn btn-default dropdown-toggle" id="phones" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                        {% trans 'More' %} <span class="caret"></span>
-                                                    </button>
-                                                    <ul class="dropdown-menu stop-propagation" aria-labelledby="phones">
-                                                        {% for phone in phone_numbers_slice %}
-                                                            <li><a class="text-white" href="tel:{{ phone.phone_number }}">
-                                                                {{ phone.phone_number.as_international }}</a></li>
-                                                        {% endfor %}
-                                                    </ul>
-                                                {% endif %}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </nav>
-                            </div>
-                        {% endwith %}
+                <nav class="navbar navbar-default">
+                    <div class="container-fluid">
+                        <div class="navbar-header">
+                            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#top-header-menu" aria-expanded="false">
+                                <span class="sr-only">{% trans 'Toggle navigation' %}</span>
+                                <span class="icon-bar"></span>
+                                <span class="icon-bar"></span>
+                                <span class="icon-bar"></span>
+                            </button>
+                            {% include "partials/brand.html" %}
+                        </div>
+
+                        <div class="collapse navbar-collapse" id="top-header-menu">
+                            {% if current_site.info.phone_numbers.exists %}
+                                {% with count_phone_numbers=current_site.info.phone_numbers.count phone_numbers_slice=current_site.info.phone_numbers.all|slice:"4:" %}
+                                    <ul class="nav navbar-nav">
+                                        {% for phone in current_site.info.phone_numbers_slice %}
+                                            <li><a href="tel:{{ phone.phone_number }}">{{ phone.phone_number.as_international }}</a></li>
+                                        {% endfor %}
+
+                                        {% if phone_numbers_slice %}
+                                            <li class="dropdown">
+                                                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                    <span class="glyphicon glyphicon-earphone"></span>
+                                                    {% trans 'Phones' %}
+                                                    <span class="sr-only">{% trans 'Phones' %}</span><span class="caret"></span>
+                                                </button>
+                                                <ul class="dropdown-menu">
+                                                    {% for phone in phone_numbers_slice %}
+                                                        <li><a class="text-white" href="tel:{{ phone.phone_number }}">
+                                                            {{ phone.phone_number.as_international }}</a></li>
+                                                    {% endfor %}
+                                                </ul>
+                                            </li>
+                                        {% endif %}
+                                    </ul>
+                                {% endwith %}
+                            {% endif %}
+                            {% block mini_basket %}{% include "partials/mini_basket.html" %}{% endblock %}
+                        </div>
                     </div>
-                {% endif %}
-                <div class="col-xs-8 col-sm-7 col-md-6 cart">
-                    {# Mini-basket wrapped in a block so some templates can now display it #}
-                    {% block mini_basket %}{% include "partials/mini_basket.html" %}{% endblock %}
-                </div>
+                </nav>
             </div>
             <div class="row center">
                 <div class="col-xs-10 col-sm-5">

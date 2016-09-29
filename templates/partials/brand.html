@@ -1,5 +1,8 @@
-<a href="{{ homepage_url }}" class="text-white">
+{% load i18n %}
+
+<a href="{{ homepage_url }}" class="navbar-brand">
     {% block brand_title %}
         <strong>{{ shop_name|upper }}</strong>
+        <span class="sr-only">{% trans 'Brand' %}</span>
     {% endblock %}
 </a>

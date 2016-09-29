@@ -6025,33 +6025,33 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
   }
 }
 .navbar-default {
-  background-color: #f8f8f8;
-  border-color: #e7e7e7;
+  background-color: #ff890d;
+  border-color: #eb7800;
 }
 .navbar-default .navbar-brand {
-  color: #777;
+  color: white;
 }
 .navbar-default .navbar-brand:hover,
 .navbar-default .navbar-brand:focus {
-  color: #5e5e5e;
+  color: #e6e6e6;
   background-color: transparent;
 }
 .navbar-default .navbar-text {
   color: #777;
 }
 .navbar-default .navbar-nav > li > a {
-  color: #777;
+  color: white;
 }
 .navbar-default .navbar-nav > li > a:hover,
 .navbar-default .navbar-nav > li > a:focus {
-  color: #333;
+  color: #eeeeee;
   background-color: transparent;
 }
 .navbar-default .navbar-nav > .active > a,
 .navbar-default .navbar-nav > .active > a:hover,
 .navbar-default .navbar-nav > .active > a:focus {
-  color: #555;
-  background-color: #e7e7e7;
+  color: #eeeeee;
+  background-color: #eb7800;
 }
 .navbar-default .navbar-nav > .disabled > a,
 .navbar-default .navbar-nav > .disabled > a:hover,
@@ -6060,39 +6060,39 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
   background-color: transparent;
 }
 .navbar-default .navbar-toggle {
-  border-color: #ddd;
+  border-color: white;
 }
 .navbar-default .navbar-toggle:hover,
 .navbar-default .navbar-toggle:focus {
-  background-color: #ddd;
+  background-color: white;
 }
 .navbar-default .navbar-toggle .icon-bar {
-  background-color: #888;
+  background-color: white;
 }
 .navbar-default .navbar-collapse,
 .navbar-default .navbar-form {
-  border-color: #e7e7e7;
+  border-color: #eb7800;
 }
 .navbar-default .navbar-nav > .open > a,
 .navbar-default .navbar-nav > .open > a:hover,
 .navbar-default .navbar-nav > .open > a:focus {
-  background-color: #e7e7e7;
-  color: #555;
+  background-color: #eb7800;
+  color: #eeeeee;
 }
 @media (max-width: 1198px) {
   .navbar-default .navbar-nav .open .dropdown-menu > li > a {
-    color: #777;
+    color: white;
   }
   .navbar-default .navbar-nav .open .dropdown-menu > li > a:hover,
   .navbar-default .navbar-nav .open .dropdown-menu > li > a:focus {
-    color: #333;
+    color: #eeeeee;
     background-color: transparent;
   }
   .navbar-default .navbar-nav .open .dropdown-menu > .active > a,
   .navbar-default .navbar-nav .open .dropdown-menu > .active > a:hover,
   .navbar-default .navbar-nav .open .dropdown-menu > .active > a:focus {
-    color: #555;
-    background-color: #e7e7e7;
+    color: #eeeeee;
+    background-color: #eb7800;
   }
   .navbar-default .navbar-nav .open .dropdown-menu > .disabled > a,
   .navbar-default .navbar-nav .open .dropdown-menu > .disabled > a:hover,
@@ -6102,17 +6102,17 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
   }
 }
 .navbar-default .navbar-link {
-  color: #777;
+  color: white;
 }
 .navbar-default .navbar-link:hover {
-  color: #333;
+  color: #eeeeee;
 }
 .navbar-default .btn-link {
-  color: #777;
+  color: white;
 }
 .navbar-default .btn-link:hover,
 .navbar-default .btn-link:focus {
-  color: #333;
+  color: #eeeeee;
 }
 .navbar-default .btn-link[disabled]:hover,
 fieldset[disabled] .navbar-default .btn-link:hover,
@@ -8350,13 +8350,6 @@ h4,
   background: transparent;
   border-color: transparent;
 }
-.navbar-primary .navbar-toggle {
-  color: white;
-  font-size: 17px;
-}
-.navbar-primary .navbar-toggle .icon-bar {
-  background-color: white;
-}
 .star-rating.One .glyphicon-star:first-child {
   color: #ff890d;
 }
@@ -8557,77 +8550,39 @@ div {
   color: #843534;
 }
 header .top {
-  height: 40px;
-  background-color: #ff890d;
-  line-height: 40px;
-  white-space: nowrap;
-  margin-bottom: 20px;
+  line-height: 50px;
 }
-header .top .phones {
-  color: #fdfcfb;
-  font-size: 20px;
-  font-weight: 700;
-  border-right: 1px solid #ffae42;
-  border-left: 1px solid #ffae42;
-  height: inherit;
-}
-header .top .phones .navbar-brand {
-  padding: 9px;
-  height: inherit;
-  color: white;
-}
-header .top .phones .navbar-brand:focus,
-header .top .phones .navbar-brand:hover {
-  color: white;
-}
-header .top .phones .navbar-default .navbar-nav > li > a {
-  padding: 9px;
-  color: white;
-}
-header .top .phones .navbar-default .navbar-nav > li > a:focus,
-header .top .phones .navbar-default .navbar-nav > li > a:hover {
-  color: white;
-}
-header .top .phones span {
-  font-size-adjust: 0.38;
-}
-header .top .cart .dropdown .dropdown-menu.full-width {
+header .top .cart .dropdown-menu.full-width {
   width: 600px;
+  margin-top: 0;
 }
-header .top .cart .dropdown .text {
+header .top .cart .text {
   float: left;
   padding-right: 5px;
   color: black;
   font-size: 15px;
   font-weight: 400;
 }
-header .top .cart .dropdown .arrow {
-  background: url("../../image/cart_arrow.png") center no-repeat;
-  background-size: 12px 11px;
-  height: inherit;
-  width: 12px;
-  float: left;
-}
-header .top .cart .dropdown .item {
+header .top .cart .item {
   padding-bottom: 10px;
   margin-bottom: 10px;
   border-bottom: 1px solid #c2c2c2;
 }
-header .top .cart .dropdown .item .image {
+header .top .cart .item .image {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
 }
-header .top .cart .dropdown .item .title {
+header .top .cart .item .title {
   line-height: 18px;
 }
-header .top .cart .dropdown .item .title a {
+header .top .cart .item .title a {
   font-size: 14px;
   font-weight: 400;
   color: #ff890d;
   text-decoration: underline;
 }
-header .top .cart .dropdown .item .price {
+header .top .cart .item .price {
   color: #6f6f6f;
   font-weight: 400;
   font-size: 18px;
@@ -8636,28 +8591,28 @@ header .top .cart .dropdown .item .price {
   transform: translateY(-50%);
   right: 10px;
 }
-header .top .cart .dropdown .item .price .glyphicon-remove {
+header .top .cart .item .price .glyphicon-remove {
   cursor: pointer;
   color: #ff890d;
 }
-header .top .cart .dropdown .item .price .currency {
+header .top .cart .item .price .currency {
   font-size: 14px;
 }
-header .top .cart .dropdown .item .short-desc {
+header .top .cart .item .short-desc {
   font-size: 14px;
   white-space: normal;
   color: #6f6f6f;
   line-height: 18px;
 }
-header .top .cart .dropdown .total {
+header .top .cart .total {
   color: #6f6f6f;
   font-weight: 400;
 }
-header .top .cart .dropdown .total .all,
-header .top .cart .dropdown .total .currency {
+header .top .cart .total .all,
+header .top .cart .total .currency {
   font-size: 14px;
 }
-header .top .cart .dropdown .total .number {
+header .top .cart .total .number {
   font-size: 18px;
 }
 header .center {
