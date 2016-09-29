@@ -30,14 +30,6 @@
                 {% if current_site.info.phone_numbers.exists %}
                     <div class="col-xs-12 col-sm-13 col-md-14 phones">
                         {% with count_phone_numbers=current_site.info.phone_numbers.count phone_numbers_slice=current_site.info.phone_numbers.all|slice:"3:" %}
-                            {#                            <ul class="nav nav-pills hidden-sm hidden-xs" role="tablist">#}
-                            {#                                {% for phone in current_site.info.phone_numbers_slice %}#}
-                            {#                                    <li role="presentation">#}
-                            {#                                        <a class="text-white" href="tel:{{ phone.phone_number }}">{{ phone.phone_number.as_international }}</a>#}
-                            {#                                    </li>#}
-                            {#                                {% endfor %}#}
-                            {#                            </ul>#}
-
                             <div class="row">
                                 <nav class="navbar navbar-default navbar-primary">
                                     <div class="container-fluid">

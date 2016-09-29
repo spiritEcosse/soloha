@@ -24,3 +24,10 @@ class StockRecordResource(resources.ModelResource):
         fields = ('id', 'delete', 'product', 'price_excl_tax', 'price_retail', 'cost_price', 'attributes',
                   'num_in_stock', 'num_allocated', 'low_stock_threshold', )
         export_order = fields
+
+    def export(self, queryset=None):
+        # Todo else not have mind, because this is very slow i.e
+        # queryset = self._meta.model.objects.order_by('id', 'cost_price')
+        if queryset is not None:
+            queryset = queryset.order_by('id', 'cost_price')
+        return super(StockRecordResource, self).export(queryset=queryset)
