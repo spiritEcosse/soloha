@@ -275,3 +275,4 @@ app.controller 'More_goods', ['$http', '$scope', '$window', '$document', '$locat
         .error ->
             console.error('An error occurred during submission')
 ]
+

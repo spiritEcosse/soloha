@@ -6,27 +6,27 @@ app_name = "soloha"
 app = angular.module app_name
 
 app.controller 'Contacts', ['$http', '$scope', '$window', 'djangoForm', '$document', ($http, $scope, $window, djangoForm, $document) ->
-  $scope.alerts = []
+    $scope.alert = null
+    $scope.disabled_button = false
 
-  $scope.closeAlert = (index) ->
-    $scope.alerts.splice(index, 1)
+    $scope.remove_alert = ->
+        $scope.alert = null
 
-  $scope.submit = ->
-    $scope.disabled = true
+    $scope.submit = ->
+        if $scope.feedback
+            $scope.disabled_button = true
+            $scope.alert = null
+            $scope.button.actual = $scope.button.sending
 
-    if $scope.feedback
-      $http.post(".", $scope.feedback).success (data) ->
-        if not djangoForm.setErrors($scope.form_comment, data.errors)
-          duration = 800
-          offset = 0
-          $scope.alerts.push({msg: data.msg, type: 'success'})
-          someElement = angular.element(document.getElementById('alerts'))
-          $document.scrollToElement(someElement, offset, duration)
-      .error ->
-        console.error('An error occurred during submission')
+            $http.post(".", $scope.feedback).success (data) ->
+                if not djangoForm.setErrors($scope.form_comment, data.errors)
+                    $scope.alert = ({msg: data.msg, type: 'alert-success'})
 
-    $scope.disabled = false
-    return false
+                $scope.button.actual = $scope.button.send
+                $scope.disabled_button = false
+            .error ->
+                console.error('An error occurred during submission')
+
 ]
 app.directive 'alertSuccess', ['$scope', ($scope) ->
 ]

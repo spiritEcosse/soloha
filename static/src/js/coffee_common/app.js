@@ -438,31 +438,29 @@
 
   app.controller('Contacts', [
     '$http', '$scope', '$window', 'djangoForm', '$document', function($http, $scope, $window, djangoForm, $document) {
-      $scope.alerts = [];
-      $scope.closeAlert = function(index) {
-        return $scope.alerts.splice(index, 1);
+      $scope.alert = null;
+      $scope.disabled_button = false;
+      $scope.remove_alert = function() {
+        return $scope.alert = null;
       };
       return $scope.submit = function() {
-        $scope.disabled = true;
         if ($scope.feedback) {
-          $http.post(".", $scope.feedback).success(function(data) {
-            var duration, offset, someElement;
+          $scope.disabled_button = true;
+          $scope.alert = null;
+          $scope.button.actual = $scope.button.sending;
+          return $http.post(".", $scope.feedback).success(function(data) {
             if (!djangoForm.setErrors($scope.form_comment, data.errors)) {
-              duration = 800;
-              offset = 0;
-              $scope.alerts.push({
+              $scope.alert = {
                 msg: data.msg,
-                type: 'success'
-              });
-              someElement = angular.element(document.getElementById('alerts'));
-              return $document.scrollToElement(someElement, offset, duration);
+                type: 'alert-success'
+              };
             }
+            $scope.button.actual = $scope.button.send;
+            return $scope.disabled_button = false;
           }).error(function() {
             return console.error('An error occurred during submission');
           });
         }
-        $scope.disabled = false;
-        return false;
       };
     }
   ]);
