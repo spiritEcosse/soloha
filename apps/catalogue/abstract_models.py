@@ -295,8 +295,8 @@ class AbstractProduct(models.Model, CommonFeatureProduct):
         if not self.slug:
             self.slug = slugify(self.get_title())
 
-        # self.characteristics.add(*self.filters.all())
         super(AbstractProduct, self).save(*args, **kwargs)
+        self.characteristics.add(*self.filters.all())
 
     # Properties
 
