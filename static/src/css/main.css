@@ -8395,7 +8395,7 @@ h4,
 }
 h1,
 h2 {
-  padding-right: 15px;
+  padding: 0;
   margin-top: 0;
 }
 a {
@@ -8535,8 +8535,9 @@ div {
   height: auto;
 }
 .page-header {
-  margin-top: 20px;
-  padding-left: 15px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  padding: 0 15px;
 }
 .alert-error {
   background-color: #f2dede;
@@ -9106,12 +9107,10 @@ header .bottom .navbar .nav > li .yamm-content .image .btn-menu {
   padding-top: 10px;
 }
 .main .breadcrumb {
-  color: #6f6f6f;
   font-size: 11px;
-  font-weight: 400;
-  text-decoration: underline;
   background: transparent;
   padding-left: 0;
+  margin-bottom: 0;
 }
 .main .breadcrumb a {
   text-decoration: underline;
