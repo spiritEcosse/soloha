@@ -3,6 +3,7 @@ from django.contrib.sites.models import Site
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from phonenumber_field.modelfields import PhoneNumberField
+from ckeditor_uploader.fields import RichTextUploadingField
 
 
 @python_2_unicode_compatible
@@ -13,6 +14,8 @@ class Info(models.Model):
     phone_numbers = models.ManyToManyField('ex_sites.PhoneNumber', verbose_name=_('Phone numbers'), blank=True)
     email = models.EmailField(verbose_name=_('Email'), max_length=200)
     shop_short_desc = models.CharField(verbose_name=_('Short description of shop'), max_length=200, blank=True)
+    way = RichTextUploadingField(verbose_name=_('Way to us'), blank=True)
+    map = RichTextUploadingField(verbose_name=_('Map google'))
 
     def __str__(self):
         return self.site.domain

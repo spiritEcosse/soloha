@@ -17,7 +17,6 @@
 
 @import 'variables.less';
 
-
 .lSAction > a {
     background-image: url('../../image/controls.png');
 }
@@ -208,27 +207,23 @@ a, span, div {
     top: 50%;
     transform: translateY(-50%);
 }
-.question {
-    padding-left: 10px;
-    padding-right: 20px;
-    margin-right: 10px;
+.reset-margin {
+    padding: 0;
+}
+.glyphicon-grid {
+    position: relative;
 
-    .item {
-        padding-left: 47px;
-        margin-left: 0;
-        padding-top: 10px;
-        padding-bottom: 10px;
-        position: relative;
+    .glyphicon-icon {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+    }
 
-        .icon {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-        }
+    .glyphicon-text {
+        padding-left: 50px;
 
-        .text {
-            padding-left: 30px;
-            line-height: 18px;
+        ol {
+            margin-left: 15px;
         }
     }
 }
@@ -246,8 +241,8 @@ a, span, div {
     height: auto;
 }
 .page-header {
-    margin-top: 10px;
-    margin-bottom: 10px;
+    margin-top: 0;
+    margin-bottom: 0;
     padding: 0 15px;
 }
 .alert-error {
@@ -927,7 +922,6 @@ header {
     }
 
     .sort {
-        border-top: 1px solid rgba(194, 194, 194, 0.39);
         border-bottom: 1px solid rgba(194, 194, 194, 0.39);
         padding-top: 10px;
         padding-bottom: 10px;
@@ -1120,7 +1114,8 @@ header {
     }
 
     .content {
-        margin-bottom: 10px;
+        padding-bottom: 10px;
+        padding-top: 10px;
     }
 
     .category {
@@ -1901,9 +1896,6 @@ header {
     }
 
     .contacts {
-        border: 1px solid #dedede;
-        border-radius: @border-radius-base;
-
         .question {
             margin-top:5px;
             color: #6f6f6f;
@@ -1946,10 +1938,6 @@ header {
                 font-size: 12px;
                 font-weight: 400;
             }
-        }
-
-        .map {
-            margin-top: 20px;
         }
 
         .social {

@@ -6,7 +6,7 @@
 {% block headertext %}{% trans 'Contacts us' %}{% endblock %}
 
 {% block breadcrumbs %}
-    <ul class="breadcrumb">
+    <ul class="breadcrumb" xmlns="http://www.w3.org/1999/html">
         <li><a href="{{ homepage_url }}">{% trans "Home" %}</a></li>
         <li><a href="{{ homepage_url }}">{% trans "Contacts" %}</a></li>
     </ul>
@@ -71,94 +71,129 @@
 {% endblock %}
 
 {% block content %}
-    <div class="col-xs-24 col-sm-18 content-group">
-        <div class="contacts col-xs-24">
-            <div class="row">
-                <div class="col-xs-24 col-md-12 form">
-                    {% verbatim alerts %}
-                        <div id="alerts" ng-cloak="">
-                            <alert ng-repeat="alert in alerts" type="{{alert.type}}" close="closeAlert($index)">{{alert.msg}}</alert>
-                        </div>
-                    {% endverbatim alerts %}
-
-                    <div class="heading">Обратная связь</div>
+    <div class="row content">
+        <div class="col-xs-24 col-md-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">
+                        <span class="glyphicon glyphicon-pencil"></span> {% trans 'Feedback' %}
+                    </h3>
+                </div>
+                <div class="panel-body">
                     <form name="{{ form.form_name }}" method="post" novalidate action=".">
                         {% csrf_token %}
                         {{ form.as_div }}
-                        <div class="cBtn" >
-                            <button type="button" id="comment_form" ng-disabled="{{ form.form_name }}.$invalid" ng-click="submit()" class="btn btn-orange" >
-                                Отправить
-                            </button>
+                        <div class="row">
+                            <div class="col-xs-8">
+                                <button type="button" ng-click="submit()" class="btn btn-primary" {% verbatim %}disabled="{{ disabled_button }}"{% endverbatim %}>
+                                    <span ng-bind="button">{% trans 'Send' %}</span>
+                                </button>
+                            </div>
+                            <div class="col-xs-16">
+                                <div class="alert alert-dismissible" role="alert" ng-class="alert.type" ng-cloak="" ng-if="alert !== null">
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="{% trans 'Close' %}" ng-click="remove_alert()">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                    <span ng-bind="alert.msg"></span>
+                                </div>
+                            </div>
                         </div>
                     </form>
                 </div>
-                <div class="col-xs-24 col-md-12">
-                    <div class="row question">
-                        <div class="heading">Контакты</div>
-                        <div class="row item">
-                            <div class="col-xs-4 row icon">
-                                <span class="glyphicon glyphicon-time"></span>
-                            </div>
-                            <div class="col-xs-20 text">
-                                {{ work_time }}
-                            </div>
-                        </div>
-                        <div class="row item">
-                            <div class="col-xs-4 row icon">
-                                <span class="glyphicon glyphicon-map-marker"></span>
-                            </div>
-                            <div class="col-xs-20 text">
-                                {{ address }}
-                            </div>
-                        </div>
-                        <div class="row item">
-                            <div class="col-xs-4 row icon">
-                                <span class="glyphicon glyphicon-phone-alt"></span>
-                            </div>
-                            <div class="col-xs-20 text">
-                                {{ phone_number }} <br/>
-                            </div>
-                        </div>
-                        <div class="row item">
-                            <div class="col-xs-4 row icon">
-                                <span class="glyphicon glyphicon-envelope"></span>
-                            </div>
-                            <div class="col-xs-20 text">{{ email }}</div>
-                        </div>
-                    </div>
+            </div>
+        </div>
 
-                    <div class="col-xs-24 info-position">
-                        <div class="heading">Как к нам проехать</div>
-                        <div class="row item">
-                            <div class="col-xs-4 wrapper-icon"><span class="icon"></span></div>
-                            <div class="col-xs-20 col-xs-offset-3">
-                                <div>От метро Дарница или Харьковская:</div>
-                                <strong>на 45 маршрутке до остановки универмаг Дарница.</strong>
-                            </div>
-                        </div>
-                        <div class="row item">
-                            <div class="col-xs-4 wrapper-icon"><span class="icon"></span></div>
-                            <div class="col-xs-20 col-xs-offset-3">
-                                <div>От метро Дружбы Народов:</div>
-                                <strong>любым транспортом до Ленинградской площади.</strong>
-                            </div>
-                        </div>
-                        <div class="row item">
-                            <div class="col-xs-4 wrapper-icon"><span class="icon"></span></div>
-                            <div class="col-xs-20 col-xs-offset-3">
-                                <div>От метро Черниговская:</div>
-                                <strong>на 416, 590, 414, 529 до Ленинградской площади.</strong>
-                            </div>
-                        </div>
-                    </div>
+        <div class="col-xs-24 col-md-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title"><span class="glyphicon glyphicon-envelope"></span> {% trans 'Contacts' %}</h3>
                 </div>
-                <div class="col-xs-24 map">
-                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2540.8781161968514!2d30.62056105083814!3d50.44337089565597!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x40d4c55ba305bd51%3A0x57f12e2dea8428fe!2z0L_RgNC-0YHQvy4g0JzQuNGA0YMsIDQsINCa0LjRl9CyLCDQo9C60YDQsNC40L3QsA!5e0!3m2!1sru!2sru!4v1454477714480" width="100%" height="450" frameborder="0" style="border:0" allowfullscreen></iframe>
-                </div>
-                <div class="col-xs-24 social text-center">
-                    <div class="text">Мы всегда рады ответить на вопросы в социальных сетях!</div>
+                <div class="panel-body">
+                    {% if current_site.info.work_time %}
+                        <div class="panel panel-default">
+                            <div class="panel-body">
+                                <div class="row glyphicon-grid">
+                                    <div class="col-xs-3 glyphicon-icon">
+                                        <span class="glyphicon glyphicon-time"></span>
+                                    </div>
+                                    <div class="col-xs-21 glyphicon-text">
+                                        {{ current_site.info.work_time }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    {% if current_site.info.address %}
+                        <div class="panel panel-default">
+                            <div class="panel-body">
+                                <div class="row glyphicon-grid">
+                                    <div class="col-xs-3 glyphicon-icon">
+                                        <span class="glyphicon glyphicon-map-marker"></span>
+                                    </div>
+                                    <div class="col-xs-21 glyphicon-text">
+                                        {{ current_site.info.address }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    {% if current_site.info.phone_numbers.exists %}
+                        <div class="panel panel-default">
+                            <div class="panel-body">
+                                <div class="row glyphicon-grid">
+                                    <div class="col-xs-3 glyphicon-icon">
+                                        <span class="glyphicon glyphicon-phone-alt"></span>
+                                    </div>
+                                    <div class="col-xs-21 glyphicon-text">
+                                        <ol class="reset-margin">
+                                            {% for phone in current_site.info.phone_numbers.all %}
+                                                <li><a href="tel:{{ phone.phone_number }}">{{ phone.phone_number.as_international }}</a></li>
+                                            {% endfor %}
+                                        </ol>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    {% if current_site.info.email %}
+                        <div class="panel panel-default">
+                            <div class="panel-body">
+                                <div class="row glyphicon-grid">
+                                    <div class="col-xs-3 glyphicon-icon">
+                                        <span class="glyphicon glyphicon-envelope"></span>
+                                    </div>
+                                    <div class="col-xs-21 glyphicon-text">
+                                        {{ current_site.info.email }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
                 </div>
             </div>
+        </div>
+
+        <div class="col-xs-24">
+            {% if current_site.info.way %}
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">
+                            <span class="glyphicon glyphicon-road"></span> {% trans 'How to reach us' %}
+                        </h3>
+                    </div>
+                    <div class="panel-body">
+                        {{ current_site.info.way|safe }}
+                    </div>
+                </div>
+            {% endif %}
+
+            {% if current_site.info.map %}
+                {{ current_site.info.map|safe }}
+            {% endif %}
+            {#            <div class="text text-center">Мы всегда рады ответить на вопросы в социальных сетях!</div>#}
         </div>
     </div>
 {% endblock %}

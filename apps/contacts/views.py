@@ -38,12 +38,8 @@ class ContactsView(FormView, ContextMixin):
             email_to, form_email = form_email, email_to
             self.send_email(request, form, form_email, email_to)
 
-            response_data['msg'] = unicode(_('Your message sent!'))
+            response_data['msg'] = str(_('Sent!'))
         return HttpResponse(json.dumps(response_data), content_type="application/json")
-
-    def get_context_data(self, **kwargs):
-        context = super(ContactsView, self).get_context_data(**kwargs)
-        return context
 
     def send_email(self, request, form, form_email, email_to):
         send_mail(_('You received a letter from the site %s') % request.META['HTTP_HOST'],

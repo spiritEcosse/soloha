@@ -36,22 +36,22 @@
     {% if categories %}
         <div class="heading">{% trans "All categories" %}</div>
         <div class="list-group">
-                {% recursetree categories %}
-                    {% if node.enable %}
-                        {% with title=node.name|lower|capfirst|truncatechars:63 url=node.get_absolute_url %}
-                            <a href="{{ node.get_absolute_url }}" class="list-group-item{% ifequal category.slug node.slug %} active{% endifequal %}">
-                                {{ title }} {% if not node.is_leaf_node %}<span class="caret"></span>{% endif %}
-                            </a>
+            {% recursetree categories %}
+                {% if node.enable %}
+                    {% with title=node.name|lower|capfirst|truncatechars:63 url=node.get_absolute_url %}
+                        <a href="{{ node.get_absolute_url }}" class="list-group-item{% ifequal category.slug node.slug %} active{% endifequal %}">
+                            {{ title }} {% if not node.is_leaf_node %}<span class="caret"></span>{% endif %}
+                        </a>
 
-                            {% if not node.is_leaf_node %}
-                                <div class="collapse list-group-submenu in">
-                                    {{ children }}
-                                </div>
-                            {% endif %}
-                        {% endwith %}
-                    {% endif %}
-                {% endrecursetree %}
-            </div>
+                        {% if not node.is_leaf_node %}
+                            <div class="collapse list-group-submenu in">
+                                {{ children }}
+                            </div>
+                        {% endif %}
+                    {% endwith %}
+                {% endif %}
+            {% endrecursetree %}
+        </div>
     {% endif %}
 
     {% if has_facets %}
@@ -69,42 +69,42 @@
 {% block content %}
     <div class="row sort">
         <div class="col-xs-8">
-            <form method="get" class="form-horizontal">
-        {# Render other search params in a hidden block #}
-        <div style="display:none">
-            {% for value in selected_facets %}
-                <input name="selected_facets" value="{{ value }}" />
-            {% endfor %}
-            {{ form.q }}
-        </div>
-
-        {% if paginator.count %}
-            {% if paginator.num_pages > 1 %}
-                {% blocktrans with start=page_obj.start_index end=page_obj.end_index count num_results=paginator.count %}
-                    <strong>{{ num_results }}</strong> result - showing <strong>{{ start }}</strong> to <strong>{{ end }}</strong>.
-                {% plural %}
-                    <strong>{{ num_results }}</strong> results - showing <strong>{{ start }}</strong> to <strong>{{ end }}</strong>.
-                {% endblocktrans %}
-            {% else %}
-                {% blocktrans count num_results=paginator.count %}
-                    <strong>1</strong> result.
-                {% plural %}
-                    <strong>{{ num_results }}</strong> results.
-                {% endblocktrans %}
-            {% endif %}
-            {% if form %}
-                <div class="pull-right">
-                    {% include "partials/form_field.html" with field=form.sort_by %}
+            <form method="get" class="form-inline">
+                {# Render other search params in a hidden block #}
+                <div style="display:none">
+                    {% for value in selected_facets %}
+                        <input name="selected_facets" value="{{ value }}" />
+                    {% endfor %}
+                    {{ form.q }}
                 </div>
-            {% endif %}
-        {% else %}
-            <p>
-                {% trans "<strong>0</strong> results." %}
-            </p>
-        {% endif %}
-    </form>
+
+                {% if paginator.count %}
+                    {% if paginator.num_pages > 1 %}
+                        {% blocktrans with start=page_obj.start_index end=page_obj.end_index count num_results=paginator.count %}
+                            <strong>{{ num_results }}</strong> result - showing <strong>{{ start }}</strong> to <strong>{{ end }}</strong>.
+                        {% plural %}
+                            <strong>{{ num_results }}</strong> results - showing <strong>{{ start }}</strong> to <strong>{{ end }}</strong>.
+                        {% endblocktrans %}
+                    {% else %}
+                        {% blocktrans count num_results=paginator.count %}
+                            <strong>1</strong> result.
+                        {% plural %}
+                            <strong>{{ num_results }}</strong> results.
+                        {% endblocktrans %}
+                    {% endif %}
+                    {% if form %}
+                        <div class="pull-right">
+                            {% include "partials/form_field.html" with field=form.sort_by %}
+                        </div>
+                    {% endif %}
+                {% else %}
+                    <p>
+                        {% trans "<strong>0</strong> results." %}
+                    </p>
+                {% endif %}
+            </form>
         </div>
-        <div class="col-xs-16">
+        <div class="col-xs-16 text-right">
             <span class="text">{% trans 'Sort by' %}:</span>
             <div class="btn-group btn-group-md" role="group" aria-label="{% trans 'Sort by' %}">
                 {% with url_extra_kwargs.sort|default:orders.0.argument as select_order %}
