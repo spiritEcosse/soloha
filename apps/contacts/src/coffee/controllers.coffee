@@ -7,29 +7,26 @@ app = angular.module app_name
 
 app.controller 'Contacts', ['$http', '$scope', '$window', 'djangoForm', '$document', ($http, $scope, $window, djangoForm, $document) ->
     $scope.alert = null
-    button = 'Sent'
-    $scope.button = button
     $scope.disabled_button = false
 
     $scope.remove_alert = ->
         $scope.alert = null
 
     $scope.submit = ->
-        $scope.disabled_button = true
-        console.log($scope.disabled_button)
-
         if $scope.feedback
-#            $scope.button = 'Sending'
+            $scope.disabled_button = true
+            $scope.alert = null
+            $scope.button.actual = $scope.button.sending
 
             $http.post(".", $scope.feedback).success (data) ->
                 if not djangoForm.setErrors($scope.form_comment, data.errors)
                     $scope.alert = ({msg: data.msg, type: 'alert-success'})
+
+                $scope.button.actual = $scope.button.send
+                $scope.disabled_button = false
             .error ->
                 console.error('An error occurred during submission')
 
-#            $scope.button = button
-            $scope.disabled_button = false
-        return false
 ]
 app.directive 'alertSuccess', ['$scope', ($scope) ->
 ]

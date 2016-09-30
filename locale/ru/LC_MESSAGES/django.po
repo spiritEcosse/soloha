@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-09-29 08:53+0000\n"
+"POT-Creation-Date: 2016-09-30 16:17+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -357,7 +357,7 @@ msgstr ""
 msgid "Product image"
 msgstr "Картинка товара"
 
-#: apps/catalogue/abstract_models.py:726 apps/contacts/forms.py:10
+#: apps/catalogue/abstract_models.py:726 apps/contacts/forms.py:12
 #: templates/customer/wishlists/wishlists_list.html:9
 #: templates/dashboard/catalogue/product_class_form.html:97
 #: templates/dashboard/catalogue/product_class_list.html:27
@@ -548,11 +548,11 @@ msgstr "Пожалуйста, введите номер."
 msgid "Available size limits: min - \"{}\", max - \"{}\""
 msgstr ""
 
-#: apps/contacts/forms.py:12
+#: apps/contacts/forms.py:15
 msgid "Enter a valid phone number"
 msgstr "Введите действительный номер телефона."
 
-#: apps/contacts/forms.py:13 apps/ex_sites/models.py:14
+#: apps/contacts/forms.py:18 apps/ex_sites/models.py:15
 #: templates/checkout/checkout.html:49 templates/checkout/thank_you.html:53
 #: templates/dashboard/partners/partner_manage.html:41
 #: templates/dashboard/partners/partner_user_list.html:43
@@ -563,26 +563,26 @@ msgstr "Введите действительный номер телефона.
 #: templates/dashboard/reports/partials/user_report.html:8
 #: templates/dashboard/users/detail.html:36
 msgid "Email"
-msgstr ""
+msgstr "Email"
 
-#: apps/contacts/forms.py:14
+#: apps/contacts/forms.py:19
 msgid "Please enter your email."
 msgstr "Пожалуйста, введите свой email."
 
-#: apps/contacts/forms.py:17 templates/dashboard/orders/order_detail.html:565
+#: apps/contacts/forms.py:23 templates/dashboard/orders/order_detail.html:565
 #: templates/dashboard/orders/order_detail.html:612
 msgid "Message"
 msgstr ""
 
-#: apps/contacts/forms.py:18
+#: apps/contacts/forms.py:24
 msgid "Please enter your message."
 msgstr "Пожалуйста, введите ваше сообщение."
 
-#: apps/contacts/views.py:45
-msgid "Your message sent!"
-msgstr "Ваше сообщение отправлено!"
+#: apps/contacts/views.py:41
+msgid "Sent!"
+msgstr "Отправлено!"
 
-#: apps/contacts/views.py:53
+#: apps/contacts/views.py:45
 #, python-format
 msgid "You received a letter from the site %s"
 msgstr ""
@@ -707,30 +707,38 @@ msgstr ""
 msgid "You already have an active alert for this product"
 msgstr ""
 
-#: apps/ex_sites/models.py:11
+#: apps/ex_sites/models.py:12
 msgid "Work time"
 msgstr "Рабочее время"
 
-#: apps/ex_sites/models.py:12
+#: apps/ex_sites/models.py:13
 msgid "Actual address"
 msgstr "Фактический адрес"
 
-#: apps/ex_sites/models.py:13
+#: apps/ex_sites/models.py:14
 #, fuzzy
 #| msgid "Phone number"
 msgid "Phone numbers"
 msgstr "Номер телефона"
 
-#: apps/ex_sites/models.py:15
+#: apps/ex_sites/models.py:16
 msgid "Short description of shop"
 msgstr "Краткое описание магазина"
 
-#: apps/ex_sites/models.py:22 apps/ex_sites/models.py:23
-#: templates/layout.html:304
+#: apps/ex_sites/models.py:17
+msgid "Way to us"
+msgstr ""
+
+#: apps/ex_sites/models.py:18
+msgid "Map google"
+msgstr ""
+
+#: apps/ex_sites/models.py:25 apps/ex_sites/models.py:26
+#: templates/layout.html:306
 msgid "Information"
 msgstr ""
 
-#: apps/ex_sites/models.py:30
+#: apps/ex_sites/models.py:33
 msgid "Phone number"
 msgstr "Номер телефона"
 
@@ -937,6 +945,7 @@ msgstr ""
 #: templates/catalogue/category.html:134 templates/catalogue/detail.html:46
 #: templates/catalogue/reviews/review_detail.html:13
 #: templates/catalogue/reviews/review_list.html:15
+#: templates/contacts/contacts.html:10
 #: templates/customer/baseaccountpage.html:14
 #: templates/customer/login_registration.html:11
 #: templates/customer/wishlists/wishlists_delete.html:7
@@ -944,7 +953,7 @@ msgstr ""
 #: templates/customer/wishlists/wishlists_detail.html:10
 #: templates/customer/wishlists/wishlists_form.html:7
 #: templates/dashboard/catalogue/category_list.html:31
-#: templates/layout.html:147 templates/search/results.html:15
+#: templates/layout.html:149 templates/search/results.html:15
 #: templates/sitemap/sitemap.html:11
 msgid "Home"
 msgstr ""
@@ -1196,7 +1205,7 @@ msgstr ""
 #: templates/basket/partials/basket_totals.html:74
 #: templates/checkout/thank_you.html:203
 #: templates/dashboard/orders/order_detail.html:195
-#: templates/partials/mini_basket.html:8
+#: templates/partials/mini_basket.html:9
 msgid "Basket total"
 msgstr ""
 
@@ -1267,29 +1276,31 @@ msgstr ""
 #, python-format
 msgid ""
 "\n"
-"                    <strong>%(num_results)s</strong> result - showing "
-"<strong>%(start)s</strong> to <strong>%(end)s</strong>.\n"
-"                "
+"                            <strong>%(num_results)s</strong> result - "
+"showing <strong>%(start)s</strong> to <strong>%(end)s</strong>.\n"
+"                        "
 msgid_plural ""
 "\n"
-"                    <strong>%(num_results)s</strong> results - showing "
-"<strong>%(start)s</strong> to <strong>%(end)s</strong>.\n"
-"                "
+"                            <strong>%(num_results)s</strong> results - "
+"showing <strong>%(start)s</strong> to <strong>%(end)s</strong>.\n"
+"                        "
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
 
 #: templates/catalogue/browse.html:89
 #, python-format
 msgid ""
 "\n"
-"                    <strong>1</strong> result.\n"
-"                "
+"                            <strong>1</strong> result.\n"
+"                        "
 msgid_plural ""
 "\n"
-"                    <strong>%(num_results)s</strong> results.\n"
-"                "
+"                            <strong>%(num_results)s</strong> results.\n"
+"                        "
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
 
 #: templates/catalogue/browse.html:102
 msgid "<strong>0</strong> results."
@@ -1355,7 +1366,7 @@ msgid "Reviews"
 msgstr ""
 
 #: templates/catalogue/detail.html:123 templates/catalogue/detail.html:243
-#: templates/layout.html:87
+#: templates/layout.html:89
 msgid "Shipping and payment"
 msgstr ""
 
@@ -1462,6 +1473,7 @@ msgstr "Под заказ"
 #: templates/catalogue/product/attributes/attribute_modal.html:11
 #: templates/catalogue/product/attributes/attribute_modal.html:12
 #: templates/catalogue/product/attributes/attribute_modal.html:30
+#: templates/contacts/contacts.html:94
 #: templates/dashboard/orders/order_list.html:72
 #: templates/partials/alert_messages.html:16
 #: templates/partials/alert_messages.html:17
@@ -2038,6 +2050,32 @@ msgstr ""
 #: templates/dashboard/vouchers/voucher_form.html:45
 #: templates/partials/form.html:11
 msgid "Save"
+msgstr ""
+
+#: templates/contacts/contacts.html:6
+msgid "Contacts us"
+msgstr ""
+
+#: templates/contacts/contacts.html:11 templates/contacts/contacts.html:109
+#: templates/layout.html:88
+msgid "Contacts"
+msgstr ""
+
+#: templates/contacts/contacts.html:79
+msgid "Feedback"
+msgstr ""
+
+#: templates/contacts/contacts.html:83 templates/contacts/contacts.html:89
+msgid "Send"
+msgstr ""
+
+#: templates/contacts/contacts.html:83 templates/dashboard/comms/detail.html:83
+#: templates/dashboard/users/detail.html:92
+msgid "Sending..."
+msgstr ""
+
+#: templates/contacts/contacts.html:184
+msgid "How to reach us"
 msgstr ""
 
 #: templates/customer/baseaccountpage.html:6
@@ -2828,11 +2866,6 @@ msgstr ""
 
 #: templates/dashboard/comms/detail.html:81
 msgid "or send a preview to:"
-msgstr ""
-
-#: templates/dashboard/comms/detail.html:83
-#: templates/dashboard/users/detail.html:92
-msgid "Sending..."
 msgstr ""
 
 #: templates/dashboard/comms/detail.html:83
@@ -4855,48 +4888,52 @@ msgstr ""
 msgid "Sorry!"
 msgstr ""
 
-#: templates/layout.html:40
+#: templates/layout.html:31
+msgid "Toggle navigation"
+msgstr ""
+
+#: templates/layout.html:51 templates/layout.html.py:52
 msgid "Phones"
 msgstr "Телефоны"
 
-#: templates/layout.html:82
+#: templates/layout.html:84
 msgid "Company"
 msgstr ""
 
-#: templates/layout.html:86
-msgid "Contacts"
-msgstr ""
-
-#: templates/layout.html:88
+#: templates/layout.html:90
 msgid "For buyers"
 msgstr ""
 
-#: templates/layout.html:96
+#: templates/layout.html:98
 msgid "You are looking for something"
 msgstr ""
 
-#: templates/layout.html:210
+#: templates/layout.html:212
 msgid "Хочу"
 msgstr ""
 
-#: templates/layout.html:260
+#: templates/layout.html:262
 msgid "Questions?"
 msgstr ""
 
-#: templates/layout.html:321
+#: templates/layout.html:323
 msgid "Support service"
 msgstr "Сервис поддержки"
 
-#: templates/layout.html:323
+#: templates/layout.html:325
 msgid "Contact us"
 msgstr ""
 
-#: templates/layout.html:324
+#: templates/layout.html:326
 msgid "Return purchase "
 msgstr ""
 
-#: templates/layout.html:325
+#: templates/layout.html:327
 msgid "Site Map"
+msgstr ""
+
+#: templates/partials/brand.html:6
+msgid "Brand"
 msgstr ""
 
 #: templates/partials/image_input_widget.html:7
@@ -4974,6 +5011,9 @@ msgstr ""
 #: templates/subscribe/subscribe.html:9
 msgid "City:"
 msgstr ""
+
+#~ msgid "Your message sent!"
+#~ msgstr "Ваше сообщение отправлено!"
 
 #~ msgid "Delete this object ? (set 1 if True)"
 #~ msgstr "Установите 1, чтобы удалить"

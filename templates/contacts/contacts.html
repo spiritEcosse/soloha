@@ -80,13 +80,13 @@
                     </h3>
                 </div>
                 <div class="panel-body">
-                    <form name="{{ form.form_name }}" method="post" novalidate action=".">
+                    <form name="{{ form.form_name }}" method="post" novalidate action="." ng-init="button.send='{% trans "Send" %}'; button.actual=button.send; button.sending='{% trans "Sending..." %}'">
                         {% csrf_token %}
                         {{ form.as_div }}
                         <div class="row">
                             <div class="col-xs-8">
-                                <button type="button" ng-click="submit()" class="btn btn-primary" {% verbatim %}disabled="{{ disabled_button }}"{% endverbatim %}>
-                                    <span ng-bind="button">{% trans 'Send' %}</span>
+                                <button type="button" ng-click="submit()" class="btn btn-primary" ng-disabled="disabled_button">
+                                    <span ng-bind="button.actual">{% trans 'Send' %}</span>
                                 </button>
                             </div>
                             <div class="col-xs-16">
