@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-09-30 16:17+0000\n"
+"POT-Creation-Date: 2016-10-10 08:17+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -578,13 +578,28 @@ msgstr ""
 msgid "Please enter your message."
 msgstr "Пожалуйста, введите ваше сообщение."
 
-#: apps/contacts/views.py:41
-msgid "Sent!"
-msgstr "Отправлено!"
+#: apps/contacts/views.py:23
+#, fuzzy
+#| msgid "Your message sent!"
+msgid "You question has been sent!"
+msgstr "Ваше сообщение отправлено!"
 
-#: apps/contacts/views.py:45
-#, python-format
-msgid "You received a letter from the site %s"
+#: apps/contacts/views.py:57
+msgid "You received a letter from the site {}"
+msgstr ""
+
+#: apps/contacts/views.py:59 apps/contacts/views.py:61
+#, fuzzy
+#| msgid "Not selected"
+msgid "Not specified."
+msgstr "Не выбрано"
+
+#: apps/contacts/views.py:58
+msgid ""
+"User name: {}.\n"
+"Email: {}.\n"
+"Phone: {}.\n"
+"Comment: {}."
 msgstr ""
 
 #: apps/customer/forms.py:101 apps/customer/forms.py:146
@@ -5012,8 +5027,8 @@ msgstr ""
 msgid "City:"
 msgstr ""
 
-#~ msgid "Your message sent!"
-#~ msgstr "Ваше сообщение отправлено!"
+#~ msgid "Sent!"
+#~ msgstr "Отправлено!"
 
 #~ msgid "Delete this object ? (set 1 if True)"
 #~ msgstr "Установите 1, чтобы удалить"
