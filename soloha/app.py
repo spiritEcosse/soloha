@@ -25,7 +25,7 @@ class Soloha(app.Shop):
         urlpatterns = [
             url(r'^search/filter/(?P<filter_slug>[\w-]+(/[\w-]+)*)/', search_view.as_view()),
             url(r'^search/', search_view.as_view()),
-            url(r'^contacts/', contacts_view.as_view()),
+            url(r'^contacts/', contacts_view.as_view(), name='contacts'),
             url(r'^ckeditor/', include('ckeditor_uploader.urls')),
             url(r'^filer/', include('filer.urls')),
             url(r'^spirit/product-autocomplete/$', ProductAutocomplete.as_view(), name='product-autocomplete'),

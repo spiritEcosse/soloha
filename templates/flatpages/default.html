@@ -1,10 +1,29 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>{{ flatpage.title }}</title>
-</head>
-<body>
-    {{ flatpage.content }}
-</body>
-</html>
+{% extends 'layout.html' %}
+{% load i18n %}
+
+{% block title %}
+    {{ flatpage.info.get_meta_title|default:""|striptags }} | {{ block.super }}
+{% endblock %}
+
+{% block description %}
+    {{ flatpage.info.get_meta_description|default:""|striptags }}
+{% endblock %}
+
+{% block keywords %}
+    {{ flatpage.info.meta_keywords|default:""|striptags }}
+{% endblock %}
+
+{% block headertext %}{{ flatpage.info.get_h1 }}{% endblock %}
+
+{% block breadcrumbs %}
+    <ul class="breadcrumb">
+        <li><a href="{{ homepage_url }}">{% trans "Home" %}</a></li>
+        <li><a href="{{ flatpage.get_absolute_url }}">{{ flatpage.title }}</a></li>
+    </ul>
+{% endblock breadcrumbs %}
+
+{% block content %}
+    <div class="col-xs-24">
+        {{ flatpage.content }}
+    </div>
+{% endblock %}

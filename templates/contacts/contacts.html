@@ -6,9 +6,9 @@
 {% block headertext %}{% trans 'Contacts us' %}{% endblock %}
 
 {% block breadcrumbs %}
-    <ul class="breadcrumb" xmlns="http://www.w3.org/1999/html">
+    <ul class="breadcrumb">
         <li><a href="{{ homepage_url }}">{% trans "Home" %}</a></li>
-        <li><a href="{{ homepage_url }}">{% trans "Contacts" %}</a></li>
+        <li><a href="{% url 'contacts' %}">{% trans "Contacts" %}</a></li>
     </ul>
 {% endblock breadcrumbs %}
 

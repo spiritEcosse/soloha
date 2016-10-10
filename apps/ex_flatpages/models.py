@@ -2,6 +2,8 @@ from django.db import models
 from django.contrib.flatpages.models import FlatPage
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext_lazy as _
+from django.template.defaultfilters import truncatechars
+from django.utils.html import strip_tags
 
 
 class InfoPage(models.Model):
@@ -22,8 +24,11 @@ class InfoPage(models.Model):
     class Meta:
         app_label = 'flatpages'
 
-    def get_absolute_url(self):
-        link = super(InfoPage, self).get_absolute_url()
-        dict_values = {'url': link.lstrip('/')}
+    def get_meta_description(self):
+        return self.meta_description or truncatechars(strip_tags(self.flatpage.content), 100)
 
-        return reverse('pages', kwargs=dict_values)
+    def get_h1(self):
+        return self.h1 or self.flatpage.title
+
+    def get_meta_title(self):
+        return self.meta_title or self.flatpage.title

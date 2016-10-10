@@ -20,7 +20,6 @@ def context_data(request):
     context['categories'] = Category.objects.filter(enable=True, level=0).select_related(
         'parent__parent'
     ).prefetch_related('children__children')[:MAX_COUNT_CATEGORIES]
-    context['contacts'] = '/contacts/'
     context['current_site'] = get_current_site(request)
     context['form'] = SubscribeForm()
     context['answer'] = ANSWER

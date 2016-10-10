@@ -1,5 +1,5 @@
 {% load i18n %}
-<footer class="footer container-fluid">
+<footer class="footer">
     {% block footer %}
         <div class="row top"></div>
         <div class="row center">
@@ -69,7 +69,7 @@
             <div class="col-xs-24 col-sm-6 column">
                 <div class="title line-bottom">{% trans "Support service" %}</div>
                 <ul class="list-group">
-                    <li class="list-group-item"><a href="{{ contacts }}">{% trans "Contact us" %}</a></li>
+                    <li class="list-group-item"><a href="{% url 'contacts' %}">{% trans "Contact us" %}</a></li>
                     <li class="list-group-item"><a href="#">{% trans "Return purchase " %}</a></li>
                     <li class="list-group-item"><a href="#">{% trans "Site Map" %}</a></li>
                 </ul>
