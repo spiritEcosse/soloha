@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-10-10 08:17+0000\n"
+"POT-Creation-Date: 2016-10-10 08:22+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -579,14 +579,12 @@ msgid "Please enter your message."
 msgstr "Пожалуйста, введите ваше сообщение."
 
 #: apps/contacts/views.py:23
-#, fuzzy
-#| msgid "Your message sent!"
 msgid "You question has been sent!"
 msgstr "Ваше сообщение отправлено!"
 
 #: apps/contacts/views.py:57
 msgid "You received a letter from the site {}"
-msgstr ""
+msgstr "Вы получили письмо с сайта {}"
 
 #: apps/contacts/views.py:59 apps/contacts/views.py:61
 #, fuzzy

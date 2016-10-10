@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from django.shortcuts import render
 from django.core.mail import send_mail
 from django.views.generic import FormView
@@ -20,7 +22,7 @@ class FeedbackForm(NgModelFormMixin, NgFormValidationMixin, Feedback):
 class ContactsView(FormView, ContextMixin, views.JSONResponseMixin):
     template_name = 'contacts/contacts.html'
     form_class = FeedbackForm
-    form_valid_message = unicode(_('You question has been sent!'))
+    form_valid_message = u'Ваше сообщение отправлено!'
 
     def post(self, request, **kwargs):
         if request.is_ajax():
@@ -54,13 +56,13 @@ class ContactsView(FormView, ContextMixin, views.JSONResponseMixin):
 
     def send_email(self, form, form_email, email_to):
         send_mail(
-            unicode(_('You received a letter from the site {}'.format(get_current_site(self.request).domain))),
-            unicode(_(u'User name: {}.\nEmail: {}.\nPhone: {}.\nComment: {}.'.format(
-                form.cleaned_data.get('name', str(_('Not specified.'))),
+            u'Вы получили письмо с сайта {}'.format(get_current_site(self.request).domain),
+            u'Имя: {}.\nEmail: {}.\nТелефон: {}.\nКомментарий: {}.'.format(
+                form.cleaned_data.get('name', u'Не указан'),
                 form_email,
-                form.cleaned_data.get('phone', str(_('Not specified.'))),
+                form.cleaned_data.get('phone', u'Не указан'),
                 form.cleaned_data['comment']
-            ))),
+            ),
             form_email,
             [email_to],
             fail_silently=False
