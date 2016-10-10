@@ -71,129 +71,127 @@
 {% endblock %}
 
 {% block content %}
-    <div class="row content">
-        <div class="col-xs-24 col-md-12">
+    <div class="col-xs-24 col-md-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">
+                    <span class="glyphicon glyphicon-pencil"></span> {% trans 'Feedback' %}
+                </h3>
+            </div>
+            <div class="panel-body">
+                <form name="{{ form.form_name }}" method="post" novalidate action="." ng-init="button.send='{% trans "Send" %}'; button.actual=button.send; button.sending='{% trans "Sending..." %}'">
+                    {% csrf_token %}
+                    {{ form.as_div }}
+                    <div class="row">
+                        <div class="col-xs-8">
+                            <button type="button" ng-click="submit()" class="btn btn-primary" ng-disabled="disabled_button">
+                                <span ng-bind="button.actual">{% trans 'Send' %}</span>
+                            </button>
+                        </div>
+                        <div class="col-xs-16">
+                            <div class="alert alert-dismissible" role="alert" ng-class="alert.type" ng-cloak="" ng-if="alert !== null">
+                                <button type="button" class="close" data-dismiss="alert" aria-label="{% trans 'Close' %}" ng-click="remove_alert()">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                                <span ng-bind="alert.msg"></span>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xs-24 col-md-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title"><span class="glyphicon glyphicon-envelope"></span> {% trans 'Contacts' %}</h3>
+            </div>
+            <div class="panel-body">
+                {% if current_site.info.work_time %}
+                    <div class="panel panel-default">
+                        <div class="panel-body">
+                            <div class="row glyphicon-grid">
+                                <div class="col-xs-3 glyphicon-icon">
+                                    <span class="glyphicon glyphicon-time"></span>
+                                </div>
+                                <div class="col-xs-21 glyphicon-text">
+                                    {{ current_site.info.work_time }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+
+                {% if current_site.info.address %}
+                    <div class="panel panel-default">
+                        <div class="panel-body">
+                            <div class="row glyphicon-grid">
+                                <div class="col-xs-3 glyphicon-icon">
+                                    <span class="glyphicon glyphicon-map-marker"></span>
+                                </div>
+                                <div class="col-xs-21 glyphicon-text">
+                                    {{ current_site.info.address }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+
+                {% if current_site.info.phone_numbers.exists %}
+                    <div class="panel panel-default">
+                        <div class="panel-body">
+                            <div class="row glyphicon-grid">
+                                <div class="col-xs-3 glyphicon-icon">
+                                    <span class="glyphicon glyphicon-phone-alt"></span>
+                                </div>
+                                <div class="col-xs-21 glyphicon-text">
+                                    <ol class="reset-margin">
+                                        {% for phone in current_site.info.phone_numbers.all %}
+                                            <li><a href="tel:{{ phone.phone_number }}">{{ phone.phone_number.as_international }}</a></li>
+                                        {% endfor %}
+                                    </ol>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+
+                {% if current_site.info.email %}
+                    <div class="panel panel-default">
+                        <div class="panel-body">
+                            <div class="row glyphicon-grid">
+                                <div class="col-xs-3 glyphicon-icon">
+                                    <span class="glyphicon glyphicon-envelope"></span>
+                                </div>
+                                <div class="col-xs-21 glyphicon-text">
+                                    {{ current_site.info.email }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xs-24">
+        {% if current_site.info.way %}
             <div class="panel panel-default">
                 <div class="panel-heading">
                     <h3 class="panel-title">
-                        <span class="glyphicon glyphicon-pencil"></span> {% trans 'Feedback' %}
+                        <span class="glyphicon glyphicon-road"></span> {% trans 'How to reach us' %}
                     </h3>
                 </div>
                 <div class="panel-body">
-                    <form name="{{ form.form_name }}" method="post" novalidate action="." ng-init="button.send='{% trans "Send" %}'; button.actual=button.send; button.sending='{% trans "Sending..." %}'">
-                        {% csrf_token %}
-                        {{ form.as_div }}
-                        <div class="row">
-                            <div class="col-xs-8">
-                                <button type="button" ng-click="submit()" class="btn btn-primary" ng-disabled="disabled_button">
-                                    <span ng-bind="button.actual">{% trans 'Send' %}</span>
-                                </button>
-                            </div>
-                            <div class="col-xs-16">
-                                <div class="alert alert-dismissible" role="alert" ng-class="alert.type" ng-cloak="" ng-if="alert !== null">
-                                    <button type="button" class="close" data-dismiss="alert" aria-label="{% trans 'Close' %}" ng-click="remove_alert()">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                    <span ng-bind="alert.msg"></span>
-                                </div>
-                            </div>
-                        </div>
-                    </form>
+                    {{ current_site.info.way|safe }}
+
+                    {% if current_site.info.map %}
+                        {{ current_site.info.map|safe }}
+                    {% endif %}
+                    {#            <div class="text text-center">Мы всегда рады ответить на вопросы в социальных сетях!</div>#}
                 </div>
             </div>
-        </div>
-
-        <div class="col-xs-24 col-md-12">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title"><span class="glyphicon glyphicon-envelope"></span> {% trans 'Contacts' %}</h3>
-                </div>
-                <div class="panel-body">
-                    {% if current_site.info.work_time %}
-                        <div class="panel panel-default">
-                            <div class="panel-body">
-                                <div class="row glyphicon-grid">
-                                    <div class="col-xs-3 glyphicon-icon">
-                                        <span class="glyphicon glyphicon-time"></span>
-                                    </div>
-                                    <div class="col-xs-21 glyphicon-text">
-                                        {{ current_site.info.work_time }}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    {% endif %}
-
-                    {% if current_site.info.address %}
-                        <div class="panel panel-default">
-                            <div class="panel-body">
-                                <div class="row glyphicon-grid">
-                                    <div class="col-xs-3 glyphicon-icon">
-                                        <span class="glyphicon glyphicon-map-marker"></span>
-                                    </div>
-                                    <div class="col-xs-21 glyphicon-text">
-                                        {{ current_site.info.address }}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    {% endif %}
-
-                    {% if current_site.info.phone_numbers.exists %}
-                        <div class="panel panel-default">
-                            <div class="panel-body">
-                                <div class="row glyphicon-grid">
-                                    <div class="col-xs-3 glyphicon-icon">
-                                        <span class="glyphicon glyphicon-phone-alt"></span>
-                                    </div>
-                                    <div class="col-xs-21 glyphicon-text">
-                                        <ol class="reset-margin">
-                                            {% for phone in current_site.info.phone_numbers.all %}
-                                                <li><a href="tel:{{ phone.phone_number }}">{{ phone.phone_number.as_international }}</a></li>
-                                            {% endfor %}
-                                        </ol>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    {% endif %}
-
-                    {% if current_site.info.email %}
-                        <div class="panel panel-default">
-                            <div class="panel-body">
-                                <div class="row glyphicon-grid">
-                                    <div class="col-xs-3 glyphicon-icon">
-                                        <span class="glyphicon glyphicon-envelope"></span>
-                                    </div>
-                                    <div class="col-xs-21 glyphicon-text">
-                                        {{ current_site.info.email }}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-
-        <div class="col-xs-24">
-            {% if current_site.info.way %}
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <h3 class="panel-title">
-                            <span class="glyphicon glyphicon-road"></span> {% trans 'How to reach us' %}
-                        </h3>
-                    </div>
-                    <div class="panel-body">
-                        {{ current_site.info.way|safe }}
-                    </div>
-                </div>
-            {% endif %}
-
-            {% if current_site.info.map %}
-                {{ current_site.info.map|safe }}
-            {% endif %}
-            {#            <div class="text text-center">Мы всегда рады ответить на вопросы в социальных сетях!</div>#}
-        </div>
+        {% endif %}
     </div>
 {% endblock %}
