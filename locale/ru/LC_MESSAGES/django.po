@@ -4935,7 +4935,7 @@ msgstr "Сервис поддержки"
 
 #: templates/layout.html:325
 msgid "Contact us"
-msgstr ""
+msgstr "Контакты"
 
 #: templates/layout.html:326
 msgid "Return purchase "

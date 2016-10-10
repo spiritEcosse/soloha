@@ -1,12 +1,130 @@
 {% load i18n %}
 <footer class="footer container-fluid">
     {% block footer %}
-        {% comment %}
-            Could be used for displaying links to privacy policy, terms of service, etc.
-            We have a CSS class defined:
-                <ul class="footer_links inline">
-                    ...
+        <div class="row top"></div>
+        <div class="row center">
+            <div class="col-xs-24 col-sm-6 row question">
+                <div class="row">
+                    {% if current_site.work_time or current_site.address or current_site.phone_number or current_site.email%}
+                        <div class="title">{% trans "Questions?" %}</div>
+                        {% if current_site.work_time %}
+                            <div class="row item line-top">
+                                <div class="col-xs-4 row icon">
+                                    <span class="glyphicon glyphicon-time"></span>
+                                </div>
+                                <div class="col-xs-20 text">
+                                    {{ current_site.work_time }}
+                                </div>
+                            </div>
+                        {% endif %}
+                        {% if current_site.address %}
+                            <div class="row item line-top">
+                                <div class="col-xs-4 row icon">
+                                    <span class="glyphicon glyphicon-map-marker"></span>
+                                </div>
+                                <div class="col-xs-20 text">
+                                    {{ current_site.address }}
+                                </div>
+                            </div>
+                        {% endif %}
+                        {% if current_site.phone_number %}
+                            <div class="row item line-top">
+                                <div class="col-xs-4 row icon">
+                                    <span class="glyphicon glyphicon-phone-alt"></span>
+                                </div>
+                                <div class="col-xs-20 text">
+                                    {{ current_site.phone_number }} <br/>
+                                </div>
+                            </div>
+                        {% endif %}
+                        {% if current_site.email %}
+                            <div class="row item line-top">
+                                <div class="col-xs-4 row icon">
+                                    <span class="glyphicon glyphicon-envelope"></span>
+                                </div>
+                                <div class="col-xs-20 text">{{ current_site.email }}</div>
+                            </div>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col-xs-24 col-sm-6 column">
+                {% if info_pages %}
+                    <div class="title line-bottom">{% trans "Information" %}</div>
+                    <ul class="list-group">
+                        {% for page in info_pages %}
+                            <li><a href="{{ page.get_absolute_url }}">{{ page.title }}</a></li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+                {#                        <div class="col-xs-24 special line-top">#}
+                {#                            <a href="#">#}
+                {#                                {% trans "Special offers" %}</a>#}
+                {#                            /#}
+                {#                            <a href="#">#}
+                {#                                {% trans "Sales" %}#}
+                {#                            </a>#}
+                {#                        </div>#}
+            </div>
+            <div class="col-xs-24 col-sm-6 column">
+                <div class="title line-bottom">{% trans "Support service" %}</div>
+                <ul class="list-group">
+                    <li class="list-group-item"><a href="{{ contacts }}">{% trans "Contact us" %}</a></li>
+                    <li class="list-group-item"><a href="#">{% trans "Return purchase " %}</a></li>
+                    <li class="list-group-item"><a href="#">{% trans "Site Map" %}</a></li>
                 </ul>
-         {% endcomment %}
+            </div>
+            {#                    <div class="col-xs-24 col-sm-6 column account">#}
+            {#                        <div class="row">#}
+            {#                            <div class="title line-bottom">{% trans "Personal office" %}</div>#}
+            {#                            <ul class="list-group">#}
+            {#                                <li class="list-group-item"><a href="#">{% trans "Personal office" %}</a></li>#}
+            {#                                <li class="list-group-item"><a href="#">{% trans "Orders history" %}</a></li>#}
+            {#                                <li class="list-group-item"><a href="#">{% trans "Notes (0)" %}</a></li>#}
+            {#                            </ul>#}
+            {#                        </div>#}
+            {#                    </div>#}
+            {#                    <div class="col-xs-24 col-sm-12 text-center subscribe" ng-controller="Subscribe">#}
+            {#                        <div class="row">#}
+            {#                            <div class="title line-top">#}
+            {#                                {% trans "Sign up for discounts!" %}#}
+            {#                            </div>#}
+            {#                            <div class="input-group">#}
+            {#                                <form name="{{ form.form_name }}" method="post" ng-hide="send_form" novalidate>#}
+            {#                                    {% csrf_token %}#}
+            {#                                    {% for field in form %}#}
+            {#                                        <div class="col-xs-6 element">#}
+            {#                                            {{ field.label_tag }}#}
+            {#                                            {{ field }}#}
+            {#                                            {{ field.errors }}#}
+            {#                                        </div>#}
+            {#                                    {% endfor %}#}
+            {#                                    <div class="col-xs-6 element">#}
+            {#                                        <button type="button" ng-disabled="{{ form.form_name }}.$invalid" ng-click="subscribe()" class="btn btn-danger btn-block">{% trans "Subscribe" %}</button>#}
+            {#                                    </div>#}
+            {#                                </form>#}
+            {#                                {% verbatim %}#}
+            {#                                <div class="alert alert-{{ alert_mode }}" role="alert" ng-show="send_form">#}
+            {#                                    {% endverbatim %}#}
+            {#                                    {{ answer }}#}
+            {#                                </div>#}
+            {#                            </div>#}
+            {#                            <div class="social">#}
+            {#                                <div class="title">{% trans "WE ARE IN SOCIAL NETWORKS JOIN US!" %}</div>#}
+            {#                            </div>#}
+            {#                        </div>#}
+            {#                    </div>#}
+        </div>
+        <div class="row bottom">
+            <div class="col-xs-24 text-center text-white">
+                <strong>
+                    Copyright {{ current_site.name }}
+                    {% if current_site.info.shop_short_desc %}
+                        - {{ current_site.info.shop_short_desc }}
+                    {% endif %}
+                    © 2012 - {% now "Y" %}
+                </strong>
+            </div>
+        </div>
     {% endblock %}
 </footer>
