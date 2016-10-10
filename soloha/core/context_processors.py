@@ -15,12 +15,9 @@ def context_data(request):
     current_site = get_current_site(request)
 
     context = dict()
-    queryset_info_page = FlatPage.objects.filter(sites__domain=get_current_site(request).domain)
-    context['info_pages'] = queryset_info_page
     context['categories'] = Category.objects.filter(enable=True, level=0).select_related(
         'parent__parent'
     ).prefetch_related('children__children')[:MAX_COUNT_CATEGORIES]
-    context['current_site'] = get_current_site(request)
     context['form'] = SubscribeForm()
     context['answer'] = ANSWER
     context['shop_tagline'] = current_site.info.shop_short_desc or settings.OSCAR_SHOP_TAGLINE

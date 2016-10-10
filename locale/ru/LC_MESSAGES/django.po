@@ -749,7 +749,7 @@ msgstr ""
 #: apps/ex_sites/models.py:25 apps/ex_sites/models.py:26
 #: templates/layout.html:306
 msgid "Information"
-msgstr ""
+msgstr "Информация"
 
 #: apps/ex_sites/models.py:33
 msgid "Phone number"

@@ -113,6 +113,7 @@ TEMPLATES = [
                 'oscar.apps.customer.notifications.context_processors.notifications',
                 'oscar.core.context_processors.metadata',
                 'soloha.core.context_processors.context_data',
+                'apps.ex_flatpages.context_processors.context_data',
             ],
         },
     },

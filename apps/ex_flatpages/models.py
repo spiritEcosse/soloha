@@ -4,6 +4,7 @@ from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext_lazy as _
 from django.template.defaultfilters import truncatechars
 from django.utils.html import strip_tags
+from django.utils.text import capfirst
 
 
 class InfoPage(models.Model):
@@ -11,6 +12,12 @@ class InfoPage(models.Model):
         ('car', 'icon-car'),
         ('pay', 'icon-pay'),
         ('manager', 'icon-manager'),
+    )
+    FOOTER = 'footer'
+    HEADER = 'header'
+    POSITION_CHOICES = (
+        (HEADER, capfirst(HEADER)),
+        (FOOTER, capfirst(FOOTER)),
     )
     flatpage = models.OneToOneField(FlatPage, on_delete=models.CASCADE, related_name='info', primary_key=True)
     enable = models.BooleanField(verbose_name=_('Enable'), default=True)
@@ -20,6 +27,7 @@ class InfoPage(models.Model):
     meta_keywords = models.TextField(verbose_name=_('Meta tag: keywords'), blank=True)
     created = models.DateTimeField(auto_now_add=True)
     icon = models.CharField(max_length=20, choices=GLYPHICON_CHOICES, blank=True)
+    position = models.CharField(choices=POSITION_CHOICES, max_length=20, blank=True)
 
     class Meta:
         app_label = 'flatpages'
