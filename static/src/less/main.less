@@ -212,6 +212,7 @@ a, span, div {
 }
 .glyphicon-grid {
     position: relative;
+    overflow: hidden;
 
     .glyphicon-icon {
         position: absolute;
@@ -224,6 +225,10 @@ a, span, div {
 
         ol {
             margin-left: 15px;
+
+            li {
+                padding: 10px 0;
+            }
         }
     }
 }
@@ -1961,7 +1966,9 @@ header {
 .list-group-submenu {
     margin-left: 25px;
 }
-
+address {
+    margin-bottom: 0;
+}
 .tab-content > .tab-pane, .pill-content > .pill-pane {
     display: block;    /* undo display:none          */
     height: 0;         /* height:0 is also invisible */
@@ -1980,12 +1987,14 @@ footer {
     }
 
     .center {
-        padding: 8px 0 0 20px;
         background-color: #010201;
         color: #fdfaf8;
         font-size: 15px;
         font-weight: 700;
 
+        .item {
+            padding: 10px 0;
+        }
         ul {
             border: none;
             margin-bottom: 10px;
@@ -1993,12 +2002,12 @@ footer {
             li {
                 background: transparent;
                 border: none;
-                padding: 5px 15px;
             }
         }
 
         a {
             color: #fdfaf8;
+            background-color: transparent;
 
             &:hover, &:focus {
                 color: #fdfaf8;

@@ -8500,6 +8500,7 @@ div {
 }
 .glyphicon-grid {
   position: relative;
+  overflow: hidden;
 }
 .glyphicon-grid .glyphicon-icon {
   position: absolute;
@@ -8511,6 +8512,9 @@ div {
 }
 .glyphicon-grid .glyphicon-text ol {
   margin-left: 15px;
+}
+.glyphicon-grid .glyphicon-text ol li {
+  padding: 10px 0;
 }
 [ng\:cloak],
 [ng-cloak],
@@ -10014,6 +10018,9 @@ header .bottom .navbar .nav > li .yamm-content .image .btn-menu {
 .list-group-submenu {
   margin-left: 25px;
 }
+address {
+  margin-bottom: 0;
+}
 .tab-content > .tab-pane,
 .pill-content > .pill-pane {
   display: block;
@@ -10037,11 +10044,13 @@ footer .top {
   height: 5px;
 }
 footer .center {
-  padding: 8px 0 0 20px;
   background-color: #010201;
   color: #fdfaf8;
   font-size: 15px;
   font-weight: 700;
+}
+footer .center .item {
+  padding: 10px 0;
 }
 footer .center ul {
   border: none;
@@ -10050,10 +10059,10 @@ footer .center ul {
 footer .center ul li {
   background: transparent;
   border: none;
-  padding: 5px 15px;
 }
 footer .center a {
   color: #fdfaf8;
+  background-color: transparent;
 }
 footer .center a:hover,
 footer .center a:focus {
