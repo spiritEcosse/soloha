@@ -1,6 +1,5 @@
 from django.db import models
 from django.contrib.flatpages.models import FlatPage
-from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext_lazy as _
 from django.template.defaultfilters import truncatechars
 from django.utils.html import strip_tags
@@ -40,3 +39,9 @@ class InfoPage(models.Model):
 
     def get_meta_title(self):
         return self.meta_title or self.flatpage.title
+
+    def url(self):
+        return self.flatpage.url
+
+    def title(self):
+        return self.flatpage.title

@@ -69,10 +69,10 @@
                     {% endif %}
                 </div>
                 <div class="col-xs-24 col-sm-6 column">
-                    {% if current_site.flatpages_footer %}
+                    {% if flatpages_footer %}
                         <div class="title line-bottom">{% trans "Information" %}</div>
                         <ul class="list-group">
-                            {% for page in current_site.flatpages_footer %}
+                            {% for page in flatpages_footer %}
                                 <li class="list-group-item"><a href="{{ page.get_absolute_url }}">{{ page.title }}</a></li>
                             {% endfor %}
                         </ul>

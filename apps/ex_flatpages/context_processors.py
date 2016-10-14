@@ -1,25 +1,12 @@
-from django.contrib.flatpages.models import FlatPage
-from apps.ex_flatpages.models import InfoPage
-from django.contrib.sites.shortcuts import get_current_site
 from django.contrib.sites.models import Site
-from django.db.models import Prefetch
+from soloha.settings import SITE_ID
 
 
 def context_data(request):
-    current_site = get_current_site(request)
-
-    flatpages = Site.objects.filter(pk=current_site.pk).prefetch_related(
-        Prefetch(
-            'flatpage_set',
-            queryset=FlatPage.objects.filter(
-                info__position=InfoPage.FOOTER
-            ), to_attr='flatpages_footer'
-        ),
-        Prefetch(
-            'flatpage_set',
-            queryset=FlatPage.objects.filter(
-                info__position=InfoPage.HEADER
-            ), to_attr='flatpages_header'
-        )
-    )
-    return {'current_site': flatpages.first()}
+    context = {}
+    site = Site.objects.filter(pk=SITE_ID).select_related('info').prefetch_related('info__phone_numbers').get()
+    context['current_site'] = site
+    flatpages = site.flatpage_set.select_related('info').filter(info__position__in=('header', 'footer'))
+    key = lambda flatpage: 'flatpages_{}'.format(flatpage.info.position)
+    [context.setdefault(key(flatpage), []).append(flatpage) for flatpage in flatpages]
+    return context

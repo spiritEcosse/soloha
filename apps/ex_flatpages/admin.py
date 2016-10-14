@@ -1,10 +1,8 @@
 from django.contrib.flatpages.admin import FlatPageAdmin
 from django.contrib import admin
-from oscar.core.loading import get_model
 import forms
-
-InfoPage = get_model('flatpages', 'InfoPage')
-FlatPage = get_model('flatpages', 'FlatPage')
+from django.contrib.flatpages.models import FlatPage
+from models import InfoPage
 
 
 class InfoPageInline(admin.StackedInline):
