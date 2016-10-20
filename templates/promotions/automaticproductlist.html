@@ -1,0 +1,26 @@
+{% extends 'promotions/baseproductlist.html' %}
+{% load product_tags %}
+{% load i18n %}
+
+{% block content %}
+    <section class="well well-blank">
+        <div class="sub-header">
+            <div class="h2">{{ promotion.name }}</div>
+        </div>
+
+        {{ promotion.description|safe }}
+
+        <div class="row items">
+            <div class="lightSlider">
+                {% for product in products %}
+                    <div class="col-sm-6 col-md-6">{% render_product product %}</div>
+                {% endfor %}
+            </div>
+        </div>
+
+        {% if block.link_url %}
+            <a href="{{ block.link_url }}">{% trans "See more" %}</a>
+        {% endif %}
+    </section>
+{% endblock %}
+

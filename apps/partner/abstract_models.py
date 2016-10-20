@@ -7,7 +7,7 @@ from oscar.core.utils import get_default_currency
 from oscar.core.compat import AUTH_USER_MODEL
 from oscar.models.fields import AutoSlugField
 from oscar.apps.partner.exceptions import InvalidStockAdjustment
-from apps.catalogue.abstract_models import CommonFeatureProduct
+from soloha.core.utils import CommonFeatureProduct
 
 
 class AbstractStockRecord(models.Model, CommonFeatureProduct):

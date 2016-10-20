@@ -76,8 +76,12 @@ INSTALLED_APPS = \
         'bootstrap_pagination',
         'memoize',
         # 'smart_load_tag',
-    ] + get_core_apps(['apps.catalogue', 'apps.promotions', 'apps.partner', 'apps.search', 'apps.order',
-                       'apps.basket', 'apps.checkout', 'apps.customer'])
+    ] + get_core_apps(
+        [
+            'apps.catalogue', 'apps.promotions', 'apps.partner', 'apps.search', 'apps.order',
+            'apps.basket', 'apps.checkout', 'apps.customer', 'apps.dashboard.promotions'
+        ]
+    )
 
 SITE_ID = 1
 
@@ -108,7 +112,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
 
                 'oscar.apps.search.context_processors.search_form',
-                'oscar.apps.promotions.context_processors.promotions',
+                'apps.promotions.context_processors.promotions',
                 'oscar.apps.checkout.context_processors.checkout',
                 'oscar.apps.customer.notifications.context_processors.notifications',
                 'oscar.core.context_processors.metadata',

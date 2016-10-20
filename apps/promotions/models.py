@@ -1,4 +1,1 @@
-from oscar.apps.promotions.models import *  # noqa
-
-
-
+from oscar.apps.promotions.models import *

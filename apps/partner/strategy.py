@@ -1,13 +1,9 @@
 from collections import namedtuple
 from decimal import Decimal as D
-from oscar.core.loading import get_model
 from oscar.apps.partner import availability, prices
 
 # A container for policies
-PurchaseInfo = namedtuple(
-    'PurchaseInfo', ['price', 'availability', 'stockrecord'])
-
-StockRecord = get_model('partner', 'StockRecord')
+PurchaseInfo = namedtuple('PurchaseInfo', ['price', 'availability', 'stockrecord'])
 
 
 class Selector(object):
@@ -189,7 +185,13 @@ class UseFirstStockRecord(object):
     product was permitted.
     """
     def select_stockrecord(self, product):
-        return StockRecord.objects.filter(product=product).order_by('price_excl_tax').first()
+        if hasattr(product, 'stockrecords_list'):
+            try:
+                return product.stockrecords_list[0]
+            except IndexError:
+                return None
+
+        return product.stockrecords.order_by('price_excl_tax').first()
 
 
 class StockRequired(object):

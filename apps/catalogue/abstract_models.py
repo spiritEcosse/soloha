@@ -12,9 +12,9 @@ from django.core.exceptions import ValidationError
 from ckeditor_uploader.fields import RichTextUploadingField
 from filer.fields.image import FilerImageField
 import logging
-from django.template import loader, Context
 from django.template.defaultfilters import truncatechars
 from django.utils.html import strip_tags
+from soloha.core.utils import CommonFeatureProduct
 
 logger = logging.getLogger(__name__)
 
@@ -22,44 +22,6 @@ REGEXP_PHONE = r'/^((8|\+38)[\- ]?)?(\(?\d{3}\)?[\- ]?)?[\d\- ]{7,10}$/'
 REGEXP_EMAIL = r'/^[-\w.]+@([A-z0-9][-A-z0-9]+\.)+[A-z]{2,4}$/'
 
 BrowsableProductManagerCore = get_class('catalogue.managers', 'BrowsableProductManager')
-
-
-class CommonFeatureProduct(object):
-    @property
-    def product_slug(self):
-        return self.product.slug
-
-    def product_enable(self):
-        return self.product.enable
-    product_enable.short_description = _('Enable product')
-
-    def product_categories_to_str(self):
-        return self.product.categories_to_str()
-    product_categories_to_str.short_description = _("Categories")
-
-    def product_partner(self):
-        return self.product.partner
-    product_partner.short_description = _("Product partner")
-
-    def thumb(self, image=None):
-        if not image:
-            image = self.product.primary_image()
-
-        return loader.get_template(
-            'admin/catalogue/product/thumb.html'
-        ).render(
-            Context(
-                {
-                    'image': image
-                }
-            )
-        )
-    thumb.allow_tags = True
-    thumb.short_description = _('Image of product')
-
-    def product_date_updated(self):
-        return self.product.date_updated
-    product_date_updated.short_description = _("Product date updated")
 
 
 class EnableManagerProduct(models.Manager):
@@ -213,14 +175,16 @@ class AbstractProduct(models.Model, CommonFeatureProduct):
         else:
             return self.get_title()
 
+    @cached_property
     def get_absolute_url(self):
         """
         Return a product's absolute url
         """
         dict_values = {'product_slug': self.slug}
 
-        if self.categories.exists():
-            dict_values.update({'category_slug': self.categories.first().full_slug})
+        if self.categories.all():
+            dict_values.update({'category_slug': self.categories.all()[0].full_slug})
+            # dict_values.update({'category_slug': self.categories.all()[0].slug})
 
         return reverse('catalogue:detail', kwargs=dict_values)
 

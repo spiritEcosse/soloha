@@ -19,76 +19,68 @@
     {% endif %}
 {% endblock %}
 
-{% block content %}
-    <div class="row">
-        <div class="col-xs-24">
-            {% for promotion in promotions_0 %}
-                {% include "promotions/multiimage.html" %}
-            {% endfor %}
-        </div>
-    </div>
-
-    <div class="col-xs-24 items">
-        <ul class="nav nav-tabs nav-justified" id="home_tabs" role="tablist">
-            {% if products_new.exists %}
-                <li role="presentation" class="active"><a data-toggle="tab" role="tab" href="#news" id="news-tab">{% trans "Новинки" %}</a></li>
-            {% endif %}
-            {% if products_order.exists %}
-                <li role="presentation"><a data-toggle="tab" role="tab" href="#hits" id="hits-tab">{% trans "Хиты продаж" %}</a></li>
-            {% endif %}
-            {% if products_special.exists %}
-                <li role="presentation"><a data-toggle="tab" role="tab" href="#special" id="special-tab">{% trans "Акции" %}</a></li>
-            {% endif %}
-            {% if products_recommend.exists %}
-                <li role="presentation"><a data-toggle="tab" role="tab" href="#recommended" id="recommended-tab">{% trans "Рекомендуем" %}</a></li>
-            {% endif %}
-        </ul>
-
-        <div class="tab-content">
-            {% if products_new.exists %}
-                <div role="tabpanel" id="news" class="tab-pane fade in active" aria-labelledby="news-tab">
-                    <div class="lightSlider">
-                        {% for product in products_new %}
-                            <div class="col-sm-6 col-md-6">
-                                {% include 'catalogue/partials/product.html' %}
-                            </div>
-                        {% endfor %}
-                    </div>
-                </div>
-            {% endif %}
-            {% if products_order.exists %}
-                <div role="tabpanel" id="hits" class="tab-pane fade in" aria-labelledby="hits-tab">
-                    <div class="lightSlider">
-                        {% for product in products_order %}
-                            <div class="col-sm-6 col-md-6">
-                                {% include 'catalogue/partials/product.html' %}
-                            </div>
-                        {% endfor %}
-                    </div>
-                </div>
-            {% endif %}
-            {% if products_special.exists %}
-                <div role="tabpanel" id="special" class="tab-pane fade in" aria-labelledby="special-tab">
-                    <div class="lightSlider">
-                        {% for product in products_special %}
-                            <div class="col-sm-6 col-md-6">
-                                {% include 'catalogue/partials/product.html' %}
-                            </div>
-                        {% endfor %}
-                    </div>
-                </div>
-            {% endif %}
-            {% if products_recommend.exists %}
-                <div role="tabpanel" id="recommended" class="tab-pane fade in" aria-labelledby="recommended-tab">
-                    <div class="lightSlider">
-                        {% for product in products_recommend %}
-                            <div class="col-sm-6 col-md-6">
-                                {% include 'catalogue/partials/product.html' %}
-                            </div>
-                        {% endfor %}
-                    </div>
-                </div>
-            {% endif %}
-        </div>
-    </div>
-{% endblock content %}
+{#{% block content %}#}
+{#    <div class="col-xs-24 items">#}
+{#        <ul class="nav nav-tabs nav-justified" id="home_tabs" role="tablist">#}
+{#            {% if products_new.exists %}#}
+{#                <li role="presentation" class="active"><a data-toggle="tab" role="tab" href="#news" id="news-tab">{% trans "News" %}</a></li>#}
+{#            {% endif %}#}
+{#            {% if products_order.exists %}#}
+{#                <li role="presentation"><a data-toggle="tab" role="tab" href="#hits" id="hits-tab">{% trans "Хиты продаж" %}</a></li>#}
+{#            {% endif %}#}
+{#            {% if products_special.exists %}#}
+{#                <li role="presentation"><a data-toggle="tab" role="tab" href="#special" id="special-tab">{% trans "Акции" %}</a></li>#}
+{#            {% endif %}#}
+{#            {% if products_recommend.exists %}#}
+{#                <li role="presentation"><a data-toggle="tab" role="tab" href="#recommended" id="recommended-tab">{% trans "Рекомендуем" %}</a></li>#}
+{#            {% endif %}#}
+{#        </ul>#}
+{##}
+{#        <div class="tab-content">#}
+{#            {% if products_new.exists %}#}
+{#                <div role="tabpanel" id="news" class="tab-pane fade in active" aria-labelledby="news-tab">#}
+{#                    <div class="lightSlider">#}
+{#                        {% for product in products_new %}#}
+{#                            <div class="col-sm-6 col-md-6">#}
+{#                                {% include 'catalogue/partials/product.html' %}#}
+{#                            </div>#}
+{#                        {% endfor %}#}
+{#                    </div>#}
+{#                </div>#}
+{#            {% endif %}#}
+{#            {% if products_order.exists %}#}
+{#                <div role="tabpanel" id="hits" class="tab-pane fade in" aria-labelledby="hits-tab">#}
+{#                    <div class="lightSlider">#}
+{#                        {% for product in products_order %}#}
+{#                            <div class="col-sm-6 col-md-6">#}
+{#                                {% include 'catalogue/partials/product.html' %}#}
+{#                            </div>#}
+{#                        {% endfor %}#}
+{#                    </div>#}
+{#                </div>#}
+{#            {% endif %}#}
+{#            {% if products_special.exists %}#}
+{#                <div role="tabpanel" id="special" class="tab-pane fade in" aria-labelledby="special-tab">#}
+{#                    <div class="lightSlider">#}
+{#                        {% for product in products_special %}#}
+{#                            <div class="col-sm-6 col-md-6">#}
+{#                                {% include 'catalogue/partials/product.html' %}#}
+{#                            </div>#}
+{#                        {% endfor %}#}
+{#                    </div>#}
+{#                </div>#}
+{#            {% endif %}#}
+{#            {% if products_recommend.exists %}#}
+{#                <div role="tabpanel" id="recommended" class="tab-pane fade in" aria-labelledby="recommended-tab">#}
+{#                    <div class="lightSlider">#}
+{#                        {% for product in products_recommend %}#}
+{#                            <div class="col-sm-6 col-md-6">#}
+{#                                {% include 'catalogue/partials/product.html' %}#}
+{#                            </div>#}
+{#                        {% endfor %}#}
+{#                    </div>#}
+{#                </div>#}
+{#            {% endif %}#}
+{#        </div>#}
+{#    </div>#}
+{#{% endblock content %}#}

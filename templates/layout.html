@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load staticfiles %}
 {% load compress %}
-{% load promotion_tags %}
+{% load fork_promotion_tags %}
 {% load thumbnail %}
 {% load i18n %}
 {% load cache %}
@@ -44,10 +44,18 @@
                 </div>
                 {% block modal %}{% endblock %}
 
-                 Div exists for AJAX updates to entire content section
+                {#                 Div exists for AJAX updates to entire content section#}
                 <div id="content_inner">{% block content %}{% endblock %}</div>
 
-                {% block promotions %}{% endblock %}
+                {# Render promotions #}
+                {% block promotions %}
+                    <div id="promotions" class="col-xs-24">
+                        {% for promotion in promotions_page %}
+                            {% render_promotion promotion %}
+                        {% endfor %}
+                    </div>
+                {% endblock %}
+
                 {% block footer_checkout %}{% endblock %}
             {% endblock content_wrapper %}
         </div>
