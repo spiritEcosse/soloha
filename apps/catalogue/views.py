@@ -190,7 +190,10 @@ class ProductCategoryView(BaseCatalogue, views.JSONResponseMixin, views.AjaxResp
 
     def redirect_if_necessary(self, current_path, category):
         if self.enforce_paths:
-            expected_path = category.get_absolute_url(self.kwargs)
+            category.page = self.kwargs['page']
+            category.sort = self.kwargs['sort']
+            category.filter_slug_objects = self.kwargs['filter_slug_objects']
+            expected_path = category.get_absolute_url
 
             if expected_path != urlquote(current_path):
                 return HttpResponsePermanentRedirect(expected_path)
@@ -373,18 +376,22 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
 
     def redirect_if_necessary(self, current_path, product):
         if self.enforce_paths:
-            expected_path = product.get_absolute_url()
+            expected_path = product.get_absolute_url
             if expected_path != urlquote(current_path):
                 return HttpResponsePermanentRedirect(expected_path)
 
     def get_queryset(self):
         queryset = super(ProductDetailView, self).get_queryset()
-        return queryset.filter(enable=True).prefetch_related(
+        return queryset.filter(enable=True).select_related('parent__product_class').prefetch_related(
             Prefetch('reviews', queryset=ProductReview.objects.filter(status=ProductReview.APPROVED), to_attr='reviews_approved'),
             Prefetch('options', queryset=Feature.objects.filter(level=0), to_attr='options_enabled'),
             Prefetch('images', queryset=ProductImage.objects.only('original', 'product')),
             Prefetch('categories__parent__parent'),
-            Prefetch('stockrecords'),
+            Prefetch('stockrecords', queryset=StockRecord.objects.order_by('price_excl_tax'),
+                     to_attr='stockrecords_list'),
+            Prefetch('children__stockrecords', queryset=StockRecord.objects.order_by('price_excl_tax'),
+                     to_attr='children_stock_list'),
+            'characteristics__parent',
         )
         # .select_related('product_class').prefetch_related(
         # Prefetch('images', queryset=ProductImage.objects.only('original', 'product')),
@@ -622,10 +629,9 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
 
         if stockrecord:
             stockrecord = stockrecord.attributes.prefetch_related(
-                Prefetch(
-                    'product_features',
-                    queryset=ProductFeature.objects.filter(**self.filter_feature_parent()),
-                    to_attr='features_by_product'
+                Prefetch('product_features', queryset=ProductFeature.objects.filter(
+                        **self.filter_feature_parent()
+                    ).select_related('product').prefetch_related('product__images__original'), to_attr='features_by_product'
                 )
             )
 
@@ -638,12 +644,10 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
             Prefetch(
                 'children', queryset=stockrecord, to_attr='selected_val'
             ),
-            Prefetch(
-                'product_features',
-                queryset=ProductFeature.objects.filter(
-                    **self.filter_product_feature()
-                ), to_attr='features_by_product'
-            )
+            # Prefetch('product_features', queryset=ProductFeature.objects.filter(
+            #         **self.filter_product_feature()
+            #     ).select_related('product').prefetch_related('product__images__original'), to_attr='features_by_product'
+            # )
         ).annotate(
             price=Min('children__stockrecords__price_excl_tax'), count_child=Count('children', distinct=True)
         ).order_by('product_features__sort', 'price', '-count_child', 'title', 'pk')

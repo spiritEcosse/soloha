@@ -16,6 +16,7 @@ class ProductQuerySet(models.query.QuerySet):
             'images',
             'categories__parent__parent',
             'characteristics__parent',
+            Prefetch('children__stockrecords', queryset=StockRecord.objects.order_by('price_excl_tax'), to_attr='children_stock_list'),
         )
 
     def browsable(self):

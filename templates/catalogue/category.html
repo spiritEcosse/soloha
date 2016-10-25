@@ -15,7 +15,7 @@
 
 {# Todo refactoring remove {% regroup selected_filters by parent as group_filters %} and query from db #}
 {% block title %}
-    {% if selected_filters.exists %}
+    {% if selected_filters %}
         {% include 'catalogue/partials/meta_tags.html' %}.
     {% endif %}
     {{ category.get_meta_title }} | {{ block.super }}

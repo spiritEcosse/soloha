@@ -75,7 +75,7 @@ INSTALLED_APPS = \
         'apps.ex_flatpages',
         'bootstrap_pagination',
         'memoize',
-        # 'smart_load_tag',
+        'debug_panel',
     ] + get_core_apps(
         [
             'apps.catalogue', 'apps.promotions', 'apps.partner', 'apps.search', 'apps.order',

@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 
-{% load history_tags %}
+{% load ex_history_tags %}
 {% load currency_filters %}
 {% load reviews_tags %}
 {% load staticfiles %}
@@ -110,15 +110,19 @@
                         <div class="col-xs-22">
                             <ul class="nav nav-tabs nav-stacked">
                                 <li class="active"><a data-toggle="tab" href="#info">{% trans 'General information' %}</a></li>
-                                {% if object.options.exists %}
+
+                                {% if object.options.all %}
                                     <li><a data-toggle="tab" href="#options">{% trans 'Select additional options' %}</a></li>
                                 {% endif %}
+
                                 <li><a data-toggle="tab" href="#characteristics">{% trans 'Characteristics' %}</a></li>
 
                                 {% if product.description %}
                                     <li><a data-toggle="tab" href="#description">{% trans 'Description' %}</a></li>
                                 {% endif %}
+
                                 <li><a data-toggle="tab" href="#reviews">{% trans 'Reviews' %}</a></li>
+
                                 {% if pages_delivery_and_pay %}
                                     <li><a data-toggle="tab" href="#delivery">{% trans 'Shipping and payment' %}</a></li>
                                 {% endif %}
@@ -136,24 +140,24 @@
                         {% include "catalogue/partials/price.html" with ng=0 %}
                     </div>
 
-                    {% if attributes.exists %}
-                        <div class="col-xs-24 col-sm-24 col-md-14 options">
-                            <span class="relation">* {% trans "The price depends on the selected parameters" %}:</span>
-
-                            <div class="list_attr" ng-if="!attributes">
-                                {% for attribute in attributes %}
-                                    {% include "catalogue/product/attributes/attributes.html" with ng=0 %}
-                                {% endfor %}
-                            </div>
-
-                            <div class="list_attr" ng-if="attributes">
-                                {% include "catalogue/product/attributes/attributes.html" with ng=1 %}
-                            </div>
-                        </div>
-                    {% endif %}
+{#                    {% if attributes %}#}
+{#                        <div class="col-xs-24 col-sm-24 col-md-14 options">#}
+{#                            <span class="relation">* {% trans "The price depends on the selected parameters" %}:</span>#}
+{##}
+{#                            <div class="list_attr" ng-if="!attributes">#}
+{#                                {% for attribute in attributes %}#}
+{#                                    {% include "catalogue/product/attributes/attributes.html" with ng=0 %}#}
+{#                                {% endfor %}#}
+{#                            </div>#}
+{##}
+{#                            <div class="list_attr" ng-if="attributes">#}
+{#                                {% include "catalogue/product/attributes/attributes.html" with ng=1 %}#}
+{#                            </div>#}
+{#                        </div>#}
+{#                    {% endif %}#}
                 </div>
 
-                {% if object.children.exists %}
+                {% if object.children.all %}
                     {% include 'catalogue/partials/child.html' %}
                 {% endif %}
 

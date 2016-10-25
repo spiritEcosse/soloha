@@ -23,10 +23,13 @@ class Basket(AbstractBasket):
             return self.lines.none()
         if self._lines is None:
             self._lines = (
-                self.lines
-                    .select_related('product', 'product__product_class', 'stockrecord')
-                    .prefetch_related('attributes', 'product__images', 'product__categories__parent__parent',
-                                      'product__stockrecords'))
+                self.lines.select_related(
+                    'product__parent__product_class', 'product__product_class', 'stockrecord'
+                ).prefetch_related(
+                    'attributes__feature__parent', 'product__images__original', 'product__categories__parent__parent',
+                    'attributes__product_images__original', 'attributes__product_images__product',
+                )
+            )
         return self._lines
 
     def add_product(self, product, quantity=1, options=None, stockrecord=None, product_images=None):
