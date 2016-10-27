@@ -644,10 +644,10 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
             Prefetch(
                 'children', queryset=stockrecord, to_attr='selected_val'
             ),
-            # Prefetch('product_features', queryset=ProductFeature.objects.filter(
-            #         **self.filter_product_feature()
-            #     ).select_related('product').prefetch_related('product__images__original'), to_attr='features_by_product'
-            # )
+            Prefetch('product_features', queryset=ProductFeature.objects.filter(
+                    **self.filter_product_feature()
+                ).select_related('product').prefetch_related('product__images__original'), to_attr='features_by_product'
+            )
         ).annotate(
             price=Min('children__stockrecords__price_excl_tax'), count_child=Count('children', distinct=True)
         ).order_by('product_features__sort', 'price', '-count_child', 'title', 'pk')
