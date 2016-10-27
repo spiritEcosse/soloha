@@ -889,8 +889,8 @@ class CustomAbstractCategory(MPTTModel):
         if getattr(self, 'page', None) is not None and int(self.page) != 1:
             dict_values.update({'page': self.page})
 
-        if getattr(self, 'sort', None) is not None:
-            dict_values.update({'sort': self.sort})
+        if getattr(self, 'order', None) is not None:
+            dict_values.update({'sort': self.order})
 
         return reverse('catalogue:category', kwargs=dict_values)
 

@@ -191,7 +191,7 @@ class ProductCategoryView(BaseCatalogue, views.JSONResponseMixin, views.AjaxResp
     def redirect_if_necessary(self, current_path, category):
         if self.enforce_paths:
             category.page = self.kwargs['page']
-            category.sort = self.kwargs['sort']
+            category.order = self.kwargs['sort']
             category.filter_slug_objects = self.kwargs['filter_slug_objects']
             expected_path = category.get_absolute_url
 
