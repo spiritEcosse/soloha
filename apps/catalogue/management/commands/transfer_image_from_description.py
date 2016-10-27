@@ -46,34 +46,39 @@ class Command(BaseCommand):
                                 with open(os.path.join(settings.MEDIA_ROOT, image_source), "rb") as file_path:
                                     filename = image_source.split('/')[-1]
                                     file_obj = File(file_path, name=filename)
-                                    image, created = Image.objects.get_or_create(original_filename=filename)
-
-                                    if created:
-                                        image.file = file_obj
-                                        image.owner = user
-                                        image.name = filename
-                                        image.save()
-
-                                    fields = {
-                                        'original': image, 'product': product
-                                    }
-                                    created = False
 
                                     try:
-                                        product_image, created = ProductImage.objects.get_or_create(**fields)
-                                    except IntegrityError:
-                                        product_image = ProductImage.objects.filter(product=product).order_by(
-                                            'display_order').last()
-                                        fields['display_order'] = product_image.display_order + 1
-                                        product_image, created = ProductImage.objects.get_or_create(**fields)
+                                        image, created = Image.objects.get_or_create(original_filename=filename)
                                     except MultipleObjectsReturned as message:
-                                        print '\nMultipleObjectsReturned'
-                                        print image.file.path
-                                        print product, product.pk
+                                        print [(image, image.file.path) for image in Image.objects.filter(original_filename=filename)]
+                                        raise Exception(message)
+                                    else:
+                                        if created:
+                                            image.file = file_obj
+                                            image.owner = user
+                                            image.name = filename
+                                            image.save()
 
-                                    if created:
-                                        product_image.caption = image_name or os.path.splitext(filename)[0]
-                                        product_image.save()
+                                        fields = {
+                                            'original': image, 'product': product
+                                        }
+                                        created = False
+
+                                        try:
+                                            product_image, created = ProductImage.objects.get_or_create(**fields)
+                                        except IntegrityError:
+                                            product_image = ProductImage.objects.filter(product=product).order_by(
+                                                'display_order').last()
+                                            fields['display_order'] = product_image.display_order + 1
+                                            product_image, created = ProductImage.objects.get_or_create(**fields)
+                                        except MultipleObjectsReturned as message:
+                                            print '\nMultipleObjectsReturned'
+                                            print image.file.path
+                                            print product, product.pk
+
+                                        if created:
+                                            product_image.caption = image_name or os.path.splitext(filename)[0]
+                                            product_image.save()
                             except IOError as message:
                                 print message
 
