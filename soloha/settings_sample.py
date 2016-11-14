@@ -21,9 +21,9 @@ HAYSTACK_CONNECTIONS = {
 
 CACHES = {
     'default': {
-        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
-        'LOCATION': '127.0.0.1:11211',
-        }
+        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+        'LOCATION': PROJECT_DIR,
+    }
 }
 
 DEBUG_TOOLBAR_CONFIG = {

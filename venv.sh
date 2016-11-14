@@ -16,6 +16,9 @@ pip install -r requirements.txt
 # Collectstatic
 ./manage.py collectstatic --noinput
 
+# Create cache table
+./manage.py createcachetable
+
 # Unzip
 tar -xzvf data/fixtures/all.tar.gz -C data/fixtures/
 
