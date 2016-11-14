@@ -6,15 +6,13 @@ local.py
 /dist/
 /build/
 **/whoosh_index/
-/data/fixtures/
+/data/fixtures/*
 !/data/fixtures/all.tar.gz
 .idea/
 **/node_modules/
 **/bower_components/
-/static_root/*
-!/static_root/empty
 /media/*
-!/media/image_not_found.jpg
+/static_root/*
 
 # Vagrant
 .vagrant
@@ -154,3 +152,5 @@ crashlytics-build.properties
 fabric.properties
 Будет удалено apps/ex_sites/templatetags/
 Будет удалено apps/flatpages/
+Будет удалено data/
+Будет удалено static_root/
