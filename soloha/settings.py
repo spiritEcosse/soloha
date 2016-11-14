@@ -16,13 +16,13 @@ import os
 from oscar import get_core_apps
 from oscar.defaults import *
 from oscar import OSCAR_MAIN_TEMPLATE_DIR
-from soloha import settings_local
 from django.utils.translation import ugettext_lazy as _
 from oscar import get_core_apps
 import sys
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-PROJECT_NAME = os.path.basename(BASE_DIR)
+
+from soloha import settings_local
 
 location = lambda x: os.path.join(
     os.path.dirname(os.path.realpath(__file__)), x)
@@ -134,7 +134,18 @@ RECOMMENDED_PRODUCTS = 20
 # Database
 # https://docs.djangoproject.com/en/1.8/ref/settings/#databases
 
-DATABASES = settings_local.DATABASES
+DATABASES = {
+    'default': {
+        'ENGINE': settings_local.DB_BACKEND,
+        'NAME': settings_local.DB_NAME,
+        'USER': settings_local.DB_USER,
+        'PASSWORD': settings_local.DB_PASSWORD,
+        'HOST': settings_local.DB_HOST,
+        'POST': settings_local.DB_PORT,
+        'ATOMIC_REQUESTS': settings_local.DB_ATOMIC_REQUESTS,
+    },
+}
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/
@@ -229,12 +240,17 @@ AUTHENTICATION_BACKENDS = (
 #              ]
 #     },
 # }
-HAYSTACK_CONNECTIONS = {
-    'default': {
-        'ENGINE': 'haystack.backends.solr_backend.SolrEngine',
-        'URL': 'http://127.0.0.1:8983/solr/',
-    },
-}
+
+
+HAYSTACK_CONNECTIONS = settings_local.HAYSTACK_CONNECTIONS
+
+
+# HAYSTACK_CONNECTIONS = {
+#     'default': {
+#         'ENGINE': 'haystack.backends.solr_backend.SolrEngine',
+#         'URL': 'http://127.0.0.1:8983/solr/',
+#     },
+# }
 
 # HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
 
