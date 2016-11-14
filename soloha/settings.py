@@ -271,6 +271,8 @@ THUMBNAIL_HIGH_RESOLUTION = True
 FILER_CANONICAL_URL = 'sharing/'
 FILER_DEBUG = DEBUG
 FILER_ENABLE_LOGGING = DEBUG
+FILER_DUMP_PAYLOAD = True
+
 THUMBNAIL_PROCESSORS = (
     'easy_thumbnails.processors.colorspace',
     'easy_thumbnails.processors.autocrop',
