@@ -1,6 +1,6 @@
 import os
-from settings import BASE_DIR
 
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_DIR = os.path.basename(BASE_DIR)
 
 DEFAULT_FROM_EMAIL = ''
@@ -19,6 +19,10 @@ HAYSTACK_CONNECTIONS = {
     },
 }
 
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, 'static'),
+)
+
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
@@ -28,6 +32,7 @@ CACHES = {
 
 DEBUG_TOOLBAR_CONFIG = {
     'RENDER_PANELS': DEBUG,
+    'JQUERY_URL': os.path.join(STATICFILES_DIRS, '/bower_components/jquery/dist/jquery.min.js'),
 }
 
 CACHE_MIDDLEWARE_SECONDS = 24 * 60 * 60

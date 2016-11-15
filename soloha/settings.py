@@ -19,11 +19,9 @@ from oscar import OSCAR_MAIN_TEMPLATE_DIR
 from django.utils.translation import ugettext_lazy as _
 from oscar import get_core_apps
 import sys
-
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
 from soloha import settings_local
 
+BASE_DIR = settings_local.BASE_DIR
 location = lambda x: os.path.join(
     os.path.dirname(os.path.realpath(__file__)), x)
 
@@ -179,16 +177,14 @@ STATIC_ROOT = os.path.join(BASE_DIR,  'static_root')
 MEDIA_ROOT = os.path.join(BASE_DIR,  'media')
 MEDIA_URL = "/media/"
 
-STATICFILES_DIRS = (
-    os.path.join(BASE_DIR, 'static'),
-)
+STATICFILES_DIRS = settings_local.STATICFILES_DIRS
 
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
     'compressor.finders.CompressorFinder',
 )
-CKEDITOR_JQUERY_URL = '//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js'
+CKEDITOR_JQUERY_URL = os.path.join(STATICFILES_DIRS, '/bower_components/jquery/dist/jquery.min.js')
 CKEDITOR_UPLOAD_PATH = 'images/'
 
 CKEDITOR_CONFIGS = {
@@ -338,7 +334,6 @@ THUMBNAIL_ALIASES = {
     },
 }
 
-
 OSCAR_SHOP_NAME = 'soloha'
 DEBUG_TOOLBAR_CONFIG = settings_local.DEBUG_TOOLBAR_CONFIG
 SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
@@ -352,4 +347,3 @@ SECURE_CONTENT_TYPE_NOSNIFF = True
 #CSRF_COOKIE_SECURE = True
 SECURE_BROWSER_XSS_FILTER = True
 X_FRAME_OPTIONS = 'DENY'
-
