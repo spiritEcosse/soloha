@@ -4,6 +4,9 @@ source `which virtualenvwrapper.sh`
 rmvirtualenv $1
 mkvirtualenv $1
 
+# Python 3 (replace ~/.virtualenvs on variable - where locate ~/.virtualenvs or something like)
+# mkvirtualenv $1 -p /usr/bin/python3.4 ~/.virtualenvs/$1
+
 # Install libs in virtual environment
 pip install -r requirements.txt
 

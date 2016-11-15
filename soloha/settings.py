@@ -19,13 +19,11 @@ from oscar import OSCAR_MAIN_TEMPLATE_DIR
 from django.utils.translation import ugettext_lazy as _
 from oscar import get_core_apps
 import sys
-
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
 from soloha import settings_local
 
-location = lambda x: os.path.join(
-    os.path.dirname(os.path.realpath(__file__)), x)
+BASE_DIR = settings_local.BASE_DIR
+
+location = lambda x: os.path.join(os.path.dirname(os.path.realpath(__file__)), x)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/

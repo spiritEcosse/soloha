@@ -1,8 +1,8 @@
 from django.contrib.flatpages.admin import FlatPageAdmin
 from django.contrib import admin
-import forms
+from apps.ex_flatpages import forms
 from django.contrib.flatpages.models import FlatPage
-from models import InfoPage
+from apps.ex_flatpages.models import InfoPage
 
 
 class InfoPageInline(admin.StackedInline):

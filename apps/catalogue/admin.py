@@ -4,12 +4,12 @@ from oscar.core.loading import get_model
 from django.forms import Textarea
 from mptt.admin import DraggableMPTTAdmin
 from import_export.admin import ImportExportMixin, ImportExportActionModelAdmin
-import resources
+from apps.catalogue import resources
 import logging  # isort:skip
 from dal import autocomplete
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
-import forms as catalogue_forms
+from apps.catalogue import forms as catalogue_forms
 import apps.partner.forms as partner_forms
 from django.db.models import Q
 from django.db.models.query import Prefetch

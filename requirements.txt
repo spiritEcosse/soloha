@@ -36,7 +36,6 @@ django-oscar==1.1.1
 django-oscar-accounts==0.3
 django-phonenumber-field==1.1.0
 django-polymorphic==0.8.1
-django-pybrowscap==1.0.0
 django-selenium==0.9.8
 django-smart-load-tag==0.3.2
 django-smartagent==0.1.1
@@ -79,7 +78,6 @@ ptyprocess==0.5.1
 purl==1.1
 pyasn1==0.1.9
 pyasn1-modules==0.0.8
-pybrowscap==2.0
 pycparser==2.14
 pycrypto==2.6.1
 Pygments==2.1.3

@@ -1,6 +1,6 @@
 from django.contrib.sites.admin import SiteAdmin
 from django.contrib import admin
-from models import PhoneNumber, Info
+from apps.ex_sites.models import PhoneNumber, Info
 from django.contrib.sites.models import Site
 
 

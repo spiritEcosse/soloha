@@ -1,6 +1,6 @@
 import os
-from settings import BASE_DIR
 
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_DIR = os.path.basename(BASE_DIR)
 
 DEFAULT_FROM_EMAIL = ''

@@ -1,7 +1,7 @@
 from import_export import widgets as import_export_widgets
 from import_export import resources, fields
 import functools
-import widgets
+from apps.catalogue import widgets
 from django.db.models.fields.related import ForeignKey
 from diff_match_patch import diff_match_patch
 from django.utils.safestring import mark_safe

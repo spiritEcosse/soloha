@@ -61,6 +61,9 @@ debian_ubuntu_install_modules: postgresql libs install_pip
 site: debian_ubuntu_install_modules create_settings_local virtual_environment
 
 
+site3:
+	sudo apt-get install python3-dev libevent-dev python-psycopg2 libpq-dev
+
 
 sandbox_image:
     docker build -t django-oscar-sandbox:latest .
