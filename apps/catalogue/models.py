@@ -9,6 +9,7 @@ from django.forms import TextInput
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.flatpages.admin import FlatPageAdmin
 from django.db import IntegrityError
+from django.db.models import Min, Q, Prefetch, BooleanField, Case, When, Count, Max
 
 __all__ = ['ProductAttributesContainer']
 
@@ -32,9 +33,44 @@ if not is_model_registered('catalogue', 'ProductOptions'):
 
     __all__.append(ProductOptions)
 
+
+def only():
+    return [
+        'slug',
+        'name',
+        'parent',
+        'icon__file_ptr__file',
+        "icon__file_ptr__original_filename",
+        "icon__file_ptr__name",
+        "icon__is_public",
+        'image_banner__file_ptr__file',
+        "image_banner__file_ptr__original_filename",
+        "image_banner__file_ptr__name",
+        "image_banner__is_public",
+        'image_banner',
+        'link_banner'
+    ]
+
+
+class ProductiveCategoryManager(models.Manager):
+    def prefetch(self):
+        return self.filter(level=0).select_related('image_banner', 'icon').prefetch_related(
+            Prefetch('children', queryset=Category.productive.browse_lo_level()),
+            Prefetch('children__children', queryset=Category.productive.browse_lo_level()),
+        )
+
+    def browse(self, prefetch=True, fields=only()):
+        queryset = self.prefetch() if prefetch else self.get_queryset()
+        return queryset.filter(enable=True).only(*fields)
+
+    def browse_lo_level(self):
+        return self.browse(prefetch=False, fields=['slug', 'name', 'parent'])
+
+
 if not is_model_registered('catalogue', 'Category'):
     class Category(CustomAbstractCategory):
-        pass
+        objects = models.Manager()
+        productive = ProductiveCategoryManager()
 
     __all__.append('Category')
 

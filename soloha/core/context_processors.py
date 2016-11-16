@@ -10,7 +10,7 @@ ANSWER = str(_('Subscribed successfully!'))
 
 def context_data(request):
     context = dict()
-    context['categories'] = Category.objects.filter(enable=True, level=0).prefetch_related('children__children')[:MAX_COUNT_CATEGORIES]
+    context['categories'] = Category.productive.browse()[:MAX_COUNT_CATEGORIES]
     context['form'] = SubscribeForm()
     context['answer'] = ANSWER
     return context
