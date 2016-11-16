@@ -19,8 +19,12 @@ HAYSTACK_CONNECTIONS = {
     },
 }
 
+FOLDER_STATIC = os.path.join(BASE_DIR, 'static')
+STATIC_URL = '/static_root/'
+FOLDER_STATIC_ROOT = os.path.join(BASE_DIR, STATIC_URL.strip("/"))
+
 STATICFILES_DIRS = (
-    os.path.join(BASE_DIR, 'static'),
+    FOLDER_STATIC,
 )
 
 CACHES = {
@@ -32,7 +36,7 @@ CACHES = {
 
 DEBUG_TOOLBAR_CONFIG = {
     'RENDER_PANELS': DEBUG,
-    'JQUERY_URL': os.path.join(STATICFILES_DIRS, '/bower_components/jquery/dist/jquery.min.js'),
+    'JQUERY_URL': os.path.join(STATIC_URL, 'bower_components/jquery/dist/jquery.min.js'),
 }
 
 CACHE_MIDDLEWARE_SECONDS = 24 * 60 * 60

@@ -38,6 +38,7 @@ libs:
     # Install other libs
 	sudo apt-get install libpq-dev
 	sudo apt-get install libmagickwand-dev
+	sudo apt-get install libjpeg-dev
 
     # Install gettext for run makemessages
 	sudo apt-get install gettext

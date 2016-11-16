@@ -172,8 +172,8 @@ TEMPLATE_DIRS = (
     location('templates'),
 )
 
-STATIC_URL = '/static_root/'
-STATIC_ROOT = os.path.join(BASE_DIR,  'static_root')
+STATIC_URL = settings_local.STATIC_URL
+STATIC_ROOT = settings_local.FOLDER_STATIC_ROOT
 MEDIA_ROOT = os.path.join(BASE_DIR,  'media')
 MEDIA_URL = "/media/"
 
@@ -184,7 +184,8 @@ STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
     'compressor.finders.CompressorFinder',
 )
-CKEDITOR_JQUERY_URL = os.path.join(STATICFILES_DIRS, '/bower_components/jquery/dist/jquery.min.js')
+
+CKEDITOR_JQUERY_URL = os.path.join(STATIC_URL, 'bower_components/jquery/dist/jquery.min.js')
 CKEDITOR_UPLOAD_PATH = 'images/'
 
 CKEDITOR_CONFIGS = {
