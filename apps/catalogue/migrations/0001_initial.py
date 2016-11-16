@@ -6,8 +6,6 @@ import oscar.models.fields.autoslugfield
 import django.db.models.deletion
 import django.core.validators
 import oscar.models.fields
-import datetime
-from django.utils.timezone import utc
 
 
 class Migration(migrations.Migration):
@@ -47,9 +45,11 @@ class Migration(migrations.Migration):
             name='Category',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('path', models.CharField(unique=True, max_length=255)),
+                ('depth', models.PositiveIntegerField()),
+                ('numchild', models.PositiveIntegerField(default=0)),
                 ('name', models.CharField(max_length=255, db_index=True, verbose_name='Name')),
                 ('description', models.TextField(verbose_name='Description', blank=True)),
-                ('image', models.ImageField(upload_to='categories', verbose_name='Image', max_length=255, blank=True, null=True)),
                 ('slug', models.SlugField(max_length=255, editable=False, verbose_name='Slug')),
                 ('full_name', models.CharField(max_length=255, editable=False, db_index=True, verbose_name='Full Name')),
             ],
@@ -82,8 +82,8 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('structure', models.CharField(default='standalone', max_length=10, verbose_name='Product structure', choices=[('standalone', 'Stand-alone product'), ('parent', 'Parent product'), ('child', 'Child product')])),
                 ('upc', oscar.models.fields.NullCharField(unique=True, verbose_name='UPC', max_length=64, help_text='Universal Product Code (UPC) is an identifier for a product which is not specific to a particular  supplier. Eg an ISBN for a book.')),
-                ('title', models.CharField(max_length=255, verbose_name='Title')),
-                ('slug', models.SlugField(max_length=255, verbose_name='Slug', unique=True)),
+                ('title', models.CharField(max_length=255, verbose_name='Title', blank=True)),
+                ('slug', models.SlugField(max_length=255, verbose_name='Slug')),
                 ('description', models.TextField(verbose_name='Description', blank=True)),
                 ('rating', models.FloatField(editable=False, verbose_name='Rating', null=True)),
                 ('date_created', models.DateTimeField(auto_now_add=True, verbose_name='Date created')),
@@ -163,7 +163,6 @@ class Migration(migrations.Migration):
             name='ProductImage',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('original', models.ImageField(upload_to='images/products/%Y/%m/', max_length=255, verbose_name='Original')),
                 ('caption', models.CharField(max_length=200, verbose_name='Caption', blank=True)),
                 ('display_order', models.PositiveIntegerField(default=0, verbose_name='Display order', help_text='An image with a display order of zero will be the primary image for a product')),
                 ('date_created', models.DateTimeField(auto_now_add=True, verbose_name='Date created')),
@@ -219,17 +218,6 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name='product',
-            name='categories',
-            field=models.ManyToManyField(to='catalogue.Category', verbose_name='Categories'),
-        ),
-        migrations.AddField(
-            model_name='category',
-            name='level',
-            field=models.PositiveIntegerField(default=1, editable=False, db_index=True),
-            preserve_default=False,
-        ),
-        migrations.AddField(
-            model_name='product',
             name='parent',
             field=models.ForeignKey(null=True, verbose_name='Parent product', related_name='children', help_text="Only choose a parent product if you're creating a child product.  For example if this is a size 4 of a particular t-shirt.  Leave blank if this is a stand-alone product (i.e. there is only one version of this product).", to='catalogue.Product', blank=True),
             preserve_default=True,
@@ -239,36 +227,6 @@ class Migration(migrations.Migration):
             name='product_class',
             field=models.ForeignKey(verbose_name='Product type', on_delete=django.db.models.deletion.PROTECT, related_name='products', help_text='Choose what type of product this is', to='catalogue.ProductClass', null=True),
             preserve_default=True,
-        ),
-        migrations.AddField(
-            model_name='category',
-            name='lft',
-            field=models.PositiveIntegerField(default=1, editable=False, db_index=True),
-            preserve_default=False,
-        ),
-        migrations.AddField(
-            model_name='category',
-            name='rght',
-            field=models.PositiveIntegerField(default=1, editable=False, db_index=True),
-            preserve_default=False,
-        ),
-        migrations.AddField(
-            model_name='category',
-            name='tree_id',
-            field=models.PositiveIntegerField(default=1, editable=False, db_index=True),
-            preserve_default=False,
-        ),
-        migrations.AddField(
-            model_name='category',
-            name='url',
-            field=models.URLField(default='', verbose_name='Full slug', max_length=1000, editable=False),
-            preserve_default=False,
-        ),
-        migrations.AddField(
-            model_name='category',
-            name='created',
-            field=models.DateTimeField(default=datetime.datetime(2016, 3, 28, 17, 13, 47, 634663, tzinfo=utc), auto_now_add=True),
-            preserve_default=False,
         ),
         migrations.AddField(
             model_name='product',

@@ -458,7 +458,7 @@ class AbstractProduct(models.Model, CommonFeatureProduct):
         Returns the primary image for a product. Usually used when one can
         only display one product image, e.g. in a list of products.
         """
-        return self.images.all()[0].image if self.images.exists() else self.get_missing_image()
+        return self.images.all()[0].image if self.images.all() else self.get_missing_image()
 
     # Updating methods
 
@@ -736,7 +736,7 @@ class CustomAbstractCategory(MPTTModel):
         names = [unicode(category.name) for category in self.get_ancestors_and_self()]
         return self._full_name_separator.join(names)
 
-    @property
+    @cached_property
     def full_slug(self):
         """
         Returns a string of this category's slug concatenated with the slugs
@@ -746,8 +746,8 @@ class CustomAbstractCategory(MPTTModel):
         has been re-purposed to only store this category's slug and to not
         include it's ancestors' slugs.
         """
-        slugs = [category.slug for category in self.get_ancestors_through_parent(include_self=True)]
-        return self._slug_separator.join(map(str, slugs))
+        slugs = [str(category.slug) for category in self.get_ancestors_through_parent(include_self=True)]
+        return self._slug_separator.join(slugs)
 
     def get_ancestors_through_parent(self, include_self=True):
         """
@@ -864,7 +864,8 @@ class CustomAbstractCategory(MPTTModel):
     def get_meta_description(self):
         return self.meta_description or truncatechars(strip_tags(self.description), 100)
 
-    def get_absolute_url(self, values={}):
+    @cached_property
+    def get_absolute_url(self):
         """
         Our URL scheme means we have to look up the category's ancestors. As
         that is a bit more expensive, we cache the generated URL. That is
@@ -875,8 +876,8 @@ class CustomAbstractCategory(MPTTModel):
         """
         dict_values = {'category_slug': self.full_slug}
 
-        if values.get('filter_slug_objects'):
-            filter_slug = values.get('filter_slug_objects').values_list('slug', flat=True)
+        if getattr(self, 'filter_slug_objects', False):
+            filter_slug = self.filter_slug_objects.values_list('slug', flat=True)
             filter_slug = AbstractFeature.slug_separator.join(filter_slug)
 
             dict_values.update(
@@ -885,11 +886,11 @@ class CustomAbstractCategory(MPTTModel):
                 }
             )
 
-        if values.get('page') and int(values.get('page')) != 1:
-            dict_values.update({'page': values.get('page')})
+        if getattr(self, 'page', None) is not None and int(self.page) != 1:
+            dict_values.update({'page': self.page})
 
-        if values.get('sort'):
-            dict_values.update({'sort': values.get('sort')})
+        if getattr(self, 'order', None) is not None:
+            dict_values.update({'sort': self.order})
 
         return reverse('catalogue:category', kwargs=dict_values)
 

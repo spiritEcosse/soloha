@@ -17,7 +17,7 @@
             <span class="caret"></span>
         </button>
 
-        <div class="dropdown-menu stop-propagation{% if request.basket.num_lines %} full-width{% endif %}" aria-labelledby="cart-show">
+        <div class="dropdown-menu stop-propagation{% if request.basket.all_lines %} full-width{% endif %}" aria-labelledby="cart-show">
             {% include "basket/partials/basket_quick.html" %}
         </div>
     </li>

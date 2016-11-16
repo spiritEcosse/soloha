@@ -10,6 +10,7 @@ from oscar.apps.partner.exceptions import InvalidStockAdjustment
 from soloha.core.utils import CommonFeatureProduct
 
 
+@python_2_unicode_compatible
 class AbstractStockRecord(models.Model, CommonFeatureProduct):
     """
     A stock record.

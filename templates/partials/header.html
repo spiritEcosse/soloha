@@ -191,7 +191,7 @@
                                             </div>
                                             {% if category.image_banner and category.link_banner %}
                                                 <div class="col-xs-12 text-right image">
-                                                    <img src="{{ category.image_banner }}" class="img-responsive pull-right" title="" alt=""/>
+                                                    <img src="{{ category.image_banner|thumbnail_url:"category_banner" }}" class="img-responsive pull-right" title="" alt=""/>
                                                     <a class="btn btn-default btn-menu btn-xs" href="{{ category.link_banner }}">{% trans "Хочу" %}</a>
                                                 </div>
                                             {% endif %}
