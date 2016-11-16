@@ -190,13 +190,10 @@ class UseFirstStockRecord(object):
     product was permitted.
     """
     def select_stockrecord(self, product):
-        if hasattr(product, 'stockrecords_list'):
-            try:
-                return product.stockrecords_list[0]
-            except IndexError:
-                return None
-
-        return product.stockrecords.order_by('price_excl_tax').first()
+        try:
+            return product.stockrecords.all()[0]
+        except IndexError:
+            return None
 
 
 class StockRequired(object):

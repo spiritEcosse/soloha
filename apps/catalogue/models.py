@@ -10,6 +10,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.contrib.flatpages.admin import FlatPageAdmin
 from django.db import IntegrityError
 from django.db.models import Min, Q, Prefetch, BooleanField, Case, When, Count, Max
+from apps.partner.models import StockRecord
 
 __all__ = ['ProductAttributesContainer']
 
@@ -54,17 +55,24 @@ def only():
 
 class ProductiveCategoryManager(models.Manager):
     def prefetch(self):
-        return self.filter(level=0).select_related('image_banner', 'icon').prefetch_related(
+        return self.get_queryset().select_related('image_banner', 'icon').prefetch_related(
             Prefetch('children', queryset=Category.productive.browse_lo_level()),
             Prefetch('children__children', queryset=Category.productive.browse_lo_level()),
         )
 
-    def browse(self, prefetch=True, fields=only()):
-        queryset = self.prefetch() if prefetch else self.get_queryset()
-        return queryset.filter(enable=True).only(*fields)
+    def browse(self, level_up=True, fields=only()):
+        lookup = {'enable': True}
+        queryset = self.get_queryset()
+
+        if level_up:
+            lookup['level'] = 0
+            queryset = self.prefetch()
+
+        queryset = queryset.filter(**lookup)
+        return queryset.only(*fields)
 
     def browse_lo_level(self):
-        return self.browse(prefetch=False, fields=['slug', 'name', 'parent'])
+        return self.browse(level_up=False, fields=['slug', 'name', 'parent'])
 
 
 if not is_model_registered('catalogue', 'Category'):
@@ -75,16 +83,46 @@ if not is_model_registered('catalogue', 'Category'):
     __all__.append('Category')
 
 
+class ProductiveFeatureManager(models.Manager):
+    def browse(self):
+        return self.get_queryset().select_related('parent').only(
+            'title', 'parent'
+        ).order_by('sort')
+
 if not is_model_registered('catalogue', 'Feature'):
     class Feature(AbstractFeature):
-        pass
+        productive = ProductiveFeatureManager()
+        objects = models.Manager()
 
     __all__.append('Filter')
 
 
+class ProductiveProductManager(models.Manager):
+    def prefetch(self):
+        return self.select_related('product_class').prefetch_related(
+            Prefetch('categories', queryset=Category.productive.browse_lo_level().select_related('parent__parent')),
+            'children',
+            Prefetch('stockrecords', queryset=StockRecord.productive.browse()),
+            Prefetch('characteristics', queryset=Feature.productive.browse()),
+            Prefetch('images', queryset=ProductImage.productive.browse()),
+        ).only(
+            'title',
+            'slug',
+            'product_class',
+            'structure',
+            'upc',
+        )
+
+    def browse(self):
+        return self.prefetch().filter(enable=True, parent=None)
+
+    def browse_with_children(self):
+        return self.prefetch().filter(enable=True)
+
+
 if not is_model_registered('catalogue', 'Product'):
     class Product(AbstractProduct):
-        pass
+        productive = ProductiveProductManager()
 
     __all__.append('Product')
 
@@ -144,9 +182,19 @@ if not is_model_registered('catalogue', 'Option'):
     __all__.append('Option')
 
 
+class ProductiveProductImageManager(models.Manager):
+    def browse(self):
+        return self.get_queryset().select_related('original').only(
+            'original__file_ptr__file',
+            "original__is_public",
+            'product',
+        ).order_by('display_order')
+
+
 if not is_model_registered('catalogue', 'ProductImage'):
     class ProductImage(AbstractProductImage):
-        pass
+        productive = ProductiveProductImageManager()
+        objects = models.Manager()
 
     __all__.append('ProductImage')
 
