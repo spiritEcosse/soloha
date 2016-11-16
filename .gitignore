@@ -6,6 +6,7 @@ local.py
 /dist/
 /build/
 .idea/
+**/whoosh_index/
 **/node_modules/
 **/bower_components/
 /static_root/*
