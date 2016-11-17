@@ -1,4 +1,5 @@
 from oscar.apps.basket.middleware import BasketMiddleware as CoreBasketMiddleware
+from apps.offer.utils import Applicator
 
 
 class BasketMiddleware(CoreBasketMiddleware):

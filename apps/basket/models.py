@@ -1,16 +1,27 @@
 from oscar.apps.basket.abstract_models import *  # noqa
 from django.utils.translation import ugettext_lazy as _
-from django.core.exceptions import ObjectDoesNotExist
-from oscar.core.loading import get_model
-from django.db.models.query import Prefetch
 from apps.catalogue.fiters import Filter
-from django.db.models import Case, When, BooleanField
+from django.db.models import Prefetch, BooleanField, Case, When
+from apps.catalogue.models import ProductFeature, Category, ProductImage, Feature
 
-ProductFeature = get_model('catalogue', 'ProductFeature')
-StockRecord = get_model('partner', 'StockRecord')
+
+class ProductiveLineAttributeManager(models.Manager):
+    def browse(self):
+        return self.get_queryset().only(
+            'line__id', 'feature__id'
+        ).order_by()
+
+
+class LineAttribute(AbstractLineAttribute):
+    objects = ProductiveLineAttributeManager()
 
 
 class Basket(AbstractBasket):
+    @property
+    def num_lines(self):
+        """Return number of lines"""
+        return len(self.all_lines())
+
     def all_lines(self):
         """
         Return a cached set of basket lines.
@@ -21,14 +32,33 @@ class Basket(AbstractBasket):
         """
         if self.id is None:
             return self.lines.none()
+
         if self._lines is None:
             self._lines = (
                 self.lines.select_related(
                     'product__parent__product_class', 'product__product_class', 'stockrecord'
                 ).prefetch_related(
-                    'attributes__feature__parent', 'product__images__original', 'product__categories__parent__parent',
-                    'attributes__product_images__original', 'attributes__product_images__product',
-                )
+                    Prefetch('attributes', queryset=LineAttribute.objects.browse()),
+                    Prefetch('attributes__feature', queryset=Feature.objects.browse()),
+                    Prefetch('attributes__product_images', queryset=ProductImage.objects.browse().select_related('product')),
+                    Prefetch('product__images', queryset=ProductImage.objects.browse()),
+                    Prefetch('product__categories', queryset=Category.objects.browse_lo_level().select_related('parent__parent')),
+                ).only(
+                    'product__id',
+                    'product__structure',
+                    'product__slug',
+                    'product__title',
+                    'product__parent__id',
+                    'product__product_class__id',
+                    'product__product_class__track_stock',
+                    'product__parent__product_class__id',
+                    'stockrecord__id',
+                    'stockrecord__price_currency',
+                    'stockrecord__price_excl_tax',
+                    'basket__id',
+                    'price_currency',
+                    'quantity',
+                ).order_by()
             )
         return self._lines
 
@@ -187,6 +217,7 @@ product_images = models.ManyToManyField(
     'catalogue.ProductImage', blank=True, related_name='line_attributes', verbose_name=_('Product images')
 )
 product_images.contribute_to_class(LineAttribute, "product_images")
+
 
 option = LineAttribute._meta.get_field('option')
 option.null = True

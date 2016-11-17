@@ -16,8 +16,7 @@ class ProductiveStockRecordManager(models.Manager):
 
 if not is_model_registered('partner', 'StockRecord'):
     class StockRecord(AbstractStockRecord):
-        objects = models.Manager()
-        productive = ProductiveStockRecordManager()
+        objects = ProductiveStockRecordManager()
 
     __all__.append('StockRecord')
 

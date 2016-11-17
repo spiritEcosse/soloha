@@ -67,6 +67,9 @@ npm-debug.log
 !apps/promotions/migrations/0002_auto_20150604_1450.py
 !apps/promotions/migrations/__init__.py
 
+!apps/offer/migrations/0001_initial.py
+!apps/offer/migrations/__init__.py
+
 # IDE files
 .project
 .pydevproject

@@ -39,7 +39,8 @@ def only():
     return [
         'slug',
         'name',
-        'parent',
+        'parent__id',
+        "icon__id",
         'icon__file_ptr__file',
         "icon__file_ptr__original_filename",
         "icon__file_ptr__name",
@@ -48,7 +49,7 @@ def only():
         "image_banner__file_ptr__original_filename",
         "image_banner__file_ptr__name",
         "image_banner__is_public",
-        'image_banner',
+        'image_banner__id',
         'link_banner'
     ]
 
@@ -56,8 +57,8 @@ def only():
 class ProductiveCategoryManager(models.Manager):
     def prefetch(self):
         return self.get_queryset().select_related('image_banner', 'icon').prefetch_related(
-            Prefetch('children', queryset=Category.productive.browse_lo_level()),
-            Prefetch('children__children', queryset=Category.productive.browse_lo_level()),
+            Prefetch('children', queryset=Category.objects.browse_lo_level()),
+            Prefetch('children__children', queryset=Category.objects.browse_lo_level()),
         )
 
     def browse(self, level_up=True, fields=only()):
@@ -69,16 +70,15 @@ class ProductiveCategoryManager(models.Manager):
             queryset = self.prefetch()
 
         queryset = queryset.filter(**lookup)
-        return queryset.only(*fields)
+        return queryset.only(*fields).order_by()
 
     def browse_lo_level(self):
-        return self.browse(level_up=False, fields=['slug', 'name', 'parent'])
+        return self.browse(level_up=False, fields=['slug', 'name', 'parent__id'])
 
 
 if not is_model_registered('catalogue', 'Category'):
     class Category(CustomAbstractCategory):
-        objects = models.Manager()
-        productive = ProductiveCategoryManager()
+        objects = ProductiveCategoryManager()
 
     __all__.append('Category')
 
@@ -87,12 +87,11 @@ class ProductiveFeatureManager(models.Manager):
     def browse(self):
         return self.get_queryset().select_related('parent').only(
             'title', 'parent'
-        ).order_by('sort')
+        ).order_by()
 
 if not is_model_registered('catalogue', 'Feature'):
     class Feature(AbstractFeature):
-        productive = ProductiveFeatureManager()
-        objects = models.Manager()
+        objects = ProductiveFeatureManager()
 
     __all__.append('Filter')
 
@@ -100,15 +99,15 @@ if not is_model_registered('catalogue', 'Feature'):
 class ProductiveProductManager(models.Manager):
     def prefetch(self):
         return self.select_related('product_class').prefetch_related(
-            Prefetch('categories', queryset=Category.productive.browse_lo_level().select_related('parent__parent')),
+            Prefetch('categories', queryset=Category.objects.browse_lo_level().select_related('parent__parent')),
             'children',
-            Prefetch('stockrecords', queryset=StockRecord.productive.browse()),
-            Prefetch('characteristics', queryset=Feature.productive.browse()),
-            Prefetch('images', queryset=ProductImage.productive.browse()),
+            Prefetch('stockrecords', queryset=StockRecord.objects.browse()),
+            Prefetch('characteristics', queryset=Feature.objects.browse()),
+            Prefetch('images', queryset=ProductImage.objects.browse()),
         ).only(
             'title',
             'slug',
-            'product_class',
+            'product_class__id',
             'structure',
             'upc',
         )
@@ -122,7 +121,7 @@ class ProductiveProductManager(models.Manager):
 
 if not is_model_registered('catalogue', 'Product'):
     class Product(AbstractProduct):
-        productive = ProductiveProductManager()
+        objects = ProductiveProductManager()
 
     __all__.append('Product')
 
@@ -185,16 +184,18 @@ if not is_model_registered('catalogue', 'Option'):
 class ProductiveProductImageManager(models.Manager):
     def browse(self):
         return self.get_queryset().select_related('original').only(
+            'original__id',
             'original__file_ptr__file',
             "original__is_public",
-            'product',
+            'product__title',
+            'product__id',
+            'caption',
         ).order_by('display_order')
 
 
 if not is_model_registered('catalogue', 'ProductImage'):
     class ProductImage(AbstractProductImage):
-        productive = ProductiveProductImageManager()
-        objects = models.Manager()
+        objects = ProductiveProductImageManager()
 
     __all__.append('ProductImage')
 

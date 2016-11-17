@@ -3,7 +3,7 @@ from apps.catalogue.models import Product
 
 
 def get_queryset(self):
-    qs = Product.productive.browse().select_related('stats')
+    qs = Product.objects.browse().select_related('stats')
 
     if self.method == self.BESTSELLING:
         return qs.order_by('-stats__score')

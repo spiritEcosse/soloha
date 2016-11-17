@@ -57,7 +57,7 @@ MIDDLEWARE_CLASSES = (
     'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware',
     'django.middleware.locale.LocaleMiddleware',
-    'oscar.apps.basket.middleware.BasketMiddleware',
+    'apps.basket.middleware.BasketMiddleware',
     'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware',
     # 'django.middleware.cache.FetchFromCacheMiddleware',
 )
