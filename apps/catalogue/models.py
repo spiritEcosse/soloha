@@ -93,7 +93,7 @@ if not is_model_registered('catalogue', 'Feature'):
     class Feature(AbstractFeature):
         objects = ProductiveFeatureManager()
 
-    __all__.append('Filter')
+    __all__.append('Feature')
 
 
 class ProductiveProductManager(models.Manager):
@@ -108,6 +108,8 @@ class ProductiveProductManager(models.Manager):
             'title',
             'slug',
             'product_class__id',
+            'product_class__track_stock',
+            'product_class__slug',
             'structure',
             'upc',
         )
