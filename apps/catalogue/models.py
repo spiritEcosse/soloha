@@ -100,7 +100,6 @@ class ProductiveProductManager(models.Manager):
     def prefetch(self):
         return self.select_related('product_class').prefetch_related(
             Prefetch('categories', queryset=Category.objects.browse_lo_level().select_related('parent__parent')),
-            'children',
             Prefetch('stockrecords', queryset=StockRecord.objects.browse()),
             Prefetch('characteristics', queryset=Feature.objects.browse()),
             Prefetch('images', queryset=ProductImage.objects.browse()),
@@ -112,7 +111,7 @@ class ProductiveProductManager(models.Manager):
             'product_class__slug',
             'structure',
             'upc',
-        )
+        ).order_by()
 
     def browse(self):
         return self.prefetch().filter(enable=True, parent=None)

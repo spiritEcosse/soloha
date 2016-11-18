@@ -1,5 +1,4 @@
 from itertools import chain
-
 from oscar.apps.promotions.models import PagePromotion, KeywordPromotion
 
 
@@ -23,15 +22,19 @@ def get_request_promotions(request):
     """
     Return promotions relevant to this request
     """
-    promotions = PagePromotion._default_manager.select_related() \
-        .prefetch_related('content_object') \
-        .filter(page_url=request.path) \
-        .order_by('display_order')
+    promotions = PagePromotion._default_manager.select_related('content_type').prefetch_related(
+        'content_object'
+    ).filter(page_url=request.path).only(
+        'content_type__id',
+        'content_type__model',
+        'content_type__app_label',
+        'object_id',
+        'position',
+    ).order_by('display_order')
 
     if 'q' in request.GET:
-        keyword_promotions \
-            = KeywordPromotion._default_manager.select_related()\
-            .filter(keyword=request.GET['q'])
+        keyword_promotions = KeywordPromotion._default_manager.select_related().filter(keyword=request.GET['q'])
+
         if keyword_promotions.exists():
             promotions = list(chain(promotions, keyword_promotions))
 

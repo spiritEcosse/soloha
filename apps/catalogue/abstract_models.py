@@ -155,9 +155,6 @@ class AbstractProduct(models.Model, CommonFeatureProduct):
             "This flag indicates if this product can be used in an offer "
             "or not"))
 
-    objects = ProductManager()
-    objects_enable = EnableManagerProduct()
-    browsable = BrowsableProductManager()
     separator = ','
 
     class Meta:
