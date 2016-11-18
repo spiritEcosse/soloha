@@ -70,6 +70,9 @@ npm-debug.log
 !apps/offer/migrations/0001_initial.py
 !apps/offer/migrations/__init__.py
 
+!apps/voucher/migrations/0001_initial.py
+!apps/voucher/migrations/__init__.py
+
 # IDE files
 .project
 .pydevproject
