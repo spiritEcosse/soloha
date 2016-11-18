@@ -1,5 +1,6 @@
 from itertools import chain
-from oscar.apps.promotions.models import PagePromotion, KeywordPromotion
+from oscar.apps.promotions.models import PagePromotion, KeywordPromotion, AutomaticProductList
+from django.db.models import Prefetch
 
 
 def promotions(request):
@@ -22,8 +23,8 @@ def get_request_promotions(request):
     """
     Return promotions relevant to this request
     """
-    promotions = PagePromotion._default_manager.select_related('content_type').prefetch_related(
-        'content_object'
+    promotions = PagePromotion._default_manager.select_related().prefetch_related(
+        'content_object',
     ).filter(page_url=request.path).only(
         'content_type__id',
         'content_type__model',
