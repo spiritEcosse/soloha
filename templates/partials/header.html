@@ -16,7 +16,7 @@
                 </div>
 
                 <div class="collapse navbar-collapse" id="top-header-menu">
-                    {% if current_site.info.phone_numbers.exists %}
+                    {% if current_site.info.phone_numbers.all %}
                         {% with count_phone_numbers=current_site.info.phone_numbers.count phone_numbers_slice=current_site.info.phone_numbers.all|slice:"4:" %}
                             <ul class="nav navbar-nav">
                                 {% for phone in current_site.info.phone_numbers_slice %}
