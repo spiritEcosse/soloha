@@ -47,7 +47,8 @@ class AbstractStockRecord(models.Model, CommonFeatureProduct):
     # service).
     price_excl_tax = models.DecimalField(
         _("Price (excl. tax)"), decimal_places=2, max_digits=12,
-        blank=True, null=True)
+        blank=True, null=True, db_index=True
+    )
 
     #: Retail price for this item.  This is simply the recommended price from
     #: the manufacturer.  If this is used, it is for display purposes only.
@@ -95,6 +96,10 @@ class AbstractStockRecord(models.Model, CommonFeatureProduct):
         app_label = 'partner'
         verbose_name = _("Stock record")
         verbose_name_plural = _("Stock records")
+
+    @classmethod
+    def order_by_price(cls):
+        return 'price_excl_tax'
 
     @property
     def net_stock_level(self):

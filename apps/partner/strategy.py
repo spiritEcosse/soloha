@@ -141,14 +141,9 @@ class Structured(Base):
         Select appropriate stock record for all children of a product
         """
         records = []
-        if hasattr(product, 'children_stock_list'):
-            raise Exception('dfdf')
-            for child in product.children_stock_list:
-                records.append((child, self.select_stockrecord(child)))
-        else:
-            for child in product.children.order_by('stockrecords__price_excl_tax'):
-                # Use tuples of (child product, stockrecord)
-                records.append((child, self.select_stockrecord(child)))
+        for child in product.children.all():
+            # Use tuples of (child product, stockrecord)
+            records.append((child, self.select_stockrecord(child)))
         return records
 
     def pricing_policy(self, product, stockrecord):

@@ -103,6 +103,9 @@ class ProductiveProductManager(models.Manager):
             Prefetch('stockrecords', queryset=StockRecord.objects.browse()),
             Prefetch('characteristics', queryset=Feature.objects.browse()),
             Prefetch('images', queryset=ProductImage.objects.browse()),
+            Prefetch('children', queryset=Product.objects.select_related('parent').only('id', 'parent').order_by(
+                'stockrecords__{}'.format(StockRecord.order_by_price()))),
+            Prefetch('children__stockrecords', queryset=StockRecord.objects.browse()),
         ).only(
             'title',
             'slug',
@@ -116,7 +119,7 @@ class ProductiveProductManager(models.Manager):
     def browse(self):
         return self.prefetch().filter(enable=True, parent=None)
 
-    def browse_with_children(self):
+    def browse_all(self):
         return self.prefetch().filter(enable=True)
 
 

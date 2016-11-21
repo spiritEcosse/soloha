@@ -78,7 +78,7 @@ INSTALLED_APPS = \
         [
             'apps.catalogue', 'apps.promotions', 'apps.partner', 'apps.search', 'apps.order',
             'apps.basket', 'apps.checkout', 'apps.customer', 'apps.dashboard.promotions', 'apps.offer',
-            'apps.voucher',
+            'apps.voucher', 'apps.analytics',
         ]
     )
 

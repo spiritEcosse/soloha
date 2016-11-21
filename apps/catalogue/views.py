@@ -126,6 +126,7 @@ class ProductCategoryView(BaseCatalogue, views.JSONResponseMixin, views.AjaxResp
     feature_orders = ('parent__sort', 'parent__title',)
     filter_slug = 'filter_slug'
     url_view_name = 'catalogue:category'
+    queryset = Product.objects.browse_all()
 
     def post(self, request, *args, **kwargs):
         if self.request.is_ajax():
@@ -203,7 +204,7 @@ class ProductCategoryView(BaseCatalogue, views.JSONResponseMixin, views.AjaxResp
         sort = filter(lambda order: order.argument == sort_argument, self.orders)[0]
 
         queryset = super(ProductCategoryView, self).get_queryset()
-        queryset = queryset.filter(enable=True, categories=self.object.get_descendants(include_self=True), categories__enable=True)
+        queryset = queryset.filter(categories=self.object.get_descendants(include_self=True), categories__enable=True)
 
         selected_filters = list(self.selected_filters)[:]
 
@@ -216,13 +217,7 @@ class ProductCategoryView(BaseCatalogue, views.JSONResponseMixin, views.AjaxResp
         for parent, values in iter:
             queryset = queryset.filter(filters__in=map(lambda obj: obj, values))
 
-        queryset = queryset.distinct().select_related('product_class').prefetch_related(
-            Prefetch('images'),
-            Prefetch('characteristics'),
-            Prefetch('product_class__options'),
-            Prefetch('stockrecords'),
-            Prefetch('categories__parent__parent'),
-        )
+        queryset = queryset.distinct()
 
         order = sort.column
 
@@ -258,11 +253,11 @@ class ProductCategoryView(BaseCatalogue, views.JSONResponseMixin, views.AjaxResp
         context = super(ProductCategoryView, self).get_context_data(**kwargs)
 
         # Todo replace on one query, without regroup
-        context['filters'] = Feature.objects.only(*self.feature_only).filter(
+        context['filters'] = Feature.objects.browse().only('title', 'parent', 'slug').filter(
             level=1, filter_products__categories=self.object.get_descendants(include_self=True),
             filter_products__enable=True, filter_products__categories__enable=True
-        ).order_by(*self.feature_orders).select_related('parent').prefetch_related(
-            Prefetch('filter_products')
+        ).order_by(*self.feature_orders).prefetch_related(
+            Prefetch('filter_products', queryset=Product.objects.only('id').order_by())
         ).distinct()
 
         products = lambda **kwargs: map(lambda obj: obj.id, self.get_products(**kwargs))

@@ -114,7 +114,7 @@ class AbstractProduct(models.Model, CommonFeatureProduct):
                     "stand-alone product (i.e. there is only one version of"
                     " this product)."))
 
-    date_created = models.DateTimeField(_("Date created"), auto_now_add=True)
+    date_created = models.DateTimeField(_("Date created"), auto_now_add=True, db_index=True)
 
     # This field is used by Haystack to reindex search
     date_updated = models.DateTimeField(
@@ -546,11 +546,11 @@ class AbstractProduct(models.Model, CommonFeatureProduct):
 
 @python_2_unicode_compatible
 class AbstractFeature(MPTTModel):
-    title = models.CharField(max_length=255)
+    title = models.CharField(max_length=255, db_index=True)
     slug = models.SlugField(verbose_name=_('Slug'), max_length=255, unique=True, blank=True, db_index=True)
     parent = TreeForeignKey('self', verbose_name=_('Parent'), related_name='children', blank=True, null=True, db_index=True)
-    sort = models.IntegerField(blank=True, null=True, default=0)
-    created = models.DateTimeField(auto_now_add=True)
+    sort = models.IntegerField(blank=True, null=True, default=0, db_index=True)
+    created = models.DateTimeField(auto_now_add=True, db_index=True)
     bottom_line = models.IntegerField(verbose_name=_('Bottom line size'), blank=True, null=True)
     top_line = models.IntegerField(verbose_name=_('Top line size'), blank=True, null=True)
     slug_separator = '/'
