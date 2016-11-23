@@ -162,7 +162,9 @@ class ProductCategoryView(BaseCatalogue, views.JSONResponseMixin, views.AjaxResp
 
     @property
     def object(self):
-        return self.get_object(queryset=self.model_category.objects.filter(enable=True))
+        return self.get_object(queryset=self.model_category.objects.browse_lo_level().select_related(
+            'parent__parent'
+        ).only('parent__parent'))
 
     def get(self, request, *args, **kwargs):
         self.kwargs['filter_slug_objects'] = self.selected_filters
@@ -204,8 +206,10 @@ class ProductCategoryView(BaseCatalogue, views.JSONResponseMixin, views.AjaxResp
         sort = filter(lambda order: order.argument == sort_argument, self.orders)[0]
 
         queryset = super(ProductCategoryView, self).get_queryset()
-        queryset = queryset.filter(categories=self.object.get_descendants(include_self=True), categories__enable=True)
-
+        queryset = queryset.filter(
+            categories__in=self.object.get_ancestors_through_parent(include_self=True),
+            categories__enable=True
+        )
         selected_filters = list(self.selected_filters)[:]
 
         if kwargs.get('potential_filter', None):
@@ -233,7 +237,9 @@ class ProductCategoryView(BaseCatalogue, views.JSONResponseMixin, views.AjaxResp
 
     def get_products(self, **kwargs):
         queryset = Product.objects.filter(
-            enable=True, categories=self.object.get_descendants(include_self=True), categories__enable=True
+            enable=True,
+            categories__in=self.object.get_ancestors_through_parent(include_self=True),
+            categories__enable=True
         )
 
         selected_filters = list(self.selected_filters)[:]
