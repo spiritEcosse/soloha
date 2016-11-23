@@ -746,6 +746,14 @@ class CustomAbstractCategory(MPTTModel):
         slugs = [str(category.slug) for category in self.get_ancestors_through_parent(include_self=True)]
         return self._slug_separator.join(slugs)
 
+    def get_descendants_through_children(self):
+        children = list(self.children.all())
+
+        for category in children:
+            children += list(category.children.all())
+
+        return children + [self]
+
     def get_ancestors_through_parent(self, include_self=True):
         """
         Get ancestors through the field of the parent.

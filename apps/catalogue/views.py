@@ -162,9 +162,10 @@ class ProductCategoryView(BaseCatalogue, views.JSONResponseMixin, views.AjaxResp
 
     @property
     def object(self):
-        return self.get_object(queryset=self.model_category.objects.browse_lo_level().select_related(
-            'parent__parent'
-        ).only('parent__parent'))
+        return self.get_object(queryset=self.model_category.objects.browse_lo_level().prefetch_related(
+            Prefetch('children', queryset=Category.objects.browse(level_up=False, fields=[])),
+            Prefetch('children__children', queryset=Category.objects.browse(level_up=False, fields=[])),
+        ))
 
     def get(self, request, *args, **kwargs):
         self.kwargs['filter_slug_objects'] = self.selected_filters
@@ -207,7 +208,7 @@ class ProductCategoryView(BaseCatalogue, views.JSONResponseMixin, views.AjaxResp
 
         queryset = super(ProductCategoryView, self).get_queryset()
         queryset = queryset.filter(
-            categories__in=self.object.get_ancestors_through_parent(include_self=True),
+            categories__in=self.object.get_descendants_through_children(),
             categories__enable=True
         )
         selected_filters = list(self.selected_filters)[:]
@@ -238,7 +239,7 @@ class ProductCategoryView(BaseCatalogue, views.JSONResponseMixin, views.AjaxResp
     def get_products(self, **kwargs):
         queryset = Product.objects.filter(
             enable=True,
-            categories__in=self.object.get_ancestors_through_parent(include_self=True),
+            categories__in=self.object.get_descendants_through_children(),
             categories__enable=True
         )
 
@@ -260,7 +261,7 @@ class ProductCategoryView(BaseCatalogue, views.JSONResponseMixin, views.AjaxResp
 
         # Todo replace on one query, without regroup
         context['filters'] = Feature.objects.browse().only('title', 'parent', 'slug').filter(
-            level=1, filter_products__categories=self.object.get_descendants(include_self=True),
+            level=1, filter_products__categories__in=self.object.get_descendants_through_children(),
             filter_products__enable=True, filter_products__categories__enable=True
         ).order_by(*self.feature_orders).prefetch_related(
             Prefetch('filter_products', queryset=Product.objects.only('id').order_by())
