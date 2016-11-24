@@ -749,7 +749,7 @@ class CustomAbstractCategory(MPTTModel):
     def get_descendants_through_children(self):
         children = list(self.children.all())
 
-        for category in children:
+        for category in children[:]:
             children += list(category.children.all())
 
         return children + [self]

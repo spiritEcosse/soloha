@@ -75,6 +75,22 @@ class ProductiveCategoryManager(models.Manager):
     def browse_lo_level(self):
         return self.browse(level_up=False, fields=['slug', 'name', 'parent__id'])
 
+    def browse_simple(self):
+        return self.browse(level_up=False, fields=['slug', 'name'])
+
+    def browse_page(self):
+        return self.browse(level_up=False, fields=[
+            'slug', 'name', 'h1', 'slug', 'meta_title', 'meta_description', 'meta_keywords', 'description'
+        ]).select_related('image').only(
+            'slug',
+            'name',
+            'image__file_ptr__file',
+            "image__file_ptr__original_filename",
+            "image__file_ptr__name",
+            "image__is_public",
+            'image__id',
+        )
+
 
 if not is_model_registered('catalogue', 'Category'):
     class Category(CustomAbstractCategory):

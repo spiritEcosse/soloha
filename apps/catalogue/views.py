@@ -115,7 +115,7 @@ class CatalogueView(BaseCatalogue, generic.ListView):
         return context
 
 
-class ProductCategoryView(BaseCatalogue, views.JSONResponseMixin, views.AjaxResponseMixin, SingleObjectMixin, generic.ListView):
+class ProductCategoryView(BaseCatalogue, SingleObjectMixin, generic.ListView):
     template_name = 'catalogue/category.html'
     enforce_paths = True
     model = Product
@@ -160,14 +160,17 @@ class ProductCategoryView(BaseCatalogue, views.JSONResponseMixin, views.AjaxResp
         context['sorting_type'] = self.kwargs['sorting_type']
         return context
 
-    @property
-    def object(self):
-        return self.get_object(queryset=self.model_category.objects.browse_lo_level().prefetch_related(
-            Prefetch('children', queryset=Category.objects.browse(level_up=False, fields=[])),
-            Prefetch('children__children', queryset=Category.objects.browse(level_up=False, fields=[])),
-        ))
+    # @property
+    # def object(self):
+    #     return self.get_object(queryset=self.model_category.objects.browse_lo_level()
+    #         # .prefetch_related(
+    #         # Prefetch('children', queryset=Category.objects.browse(level_up=False, fields=['id', 'parent__id']).select_related('parent')),
+    #         # Prefetch('children__children', queryset=Category.objects.browse(level_up=False, fields=['id', 'parent__id']).select_related('parent')),
+    #     # )
+    #     )
 
     def get(self, request, *args, **kwargs):
+        self.object = self.get_object(queryset=self.model_category.objects.browse_simple())
         self.kwargs['filter_slug_objects'] = self.selected_filters
         potential_redirect = self.redirect_if_necessary(request.path, self.object)
 
@@ -260,28 +263,34 @@ class ProductCategoryView(BaseCatalogue, views.JSONResponseMixin, views.AjaxResp
         context = super(ProductCategoryView, self).get_context_data(**kwargs)
 
         # Todo replace on one query, without regroup
-        context['filters'] = Feature.objects.browse().only('title', 'parent', 'slug').filter(
+        filters = Feature.objects.browse().only('title', 'parent', 'slug').filter(
             level=1, filter_products__categories__in=self.object.get_descendants_through_children(),
             filter_products__enable=True, filter_products__categories__enable=True
-        ).order_by(*self.feature_orders).prefetch_related(
-            Prefetch('filter_products', queryset=Product.objects.only('id').order_by())
-        ).distinct()
+        ).order_by(*self.feature_orders).distinct()
 
-        products = lambda **kwargs: map(lambda obj: obj.id, self.get_products(**kwargs))
-        key = lambda feature: feature.parent.pk
-        # Todo really need sort by feature.parent.pk ?
-        iter = groupby(sorted(self.selected_filters, key=key), key=key)
-        filters_parent = map(lambda obj: obj[0], iter)
+        filters_count_product = filters.filter(
+            filter_products__filters=self.selected_filters
+        ).annotate(
+            potential_products_count=Count('filter_products')
+        )
 
-        for feature in context['filters']:
-            feature.potential_products_count = feature.filter_products.filter(
-                id__in=products(potential_filter=feature)
-            )
+        context['filters'] = filters_count_product
 
-            if feature.parent.pk in filters_parent:
-                feature.potential_products_count = feature.potential_products_count.exclude(id__in=products)
-
-            feature.potential_products_count = feature.potential_products_count.count()
+        # products = lambda **kwargs: map(lambda obj: obj.id, self.get_products(**kwargs))
+        # key = lambda feature: feature.parent.pk
+        # # Todo really need sort by feature.parent.pk ?
+        # iter = groupby(sorted(self.selected_filters, key=key), key=key)
+        # filters_parent = map(lambda obj: obj[0], iter)
+        #
+        # for feature in context['filters']:
+        #     feature.potential_products_count = feature.filter_products.filter(
+        #         id__in=products(potential_filter=feature)
+        #     )
+        #
+        #     if feature.parent.pk in filters_parent:
+        #         feature.potential_products_count = feature.potential_products_count.exclude(id__in=products)
+        #
+        #     feature.potential_products_count = feature.potential_products_count.count()
 
         context['url_extra_kwargs'].update({'category_slug': self.kwargs.get('category_slug')})
         context['selected_filters'] = self.selected_filters
