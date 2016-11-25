@@ -35,61 +35,78 @@ if not is_model_registered('catalogue', 'ProductOptions'):
     __all__.append(ProductOptions)
 
 
-def only():
-    return [
-        'slug',
-        'name',
-        'parent__id',
-        "icon__id",
-        'icon__file_ptr__file',
-        "icon__file_ptr__original_filename",
-        "icon__file_ptr__name",
-        "icon__is_public",
-        'image_banner__file_ptr__file',
-        "image_banner__file_ptr__original_filename",
-        "image_banner__file_ptr__name",
-        "image_banner__is_public",
-        'image_banner__id',
-        'link_banner'
-    ]
-
-
-class ProductiveCategoryManager(models.Manager):
-    def prefetch(self):
-        return self.get_queryset().select_related('image_banner', 'icon').prefetch_related(
-            Prefetch('children', queryset=Category.objects.browse_lo_level()),
-            Prefetch('children__children', queryset=Category.objects.browse_lo_level()),
+class ProductiveCategoryQuerySet(models.QuerySet):
+    def prefetch(self, queryset):
+        return self.prefetch_related(
+            Prefetch('children', queryset=queryset),
+            Prefetch('children__children', queryset=queryset),
         )
 
-    def browse(self, level_up=True, fields=only()):
-        lookup = {'enable': True}
-        queryset = self.get_queryset()
+    def select_main_menu(self):
+        return self.select_related('image_banner', 'icon')
 
-        if level_up:
-            lookup['level'] = 0
-            queryset = self.prefetch()
+    def included(self):
+        return self.filter(enable=True)
 
-        queryset = queryset.filter(**lookup)
-        return queryset.only(*fields).order_by()
-
-    def browse_lo_level(self):
-        return self.browse(level_up=False, fields=['slug', 'name', 'parent__id'])
-
-    def browse_simple(self):
-        return self.browse(level_up=False, fields=['slug', 'name'])
-
-    def browse_page(self):
-        return self.browse(level_up=False, fields=[
-            'slug', 'name', 'h1', 'slug', 'meta_title', 'meta_description', 'meta_keywords', 'description'
-        ]).select_related('image').only(
+    def menu_only(self):
+        return self.only(
             'slug',
             'name',
+            'parent__id',
+            "icon__id",
+            'icon__file_ptr__file',
+            "icon__file_ptr__original_filename",
+            "icon__file_ptr__name",
+            "icon__is_public",
+            'image_banner__file_ptr__file',
+            "image_banner__file_ptr__original_filename",
+            "image_banner__file_ptr__name",
+            "image_banner__is_public",
+            'image_banner__id',
+            'link_banner'
+        )
+
+    def lo_only(self):
+        return self.only('slug', 'name', 'parent__id')
+
+    def only_simple(self):
+        return self.only('id')
+
+    def order(self):
+        return self.order_by()
+
+    def page_only(self):
+        return self.only(
+            'slug', 'name', 'h1', 'slug', 'meta_title', 'meta_description', 'meta_keywords', 'description',
             'image__file_ptr__file',
             "image__file_ptr__original_filename",
             "image__file_ptr__name",
             "image__is_public",
             'image__id',
         )
+
+    def select_product_url(self):
+        return self.select_related('parent__parent')
+
+    def select_page(self):
+        return self.select_related('image')
+
+
+class ProductiveCategoryManager(models.Manager):
+    def get_queryset(self):
+        return ProductiveCategoryQuerySet(self.model, using=self._db)
+
+    def common(self):
+        return self.get_queryset().included().only_simple().order()
+
+    def menu(self):
+        return self.common().select_main_menu().prefetch(queryset=self.lo()).menu_only()
+
+    def lo(self):
+        return self.common().lo_only()
+
+    def page(self):
+        return self.common().select_product_url().prefetch(queryset=self.common()).page_only()
 
 
 if not is_model_registered('catalogue', 'Category'):
@@ -103,6 +120,11 @@ class ProductiveFeatureManager(models.Manager):
     def browse(self):
         return self.get_queryset().select_related('parent').only(
             'title', 'parent'
+        ).order_by()
+
+    def simple(self):
+        return self.get_queryset().only(
+            'id',
         ).order_by()
 
 if not is_model_registered('catalogue', 'Feature'):
