@@ -10,7 +10,7 @@ ANSWER = str(_('Subscribed successfully!'))
 
 def context_data(request):
     context = dict()
-    context['categories'] = Category.objects.browse()[:MAX_COUNT_CATEGORIES]
+    context['categories'] = Category.objects.menu()[:MAX_COUNT_CATEGORIES]
     context['form'] = SubscribeForm()
     context['answer'] = ANSWER
     return context

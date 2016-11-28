@@ -771,9 +771,10 @@ class CustomAbstractCategory(MPTTModel):
         return parents
 
     def get_parents(self, obj, parents):
-        if obj.parent:
+        if obj.parent_id is not None:
             parents.append(obj.parent)
             return self.get_parents(obj=obj.parent, parents=parents)
+
         parents.reverse()
         return parents
 

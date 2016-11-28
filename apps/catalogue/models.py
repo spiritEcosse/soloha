@@ -36,23 +36,51 @@ if not is_model_registered('catalogue', 'ProductOptions'):
 
 
 class ProductiveCategoryQuerySet(models.QuerySet):
-    def prefetch(self, queryset):
+    def prefetch(self, children, grandchildren):
         return self.prefetch_related(
-            Prefetch('children', queryset=queryset),
-            Prefetch('children__children', queryset=queryset),
+            Prefetch('children', queryset=children),
+            Prefetch('children__children', queryset=grandchildren),
         )
 
     def select_main_menu(self):
         return self.select_related('image_banner', 'icon')
 
+    def select_product_url(self):
+        return self.select_related('parent__parent')
+
+    def select_children(self):
+        return self.select_related('parent')
+
+    def select_grandchildren(self):
+        return self.select_related('parent__parent')
+
+    def select_page(self):
+        return self.select_related('image')
+
     def included(self):
         return self.filter(enable=True)
 
-    def menu_only(self):
+    def hi(self):
+        return self.filter(level=0)
+
+    def order_simple(self):
+        return self.order_by()
+
+    def only_page(self):
+        return self.only(
+            'slug', 'name', 'h1', 'slug', 'meta_title', 'meta_description', 'meta_keywords', 'description',
+            'image__file_ptr__file',
+            "image__file_ptr__original_filename",
+            "image__file_ptr__name",
+            "image__is_public",
+            'image__id',
+        )
+
+    def only_menu(self):
         return self.only(
             'slug',
             'name',
-            'parent__id',
+            'parent_id',
             "icon__id",
             'icon__file_ptr__file',
             "icon__file_ptr__original_filename",
@@ -66,30 +94,14 @@ class ProductiveCategoryQuerySet(models.QuerySet):
             'link_banner'
         )
 
-    def lo_only(self):
-        return self.only('slug', 'name', 'parent__id')
+    def only_children(self):
+        return self.only('slug', 'name', 'parent_id')
+
+    def only_product_url(self):
+        return self.only('slug', 'parent_id')
 
     def only_simple(self):
         return self.only('id')
-
-    def order(self):
-        return self.order_by()
-
-    def page_only(self):
-        return self.only(
-            'slug', 'name', 'h1', 'slug', 'meta_title', 'meta_description', 'meta_keywords', 'description',
-            'image__file_ptr__file',
-            "image__file_ptr__original_filename",
-            "image__file_ptr__name",
-            "image__is_public",
-            'image__id',
-        )
-
-    def select_product_url(self):
-        return self.select_related('parent__parent')
-
-    def select_page(self):
-        return self.select_related('image')
 
 
 class ProductiveCategoryManager(models.Manager):
@@ -97,16 +109,25 @@ class ProductiveCategoryManager(models.Manager):
         return ProductiveCategoryQuerySet(self.model, using=self._db)
 
     def common(self):
-        return self.get_queryset().included().only_simple().order()
+        return self.get_queryset().included().only_simple().order_simple()
 
     def menu(self):
-        return self.common().select_main_menu().prefetch(queryset=self.lo()).menu_only()
+        return self.common().hi().select_main_menu().prefetch(
+            children=self.children(),
+            grandchildren=self.grandchildren()
+        ).only_menu()
 
-    def lo(self):
-        return self.common().lo_only()
+    def children(self):
+        return self.common().select_children().only_children()
+
+    def grandchildren(self):
+        return self.common().select_grandchildren().only_children()
+
+    def product_url(self):
+        return self.common().select_product_url().only_product_url()
 
     def page(self):
-        return self.common().select_product_url().prefetch(queryset=self.common()).page_only()
+        return self.common().select_product_url().prefetch(queryset=self.common()).only_page()
 
 
 if not is_model_registered('catalogue', 'Category'):
@@ -137,7 +158,7 @@ if not is_model_registered('catalogue', 'Feature'):
 class ProductiveProductManager(models.Manager):
     def prefetch(self):
         return self.select_related('product_class').prefetch_related(
-            Prefetch('categories', queryset=Category.objects.browse_lo_level().select_related('parent__parent')),
+            Prefetch('categories', queryset=Category.objects.product_url()),
             Prefetch('stockrecords', queryset=StockRecord.objects.browse()),
             Prefetch('characteristics', queryset=Feature.objects.browse()),
             Prefetch('images', queryset=ProductImage.objects.browse()),
