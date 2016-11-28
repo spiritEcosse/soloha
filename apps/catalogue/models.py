@@ -109,6 +109,9 @@ class ProductiveCategoryQuerySet(models.QuerySet):
     def only_product_url(self):
         return self.only('slug', 'parent_id')
 
+    def only_parent(self):
+        return self.only('parent_id')
+
     def only_simple(self):
         return self.only('id')
 
@@ -137,8 +140,8 @@ class ProductiveCategoryManager(models.Manager):
 
     def page(self):
         return self.common().select_page().prefetch(
-            children=self.common(),
-            grandchildren=self.common()
+            children=self.common().only_parent(),
+            grandchildren=self.common().only_parent()
         ).only_page()
 
 

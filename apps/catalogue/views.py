@@ -244,11 +244,11 @@ class ProductCategoryView(BaseCatalogue, SingleObjectMixin, generic.ListView):
             filter_products__enable=True, filter_products__categories__enable=True
         ).order_by(*self.feature_orders).distinct()
 
-        # filters_count_product = Feature.objects.simple().filter(
-        #     filter_products=self.get_queryset()
-        # ).annotate(
-        #     potential_products_count=Count('filter_products', distinct=True)
-        # ).distinct()
+        filters_count_product = Feature.objects.simple().filter(
+            filter_products=self.get_queryset()
+        ).annotate(
+            potential_products_count=Count('filter_products', distinct=True)
+        ).distinct()
 
         context['filters'] = filters
         context['url_extra_kwargs'].update({'category_slug': self.kwargs.get('category_slug')})
