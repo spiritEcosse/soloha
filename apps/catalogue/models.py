@@ -36,6 +36,14 @@ if not is_model_registered('catalogue', 'ProductOptions'):
 
 
 class ProductiveCategoryQuerySet(models.QuerySet):
+    @property
+    def parent(self):
+        return 'parent'
+
+    @property
+    def parent_double(self):
+        return '{0}__{0}'.format(self.parent)
+
     def prefetch(self, children, grandchildren):
         return self.prefetch_related(
             Prefetch('children', queryset=children),
@@ -46,16 +54,16 @@ class ProductiveCategoryQuerySet(models.QuerySet):
         return self.select_related('image_banner', 'icon')
 
     def select_product_url(self):
-        return self.select_related('parent__parent')
+        return self.select_related(self.parent_double)
 
     def select_children(self):
-        return self.select_related('parent')
+        return self.select_related(self.parent)
 
     def select_grandchildren(self):
-        return self.select_related('parent__parent')
+        return self.select_related(self.parent_double)
 
     def select_page(self):
-        return self.select_related('image')
+        return self.select_related('image', self.parent_double)
 
     def included(self):
         return self.filter(enable=True)
@@ -74,6 +82,7 @@ class ProductiveCategoryQuerySet(models.QuerySet):
             "image__file_ptr__name",
             "image__is_public",
             'image__id',
+            'parent_id',
         )
 
     def only_menu(self):
@@ -127,7 +136,10 @@ class ProductiveCategoryManager(models.Manager):
         return self.common().select_product_url().only_product_url()
 
     def page(self):
-        return self.common().select_product_url().prefetch(queryset=self.common()).only_page()
+        return self.common().select_page().prefetch(
+            children=self.common(),
+            grandchildren=self.common()
+        ).only_page()
 
 
 if not is_model_registered('catalogue', 'Category'):
@@ -155,9 +167,12 @@ if not is_model_registered('catalogue', 'Feature'):
     __all__.append('Feature')
 
 
-class ProductiveProductManager(models.Manager):
-    def prefetch(self):
-        return self.select_related('product_class').prefetch_related(
+class ProductiveProductQuerySet(models.QuerySet):
+    def included(self):
+        return self.filter(enable=True)
+
+    def prefetch_list(self):
+        return self.prefetch_related(
             Prefetch('categories', queryset=Category.objects.product_url()),
             Prefetch('stockrecords', queryset=StockRecord.objects.browse()),
             Prefetch('characteristics', queryset=Feature.objects.browse()),
@@ -165,7 +180,10 @@ class ProductiveProductManager(models.Manager):
             Prefetch('children', queryset=Product.objects.select_related('parent').only('id', 'parent').order_by(
                 'stockrecords__{}'.format(StockRecord.order_by_price()))),
             Prefetch('children__stockrecords', queryset=StockRecord.objects.browse()),
-        ).only(
+        )
+
+    def only_list(self):
+        return self.only(
             'title',
             'slug',
             'product_class__id',
@@ -173,13 +191,30 @@ class ProductiveProductManager(models.Manager):
             'product_class__slug',
             'structure',
             'upc',
-        ).order_by()
+        )
 
-    def browse(self):
-        return self.prefetch().filter(enable=True, parent=None)
+    def order_simple(self):
+        return self.order_by()
 
-    def browse_all(self):
-        return self.prefetch().filter(enable=True)
+    def select_list(self):
+        return self.select_related('product_class')
+
+    def canonical(self):
+        return self.filter(parent=None)
+
+
+class ProductiveProductManager(models.Manager):
+    def get_queryset(self):
+        return ProductiveProductQuerySet(self.model, using=self._db)
+
+    def common(self):
+        return self.get_queryset().included().order_simple()
+
+    def list(self):
+        return self.common().select_list().prefetch_list().only_list()
+
+    def promotions(self):
+        return self.common().canonical().select_list().prefetch_list().only_list()
 
 
 if not is_model_registered('catalogue', 'Product'):

@@ -4,7 +4,7 @@ from django.db.models import Max, Min
 
 
 def get_queryset(self):
-    qs = Product.objects.browse()
+    qs = Product.objects.promotions()
 
     if self.method == self.BESTSELLING:
         return qs.order_by('-stats__score')

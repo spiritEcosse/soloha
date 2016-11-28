@@ -126,7 +126,7 @@ class ProductCategoryView(BaseCatalogue, SingleObjectMixin, generic.ListView):
     feature_orders = ('parent__sort', 'parent__title',)
     filter_slug = 'filter_slug'
     url_view_name = 'catalogue:category'
-    queryset = Product.objects.browse_all()
+    queryset = Product.objects.list()
 
     def post(self, request, *args, **kwargs):
         if self.request.is_ajax():
@@ -215,10 +215,6 @@ class ProductCategoryView(BaseCatalogue, SingleObjectMixin, generic.ListView):
             categories__enable=True
         )
         selected_filters = list(self.selected_filters)[:]
-
-        if kwargs.get('potential_filter', None):
-            selected_filters.append(kwargs.get('potential_filter'))
-
         key = lambda feature: feature.parent.pk
         iter = groupby(sorted(selected_filters, key=key), key=key)
 
@@ -244,17 +240,17 @@ class ProductCategoryView(BaseCatalogue, SingleObjectMixin, generic.ListView):
 
         # Todo replace on one query, without regroup
         filters = Feature.objects.browse().only('title', 'parent', 'slug').filter(
-            level=1, filter_products__categories__in=self.object.only_simple().get_descendants_through_children(),
+            level=1, filter_products__categories__in=self.object.get_descendants_through_children(),
             filter_products__enable=True, filter_products__categories__enable=True
         ).order_by(*self.feature_orders).distinct()
 
-        filters_count_product = Feature.objects.simple().filter(
-            filter_products=self.get_queryset()
-        ).annotate(
-            potential_products_count=Count('filter_products')
-        )
+        # filters_count_product = Feature.objects.simple().filter(
+        #     filter_products=self.get_queryset()
+        # ).annotate(
+        #     potential_products_count=Count('filter_products', distinct=True)
+        # ).distinct()
 
-        context['filters'] = filters_count_product
+        context['filters'] = filters
         context['url_extra_kwargs'].update({'category_slug': self.kwargs.get('category_slug')})
         context['selected_filters'] = self.selected_filters
         return context

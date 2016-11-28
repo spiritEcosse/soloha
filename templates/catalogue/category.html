@@ -39,7 +39,7 @@
 {% endblock %}
 
 {% block column_left %}
-    {% if filters.exists %}
+    {% if filters %}
         {% assign trancate_filter 32 %}
         {% assign trancate_filter_value 23 %}
         {% if selected_filters.exists %}
