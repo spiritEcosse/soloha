@@ -242,6 +242,12 @@ class ProductCategoryView(BaseCatalogue, SingleObjectMixin, generic.ListView):
         filters = Feature.objects.browse().only('title', 'parent', 'slug').filter(
             level=1, filter_products__categories__in=self.object.get_descendants_through_children(),
             filter_products__enable=True, filter_products__categories__enable=True
+        ).prefetch_related(
+            Prefetch(
+                'filter_products',
+                queryset=Product.objects.filter(id__in=self.get_queryset()),
+                to_attr='potential_products_count'
+            )
         ).order_by(*self.feature_orders).distinct()
 
         filters_count_product = Feature.objects.simple().filter(
