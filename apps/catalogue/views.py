@@ -246,15 +246,13 @@ class ProductCategoryView(BaseCatalogue, SingleObjectMixin, generic.ListView):
             Prefetch(
                 'filter_products',
                 queryset=Product.objects.filter(id__in=self.get_queryset()),
-                to_attr='potential_products_count'
+                to_attr='products'
             )
         ).order_by(*self.feature_orders).distinct()
 
-        filters_count_product = Feature.objects.simple().filter(
-            filter_products=self.get_queryset()
-        ).annotate(
-            potential_products_count=Count('filter_products', distinct=True)
-        ).distinct()
+        for feature in filters:
+            print feature
+            print len(feature.products)
 
         context['filters'] = filters
         context['url_extra_kwargs'].update({'category_slug': self.kwargs.get('category_slug')})
