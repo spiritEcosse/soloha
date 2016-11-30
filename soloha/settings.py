@@ -13,11 +13,9 @@ https://docs.djangoproject.com/en/1.8/ref/settings/
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
-from oscar import get_core_apps
 from oscar.defaults import *
 from oscar import OSCAR_MAIN_TEMPLATE_DIR
 from django.utils.translation import ugettext_lazy as _
-from oscar import get_core_apps
 import sys
 from soloha import settings_local
 
@@ -39,7 +37,7 @@ ALLOWED_HOSTS = settings_local.ALLOWED_HOSTS
 # Application definition
 
 INSTALLED_APPS = \
-    [
+    (
         'flat',
         'dal',
         'dal_select2',
@@ -56,6 +54,25 @@ INSTALLED_APPS = \
         'django.contrib.staticfiles',
         'django.contrib.flatpages',
         'django.contrib.redirects',
+        'oscar',
+        'apps.contacts',
+        'apps.ex_sites',
+        'apps.ex_redirects',
+        'apps.sitemap',
+        'apps.subscribe',
+        'apps.ex_flatpages',
+        'apps.catalogue',
+        'apps.catalogue.reviews',
+        'apps.analytics',
+        'apps.checkout',
+        'apps.partner',
+        'apps.basket',
+        'apps.offer',
+        'apps.order',
+        'apps.customer',
+        'apps.promotions',
+        'apps.search',
+        'apps.voucher',
         'compressor',
         'widget_tweaks',
         'djangular',
@@ -63,23 +80,12 @@ INSTALLED_APPS = \
         'feincms',
         'easy_thumbnails',
         'filer',
-        'apps.contacts',
-        'apps.ex_sites',
-        'apps.ex_redirects',
         'import_export',
         'ckeditor',
-        'apps.sitemap',
-        'apps.subscribe',
-        'apps.ex_flatpages',
         'bootstrap_pagination',
-        'memoize',
         'debug_panel',
-    ] + get_core_apps(
-        [
-            'apps.catalogue', 'apps.promotions', 'apps.partner', 'apps.search', 'apps.order',
-            'apps.basket', 'apps.checkout', 'apps.customer', 'apps.dashboard.promotions', 'apps.offer',
-            'apps.voucher', 'apps.analytics',
-        ]
+        'haystack',
+        'django_tables2',
     )
 
 SITE_ID = 1

@@ -1,21 +1,11 @@
-from oscar.core.loading import get_model
 from djangular.forms import NgModelFormMixin, NgFormValidationMixin, NgModelForm
 from djangular.styling.bootstrap3.forms import Bootstrap3Form
 from django.utils.translation import ugettext_lazy as _
 from django import forms
-from apps.catalogue.abstract_models import REGEXP_PHONE
+from apps.catalogue.models import REGEXP_PHONE
 from dal import autocomplete
-
-QuickOrder = get_model('order', 'QuickOrder')
-ProductRecommendation = get_model('catalogue', 'ProductRecommendation')
-Feature = get_model('catalogue', 'Feature')
-Category = get_model('catalogue', 'Category')
-Product = get_model('catalogue', 'Product')
-ProductImage = get_model('catalogue', 'ProductImage')
-ProductFeature = get_model('catalogue', 'ProductFeature')
-StockRecord = get_model('partner', 'StockRecord')
-Partner = get_model('partner', 'Partner')
-Info = get_model('sites', 'Info')
+from apps.catalogue.models import Product, Category, ProductImage, ProductFeature, Feature, ProductRecommendation
+from apps.order.models import QuickOrder
 
 
 class QuickOrderMeta(type(NgModelForm), type(Bootstrap3Form)):

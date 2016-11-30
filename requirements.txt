@@ -30,19 +30,17 @@ django-flat-theme==1.1.3
 -e git+https://github.com/django-haystack/django-haystack.git@99e5a10ae8535a7883ff95d2e83fa4f127db546d#egg=django_haystack
 django-htmlmin==0.9.1
 django-import-export==0.4.5
-django-memoize==2.0.0
-django-mptt==0.8.3
+django-mptt==0.8.6
 django-oscar==1.1.1
 django-oscar-accounts==0.3
 django-phonenumber-field==1.1.0
-django-polymorphic==0.8.1
+django-polymorphic==1.0.2
 django-pybrowscap==1.0.0
 django-selenium==0.9.8
 django-smart-load-tag==0.3.2
 django-smartagent==0.1.1
 django-suit==0.2.15
 django-tables2==1.0.6
-django-treebeard==4.0
 django-widget-tweaks==1.3
 docopt==0.6.2
 easy-thumbnails==2.3
