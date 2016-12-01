@@ -8,11 +8,13 @@ from django.utils.encoding import python_2_unicode_compatible, smart_text
 from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
+from django.db.models import Prefetch, BooleanField, Case, When
 
 from apps.basket.managers import OpenBasketManager, SavedBasketManager
 from apps.offer import results
 from apps.voucher.models import Voucher
-from apps.catalogue.models import Product, Option
+from apps.catalogue.models import Product, Option, ProductImage, Feature, ProductFeature, Category
+from apps.catalogue.fiters import Filter
 from apps.partner.models import StockRecord
 
 from soloha.core.utils import get_default_currency
@@ -22,6 +24,13 @@ from soloha.core.templatetags.currency_filters import currency
 
 class InvalidBasketLineError(Exception):
     pass
+
+
+class ProductiveLineAttributeManager(models.Manager):
+    def browse(self):
+        return self.get_queryset().only(
+            'line__id', 'feature__id'
+        ).order_by()
 
 
 @python_2_unicode_compatible
@@ -89,10 +98,6 @@ class Basket(models.Model):
     # Strategy
     # ========
 
-    @property
-    def has_strategy(self):
-        return hasattr(self, '_strategy')
-
     def _get_strategy(self):
         if not self.has_strategy:
             raise RuntimeError(
@@ -108,24 +113,6 @@ class Basket(models.Model):
         self._strategy = strategy
 
     strategy = property(_get_strategy, _set_strategy)
-
-    def all_lines(self):
-        """
-        Return a cached set of basket lines.
-
-        This is important for offers as they alter the line models and you
-        don't want to reload them from the DB as that information would be
-        lost.
-        """
-        if self.id is None:
-            return self.lines.none()
-        if self._lines is None:
-            self._lines = (
-                self.lines
-                .select_related('product', 'stockrecord')
-                .prefetch_related(
-                    'attributes', 'product__images'))
-        return self._lines
 
     def is_quantity_allowed(self, qty):
         """
@@ -156,75 +143,6 @@ class Basket(models.Model):
             raise PermissionDenied("A frozen basket cannot be flushed")
         self.lines.all().delete()
         self._lines = None
-
-    def add_product(self, product, quantity=1, options=None):
-        """
-        Add a product to the basket
-
-        'stock_info' is the price and availability data returned from
-        a partner strategy class.
-
-        The 'options' list should contains dicts with keys 'option' and 'value'
-        which link the relevant product.Option model and string value
-        respectively.
-
-        Returns (line, created).
-          line: the matching basket line
-          created: whether the line was created or updated
-
-        """
-        if options is None:
-            options = []
-        if not self.id:
-            self.save()
-
-        # Ensure that all lines are the same currency
-        price_currency = self.currency
-        stock_info = self.strategy.fetch_for_product(product)
-        if price_currency and stock_info.price.currency != price_currency:
-            raise ValueError((
-                "Basket lines must all have the same currency. Proposed "
-                "line has currency %s, while basket has currency %s")
-                % (stock_info.price.currency, price_currency))
-
-        if stock_info.stockrecord is None:
-            raise ValueError((
-                "Basket lines must all have stock records. Strategy hasn't "
-                "found any stock record for product %s") % product)
-
-        # Line reference is used to distinguish between variations of the same
-        # product (eg T-shirts with different personalisations)
-        line_ref = self._create_line_reference(
-            product, stock_info.stockrecord, options)
-
-        # Determine price to store (if one exists).  It is only stored for
-        # audit and sometimes caching.
-        defaults = {
-            'quantity': quantity,
-            'price_excl_tax': stock_info.price.excl_tax,
-            'price_currency': stock_info.price.currency,
-        }
-        if stock_info.price.is_tax_known:
-            defaults['price_incl_tax'] = stock_info.price.incl_tax
-
-        line, created = self.lines.get_or_create(
-            line_reference=line_ref,
-            product=product,
-            stockrecord=stock_info.stockrecord,
-            defaults=defaults)
-        if created:
-            for option_dict in options:
-                line.attributes.create(option=option_dict['option'],
-                                       value=option_dict['value'])
-        else:
-            line.quantity += quantity
-            line.save()
-        self.reset_offer_applications()
-
-        # Returning the line is useful when overriding this method.
-        return line, created
-    add_product.alters_data = True
-    add = add_product
 
     def applied_offers(self):
         """
@@ -331,16 +249,6 @@ class Basket(models.Model):
     # Helpers
     # =======
 
-    def _create_line_reference(self, product, stockrecord, options):
-        """
-        Returns a reference string for a line based on the item
-        and its options.
-        """
-        base = '%s_%s' % (product.id, stockrecord.id)
-        if not options:
-            return base
-        return "%s_%s" % (base, zlib.crc32(repr(options).encode('utf8')))
-
     def _get_total(self, property):
         """
         For executing a named method on each line of the basket
@@ -358,6 +266,15 @@ class Basket(models.Model):
     # ==========
     # Properties
     # ==========
+
+    @property
+    def has_strategy(self):
+        return hasattr(self, '_strategy')
+
+    @property
+    def num_lines(self):
+        """Return number of lines"""
+        return len(self.all_lines())
 
     @property
     def is_empty(self):
@@ -452,11 +369,6 @@ class Basket(models.Model):
         return self._get_total('line_price_excl_tax')
 
     @property
-    def num_lines(self):
-        """Return number of lines"""
-        return self.all_lines().count()
-
-    @property
     def num_items(self):
         """Return number of items"""
         return sum(line.quantity for line in self.lines.all())
@@ -514,6 +426,193 @@ class Basket(models.Model):
     # =============
     # Query methods
     # =============
+
+    def all_lines(self):
+        """
+        Return a cached set of basket lines.
+
+        This is important for offers as they alter the line models and you
+        don't want to reload them from the DB as that information would be
+        lost.
+        """
+        if self.id is None:
+            return self.lines.none()
+
+        if self._lines is None:
+            self._lines = (
+                self.lines.select_related(
+                    'product__parent__product_class', 'product__product_class', 'stockrecord'
+                ).prefetch_related(
+                    Prefetch('attributes', queryset=LineAttribute.objects.browse()),
+                    Prefetch('attributes__feature', queryset=Feature.objects.browse()),
+                    Prefetch('attributes__product_images',
+                             queryset=ProductImage.objects.browse().select_related('product')),
+                    Prefetch('product__images', queryset=ProductImage.objects.browse()),
+                    Prefetch('product__categories',
+                             queryset=Category.objects.browse_lo_level().select_related('parent__parent')),
+                ).only(
+                    'product__id',
+                    'product__structure',
+                    'product__slug',
+                    'product__title',
+                    'product__parent__id',
+                    'product__product_class__id',
+                    'product__product_class__track_stock',
+                    'product__parent__product_class__id',
+                    'stockrecord__id',
+                    'stockrecord__price_currency',
+                    'stockrecord__price_excl_tax',
+                    'basket__id',
+                    'price_currency',
+                    'quantity',
+                ).order_by()
+            )
+        return self._lines
+
+    def add_product(self, product, quantity=1, options=None, stockrecord=None, product_images=None):
+        """
+        Add a product to the basket
+
+        'stock_info' is the price and availability data returned from
+        a partner strategy class.
+
+        The 'options' list should contains dicts with keys 'option' and 'value'
+        which link the relevant product.Option model and string value
+        respectively.
+
+        Returns (line, created).
+          line: the matching basket line
+          created: whether the line was created or updated
+
+        """
+        if options is None:
+            options = []
+        if not self.id:
+            self.save()
+
+        # Ensure that all lines are the same currency
+        price_currency = self.currency
+
+        stock_info = self.strategy.fetch_for_product(product, stockrecord=stockrecord)
+
+        if price_currency and stock_info.price.currency != price_currency:
+            raise ValueError((
+                                 "Basket lines must all have the same currency. Proposed "
+                                 "line has currency %s, while basket has currency %s")
+                             % (stock_info.price.currency, price_currency))
+
+        if stock_info.stockrecord is None:
+            raise ValueError((
+                                 "Basket lines must all have stock records. Strategy hasn't "
+                                 "found any stock record for product %s") % product)
+
+        # Line reference is used to distinguish between variations of the same
+        # product (eg T-shirts with different personalisations)
+        line_ref = self._create_line_reference(
+            product, stock_info.stockrecord, options, stock_info.stockrecord.attributes.all()
+        )
+
+        # Determine price to store (if one exists).  It is only stored for
+        # audit and sometimes caching.
+        defaults = {
+            'quantity': quantity,
+            'price_excl_tax': stock_info.price.excl_tax,
+            'price_currency': stock_info.price.currency,
+        }
+        if stock_info.price.is_tax_known:
+            defaults['price_incl_tax'] = stock_info.price.incl_tax
+
+        line, created = self.lines.get_or_create(
+            line_reference=line_ref,
+            product=product,
+            stockrecord=stock_info.stockrecord,
+            defaults=defaults)
+
+        if created:
+            attributes = line.stockrecord.attributes
+
+            if product_images:
+                attributes = attributes.prefetch_related(*self.prefetch(product, product_images))
+
+            for attribute in attributes.all():
+                line_attributes = line.attributes.create(feature=attribute)
+
+                if getattr(attribute, 'have_product_images', None):
+                    line_attributes.product_images.add(product_images)
+        else:
+            line_attributes = line.attributes
+
+            if product_images:
+                line_attributes = line_attributes.prefetch_related(
+                    *self.prefetch(product, product_images, feature=True)
+                )
+
+            for line_attribute in line_attributes.all():
+                if getattr(line_attribute.feature, 'have_product_images', None):
+                    line_attribute.product_images.clear()
+                    line_attribute.product_images.add(product_images)
+
+            line.quantity += quantity
+            line.save()
+        self.reset_offer_applications()
+
+        # Returning the line is useful when overriding this method.
+        return line, created
+    add_product.alters_data = True
+    add = add_product
+
+    def annotate(self, queryset, product_images, feature=False):
+        fields = 'feature__' if feature else ''
+        fields += 'product_features__product_with_images'
+
+        when_kwargs = {fields: product_images.product, 'then': True}
+
+        queryset = queryset.annotate(
+            product_features_exists=Case(
+                When(**when_kwargs),
+                default=False,
+                output_field=BooleanField()
+            )
+        ).distinct()
+
+        return queryset.all()
+
+    def prefetch(self, product, product_images, feature=False):
+        lookup = Filter(product=product)
+        prefetch = []
+        fields = 'feature__' if feature else ''
+        fields += 'product_features'
+
+        prefetch.append(
+            Prefetch(
+                fields,
+                queryset=ProductFeature.objects.filter(
+                    **lookup.filter_feature_parent(
+                        {
+                            'product_with_images': product_images.product
+                        }
+                    )
+                ),
+                to_attr='have_product_images',
+            )
+        )
+
+        return prefetch
+
+    def _create_line_reference(self, product, stockrecord, options, attributes=None):
+        """
+        Returns a reference string for a line based on the item
+        and its options.
+        """
+        base = '%s_%s' % (product.id, stockrecord.id)
+
+        if options:
+            base = "%s_%s" % (base, zlib.crc32(repr(options).encode('utf8')))
+
+        if attributes:
+            base = u"%s_%s" % (base, zlib.crc32(repr(attributes)))
+
+        return base
 
     def contains_voucher(self, code):
         """
@@ -830,8 +929,13 @@ class LineAttribute(models.Model):
     An attribute of a basket line
     """
     line = models.ForeignKey(Line, related_name='attributes', verbose_name=_("Line"))
-    option = models.ForeignKey(Option, verbose_name=_("Option"))
-    value = models.CharField(_("Value"), max_length=255)
+    option = models.ForeignKey(Option, verbose_name=_("Option"), null=True, blank=True)
+    value = models.CharField(_("Value"), max_length=255, blank=True)
+    feature = models.ForeignKey(Feature, verbose_name=_('Feature'), null=True, blank=True)
+    product_images = models.ManyToManyField(
+        ProductImage, blank=True, related_name='line_attributes', verbose_name=_('Product images')
+    )
+    objects = ProductiveLineAttributeManager()
 
     class Meta:
         app_label = 'basket'
