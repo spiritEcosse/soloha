@@ -207,6 +207,18 @@ class ProductiveProductManager(models.Manager):
         return self.common().canonical().select_list().prefetch_list().only_list()
 
 
+class ProductiveProductImageManager(models.Manager):
+    def browse(self):
+        return self.get_queryset().select_related('original').only(
+            'original__id',
+            'original__file_ptr__file',
+            "original__is_public",
+            'product__title',
+            'product__id',
+            'caption',
+        ).order_by('display_order')
+
+
 class MissingProductImage(object):
 
     """
@@ -1552,18 +1564,6 @@ class ProductAttributeValue(models.Model):
     @property
     def _richtext_as_html(self):
         return mark_safe(self.value)
-
-
-class ProductiveProductImageManager(models.Manager):
-    def browse(self):
-        return self.get_queryset().select_related('original').only(
-            'original__id',
-            'original__file_ptr__file',
-            "original__is_public",
-            'product__title',
-            'product__id',
-            'caption',
-        ).order_by('display_order')
 
 
 @python_2_unicode_compatible
