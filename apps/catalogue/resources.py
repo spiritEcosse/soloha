@@ -1,41 +1,24 @@
-from import_export import widgets as import_export_widgets
-from import_export import resources, fields
-import functools
-import widgets
-from django.db.models.fields.related import ForeignKey
-from diff_match_patch import diff_match_patch
-from django.utils.safestring import mark_safe
-from import_export.results import RowResult
-from copy import deepcopy
 from django.db import transaction
 from django.db.transaction import TransactionManagementError
-import logging  # isort:skip
-import traceback
-from oscar.core.loading import get_model
+from django.db.models.fields.related import ForeignKey
+from django.utils.safestring import mark_safe
+from django.utils.encoding import force_text
+
+from import_export import widgets
+from import_export import resources, fields
+from import_export.results import RowResult
+
+from diff_match_patch import diff_match_patch
+from copy import deepcopy
 from filer.models.imagemodels import Image
-from django.utils.translation import ugettext_lazy as _
-try:
-    from django.utils.encoding import force_text
-except ImportError:
-    from django.utils.encoding import force_unicode as force_text
-#Todo change list import module
-try:  # Python 2.7+
-    from logging import NullHandler
-except ImportError:
-    class NullHandler(logging.Handler):
-        def emit(self, record):
-            pass
 
-logging.getLogger(__name__).addHandler(NullHandler())
+import logging
+import traceback
+import functools
 
-Feature = get_model('catalogue', 'Feature')
-Category = get_model('catalogue', 'Category')
-Product = get_model('catalogue', 'Product')
-ProductAttribute = get_model('catalogue', 'ProductAttribute')
-ProductAttributeValue = get_model('catalogue', 'ProductAttributeValue')
-ProductImage = get_model('catalogue', 'ProductImage')
-ProductFeature = get_model('catalogue', 'ProductFeature')
-ProductRecommendation = get_model('catalogue', 'ProductRecommendation')
+from apps.catalogue import models as catalogue_models, widgets as catalogue_widgets
+
+logging.getLogger(__name__).addHandler(logging.NullHandler())
 
 
 class Field(fields.Field):
@@ -109,7 +92,7 @@ class Field(fields.Field):
 
         if value is None:
             return ""
-        if isinstance(self.widget, widgets.IntermediateModelManyToManyWidget):
+        if isinstance(self.widget, catalogue_widgets.IntermediateModelManyToManyWidget):
             return self.widget.render(value, obj)
         else:
             return self.widget.render(value)
@@ -118,7 +101,7 @@ class Field(fields.Field):
 class ModelResource(resources.ModelResource):
     delete = fields.Field(
         column_name='Delete this object ? (set 1 if True)',
-        widget=import_export_widgets.BooleanWidget()
+        widget=widgets.BooleanWidget()
     )
     prefix = 'rel_'
 
@@ -126,7 +109,7 @@ class ModelResource(resources.ModelResource):
         obj = super(ModelResource, cls).__new__(cls, *args, **kwargs)
 
         for field in obj.get_fields():
-            if isinstance(field.widget, widgets.IntermediateModelManyToManyWidget):
+            if isinstance(field.widget, catalogue_widgets.IntermediateModelManyToManyWidget):
                 field.widget.rel_field = obj._meta.model._meta.get_field_by_name(field.attribute)[0]
 
                 field.widget.intermediate_own_fields = []
@@ -138,7 +121,7 @@ class ModelResource(resources.ModelResource):
         return obj
 
     @classmethod
-    def widget_from_django_field(cls, f, default=import_export_widgets.Widget):
+    def widget_from_django_field(cls, f, default=widgets.Widget):
         """
         Returns the widget that would likely be associated with each
         Django type.
@@ -146,23 +129,23 @@ class ModelResource(resources.ModelResource):
         result = default
         internal_type = f.get_internal_type()
         if internal_type in ('ManyToManyField', ):
-            result = functools.partial(widgets.IntermediateModelManyToManyWidget,
+            result = functools.partial(catalogue_widgets.IntermediateModelManyToManyWidget,
                                        model=f.rel.to, rel=f.rel)
         if internal_type in ('ForeignKey', 'OneToOneField', ):
-            result = functools.partial(import_export_widgets.ForeignKeyWidget,
+            result = functools.partial(widgets.ForeignKeyWidget,
                                        model=f.rel.to)
         if internal_type in ('DecimalField', ):
-            result = import_export_widgets.DecimalWidget
+            result = widgets.DecimalWidget
         if internal_type in ('DateTimeField', ):
-            result = import_export_widgets.DateTimeWidget
+            result = widgets.DateTimeWidget
         elif internal_type in ('DateField', ):
-            result = import_export_widgets.DateWidget
+            result = widgets.DateWidget
         elif internal_type in ('IntegerField', 'PositiveIntegerField',
                                'PositiveSmallIntegerField',
                                'SmallIntegerField', 'AutoField'):
-            result = import_export_widgets.IntegerWidget
+            result = widgets.IntegerWidget
         elif internal_type in ('BooleanField', 'NullBooleanField'):
-            result = import_export_widgets.BooleanWidget
+            result = widgets.BooleanWidget
         return result
 
     @classmethod
@@ -182,9 +165,9 @@ class ModelResource(resources.ModelResource):
 
     def copy_relation(self, obj):
         for field in self.get_fields():
-            if isinstance(field.widget, widgets.IntermediateModelManyToManyWidget) \
-                    or isinstance(field.widget, import_export_widgets.ManyToManyWidget) \
-                    or isinstance(field.widget, widgets.ImageManyToManyWidget):
+            if isinstance(field.widget, catalogue_widgets.IntermediateModelManyToManyWidget) \
+                    or isinstance(field.widget, widgets.ManyToManyWidget) \
+                    or isinstance(field.widget, catalogue_widgets.ImageManyToManyWidget):
                 setattr(obj, '{}{}'.format(self.prefix, field.column_name), self.export_field(field, obj))
 
     def import_row(self, row, instance_loader, dry_run=False, **kwargs):
@@ -280,36 +263,36 @@ class ModelResource(resources.ModelResource):
             for field in self.get_fields():
                 field.widget.obj = obj
 
-                if not isinstance(field.widget, import_export_widgets.ManyToManyWidget) \
-                        and not isinstance(field.widget, widgets.ImageManyToManyWidget) \
-                        and not isinstance(field.widget, widgets.IntermediateModelManyToManyWidget):
+                if not isinstance(field.widget, widgets.ManyToManyWidget) \
+                        and not isinstance(field.widget, catalogue_widgets.ImageManyToManyWidget) \
+                        and not isinstance(field.widget, catalogue_widgets.IntermediateModelManyToManyWidget):
                     continue
                 self.import_field(field, obj, data)
 
 
 class FeatureResource(ModelResource):
-    title = fields.Field(column_name='title', attribute='title', widget=widgets.CharWidget())
-    parent = fields.Field(attribute='parent', column_name='parent', widget=import_export_widgets.ForeignKeyWidget(
-        model=Feature, field='slug'))
+    title = fields.Field(column_name='title', attribute='title', widget=catalogue_widgets.CharWidget())
+    parent = fields.Field(attribute='parent', column_name='parent', widget=widgets.ForeignKeyWidget(
+        model=catalogue_models.Feature, field='slug'))
 
     class Meta:
-        model = Feature
+        model = catalogue_models.Feature
         fields = ('id', 'delete', 'title', 'slug', 'parent', 'sort', 'bottom_line', 'top_line',)
         export_order = fields
 
 
 class ProductFeatureResource(ModelResource):
-    product = fields.Field(column_name='product', attribute='product', widget=import_export_widgets.ForeignKeyWidget(
-        model=Product, field='slug'))
-    feature = fields.Field(column_name='feature', attribute='feature', widget=import_export_widgets.ForeignKeyWidget(
-        model=Feature, field='slug'))
-    image = fields.Field(column_name='image', attribute='image', widget=widgets.ImageForeignKeyWidget(
+    product = fields.Field(column_name='product', attribute='product', widget=widgets.ForeignKeyWidget(
+        model=catalogue_models.Product, field='slug'))
+    feature = fields.Field(column_name='feature', attribute='feature', widget=widgets.ForeignKeyWidget(
+        model=catalogue_models.Feature, field='slug'))
+    image = fields.Field(column_name='image', attribute='image', widget=catalogue_widgets.ImageForeignKeyWidget(
         model=Image, field='original_filename'))
     product_with_images = fields.Field(column_name='product_with_images', attribute='product_with_images',
-                                       widget=widgets.ManyToManyWidget(model=Product, field='slug'))
+                                       widget=catalogue_widgets.ManyToManyWidget(model=catalogue_models.Product, field='slug'))
 
     class Meta:
-        model = ProductFeature
+        model = catalogue_models.ProductFeature
         fields = ('id', 'delete', 'product', 'feature', 'sort', 'info', 'non_standard', 'image', 'product_with_images',)
         export_order = fields
 
@@ -321,17 +304,17 @@ class ProductFeatureResource(ModelResource):
 
 
 class CategoryResource(ModelResource):
-    parent = fields.Field(attribute='parent', column_name='parent', widget=import_export_widgets.ForeignKeyWidget(
-        model=Category, field='slug'))
-    icon = fields.Field(column_name='icon', attribute='icon', widget=widgets.ImageForeignKeyWidget(
+    parent = fields.Field(attribute='parent', column_name='parent', widget=widgets.ForeignKeyWidget(
+        model=catalogue_models.Category, field='slug'))
+    icon = fields.Field(column_name='icon', attribute='icon', widget=catalogue_widgets.ImageForeignKeyWidget(
         model=Image, field='original_filename'))
-    image_banner = fields.Field(column_name='image_banner', attribute='image_banner', widget=widgets.ImageForeignKeyWidget(
+    image_banner = fields.Field(column_name='image_banner', attribute='image_banner', widget=catalogue_widgets.ImageForeignKeyWidget(
         model=Image, field='original_filename'))
-    image = fields.Field(column_name='image', attribute='image', widget=widgets.ImageForeignKeyWidget(
+    image = fields.Field(column_name='image', attribute='image', widget=catalogue_widgets.ImageForeignKeyWidget(
         model=Image, field='original_filename'))
 
     class Meta:
-        model = Category
+        model = catalogue_models.Category
         fields = ('id', 'delete', 'enable', 'name', 'slug', 'parent', 'sort', 'meta_title', 'h1', 'meta_description',
                   'meta_keywords', 'link_banner', 'description', 'image', 'image_banner', 'icon', )
         export_order = fields
@@ -340,46 +323,46 @@ class CategoryResource(ModelResource):
 class ProductImageResource(ModelResource):
     original = fields.Field(
         column_name='original', attribute='original',
-        widget=widgets.ForeignKeyWidget(model=Image, field='original_filename')
+        widget=catalogue_widgets.ForeignKeyWidget(model=Image, field='original_filename')
     )
     product_slug = fields.Field(
         column_name='product', attribute='product',
-        widget=import_export_widgets.ForeignKeyWidget(model=Product, field='slug')
+        widget=widgets.ForeignKeyWidget(model=catalogue_models.Product, field='slug')
     )
 
     class Meta:
-        model = ProductImage
+        model = catalogue_models.ProductImage
         fields = ('id', 'delete', 'product_slug', 'original', 'caption', 'display_order', )
         export_order = fields
 
 
 class ProductRecommendationResource(ModelResource):
-    primary = fields.Field(column_name='primary', attribute='primary', widget=import_export_widgets.ForeignKeyWidget(
-        model=Product, field='slug',
+    primary = fields.Field(column_name='primary', attribute='primary', widget=widgets.ForeignKeyWidget(
+        model=catalogue_models.Product, field='slug',
     ))
     recommendation = fields.Field(column_name='recommendation', attribute='recommendation',
-                                  widget=import_export_widgets.ForeignKeyWidget(
-                                      model=Product, field='slug',
+                                  widget=widgets.ForeignKeyWidget(
+                                      model=catalogue_models.Product, field='slug',
                                   ))
 
     class Meta:
-        model = ProductRecommendation
+        model = catalogue_models.ProductRecommendation
         fields = ('id', 'delete', 'primary', 'recommendation', 'ranking', )
         export_order = fields
 
 
 class ProductResource(ModelResource):
     categories_slug = fields.Field(column_name='categories', attribute='categories',
-                                   widget=widgets.ManyToManyWidget(model=Category, field='slug'))
+                                   widget=catalogue_widgets.ManyToManyWidget(model=catalogue_models.Category, field='slug'))
     filters_slug = fields.Field(column_name='filters', attribute='filters',
-                                widget=widgets.ManyToManyWidget(model=Feature, field='slug'))
+                                widget=catalogue_widgets.ManyToManyWidget(model=catalogue_models.Feature, field='slug'))
     characteristics_slug = fields.Field(column_name='characteristics', attribute='characteristics',
-                                        widget=widgets.ManyToManyWidget(model=Feature, field='slug'))
-    parent = fields.Field(attribute='parent', column_name='parent', widget=import_export_widgets.ForeignKeyWidget(
-        model=Product, field='slug'))
+                                        widget=catalogue_widgets.ManyToManyWidget(model=catalogue_models.Feature, field='slug'))
+    parent = fields.Field(attribute='parent', column_name='parent', widget=widgets.ForeignKeyWidget(
+        model=catalogue_models.Product, field='slug'))
 
     class Meta:
-        model = Product
+        model = catalogue_models.Product
         fields = ('id', 'delete', 'title', 'slug', 'enable', 'structure', 'parent', 'h1', 'meta_title',
                   'meta_description', 'meta_keywords', 'categories_slug', 'filters_slug', 'characteristics_slug',
                   'product_class', )

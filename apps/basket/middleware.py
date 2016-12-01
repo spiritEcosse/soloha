@@ -2,12 +2,10 @@ from django.conf import settings
 from django.core.signing import Signer, BadSignature
 from django.utils.functional import SimpleLazyObject, empty
 
-from oscar.core.loading import get_model
-from oscar.core.loading import get_class
+from apps.offer.utils import Applicator
+from apps.basket.models import Basket
+from apps.partner.strategy import Selector
 
-Applicator = get_class('offer.utils', 'Applicator')
-Basket = get_model('basket', 'basket')
-Selector = get_class('partner.strategy', 'Selector')
 
 selector = Selector()
 
@@ -170,7 +168,7 @@ class BasketMiddleware(object):
 
         This is its own method to allow it to be overridden
         """
-        master.merge(slave, add_quantities=False)
+        master.merge(slave, add_quantities=True)
 
     def get_cookie_basket(self, cookie_key, request, manager):
         """

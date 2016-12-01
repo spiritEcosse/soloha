@@ -1,6 +1,5 @@
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models.fields import CharField, DecimalField
-from django.db.models import SubfieldBase
 from django.utils import six
 from django.utils.translation import ugettext_lazy as _
 
@@ -64,7 +63,7 @@ class PositiveDecimalField(DecimalField):
         return super(PositiveDecimalField, self).formfield(min_value=0)
 
 
-class UppercaseCharField(six.with_metaclass(SubfieldBase, CharField)):
+class UppercaseCharField(CharField):
     """
     A simple subclass of ``django.db.models.fields.CharField`` that
     restricts all text to be uppercase.
@@ -81,7 +80,7 @@ class UppercaseCharField(six.with_metaclass(SubfieldBase, CharField)):
             return val
 
 
-class NullCharField(six.with_metaclass(SubfieldBase, CharField)):
+class NullCharField(CharField):
     """
     CharField that stores '' as None and returns None as ''
     Useful when using unique=True and forms. Implies null==blank==True.
@@ -118,7 +117,7 @@ class NullCharField(six.with_metaclass(SubfieldBase, CharField)):
         return name, path, args, kwargs
 
 
-class PhoneNumberField(six.with_metaclass(SubfieldBase, CharField)):
+class PhoneNumberField(CharField):
     """
     An international phone number.
 

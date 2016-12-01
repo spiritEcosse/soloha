@@ -3,20 +3,15 @@ from django.conf import settings
 from django.forms.models import modelformset_factory, BaseModelFormSet
 from django.db.models import Sum
 from django.utils.translation import ugettext_lazy as _
-from django.contrib.postgres.forms import SimpleArrayField
-from oscar.core.loading import get_model
-from oscar.forms import widgets
 
-Line = get_model('basket', 'line')
-Basket = get_model('basket', 'basket')
-Product = get_model('catalogue', 'product')
-StockRecord = get_model('partner', 'StockRecord')
-ProductImage = get_model('catalogue', 'ProductImage')
+from soloha.core.forms import widgets
+from apps.basket.models import Line
+from apps.partner.models import StockRecord
+from apps.catalogue.models import Product, ProductImage
 
 
 class BasketLineForm(forms.ModelForm):
-    save_for_later = forms.BooleanField(
-        initial=False, required=False, label=_('Save for Later'))
+    save_for_later = forms.BooleanField(initial=False, required=False, label=_('Save for Later'))
 
     def __init__(self, strategy, *args, **kwargs):
         super(BasketLineForm, self).__init__(*args, **kwargs)
@@ -68,13 +63,12 @@ class BaseBasketLineFormSet(BaseModelFormSet):
 
 
 BasketLineFormSet = modelformset_factory(
-    Line, form=BasketLineForm, formset=BaseBasketLineFormSet, extra=0,
-    can_delete=True)
+    Line, form=BasketLineForm, formset=BaseBasketLineFormSet, extra=0, can_delete=True
+)
 
 
 class SavedLineForm(forms.ModelForm):
-    move_to_basket = forms.BooleanField(initial=False, required=False,
-                                        label=_('Move to Basket'))
+    move_to_basket = forms.BooleanField(initial=False, required=False, label=_('Move to Basket'))
 
     class Meta:
         model = Line
@@ -117,9 +111,9 @@ class BaseSavedLineFormSet(BaseModelFormSet):
             i, strategy=self.strategy, basket=self.basket, **kwargs)
 
 
-SavedLineFormSet = modelformset_factory(Line, form=SavedLineForm,
-                                        formset=BaseSavedLineFormSet, extra=0,
-                                        can_delete=True)
+SavedLineFormSet = modelformset_factory(
+    Line, form=SavedLineForm, formset=BaseSavedLineFormSet, extra=0, can_delete=True
+)
 
 
 class BasketVoucherForm(forms.Form):
@@ -310,8 +304,7 @@ class SimpleAddToBasketForm(AddToBasketForm):
     Simplified version of the add to basket form where the quantity is
     defaulted to 1 and rendered in a hidden widget
     """
-    quantity = forms.IntegerField(
-        initial=1, min_value=1, widget=forms.HiddenInput, label=_('Quantity'))
+    quantity = forms.IntegerField(initial=1, min_value=1, widget=forms.HiddenInput, label=_('Quantity'))
 
 
 class AddToBasketWithAttributesForm(SimpleAddToBasketForm):

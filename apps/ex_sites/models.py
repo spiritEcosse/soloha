@@ -6,6 +6,13 @@ from phonenumber_field.modelfields import PhoneNumberField
 from ckeditor_uploader.fields import RichTextUploadingField
 
 
+class PhoneNumberManager(models.Manager):
+    def browse(self):
+        return self.get_queryset().only(
+            'phone_number',
+        )
+
+
 class PhoneNumber(models.Model):
     phone_number = PhoneNumberField(verbose_name=_('Phone number'), blank=True)
     objects = PhoneNumberManager()
@@ -40,10 +47,3 @@ class Info(models.Model):
 
     def phone_numbers_slice(self):
         return self.phone_numbers.all()[:4]
-
-
-class PhoneNumberManager(models.Manager):
-    def browse(self):
-        return self.get_queryset().only(
-            'phone_number',
-        )

@@ -1,6 +1,5 @@
 from django.template import loader, Context
-from django.utils.translation import ugettext_lazy as _, pgettext_lazy
-from __future__ import absolute_import  # for logging import below
+from django.utils.translation import ugettext_lazy as _
 import datetime
 import logging
 

@@ -1,50 +1,20 @@
 from django.contrib import admin
 from django.db import models
-from oscar.core.loading import get_model
 from django.forms import Textarea
-from mptt.admin import DraggableMPTTAdmin
-from import_export.admin import ImportExportMixin, ImportExportActionModelAdmin
-import resources
-import logging  # isort:skip
-from dal import autocomplete
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
-import forms as catalogue_forms
-import apps.partner.forms as partner_forms
 from django.db.models import Q
 from django.db.models.query import Prefetch
 
-#Todo change list import module
-try:  # Python 2.7+
-    from logging import NullHandler
-except ImportError:
-    class NullHandler(logging.Handler):
-        def emit(self, record):
-            pass
+from mptt.admin import DraggableMPTTAdmin
+from import_export.admin import ImportExportMixin, ImportExportActionModelAdmin
+import logging
+from dal import autocomplete
 
-logging.getLogger(__name__).addHandler(NullHandler())
+from apps.catalogue import resources, models as catalogue_models, forms as catalogue_forms
+from apps.partner import models as partner_models, forms as partner_forms
 
-try:
-    from django.utils.encoding import force_text
-except ImportError:
-    from django.utils.encoding import force_unicode as force_text
-
-
-Feature = get_model('catalogue', 'Feature')
-AttributeOption = get_model('catalogue', 'AttributeOption')
-AttributeOptionGroup = get_model('catalogue', 'AttributeOptionGroup')
-Category = get_model('catalogue', 'Category')
-Option = get_model('catalogue', 'Option')
-Product = get_model('catalogue', 'Product')
-ProductAttribute = get_model('catalogue', 'ProductAttribute')
-ProductAttributeValue = get_model('catalogue', 'ProductAttributeValue')
-ProductClass = get_model('catalogue', 'ProductClass')
-ProductImage = get_model('catalogue', 'ProductImage')
-ProductFeature = get_model('catalogue', 'ProductFeature')
-ProductRecommendation = get_model('catalogue', 'ProductRecommendation')
-StockRecord = get_model('partner', 'StockRecord')
-Partner = get_model('partner', 'Partner')
-Info = get_model('sites', 'Info')
+logging.getLogger(__name__).addHandler(logging.NullHandler())
 
 
 class ProductAutocomplete(autocomplete.Select2QuerySetView):
@@ -53,7 +23,7 @@ class ProductAutocomplete(autocomplete.Select2QuerySetView):
         return super(ProductAutocomplete, self).dispatch(*args, **kwargs)
 
     def get_queryset(self):
-        qs = Product.objects.all().only('pk', 'title', 'slug', )
+        qs = catalogue_models.Product.objects.all().only('pk', 'title', 'slug', )
 
         if self.q:
             try:
@@ -72,7 +42,7 @@ class CategoriesAutocomplete(autocomplete.Select2QuerySetView):
         return super(CategoriesAutocomplete, self).dispatch(*args, **kwargs)
 
     def get_queryset(self):
-        qs = Category.objects.all().only('pk', 'name', 'slug', )
+        qs = catalogue_models.Category.objects.all().only('pk', 'name', 'slug', )
 
         if self.q:
             try:
@@ -91,7 +61,7 @@ class FeatureAutocomplete(autocomplete.Select2QuerySetView):
         return super(FeatureAutocomplete, self).dispatch(*args, **kwargs)
 
     def get_queryset(self):
-        qs = Feature.objects.all().only('pk', 'title', 'slug', )
+        qs = catalogue_models.Feature.objects.all().only('pk', 'title', 'slug', )
 
         if self.q:
             try:
@@ -105,36 +75,36 @@ class FeatureAutocomplete(autocomplete.Select2QuerySetView):
 
 
 class StockRecordInline(admin.StackedInline):
-    model = StockRecord
+    model = partner_models.StockRecord
     form = partner_forms.StockRecordForm
 
 
 class ProductFeatureInline(admin.StackedInline):
-    model = ProductFeature
+    model = catalogue_models.ProductFeature
     form = catalogue_forms.ProductFeatureForm
 
 
 class AttributeInline(admin.TabularInline):
-    model = ProductAttributeValue
+    model = catalogue_models.ProductAttributeValue
 
 
 class ProductRecommendationInline(admin.TabularInline):
-    model = ProductRecommendation
+    model = catalogue_models.ProductRecommendation
     fk_name = 'primary'
     form = catalogue_forms.ProductRecommendationForm
 
 
 class ProductAttributeInline(admin.TabularInline):
-    model = ProductAttribute
+    model = catalogue_models.ProductAttribute
     extra = 2
 
 
 class AttributeOptionInline(admin.TabularInline):
-    model = AttributeOption
+    model = catalogue_models.AttributeOption
 
 
 class ProductImageInline(admin.TabularInline):
-    model = ProductImage
+    model = catalogue_models.ProductImage
 
 
 class ProductImageAdmin(ImportExportMixin, ImportExportActionModelAdmin):
@@ -205,7 +175,7 @@ class ProductAdmin(ImportExportMixin, ImportExportActionModelAdmin):
     def get_queryset(self, request):
         qs = super(ProductAdmin, self).get_queryset(request)
         return qs.only(*self.list_attr).order_by('-date_updated', 'title').prefetch_related(
-            Prefetch('images', queryset=ProductImage.objects.only('original', 'product')),
+            Prefetch('images', queryset=catalogue_models.ProductImage.objects.only('original', 'product')),
             Prefetch('images__original'),
             Prefetch('attribute_values'),
             Prefetch('attributes'),
@@ -252,7 +222,7 @@ class CategoryAdmin(ImportExportMixin, ImportExportActionModelAdmin, DraggableMP
     list_display = ('pk', 'indented_title', 'slug', 'parent', 'enable', 'sort', 'created')
     list_filter = ('enable', 'created', 'sort', )
     formfield_overrides = {
-        models.TextField: {'widget': Textarea()},
+        catalogue_models.TextField: {'widget': Textarea()},
     }
     mptt_level_indent = 20
     search_fields = ('name', 'slug', 'id', )
@@ -260,18 +230,20 @@ class CategoryAdmin(ImportExportMixin, ImportExportActionModelAdmin, DraggableMP
     form = catalogue_forms.CategoryForm
 
     class Media:
-        js = ("https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css",
-              "https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js")
+        js = (
+            "https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css",
+            "https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js"
+        )
 
 
-admin.site.register(ProductClass, ProductClassAdmin)
-admin.site.register(Product, ProductAdmin)
-admin.site.register(ProductAttribute, ProductAttributeAdmin)
-admin.site.register(ProductAttributeValue, ProductAttributeValueAdmin)
-admin.site.register(AttributeOptionGroup, AttributeOptionGroupAdmin)
-admin.site.register(Option, OptionAdmin)
-admin.site.register(ProductImage, ProductImageAdmin)
-admin.site.register(Category, CategoryAdmin)
-admin.site.register(Feature, FeatureAdmin)
-admin.site.register(ProductFeature, ProductFeatureAdmin)
-admin.site.register(ProductRecommendation, ProductRecommendationAdmin)
+admin.site.register(catalogue_models.ProductClass, ProductClassAdmin)
+admin.site.register(catalogue_models.Product, ProductAdmin)
+admin.site.register(catalogue_models.ProductAttribute, ProductAttributeAdmin)
+admin.site.register(catalogue_models.ProductAttributeValue, ProductAttributeValueAdmin)
+admin.site.register(catalogue_models.AttributeOptionGroup, AttributeOptionGroupAdmin)
+admin.site.register(catalogue_models.Option, OptionAdmin)
+admin.site.register(catalogue_models.ProductImage, ProductImageAdmin)
+admin.site.register(catalogue_models.Category, CategoryAdmin)
+admin.site.register(catalogue_models.Feature, FeatureAdmin)
+admin.site.register(catalogue_models.ProductFeature, ProductFeatureAdmin)
+admin.site.register(catalogue_models.ProductRecommendation, ProductRecommendationAdmin)

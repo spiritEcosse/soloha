@@ -14,20 +14,15 @@ from django.core.exceptions import ObjectDoesNotExist
 
 from extra_views import ModelFormSetView
 
-from oscar.core import ajax
-from oscar.core.utils import redirect_to_referrer, safe_referrer
-from oscar.apps.basket import signals
-from oscar.core.loading import get_class, get_classes, get_model
+from soloha.core import ajax
+from soloha.core.utils import redirect_to_referrer, safe_referrer
 
-Applicator = get_class('offer.utils', 'Applicator')
-(BasketLineFormSet, BasketLineForm, AddToBasketForm, BasketVoucherForm,
- SavedLineFormSet, SavedLineForm) \
-    = get_classes('basket.forms', ('BasketLineFormSet', 'BasketLineForm',
-                                   'AddToBasketForm', 'BasketVoucherForm',
-                                   'SavedLineFormSet', 'SavedLineForm'))
-Repository = get_class('shipping.repository', ('Repository'))
-OrderTotalCalculator = get_class(
-    'checkout.calculators', 'OrderTotalCalculator')
+from apps.basket.forms import AddToBasketWithAttributesForm, BasketLineFormSet, BasketLineForm, AddToBasketForm, \
+    BasketVoucherForm, SavedLineFormSet, SavedLineForm
+from apps.basket import signals
+from apps.offer.utils import Applicator
+from apps.shipping.repository import Repository
+from apps.checkout.calculators import OrderTotalCalculator
 
 
 def get_messages(basket, offers_before, offers_after,
@@ -325,11 +320,14 @@ class BasketAddView(FormView):
         offers_before = self.request.basket.applied_offers()
 
         self.request.basket.add_product(
-            form.product, form.cleaned_data['quantity'],
-            form.cleaned_options())
+            form.product,
+            form.cleaned_data['quantity'],
+            form.cleaned_options(),
+            form.cleaned_data.get('stockrecord', None),
+            form.cleaned_data.get('product_images', None)
+        )
 
-        messages.success(self.request, self.get_success_message(form),
-                         extra_tags='safe noicon')
+        messages.success(self.request, self.get_success_message(form), extra_tags='safe noicon')
 
         # Check for additional offer messages
         apply_messages(self.request, offers_before)
@@ -337,7 +335,8 @@ class BasketAddView(FormView):
         # Send signal for basket addition
         self.add_signal.send(
             sender=self, product=form.product, user=self.request.user,
-            request=self.request)
+            request=self.request
+        )
 
         return super(BasketAddView, self).form_valid(form)
 
@@ -516,3 +515,7 @@ class SavedView(ModelFormSetView):
                 error for ed in formset.errors for el
                 in ed.values() for error in el))
         return redirect_to_referrer(self.request, 'basket:summary')
+
+
+class BasketAddWithAttributesView(BasketAddView):
+    form_class = AddToBasketWithAttributesForm

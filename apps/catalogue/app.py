@@ -1,16 +1,14 @@
 from oscar.apps.catalogue.app import CatalogueApplication as CoreCatalogueApplication
-from django.views.generic.list import MultipleObjectMixin
 from django.conf.urls import url
-from oscar.core.loading import get_class, get_model
-from django.views.decorators.cache import cache_page
+from apps.catalogue import views
 
 
 class CatalogueApplication(CoreCatalogueApplication):
-    product_category_view = get_class('catalogue.views', 'ProductCategoryView')
-    calculate_price = get_class('catalogue.views', 'ProductCalculatePrice')
-    quick_order_view = get_class('catalogue.views', 'QuickOrderView')
-    attr_prod = get_class('catalogue.views', 'AttrProd')
-    attr_prod_images = get_class('catalogue.views', 'AttrProdImages')
+    product_category_view = views.ProductCategoryView
+    calculate_price = views.ProductCalculatePrice
+    quick_order_view = views.QuickOrderView
+    attr_prod = views.AttrProd
+    attr_prod_images = views.AttrProdImages
 
     def get_urls(self):
         urlpatterns = [
@@ -27,5 +25,56 @@ class CatalogueApplication(CoreCatalogueApplication):
             url(r'^attr/product/(?P<pk>[\d]+)/images/$', self.attr_prod_images.as_view(), name='attr_prod_images'),
         ]
         return urlpatterns
+
+application = CatalogueApplication()
+
+from django.conf.urls import url, include
+
+from oscar.core.application import Application
+from oscar.core.loading import get_class
+from oscar.apps.catalogue.reviews.app import application as reviews_app
+
+
+class BaseCatalogueApplication(Application):
+    name = 'catalogue'
+    detail_view = get_class('catalogue.views', 'ProductDetailView')
+    catalogue_view = get_class('catalogue.views', 'CatalogueView')
+    category_view = get_class('catalogue.views', 'ProductCategoryView')
+    range_view = get_class('offer.views', 'RangeDetailView')
+
+    def get_urls(self):
+        urlpatterns = super(BaseCatalogueApplication, self).get_urls()
+        urlpatterns += [
+            url(r'^$', self.catalogue_view.as_view(), name='index'),
+            url(r'^(?P<product_slug>[\w-]*)_(?P<pk>\d+)/$',
+                self.detail_view.as_view(), name='detail'),
+            url(r'^category/(?P<category_slug>[\w-]+(/[\w-]+)*)_(?P<pk>\d+)/$',
+                self.category_view.as_view(), name='category'),
+            # Fallback URL if a user chops of the last part of the URL
+            url(r'^category/(?P<category_slug>[\w-]+(/[\w-]+)*)/$',
+                self.category_view.as_view()),
+            url(r'^ranges/(?P<slug>[\w-]+)/$',
+                self.range_view.as_view(), name='range')]
+        return self.post_process_urls(urlpatterns)
+
+
+class ReviewsApplication(Application):
+    name = None
+    reviews_app = reviews_app
+
+    def get_urls(self):
+        urlpatterns = super(ReviewsApplication, self).get_urls()
+        urlpatterns += [
+            url(r'^(?P<product_slug>[\w-]*)_(?P<product_pk>\d+)/reviews/',
+                include(self.reviews_app.urls)),
+        ]
+        return self.post_process_urls(urlpatterns)
+
+
+class CatalogueApplication(BaseCatalogueApplication, ReviewsApplication):
+    """
+    Composite class combining Products with Reviews
+    """
+
 
 application = CatalogueApplication()

@@ -1,13 +1,7 @@
-from oscar.core.loading import get_model
 from django.utils.translation import ugettext_lazy as _
-from oscar.core.loading import get_class
 
-ReportGenerator = get_class('dashboard.reports.reports', 'ReportGenerator')
-ReportCSVFormatter = get_class('dashboard.reports.reports',
-                               'ReportCSVFormatter')
-ReportHTMLFormatter = get_class('dashboard.reports.reports',
-                                'ReportHTMLFormatter')
-Basket = get_model('basket', 'Basket')
+from apps.dashboard.reports.reports import ReportGenerator, ReportCSVFormatter, ReportHTMLFormatter
+from apps.basket.models import Basket
 
 
 class OpenBasketReportCSVFormatter(ReportCSVFormatter):

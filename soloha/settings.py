@@ -86,6 +86,7 @@ INSTALLED_APPS = \
         'debug_panel',
         'haystack',
         'django_tables2',
+        'django_extensions',
     )
 
 SITE_ID = 1
