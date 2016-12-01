@@ -1223,7 +1223,6 @@ class ProductOptions(models.Model):
         return u'{}, {} - {}'.format(self.pk, self.product.title, self.option.title)
 
 
-@python_2_unicode_compatible
 class ProductRecommendation(models.Model, CommonFeatureProduct):
     """
     'Through' model for product recommendations
@@ -1259,6 +1258,48 @@ class ProductRecommendation(models.Model, CommonFeatureProduct):
         return self.recommendation.thumb()
     recommendation_thumb.allow_tags = True
     recommendation_thumb.short_description = _('Image of recommendation product.')
+
+
+@python_2_unicode_compatible
+class AttributeOptionGroup(models.Model):
+    """
+    Defines a group of options that collectively may be used as an
+    attribute type
+
+    For example, Language
+    """
+    name = models.CharField(_('Name'), max_length=128)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        app_label = 'catalogue'
+        verbose_name = _('Attribute option group')
+        verbose_name_plural = _('Attribute option groups')
+
+    @property
+    def option_summary(self):
+        options = [o.option for o in self.options.all()]
+        return ", ".join(options)
+
+
+@python_2_unicode_compatible
+class AttributeOption(models.Model):
+    """
+    Provides an option within an option group for an attribute type
+    Examples: In a Language group, English, Greek, French
+    """
+    group = models.ForeignKey(AttributeOptionGroup, related_name='options', verbose_name=_("Group"))
+    option = models.CharField(_('Option'), max_length=255)
+
+    def __str__(self):
+        return self.option
+
+    class Meta:
+        app_label = 'catalogue'
+        verbose_name = _('Attribute option')
+        verbose_name_plural = _('Attribute options')
 
 
 @python_2_unicode_compatible
@@ -1511,48 +1552,6 @@ class ProductAttributeValue(models.Model):
     @property
     def _richtext_as_html(self):
         return mark_safe(self.value)
-
-
-@python_2_unicode_compatible
-class AttributeOptionGroup(models.Model):
-    """
-    Defines a group of options that collectively may be used as an
-    attribute type
-
-    For example, Language
-    """
-    name = models.CharField(_('Name'), max_length=128)
-
-    def __str__(self):
-        return self.name
-
-    class Meta:
-        app_label = 'catalogue'
-        verbose_name = _('Attribute option group')
-        verbose_name_plural = _('Attribute option groups')
-
-    @property
-    def option_summary(self):
-        options = [o.option for o in self.options.all()]
-        return ", ".join(options)
-
-
-@python_2_unicode_compatible
-class AttributeOption(models.Model):
-    """
-    Provides an option within an option group for an attribute type
-    Examples: In a Language group, English, Greek, French
-    """
-    group = models.ForeignKey(AttributeOptionGroup, related_name='options', verbose_name=_("Group"))
-    option = models.CharField(_('Option'), max_length=255)
-
-    def __str__(self):
-        return self.option
-
-    class Meta:
-        app_label = 'catalogue'
-        verbose_name = _('Attribute option')
-        verbose_name_plural = _('Attribute options')
 
 
 class ProductiveProductImageManager(models.Manager):
