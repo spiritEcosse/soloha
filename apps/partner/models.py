@@ -1,13 +1,11 @@
 from django.db.models import F
 from soloha.core.utils import CommonFeatureProduct
-from apps.catalogue.models import Product, Feature
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _, pgettext_lazy
 from django.utils.timezone import now
 from oscar.core.utils import get_default_currency
 from oscar.core.compat import AUTH_USER_MODEL
-from oscar.models.fields import AutoSlugField
 from oscar.apps.partner.exceptions import InvalidStockAdjustment
 
 
@@ -16,6 +14,84 @@ class ProductiveStockRecordManager(models.Manager):
         return self.get_queryset().only(
             self.model.order_by_price(), 'product', 'price_currency'
         ).order_by(self.model.order_by_price())
+
+
+@python_2_unicode_compatible
+class Partner(models.Model):
+    """
+    A fulfillment partner. An individual or company who can fulfil products.
+    E.g. for physical goods, somebody with a warehouse and means of delivery.
+
+    Creating one or more instances of the Partner model is a required step in
+    setting up an Oscar deployment. Many Oscar deployments will only have one
+    fulfillment partner.
+    """
+    code = models.SlugField(_("Code"), max_length=128, unique=True)
+    name = models.CharField(pgettext_lazy(u"Partner's name", u"Name"), max_length=128, blank=True)
+
+    #: A partner can have users assigned to it. This is used
+    #: for access modelling in the permission-based dashboard
+    users = models.ManyToManyField(
+        AUTH_USER_MODEL, related_name="partners",
+        blank=True, verbose_name=_("Users")
+    )
+    markup = models.DecimalField(
+        verbose_name=_('Mark-up on goods this partner'), blank=True, decimal_places=2, max_digits=12, default=1
+    )
+    rate = models.DecimalField(
+        verbose_name=_('Rate on goods this partner'), blank=True, decimal_places=2, max_digits=12, default=1
+    )
+
+    class Meta:
+        app_label = 'partner'
+        permissions = (('dashboard_access', 'Can access dashboard'), )
+        verbose_name = _('Fulfillment partner')
+        verbose_name_plural = _('Fulfillment partners')
+
+    def __str__(self):
+        return self.display_name
+
+    def save(self, **kwargs):
+        super(Partner, self).save(**kwargs)
+        StockRecord.objects.filter(
+            product__partner=self
+        ).update(
+            price_excl_tax=F('cost_price') * self.rate * self.markup
+        )
+
+    @property
+    def display_name(self):
+        return self.name or self.code
+
+    @property
+    def primary_address(self):
+        """
+        Returns a partners primary address. Usually that will be the
+        headquarters or similar.
+
+        This is a rudimentary implementation that raises an error if there's
+        more than one address. If you actually want to support multiple
+        addresses, you will likely need to extend PartnerAddress to have some
+        field or flag to base your decision on.
+        """
+        addresses = self.addresses.all()
+        if len(addresses) == 0:  # intentionally using len() to save queries
+            return None
+        elif len(addresses) == 1:
+            return addresses[0]
+        else:
+            raise NotImplementedError(
+                "Oscar's default implementation of primary_address only "
+                "supports one PartnerAddress.  You need to override the "
+                "primary_address to look up the right address")
+
+    def get_address_for_stockrecord(self, stockrecord):
+        """
+        Stock might be coming from different warehouses. Overriding this
+        function allows selecting the correct PartnerAddress for the record.
+        That can be useful when determining tax.
+        """
+        return self.primary_address
 
 
 @python_2_unicode_compatible
@@ -29,9 +105,9 @@ class StockRecord(models.Model, CommonFeatureProduct):
     Stockrecords are used by 'strategies' to determine availability and pricing
     information for the customer.
     """
-    product = models.ForeignKey(Product, related_name="stockrecords", verbose_name=_("Product"))
+    product = models.ForeignKey('catalogue.Product', related_name="stockrecords", verbose_name=_("Product"))
     attributes = models.ManyToManyField(
-        Feature, verbose_name=_('Attributes'), related_name='stockrecords', blank=True
+        'catalogue.Feature', verbose_name=_('Attributes'), related_name='stockrecords', blank=True
     )
 
     # ToDo delete this field
@@ -171,84 +247,6 @@ class StockRecord(models.Model, CommonFeatureProduct):
         if self.low_stock_threshold is None:
             return False
         return self.net_stock_level < self.low_stock_threshold
-
-
-@python_2_unicode_compatible
-class Partner(models.Model):
-    """
-    A fulfillment partner. An individual or company who can fulfil products.
-    E.g. for physical goods, somebody with a warehouse and means of delivery.
-
-    Creating one or more instances of the Partner model is a required step in
-    setting up an Oscar deployment. Many Oscar deployments will only have one
-    fulfillment partner.
-    """
-    code = AutoSlugField(_("Code"), max_length=128, unique=True, populate_from='name')
-    name = models.CharField(pgettext_lazy(u"Partner's name", u"Name"), max_length=128, blank=True)
-
-    #: A partner can have users assigned to it. This is used
-    #: for access modelling in the permission-based dashboard
-    users = models.ManyToManyField(
-        AUTH_USER_MODEL, related_name="partners",
-        blank=True, verbose_name=_("Users")
-    )
-    markup = models.DecimalField(
-        verbose_name=_('Mark-up on goods this partner'), blank=True, decimal_places=2, max_digits=12, default=1
-    )
-    rate = models.DecimalField(
-        verbose_name=_('Rate on goods this partner'), blank=True, decimal_places=2, max_digits=12, default=1
-    )
-
-    class Meta:
-        app_label = 'partner'
-        permissions = (('dashboard_access', 'Can access dashboard'), )
-        verbose_name = _('Fulfillment partner')
-        verbose_name_plural = _('Fulfillment partners')
-
-    def __str__(self):
-        return self.display_name
-
-    def save(self, **kwargs):
-        super(Partner, self).save(**kwargs)
-        StockRecord.objects.filter(
-            product__partner=self
-        ).update(
-            price_excl_tax=F('cost_price') * self.rate * self.markup
-        )
-
-    @property
-    def display_name(self):
-        return self.name or self.code
-
-    @property
-    def primary_address(self):
-        """
-        Returns a partners primary address. Usually that will be the
-        headquarters or similar.
-
-        This is a rudimentary implementation that raises an error if there's
-        more than one address. If you actually want to support multiple
-        addresses, you will likely need to extend PartnerAddress to have some
-        field or flag to base your decision on.
-        """
-        addresses = self.addresses.all()
-        if len(addresses) == 0:  # intentionally using len() to save queries
-            return None
-        elif len(addresses) == 1:
-            return addresses[0]
-        else:
-            raise NotImplementedError(
-                "Oscar's default implementation of primary_address only "
-                "supports one PartnerAddress.  You need to override the "
-                "primary_address to look up the right address")
-
-    def get_address_for_stockrecord(self, stockrecord):
-        """
-        Stock might be coming from different warehouses. Overriding this
-        function allows selecting the correct PartnerAddress for the record.
-        That can be useful when determining tax.
-        """
-        return self.primary_address
 
 
 @python_2_unicode_compatible

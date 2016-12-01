@@ -26,7 +26,6 @@ import logging
 from django.template.defaultfilters import truncatechars
 from django.utils.html import strip_tags
 from soloha.core.utils import CommonFeatureProduct
-from oscar.models.fields import NullCharField, AutoSlugField
 from apps.partner.models import Partner
 from django.utils.translation import ugettext_lazy as _, pgettext_lazy
 from oscar.core.decorators import deprecated
@@ -255,6 +254,41 @@ class MissingProductImage(object):
 
 
 @python_2_unicode_compatible
+class Option(models.Model):
+    """
+    An option that can be selected for a particular item when the product
+    is added to the basket.
+
+    For example,  a list ID for an SMS message send, or a personalised message
+    to print on a T-shirt.
+
+    This is not the same as an 'attribute' as options do not have a fixed value
+    for a particular item.  Instead, option need to be specified by a customer
+    when they add the item to their basket.
+    """
+    name = models.CharField(_("Name"), max_length=128)
+    code = models.SlugField(_("Code"), max_length=128, unique=True)
+    REQUIRED, OPTIONAL = ('Required', 'Optional')
+    TYPE_CHOICES = (
+        (REQUIRED, _("Required - a value for this option must be specified")),
+        (OPTIONAL, _("Optional - a value for this option can be omitted")),
+    )
+    type = models.CharField(_("Status"), max_length=128, default=REQUIRED, choices=TYPE_CHOICES)
+
+    class Meta:
+        app_label = 'catalogue'
+        verbose_name = _("Option")
+        verbose_name_plural = _("Options")
+
+    def __str__(self):
+        return self.name
+
+    @property
+    def is_required(self):
+        return self.type == self.REQUIRED
+
+
+@python_2_unicode_compatible
 class ProductClass(models.Model):
     """
     Used for defining options and attributes for a subset of products.
@@ -266,7 +300,7 @@ class ProductClass(models.Model):
     Not necessarily equivalent to top-level categories but usually will be.
     """
     name = models.CharField(_('Name'), max_length=128)
-    slug = AutoSlugField(_('Slug'), max_length=128, unique=True, populate_from='name')
+    slug = models.SlugField(_('Slug'), max_length=128, unique=True)
 
     #: Some product type don't require shipping (eg digital products) - we use
     #: this field to take some shortcuts in the checkout.
@@ -294,25 +328,6 @@ class ProductClass(models.Model):
     @property
     def has_attributes(self):
         return self.attributes.exists()
-
-
-@python_2_unicode_compatible
-class ProductOptions(models.Model):
-    product = models.ForeignKey(Product, related_name='product_options')
-    option = models.ForeignKey(Feature, related_name='product_options')
-    plus = models.BooleanField(verbose_name=_('Plus on price'), default=False)
-    percent = models.IntegerField(verbose_name=_('Percent'), null=True, blank=True, default=0)
-    price_retail = models.DecimalField(_("Price (retail)"), decimal_places=2, max_digits=12)
-    cost_price = models.DecimalField(_("Cost Price"), decimal_places=2, max_digits=12)
-
-    class Meta:
-        app_label = 'catalogue'
-        unique_together = ('product', 'option',)
-        verbose_name = _('Product option')
-        verbose_name_plural = _('Product options')
-
-    def __str__(self):
-        return u'{}, {} - {}'.format(self.pk, self.product.title, self.option.title)
 
 
 @python_2_unicode_compatible
@@ -711,10 +726,11 @@ class Product(models.Model, CommonFeatureProduct):
         _("Product structure"), max_length=10, choices=STRUCTURE_CHOICES, default=STANDALONE
     )
 
-    upc = NullCharField(
-        _("UPC"), max_length=64, blank=True, null=True, unique=True, help_text=_("Universal Product Code (UPC) is an identifier for "
-                    "a product which is not specific to a particular "
-                    " supplier. Eg an ISBN for a book.")
+    upc = models.CharField(
+        _("UPC"), max_length=64, blank=True, unique=True, help_text=_(
+            "Universal Product Code (UPC) is an identifier for a product which is not specific to a particular "
+            " supplier. Eg an ISBN for a book."
+        )
     )
 
     parent = models.ForeignKey(
@@ -736,9 +752,9 @@ class Product(models.Model, CommonFeatureProduct):
 
     categories = models.ManyToManyField(Category, related_name="products", verbose_name=_("Categories"))
     filters = models.ManyToManyField(Feature, related_name="filter_products", verbose_name=_('Filters of product'), blank=True)
-    attributes = models.ManyToManyField(Feature, through=ProductFeature, verbose_name=_('Attribute of product'), related_name="attr_products", blank=True)
+    attributes = models.ManyToManyField(Feature, through='catalogue.ProductFeature', verbose_name=_('Attribute of product'), related_name="attr_products", blank=True)
     characteristics = models.ManyToManyField(Feature, verbose_name='Characteristics', related_name='characteristic_products', blank=True)
-    options = models.ManyToManyField(Feature, through=ProductOptions, related_name='option_products', verbose_name='Additional options')
+    options = models.ManyToManyField(Feature, through='catalogue.ProductOptions', related_name='option_products', verbose_name='Additional options')
 
     non_standard_price_retail = models.DecimalField(_("Non-standard retail price"), decimal_places=2, max_digits=12, blank=True, default=0)
     non_standard_cost_price = models.DecimalField(_("Non-standard cost price"), decimal_places=2, max_digits=12, blank=True, default=0)
@@ -751,7 +767,7 @@ class Product(models.Model, CommonFeatureProduct):
         help_text=_("Choose what type of product this is")
     )
     recommended_products = models.ManyToManyField(
-        'self', through=ProductRecommendation, blank=True,
+        'self', through='catalogue.ProductRecommendation', blank=True,
         verbose_name=_("Recommended products"),
         help_text=_("These are products that are recommended to accompany the "
                     "main product.")
@@ -1138,6 +1154,76 @@ class Product(models.Model, CommonFeatureProduct):
 
 
 @python_2_unicode_compatible
+class ProductFeature(models.Model, CommonFeatureProduct):
+    sort = models.IntegerField(_('Sort'), blank=True, null=True, default=0)
+    info = models.CharField(_('Block info'), max_length=255, blank=True)
+    product = models.ForeignKey(
+        Product, verbose_name=_('Product'), related_name='product_features', on_delete=models.DO_NOTHING
+    )
+    feature = models.ForeignKey(
+        Feature, verbose_name=_('Feature'), related_name='product_features', on_delete=models.DO_NOTHING
+    )
+    non_standard = models.BooleanField(verbose_name=_('Available non standard size for this feature'), default=False)
+    image = FilerImageField(verbose_name=_("Image"), null=True, blank=True, related_name="image")
+    product_with_images = models.ManyToManyField(
+        Product, verbose_name=_('Product with images.'), related_name='product_feature', blank=True
+    )
+
+    class Meta:
+        unique_together = ('product', 'feature', )
+        ordering = ['sort', 'feature__title']
+        app_label = 'catalogue'
+        verbose_name = _('Product feature')
+        verbose_name_plural = _('Product features')
+
+    def __str__(self):
+        return u'{}, {} - {}'.format(self.pk, getattr(self, 'product.title', None), getattr(self, 'feature.title', None))
+
+    def clean(self):
+        if self.non_standard is True:
+            if self.feature.bottom_line is None:
+                raise ValidationError(_('For this feature not specified bottom_line.'))
+
+            if self.feature.top_line is None:
+                raise ValidationError(_('For this feature not specified top_line.'))
+
+            if self.product.non_standard_price_retail == 0:
+                raise ValidationError(_('For this product set non_standard_price_retail to 0.'))
+
+    def save(self, *args, **kwargs):
+        if self.non_standard is True:
+            if self.feature.bottom_line is None:
+                raise Exception('For feature - "{}" not specified bottom_line.'.format(self.feature))
+
+            if self.feature.top_line is None:
+                raise Exception('For feature - "{}" not specified top_line.'.format(self.feature))
+
+            if self.product.non_standard_price_retail == 0:
+                raise Exception('For product - "{}" set non_standard_price_retail to 0.'.format(self.product))
+
+        super(ProductFeature, self).save(*args, **kwargs)
+
+
+@python_2_unicode_compatible
+class ProductOptions(models.Model):
+    product = models.ForeignKey(Product, related_name='product_options')
+    option = models.ForeignKey(Feature, related_name='product_options')
+    plus = models.BooleanField(verbose_name=_('Plus on price'), default=False)
+    percent = models.IntegerField(verbose_name=_('Percent'), null=True, blank=True, default=0)
+    price_retail = models.DecimalField(_("Price (retail)"), decimal_places=2, max_digits=12)
+    cost_price = models.DecimalField(_("Cost Price"), decimal_places=2, max_digits=12)
+
+    class Meta:
+        app_label = 'catalogue'
+        unique_together = ('product', 'option',)
+        verbose_name = _('Product option')
+        verbose_name_plural = _('Product options')
+
+    def __str__(self):
+        return u'{}, {} - {}'.format(self.pk, self.product.title, self.option.title)
+
+
+@python_2_unicode_compatible
 class ProductRecommendation(models.Model, CommonFeatureProduct):
     """
     'Through' model for product recommendations
@@ -1469,41 +1555,6 @@ class AttributeOption(models.Model):
         verbose_name_plural = _('Attribute options')
 
 
-@python_2_unicode_compatible
-class Option(models.Model):
-    """
-    An option that can be selected for a particular item when the product
-    is added to the basket.
-
-    For example,  a list ID for an SMS message send, or a personalised message
-    to print on a T-shirt.
-
-    This is not the same as an 'attribute' as options do not have a fixed value
-    for a particular item.  Instead, option need to be specified by a customer
-    when they add the item to their basket.
-    """
-    name = models.CharField(_("Name"), max_length=128)
-    code = AutoSlugField(_("Code"), max_length=128, unique=True, populate_from='name')
-    REQUIRED, OPTIONAL = ('Required', 'Optional')
-    TYPE_CHOICES = (
-        (REQUIRED, _("Required - a value for this option must be specified")),
-        (OPTIONAL, _("Optional - a value for this option can be omitted")),
-    )
-    type = models.CharField(_("Status"), max_length=128, default=REQUIRED, choices=TYPE_CHOICES)
-
-    class Meta:
-        app_label = 'catalogue'
-        verbose_name = _("Option")
-        verbose_name_plural = _("Options")
-
-    def __str__(self):
-        return self.name
-
-    @property
-    def is_required(self):
-        return self.type == self.REQUIRED
-
-
 class ProductiveProductImageManager(models.Manager):
     def browse(self):
         return self.get_queryset().select_related('original').only(
@@ -1590,54 +1641,3 @@ class ProductImage(models.Model, CommonFeatureProduct):
         for idx, image in enumerate(images):
             image.display_order = idx
             image.save()
-
-
-@python_2_unicode_compatible
-class ProductFeature(models.Model, CommonFeatureProduct):
-    sort = models.IntegerField(_('Sort'), blank=True, null=True, default=0)
-    info = models.CharField(_('Block info'), max_length=255, blank=True)
-    product = models.ForeignKey(
-        Product, verbose_name=_('Product'), related_name='product_features', on_delete=models.DO_NOTHING
-    )
-    feature = models.ForeignKey(
-        Feature, verbose_name=_('Feature'), related_name='product_features', on_delete=models.DO_NOTHING
-    )
-    non_standard = models.BooleanField(verbose_name=_('Available non standard size for this feature'), default=False)
-    image = FilerImageField(verbose_name=_("Image"), null=True, blank=True, related_name="image")
-    product_with_images = models.ManyToManyField(
-        Product, verbose_name=_('Product with images.'), related_name='product_feature', blank=True
-    )
-
-    class Meta:
-        unique_together = ('product', 'feature', )
-        ordering = ['sort', 'feature__title']
-        app_label = 'catalogue'
-        verbose_name = _('Product feature')
-        verbose_name_plural = _('Product features')
-
-    def __str__(self):
-        return u'{}, {} - {}'.format(self.pk, getattr(self, 'product.title', None), getattr(self, 'feature.title', None))
-
-    def clean(self):
-        if self.non_standard is True:
-            if self.feature.bottom_line is None:
-                raise ValidationError(_('For this feature not specified bottom_line.'))
-
-            if self.feature.top_line is None:
-                raise ValidationError(_('For this feature not specified top_line.'))
-
-            if self.product.non_standard_price_retail == 0:
-                raise ValidationError(_('For this product set non_standard_price_retail to 0.'))
-
-    def save(self, *args, **kwargs):
-        if self.non_standard is True:
-            if self.feature.bottom_line is None:
-                raise Exception('For feature - "{}" not specified bottom_line.'.format(self.feature))
-
-            if self.feature.top_line is None:
-                raise Exception('For feature - "{}" not specified top_line.'.format(self.feature))
-
-            if self.product.non_standard_price_retail == 0:
-                raise Exception('For product - "{}" set non_standard_price_retail to 0.'.format(self.product))
-
-        super(ProductFeature, self).save(*args, **kwargs)
