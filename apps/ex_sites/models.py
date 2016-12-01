@@ -6,12 +6,25 @@ from phonenumber_field.modelfields import PhoneNumberField
 from ckeditor_uploader.fields import RichTextUploadingField
 
 
+class PhoneNumber(models.Model):
+    phone_number = PhoneNumberField(verbose_name=_('Phone number'), blank=True)
+    objects = PhoneNumberManager()
+
+    class Meta:
+        app_label = 'sites'
+        verbose_name = _('Phone number')
+        verbose_name_plural = _('Phone numbers')
+
+    def __str__(self):
+        return self.phone_number.as_international
+
+
 @python_2_unicode_compatible
 class Info(models.Model):
     site = models.OneToOneField(Site, on_delete=models.CASCADE, related_name='info')
     work_time = models.CharField(verbose_name=_('Work time'), max_length=1000)
     address = models.CharField(verbose_name=_('Actual address'), max_length=1000)
-    phone_numbers = models.ManyToManyField('sites.PhoneNumber', verbose_name=_('Phone numbers'), blank=True)
+    phone_numbers = models.ManyToManyField(PhoneNumber, verbose_name=_('Phone numbers'), blank=True)
     email = models.EmailField(verbose_name=_('Email'), max_length=200)
     shop_short_desc = models.CharField(verbose_name=_('Short description of shop'), max_length=200, blank=True)
     way = RichTextUploadingField(verbose_name=_('Way to us'), blank=True)
@@ -34,16 +47,3 @@ class PhoneNumberManager(models.Manager):
         return self.get_queryset().only(
             'phone_number',
         )
-
-
-class PhoneNumber(models.Model):
-    phone_number = PhoneNumberField(verbose_name=_('Phone number'), blank=True)
-    objects = PhoneNumberManager()
-
-    class Meta:
-        app_label = 'sites'
-        verbose_name = _('Phone number')
-        verbose_name_plural = _('Phone numbers')
-
-    def __str__(self):
-        return self.phone_number.as_international

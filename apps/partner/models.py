@@ -7,6 +7,7 @@ from django.utils.timezone import now
 from oscar.core.utils import get_default_currency
 from oscar.core.compat import AUTH_USER_MODEL
 from oscar.apps.partner.exceptions import InvalidStockAdjustment
+from soloha.core.models.fields import AutoSlugField
 
 
 class ProductiveStockRecordManager(models.Manager):
@@ -26,7 +27,7 @@ class Partner(models.Model):
     setting up an Oscar deployment. Many Oscar deployments will only have one
     fulfillment partner.
     """
-    code = models.SlugField(_("Code"), max_length=128, unique=True)
+    code = AutoSlugField(_("Code"), max_length=128, unique=True, populate_from='name')
     name = models.CharField(pgettext_lazy(u"Partner's name", u"Name"), max_length=128, blank=True)
 
     #: A partner can have users assigned to it. This is used

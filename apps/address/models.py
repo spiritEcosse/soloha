@@ -7,9 +7,66 @@ from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _, pgettext_lazy
 from django.core import exceptions
 
-from oscar.core.compat import AUTH_USER_MODEL
-from oscar.models.fields import UppercaseCharField, PhoneNumberField
-from django.utils.six.moves import filter
+from soloha.core.compat import AUTH_USER_MODEL
+from soloha.core.models.fields import UppercaseCharField, PhoneNumberField
+
+from apps.partner.models import Partner
+
+@python_2_unicode_compatible
+class Country(models.Model):
+    """
+    International Organization for Standardization (ISO) 3166-1 Country list.
+
+    The field names are a bit awkward, but kept for backwards compatibility.
+    pycountry's syntax of alpha2, alpha3, name and official_name seems sane.
+    """
+    iso_3166_1_a2 = models.CharField(
+        _('ISO 3166-1 alpha-2'), max_length=2, primary_key=True)
+    iso_3166_1_a3 = models.CharField(
+        _('ISO 3166-1 alpha-3'), max_length=3, blank=True)
+    iso_3166_1_numeric = models.CharField(
+        _('ISO 3166-1 numeric'), blank=True, max_length=3)
+
+    #: The commonly used name; e.g. 'United Kingdom'
+    printable_name = models.CharField(_('Country name'), max_length=128)
+    #: The full official name of a country
+    #: e.g. 'United Kingdom of Great Britain and Northern Ireland'
+    name = models.CharField(_('Official name'), max_length=128)
+
+    display_order = models.PositiveSmallIntegerField(
+        _("Display order"), default=0, db_index=True,
+        help_text=_('Higher the number, higher the country in the list.')
+    )
+
+    is_shipping_country = models.BooleanField(_("Is shipping country"), default=False, db_index=True)
+
+    class Meta:
+        app_label = 'address'
+        verbose_name = _('Country')
+        verbose_name_plural = _('Countries')
+        ordering = ('-display_order', 'printable_name',)
+
+    def __str__(self):
+        return self.printable_name or self.name
+
+    @property
+    def code(self):
+        """
+        Shorthand for the ISO 3166 Alpha-2 code
+        """
+        return self.iso_3166_1_a2
+
+    @property
+    def numeric_code(self):
+        """
+        Shorthand for the ISO 3166 numeric code.
+
+        iso_3166_1_numeric used to wrongly be a integer field, but has to be
+        padded with leading zeroes. It's since been converted to a char field,
+        but the database might still contain non-padded strings. That's why
+        the padding is kept.
+        """
+        return u"%.03d" % int(self.iso_3166_1_numeric)
 
 
 @python_2_unicode_compatible
@@ -216,27 +273,24 @@ class Address(models.Model):
 
     title = models.CharField(
         pgettext_lazy(u"Treatment Pronouns for the customer", u"Title"),
-        max_length=64, choices=TITLE_CHOICES, blank=True)
+        max_length=64, choices=TITLE_CHOICES, blank=True
+    )
     first_name = models.CharField(_("First name"), max_length=255, blank=True)
     last_name = models.CharField(_("Last name"), max_length=255, blank=True)
 
     # We use quite a few lines of an address as they are often quite long and
     # it's easier to just hide the unnecessary ones than add extra ones.
     line1 = models.CharField(_("First line of address"), max_length=255)
-    line2 = models.CharField(
-        _("Second line of address"), max_length=255, blank=True)
-    line3 = models.CharField(
-        _("Third line of address"), max_length=255, blank=True)
+    line2 = models.CharField(_("Second line of address"), max_length=255, blank=True)
+    line3 = models.CharField(_("Third line of address"), max_length=255, blank=True)
     line4 = models.CharField(_("City"), max_length=255, blank=True)
     state = models.CharField(_("State/County"), max_length=255, blank=True)
-    postcode = UppercaseCharField(
-        _("Post/Zip-code"), max_length=64, blank=True)
-    country = models.ForeignKey('address.Country', verbose_name=_("Country"))
+    postcode = UppercaseCharField(_("Post/Zip-code"), max_length=64, blank=True)
+    country = models.ForeignKey(Country, verbose_name=_("Country"))
 
     #: A field only used for searching addresses - this contains all the
     #: relevant fields.  This is effectively a poor man's Solr text field.
-    search_text = models.TextField(
-        _("Search text - used only for searching addresses"), editable=False)
+    search_text = models.TextField(_("Search text - used only for searching addresses"), editable=False)
 
     def __str__(self):
         return self.summary
@@ -289,6 +343,7 @@ class Address(models.Model):
                     {'postcode': [msg]})
 
     def _update_search_text(self):
+        # Todo or use: from django.utils.six.moves import filter ?
         search_fields = filter(
             bool, [self.first_name, self.last_name,
                    self.line1, self.line2, self.line3, self.line4,
@@ -378,63 +433,6 @@ class Address(models.Model):
         return fields
 
 
-@python_2_unicode_compatible
-class Country(models.Model):
-    """
-    International Organization for Standardization (ISO) 3166-1 Country list.
-
-    The field names are a bit awkward, but kept for backwards compatibility.
-    pycountry's syntax of alpha2, alpha3, name and official_name seems sane.
-    """
-    iso_3166_1_a2 = models.CharField(
-        _('ISO 3166-1 alpha-2'), max_length=2, primary_key=True)
-    iso_3166_1_a3 = models.CharField(
-        _('ISO 3166-1 alpha-3'), max_length=3, blank=True)
-    iso_3166_1_numeric = models.CharField(
-        _('ISO 3166-1 numeric'), blank=True, max_length=3)
-
-    #: The commonly used name; e.g. 'United Kingdom'
-    printable_name = models.CharField(_('Country name'), max_length=128)
-    #: The full official name of a country
-    #: e.g. 'United Kingdom of Great Britain and Northern Ireland'
-    name = models.CharField(_('Official name'), max_length=128)
-
-    display_order = models.PositiveSmallIntegerField(
-        _("Display order"), default=0, db_index=True,
-        help_text=_('Higher the number, higher the country in the list.'))
-
-    is_shipping_country = models.BooleanField(
-        _("Is shipping country"), default=False, db_index=True)
-
-    class Meta:
-        app_label = 'address'
-        verbose_name = _('Country')
-        verbose_name_plural = _('Countries')
-        ordering = ('-display_order', 'printable_name',)
-
-    def __str__(self):
-        return self.printable_name or self.name
-
-    @property
-    def code(self):
-        """
-        Shorthand for the ISO 3166 Alpha-2 code
-        """
-        return self.iso_3166_1_a2
-
-    @property
-    def numeric_code(self):
-        """
-        Shorthand for the ISO 3166 numeric code.
-
-        iso_3166_1_numeric used to wrongly be a integer field, but has to be
-        padded with leading zeroes. It's since been converted to a char field,
-        but the database might still contain non-padded strings. That's why
-        the padding is kept.
-        """
-        return u"%.03d" % int(self.iso_3166_1_numeric)
-
-
 class ShippingAddress(Address):
     """
     A shipping address.
@@ -453,11 +451,13 @@ class ShippingAddress(Address):
 
     phone_number = PhoneNumberField(
         _("Phone number"), blank=True,
-        help_text=_("In case we need to call you about your order"))
+        help_text=_("In case we need to call you about your order")
+    )
     notes = models.TextField(
         blank=True, verbose_name=_('Instructions'),
         help_text=_("Tell us anything we should know when delivering "
-                    "your order."))
+                    "your order.")
+    )
 
     class Meta:
         # ShippingAddress is registered in order/models.py
@@ -487,16 +487,13 @@ class UserAddress(ShippingAddress):
     model, we allow users the ability to add/edit/delete from their address
     book without affecting orders already placed.
     """
-    user = models.ForeignKey(
-        AUTH_USER_MODEL, related_name='addresses', verbose_name=_("User"))
+    user = models.ForeignKey(AUTH_USER_MODEL, related_name='addresses', verbose_name=_("User"))
 
     #: Whether this address is the default for shipping
-    is_default_for_shipping = models.BooleanField(
-        _("Default shipping address?"), default=False)
+    is_default_for_shipping = models.BooleanField(_("Default shipping address?"), default=False)
 
     #: Whether this address should be the default for billing.
-    is_default_for_billing = models.BooleanField(
-        _("Default billing address?"), default=False)
+    is_default_for_billing = models.BooleanField(_("Default billing address?"), default=False)
 
     #: We keep track of the number of times an address has been used
     #: as a shipping address so we can show the most popular ones
@@ -505,8 +502,7 @@ class UserAddress(ShippingAddress):
 
     #: A hash is kept to try and avoid duplicate addresses being added
     #: to the address book.
-    hash = models.CharField(_("Address Hash"), max_length=255, db_index=True,
-                            editable=False)
+    hash = models.CharField(_("Address Hash"), max_length=255, db_index=True, editable=False)
     date_created = models.DateTimeField(_("Date Created"), auto_now_add=True)
 
     def save(self, *args, **kwargs):
@@ -575,8 +571,7 @@ class PartnerAddress(Address):
     A partner can have one or more addresses. This can be useful e.g. when
     determining US tax which depends on the origin of the shipment.
     """
-    partner = models.ForeignKey('partner.Partner', related_name='addresses',
-                                verbose_name=_('Partner'))
+    partner = models.ForeignKey(Partner, related_name='addresses', verbose_name=_('Partner'))
 
     class Meta:
         app_label = 'partner'

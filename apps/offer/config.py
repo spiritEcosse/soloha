@@ -1,5 +1,8 @@
-from oscar.apps.offer import config
+from django.apps import AppConfig
+from django.utils.translation import ugettext_lazy as _
 
 
-class OfferConfig(config.OfferConfig):
-    name = 'apps.offer'
+class OfferConfig(AppConfig):
+    label = 'offer'
+    name = 'oscar.apps.offer'
+    verbose_name = _('Offer')

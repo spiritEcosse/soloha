@@ -1,14 +1,11 @@
 from django.conf import settings
 from django import forms
 
-from oscar.core.loading import get_model
-from oscar.views.generic import PhoneNumberMixin
-
-UserAddress = get_model('address', 'useraddress')
+from soloha.core.views.generic import PhoneNumberMixin
+from apps.address.models import UserAddress
 
 
 class AbstractAddressForm(forms.ModelForm):
-
     def __init__(self, *args, **kwargs):
         """
         Set fields in OSCAR_REQUIRED_ADDRESS_FIELDS as required.
@@ -21,7 +18,6 @@ class AbstractAddressForm(forms.ModelForm):
 
 
 class UserAddressForm(PhoneNumberMixin, AbstractAddressForm):
-
     class Meta:
         model = UserAddress
         fields = [

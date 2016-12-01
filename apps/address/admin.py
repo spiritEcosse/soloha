@@ -1,5 +1,5 @@
 from django.contrib import admin
-from oscar.core.loading import get_model
+from apps.address.models import UserAddress, Country
 
 
 class UserAddressAdmin(admin.ModelAdmin):
@@ -10,5 +10,5 @@ class CountryAdmin(admin.ModelAdmin):
     search_fields = ('name',)
 
 
-admin.site.register(get_model('address', 'useraddress'), UserAddressAdmin)
-admin.site.register(get_model('address', 'country'), CountryAdmin)
+admin.site.register(UserAddress, UserAddressAdmin)
+admin.site.register(Country, CountryAdmin)

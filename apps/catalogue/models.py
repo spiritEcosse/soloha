@@ -29,6 +29,7 @@ from soloha.core.utils import CommonFeatureProduct
 from apps.partner.models import Partner
 from django.utils.translation import ugettext_lazy as _, pgettext_lazy
 from oscar.core.decorators import deprecated
+from soloha.core.models.fields import NullCharField, AutoSlugField
 
 
 REGEXP_PHONE = r'/^((8|\+38)[\- ]?)?(\(?\d{3}\)?[\- ]?)?[\d\- ]{7,10}$/'
@@ -279,7 +280,7 @@ class Option(models.Model):
     when they add the item to their basket.
     """
     name = models.CharField(_("Name"), max_length=128)
-    code = models.SlugField(_("Code"), max_length=128, unique=True)
+    code = AutoSlugField(_("Code"), max_length=128, unique=True, populate_from='name')
     REQUIRED, OPTIONAL = ('Required', 'Optional')
     TYPE_CHOICES = (
         (REQUIRED, _("Required - a value for this option must be specified")),
@@ -312,7 +313,7 @@ class ProductClass(models.Model):
     Not necessarily equivalent to top-level categories but usually will be.
     """
     name = models.CharField(_('Name'), max_length=128)
-    slug = models.SlugField(_('Slug'), max_length=128, unique=True)
+    slug = AutoSlugField(_('Slug'), max_length=128, unique=True, populate_from='name')
 
     #: Some product type don't require shipping (eg digital products) - we use
     #: this field to take some shortcuts in the checkout.
@@ -738,8 +739,8 @@ class Product(models.Model, CommonFeatureProduct):
         _("Product structure"), max_length=10, choices=STRUCTURE_CHOICES, default=STANDALONE
     )
 
-    upc = models.CharField(
-        _("UPC"), max_length=64, blank=True, unique=True, help_text=_(
+    upc = NullCharField(
+        _("UPC"), max_length=64, blank=True, null=True, unique=True, help_text=_(
             "Universal Product Code (UPC) is an identifier for a product which is not specific to a particular "
             " supplier. Eg an ISBN for a book."
         )

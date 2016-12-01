@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.utils.translation import ugettext_lazy as _
 from django.db import models
 from oscar.core.loading import get_model
+from oscar.models.fields import AutoSlugField
 
 Product = get_model('catalogue', 'Product')
 

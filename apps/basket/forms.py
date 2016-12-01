@@ -3,15 +3,13 @@ from django.conf import settings
 from django.forms.models import modelformset_factory, BaseModelFormSet
 from django.db.models import Sum
 from django.utils.translation import ugettext_lazy as _
-from django.contrib.postgres.forms import SimpleArrayField
+
 from oscar.core.loading import get_model
 from oscar.forms import widgets
 
 Line = get_model('basket', 'line')
 Basket = get_model('basket', 'basket')
 Product = get_model('catalogue', 'product')
-StockRecord = get_model('partner', 'StockRecord')
-ProductImage = get_model('catalogue', 'ProductImage')
 
 
 class BasketLineForm(forms.ModelForm):
@@ -145,8 +143,9 @@ class AddToBasketForm(forms.Form):
 
         super(AddToBasketForm, self).__init__(*args, **kwargs)
 
-        # if product.is_parent:
-        #     self._create_parent_product_fields(product)
+        # Dynamically build fields
+        if product.is_parent:
+            self._create_parent_product_fields(product)
         self._create_product_fields(product)
 
     # Dynamic form building methods
@@ -184,9 +183,8 @@ class AddToBasketForm(forms.Form):
         """
         Add the product option fields.
         """
-        pass
-        # for option in product.options:
-        #     self._add_option_field(product, option)
+        for option in product.options:
+            self._add_option_field(product, option)
 
     def _add_option_field(self, product, option):
         """
@@ -239,42 +237,12 @@ class AddToBasketForm(forms.Form):
         # method
         return getattr(self, 'child_product', self.parent_product)
 
-    def stockrecord_clean(self):
-        stockrecord = self.cleaned_data.get('stockrecord', None)
-
-        if stockrecord is None:
-            stockrecord = self.basket.strategy
-
-            if self.product.is_parent:
-                product, stockrecord = stockrecord.select_children_stockrecords(self.product)[0]
-            else:
-                stockrecord = stockrecord.select_stockrecord(self.product)
-
-        if self.product.is_parent:
-            try:
-                child = self.product.children.get(
-                    id=stockrecord.product.id
-                )
-            except Product.DoesNotExist:
-                raise forms.ValidationError(
-                    _("Please select a valid product"))
-        else:
-            child = stockrecord.product
-
-        # To avoid duplicate SQL queries, we cache a copy of the loaded child
-        # product as we're going to need it later.
-        self.child_product = child
-        self.stockrecord = stockrecord
-
-        return self.stockrecord
-
     def clean(self):
-        self.stockrecord_clean()
-        info = self.basket.strategy.fetch_for_product(self.product, stockrecord=getattr(self, 'stockrecord', None))
+        info = self.basket.strategy.fetch_for_product(self.product)
 
         # Check currencies are sensible
         if (self.basket.currency and
-                    info.price.currency != self.basket.currency):
+                info.price.currency != self.basket.currency):
             raise forms.ValidationError(
                 _("This product cannot be added to the basket as its currency "
                   "isn't the same as other products in your basket"))
@@ -297,11 +265,11 @@ class AddToBasketForm(forms.Form):
         Return submitted options in a clean format
         """
         options = []
-        # for option in self.parent_product.options:
-        #     if option.code in self.cleaned_data:
-        #         options.append({
-        #             'option': option,
-        #             'value': self.cleaned_data[option.code]})
+        for option in self.parent_product.options:
+            if option.code in self.cleaned_data:
+                options.append({
+                    'option': option,
+                    'value': self.cleaned_data[option.code]})
         return options
 
 
@@ -312,18 +280,3 @@ class SimpleAddToBasketForm(AddToBasketForm):
     """
     quantity = forms.IntegerField(
         initial=1, min_value=1, widget=forms.HiddenInput, label=_('Quantity'))
-
-
-class AddToBasketWithAttributesForm(SimpleAddToBasketForm):
-    stockrecord = forms.ModelChoiceField(
-        queryset=StockRecord.objects.all(),
-        widget=forms.HiddenInput(attrs={'ng-model': 'stockrecord', 'ng-value': 'stockrecord'}),
-        required=False
-    )
-    product_images = forms.ModelChoiceField(
-        queryset=ProductImage.objects.all(),
-        widget=forms.HiddenInput(attrs={
-            'ng-model': 'product_images.pk', 'ng-value': 'product_images.pk'
-        }),
-        required=False
-    )

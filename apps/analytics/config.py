@@ -1,5 +1,11 @@
-from oscar.apps.analytics import config
+from django.apps import AppConfig
+from django.utils.translation import ugettext_lazy as _
 
 
-class AnalyticsConfig(config.AnalyticsConfig):
+class AnalyticsConfig(AppConfig):
+    label = 'analytics'
     name = 'apps.analytics'
+    verbose_name = _('Analytics')
+
+    def ready(self):
+        from apps.analytics import receivers  # noqa

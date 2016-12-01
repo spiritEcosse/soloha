@@ -83,7 +83,7 @@ class Applicator(object):
         # Using select_related with the condition/benefit ranges doesn't seem
         # to work.  I think this is because both the related objects have the
         # FK to range with the same name.
-        return qs.select_related('condition', 'benefit').only('condition__value', 'benefit__value')
+        return qs.select_related('condition', 'benefit')
 
     def get_basket_offers(self, basket, user):
         """
@@ -94,7 +94,7 @@ class Applicator(object):
         if not basket.id or not user:
             return offers
 
-        for voucher in basket.vouchers.browse():
+        for voucher in basket.vouchers.all():
             available_to_user, __ = voucher.is_available_to_user(user=user)
             if voucher.is_active() and available_to_user:
                 basket_offers = voucher.offers.all()
