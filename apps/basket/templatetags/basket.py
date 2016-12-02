@@ -1,15 +1,14 @@
 import re
-from django.template import Library, Node, Variable, TemplateSyntaxError
 from widget_tweaks.templatetags.widget_tweaks import FieldAttributeNode
-from django.template.debug import DebugParser
-from django import template
-from apps.basket.forms import AddToBasketWithAttributesForm
-from oscar.core.loading import get_model
-from oscar.core.loading import get_class
 
-AddToBasketForm = get_class('basket.forms', 'AddToBasketForm')
-SimpleAddToBasketForm = get_class('basket.forms', 'SimpleAddToBasketForm')
-Product = get_model('catalogue', 'product')
+from django.template import TemplateSyntaxError
+from django.template.context_processors import DebugParser
+from django import template
+
+from apps.basket.forms import AddToBasketWithAttributesForm
+from apps.basket.forms import AddToBasketForm, SimpleAddToBasketForm
+from apps.catalogue.models import Product
+
 QNT_SINGLE, QNT_MULTIPLE = 'single', 'multiple'
 parser = DebugParser
 

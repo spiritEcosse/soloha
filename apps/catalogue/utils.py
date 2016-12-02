@@ -11,13 +11,9 @@ from django.core.exceptions import FieldError
 from django.db.transaction import atomic
 from django.utils.translation import ugettext_lazy as _
 
-from oscar.core.loading import get_model
-from oscar.apps.catalogue.exceptions import (
-    ImageImportError, IdenticalImageError, InvalidImageArchive)
+from oscar.apps.catalogue.exceptions import (ImageImportError, IdenticalImageError, InvalidImageArchive)
 
-Category = get_model('catalogue', 'category')
-Product = get_model('catalogue', 'product')
-ProductImage = get_model('catalogue', 'productimage')
+from apps.catalogue.models import Product, ProductImage
 
 
 # This is an old class only really intended to be used by the internal sandbox

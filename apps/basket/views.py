@@ -17,12 +17,15 @@ from extra_views import ModelFormSetView
 from soloha.core import ajax
 from soloha.core.utils import redirect_to_referrer, safe_referrer
 
+from apps.basket.models import Basket, Line
 from apps.basket.forms import AddToBasketWithAttributesForm, BasketLineFormSet, BasketLineForm, AddToBasketForm, \
     BasketVoucherForm, SavedLineFormSet, SavedLineForm
 from apps.basket import signals
 from apps.offer.utils import Applicator
 from apps.shipping.repository import Repository
 from apps.checkout.calculators import OrderTotalCalculator
+from apps.catalogue.models import Product
+from apps.voucher.models import Voucher
 
 
 def get_messages(basket, offers_before, offers_after,
@@ -81,8 +84,8 @@ def apply_messages(request, offers_before):
 
 
 class BasketView(ModelFormSetView):
-    model = get_model('basket', 'Line')
-    basket_model = get_model('basket', 'Basket')
+    model = Line
+    basket_model = Basket
     formset_class = BasketLineFormSet
     form_class = BasketLineForm
     extra = 0
@@ -224,8 +227,7 @@ class BasketView(ModelFormSetView):
         # If AJAX submission, don't redirect but reload the basket content HTML
         if self.request.is_ajax():
             # Reload basket and apply offers again
-            self.request.basket = get_model('basket', 'Basket').objects.get(
-                id=self.request.basket.id)
+            self.request.basket = Basket.objects.get(id=self.request.basket.id)
             self.request.basket.strategy = self.request.strategy
             Applicator().apply(self.request.basket, self.request.user,
                                self.request)
@@ -266,8 +268,7 @@ class BasketView(ModelFormSetView):
                             content_type="application/json")
 
     def move_line_to_saved_basket(self, line):
-        saved_basket, _ = get_model('basket', 'basket').saved.get_or_create(
-            owner=self.request.user)
+        saved_basket, _ = Basket.saved.get_or_create(owner=self.request.user)
         saved_basket.merge_line(line)
 
     def formset_invalid(self, formset):
@@ -292,7 +293,7 @@ class BasketAddView(FormView):
     a templatetag from module basket_tags.py.
     """
     form_class = AddToBasketForm
-    product_model = get_model('catalogue', 'product')
+    product_model = Product
     add_signal = signals.basket_addition
     http_method_names = ['post']
 
@@ -355,7 +356,7 @@ class BasketAddView(FormView):
 
 class VoucherAddView(FormView):
     form_class = BasketVoucherForm
-    voucher_model = get_model('voucher', 'voucher')
+    voucher_model = Voucher
     add_signal = signals.voucher_addition
 
     def get(self, request, *args, **kwargs):
@@ -429,7 +430,7 @@ class VoucherAddView(FormView):
 
 
 class VoucherRemoveView(View):
-    voucher_model = get_model('voucher', 'voucher')
+    voucher_model = Voucher
     remove_signal = signals.voucher_removal
     http_method_names = ['post']
 
@@ -457,8 +458,8 @@ class VoucherRemoveView(View):
 
 
 class SavedView(ModelFormSetView):
-    model = get_model('basket', 'line')
-    basket_model = get_model('basket', 'basket')
+    model = Line
+    basket_model = Basket
     formset_class = SavedLineFormSet
     form_class = SavedLineForm
     extra = 0

@@ -1,35 +1,36 @@
-from django.db.models import Prefetch
-from apps.partner.models import StockRecord
-from django.contrib.contenttypes import fields
 import os
-from django.utils import six
+import logging
+
 from datetime import datetime, date
+from easy_thumbnails.files import get_thumbnailer
+from mptt.models import MPTTModel, TreeForeignKey
+from ckeditor_uploader.fields import RichTextUploadingField
+from filer.fields.image import FilerImageField
+
+from django.utils import six
+from django.template.defaultfilters import truncatechars
+from django.utils.html import strip_tags
+from django.utils.translation import ugettext_lazy as _, pgettext_lazy
+from django.db.models import Prefetch
+from django.contrib.contenttypes import fields
+from django.core.exceptions import ValidationError
 from django.utils.safestring import mark_safe
 from django.conf import settings
 from django.core.files.base import File
 from django.core.urlresolvers import reverse
 from django.core.validators import RegexValidator
-from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.functional import cached_property
 from django.contrib.contenttypes.models import ContentType
-from oscar.core.utils import slugify
-from oscar.core.validators import non_python_keyword
-from oscar.core.loading import get_model
-from easy_thumbnails.files import get_thumbnailer
-from soloha.settings import MEDIA_ROOT
-from mptt.models import MPTTModel, TreeForeignKey
-from django.core.exceptions import ValidationError
-from ckeditor_uploader.fields import RichTextUploadingField
-from filer.fields.image import FilerImageField
-import logging
-from django.template.defaultfilters import truncatechars
-from django.utils.html import strip_tags
-from soloha.core.utils import CommonFeatureProduct
-from apps.partner.models import Partner
-from django.utils.translation import ugettext_lazy as _, pgettext_lazy
-from oscar.core.decorators import deprecated
+from django.db import models
+
+from soloha.core.decorators import deprecated
 from soloha.core.models.fields import NullCharField, AutoSlugField
+from soloha.core.utils import CommonFeatureProduct, slugify
+from soloha.settings import MEDIA_ROOT
+from soloha.core.validators import non_python_keyword
+
+from apps.partner.models import StockRecord, Partner
 
 
 REGEXP_PHONE = r'/^((8|\+38)[\- ]?)?(\(?\d{3}\)?[\- ]?)?[\d\- ]{7,10}$/'
@@ -1387,7 +1388,6 @@ class ProductAttribute(models.Model):
         return self.name
 
     def save_value(self, product, value):
-        ProductAttributeValue = get_model('catalogue', 'ProductAttributeValue')
         try:
             value_obj = product.attribute_values.get(attribute=self)
         except ProductAttributeValue.DoesNotExist:
@@ -1396,8 +1396,7 @@ class ProductAttribute(models.Model):
             delete_file = self.is_file and value is False
             if value is None or value == '' or delete_file:
                 return
-            value_obj = ProductAttributeValue.objects.create(
-                product=product, attribute=self)
+            value_obj = ProductAttributeValue.objects.create(product=product, attribute=self)
 
         if self.is_file:
             # File fields in Django are treated differently, see
@@ -1457,17 +1456,19 @@ class ProductAttribute(models.Model):
             raise ValidationError(_("Must be a model instance"))
 
     def _validate_option(self, value):
-        if not isinstance(value, get_model('catalogue', 'AttributeOption')):
+        if not isinstance(value, AttributeOption):
             raise ValidationError(
                 _("Must be an AttributeOption model object instance"))
+
         if not value.pk:
             raise ValidationError(_("AttributeOption has not been saved yet"))
-        valid_values = self.option_group.options.values_list(
-            'option', flat=True)
+        valid_values = self.option_group.options.values_list('option', flat=True)
+
         if value.option not in valid_values:
             raise ValidationError(
                 _("%(enum)s is not a valid choice for %(attr)s") %
-                {'enum': value, 'attr': self})
+                {'enum': value, 'attr': self}
+            )
 
     def _validate_file(self, value):
         if value and not isinstance(value, File):

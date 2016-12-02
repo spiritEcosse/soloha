@@ -2,14 +2,13 @@ from django.conf import settings
 from django.utils.module_loading import import_string
 from django.views.generic.list import MultipleObjectMixin
 
-from oscar.core.decorators import deprecated
-from oscar.core.loading import get_class, get_model
+from soloha.core.decorators import deprecated
 
-BrowseCategoryForm = get_class('search.forms', 'BrowseCategoryForm')
-SearchHandler = get_class('search.search_handlers', 'SearchHandler')
-is_solr_supported = get_class('search.features', 'is_solr_supported')
-is_elasticsearch_supported = get_class('search.features', 'is_elasticsearch_supported')
-Product = get_model('catalogue', 'Product')
+from apps.search.forms import BrowseCategoryForm
+from apps.search.search_handlers import SearchHandler
+from apps.search.features import is_solr_supported
+from apps.search.features import is_elasticsearch_supported
+from apps.catalogue.models import Product
 
 
 def get_product_search_handler_class():
@@ -23,14 +22,11 @@ def get_product_search_handler_class():
     if settings.OSCAR_PRODUCT_SEARCH_HANDLER is not None:
         return import_string(settings.OSCAR_PRODUCT_SEARCH_HANDLER)
     if is_solr_supported():
-        return get_class('catalogue.search_handlers', 'ProductSearchHandler')
+        return ProductSearchHandler
     elif is_elasticsearch_supported():
-        return get_class(
-            'catalogue.search_handlers', 'ESProductSearchHandler',
-        )
+        return ESProductSearchHandler
     else:
-        return get_class(
-            'catalogue.search_handlers', 'SimpleProductSearchHandler')
+        return SimpleProductSearchHandler
 
 
 class SolrProductSearchHandler(SearchHandler):

@@ -1,9 +1,17 @@
-from oscar.apps.catalogue.app import CatalogueApplication as CoreCatalogueApplication
-from django.conf.urls import url
+from django.conf.urls import url, include
+
+from soloha.core.application import Application
+from apps.catalogue.reviews.app import application as reviews_app
 from apps.catalogue import views
+from apps.offer.views import RangeDetailView
 
 
-class CatalogueApplication(CoreCatalogueApplication):
+class BaseCatalogueApplication(Application):
+    name = 'catalogue'
+    detail_view = views.ProductDetailView
+    catalogue_view = views.CatalogueView
+    category_view = views.ProductCategoryView
+    range_view = RangeDetailView
     product_category_view = views.ProductCategoryView
     calculate_price = views.ProductCalculatePrice
     quick_order_view = views.QuickOrderView
@@ -11,50 +19,25 @@ class CatalogueApplication(CoreCatalogueApplication):
     attr_prod_images = views.AttrProdImages
 
     def get_urls(self):
-        urlpatterns = [
-            url(r'^(?:page/(?P<page>\d+)/)?(?:sort/(?P<sort>[\w-]+)/)?$', self.catalogue_view.as_view(), name='index'),
-            url(r'^category/(?P<category_slug>[\w-]+(/[\w-]+)*)/product/(?P<product_slug>[\w-]+)/$', self.detail_view.as_view(), name='detail'),
-            url(r'^category/(?P<category_slug>[\w-]+(/(?!filter|page|sort)[\w-]+(?!filter|page|sort))*)(?:/filter/(?P<filter_slug>[\w-]+(/(?!page|sort)[\w-]+(?!page|sort))*))*/(?:page/(?P<page>\d+)/)?(?:sort/(?P<sort>[\w-]+)/)?$',
-                self.product_category_view.as_view(), name='category'),
-        ]
-        urlpatterns += super(CatalogueApplication, self).get_urls()
+        urlpatterns = super(BaseCatalogueApplication, self).get_urls()
         urlpatterns += [
+            url(r'^(?:page/(?P<page>\d+)/)?(?:sort/(?P<sort>[\w-]+)/)?$', self.catalogue_view.as_view(), name='index'),
+            url(
+                r'^category/(?P<category_slug>[\w-]+(/[\w-]+)*)/product/(?P<product_slug>[\w-]+)/$',
+                self.detail_view.as_view(), name='detail'
+            ),
+            url(
+                r'^category/(?P<category_slug>[\w-]+(/(?!filter|page|sort)[\w-]+(?!filter|page|sort))*)(?:/filter/(?P<filter_slug>[\w-]+(/(?!page|sort)[\w-]+(?!page|sort))*))*/(?:page/(?P<page>\d+)/)?(?:sort/(?P<sort>[\w-]+)/)?$',
+                self.product_category_view.as_view(), name='category'
+            ),
+
+            url(r'^ranges/(?P<slug>[\w-]+)/$', self.range_view.as_view(), name='range'),
+
             url(r'^calculate/price/(?P<pk>[\d]+)$', self.calculate_price.as_view(), name='calculate_price'),
             url(r'^quick/order/(?P<pk>[\d]+)$', self.quick_order_view.as_view(), name='quick_order'),
             url(r'^attr/(?P<attr_pk>[\d]+)/product/(?P<pk>[\d]+)/$', self.attr_prod.as_view(), name='attr_prod'),
             url(r'^attr/product/(?P<pk>[\d]+)/images/$', self.attr_prod_images.as_view(), name='attr_prod_images'),
         ]
-        return urlpatterns
-
-application = CatalogueApplication()
-
-from django.conf.urls import url, include
-
-from oscar.core.application import Application
-from oscar.core.loading import get_class
-from oscar.apps.catalogue.reviews.app import application as reviews_app
-
-
-class BaseCatalogueApplication(Application):
-    name = 'catalogue'
-    detail_view = get_class('catalogue.views', 'ProductDetailView')
-    catalogue_view = get_class('catalogue.views', 'CatalogueView')
-    category_view = get_class('catalogue.views', 'ProductCategoryView')
-    range_view = get_class('offer.views', 'RangeDetailView')
-
-    def get_urls(self):
-        urlpatterns = super(BaseCatalogueApplication, self).get_urls()
-        urlpatterns += [
-            url(r'^$', self.catalogue_view.as_view(), name='index'),
-            url(r'^(?P<product_slug>[\w-]*)_(?P<pk>\d+)/$',
-                self.detail_view.as_view(), name='detail'),
-            url(r'^category/(?P<category_slug>[\w-]+(/[\w-]+)*)_(?P<pk>\d+)/$',
-                self.category_view.as_view(), name='category'),
-            # Fallback URL if a user chops of the last part of the URL
-            url(r'^category/(?P<category_slug>[\w-]+(/[\w-]+)*)/$',
-                self.category_view.as_view()),
-            url(r'^ranges/(?P<slug>[\w-]+)/$',
-                self.range_view.as_view(), name='range')]
         return self.post_process_urls(urlpatterns)
 
 
@@ -65,8 +48,7 @@ class ReviewsApplication(Application):
     def get_urls(self):
         urlpatterns = super(ReviewsApplication, self).get_urls()
         urlpatterns += [
-            url(r'^(?P<product_slug>[\w-]*)_(?P<product_pk>\d+)/reviews/',
-                include(self.reviews_app.urls)),
+            url(r'^(?P<product_slug>[\w-]*)_(?P<product_pk>\d+)/reviews/', include(self.reviews_app.urls)),
         ]
         return self.post_process_urls(urlpatterns)
 

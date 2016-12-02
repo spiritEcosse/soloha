@@ -4,5 +4,5 @@ from django.utils.translation import ugettext_lazy as _
 
 class CheckoutConfig(AppConfig):
     label = 'checkout'
-    name = 'oscar.apps.checkout'
+    name = 'apps.checkout'
     verbose_name = _('Checkout')

@@ -1,7 +1,6 @@
 from haystack import indexes
 
-from oscar.core.loading import get_model
-Product = get_model('catalogue', 'product')
+from apps.catalogue.models import Product
 
 
 class ProductIndex(indexes.SearchIndex, indexes.Indexable):
@@ -19,6 +18,7 @@ class ProductIndex(indexes.SearchIndex, indexes.Indexable):
     def get_model(self):
         return Product
 
+    # Todo: return only included products
     def index_queryset(self, using=None):
         return self.get_model().objects.all()
 

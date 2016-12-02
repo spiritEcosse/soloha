@@ -16,7 +16,7 @@ import logging
 import traceback
 import functools
 
-from apps.catalogue import models as catalogue_models, widgets as catalogue_widgets
+from apps.catalogue import models as catalogue_models, widgets as widgets_catalogue
 
 logging.getLogger(__name__).addHandler(logging.NullHandler())
 
@@ -92,7 +92,7 @@ class Field(fields.Field):
 
         if value is None:
             return ""
-        if isinstance(self.widget, catalogue_widgets.IntermediateModelManyToManyWidget):
+        if isinstance(self.widget, widgets_catalogue.IntermediateModelManyToManyWidget):
             return self.widget.render(value, obj)
         else:
             return self.widget.render(value)
@@ -109,7 +109,7 @@ class ModelResource(resources.ModelResource):
         obj = super(ModelResource, cls).__new__(cls, *args, **kwargs)
 
         for field in obj.get_fields():
-            if isinstance(field.widget, catalogue_widgets.IntermediateModelManyToManyWidget):
+            if isinstance(field.widget, widgets_catalogue.IntermediateModelManyToManyWidget):
                 field.widget.rel_field = obj._meta.model._meta.get_field_by_name(field.attribute)[0]
 
                 field.widget.intermediate_own_fields = []
@@ -129,10 +129,10 @@ class ModelResource(resources.ModelResource):
         result = default
         internal_type = f.get_internal_type()
         if internal_type in ('ManyToManyField', ):
-            result = functools.partial(catalogue_widgets.IntermediateModelManyToManyWidget,
+            result = functools.partial(widgets_catalogue.IntermediateModelManyToManyWidget,
                                        model=f.rel.to, rel=f.rel)
         if internal_type in ('ForeignKey', 'OneToOneField', ):
-            result = functools.partial(widgets.ForeignKeyWidget,
+            result = functools.partial(widgets_catalogue.ForeignKeyWidget,
                                        model=f.rel.to)
         if internal_type in ('DecimalField', ):
             result = widgets.DecimalWidget
@@ -165,9 +165,9 @@ class ModelResource(resources.ModelResource):
 
     def copy_relation(self, obj):
         for field in self.get_fields():
-            if isinstance(field.widget, catalogue_widgets.IntermediateModelManyToManyWidget) \
-                    or isinstance(field.widget, widgets.ManyToManyWidget) \
-                    or isinstance(field.widget, catalogue_widgets.ImageManyToManyWidget):
+            if isinstance(field.widget, widgets_catalogue.IntermediateModelManyToManyWidget) \
+                    or isinstance(field.widget, widgets_catalogue.ManyToManyWidget) \
+                    or isinstance(field.widget, widgets_catalogue.ManyToManyWidget):
                 setattr(obj, '{}{}'.format(self.prefix, field.column_name), self.export_field(field, obj))
 
     def import_row(self, row, instance_loader, dry_run=False, **kwargs):
@@ -263,16 +263,16 @@ class ModelResource(resources.ModelResource):
             for field in self.get_fields():
                 field.widget.obj = obj
 
-                if not isinstance(field.widget, widgets.ManyToManyWidget) \
-                        and not isinstance(field.widget, catalogue_widgets.ImageManyToManyWidget) \
-                        and not isinstance(field.widget, catalogue_widgets.IntermediateModelManyToManyWidget):
+                if not isinstance(field.widget, widgets_catalogue.ManyToManyWidget) \
+                        and not isinstance(field.widget, widgets_catalogue.ManyToManyWidget) \
+                        and not isinstance(field.widget, widgets_catalogue.IntermediateModelManyToManyWidget):
                     continue
                 self.import_field(field, obj, data)
 
 
 class FeatureResource(ModelResource):
-    title = fields.Field(column_name='title', attribute='title', widget=catalogue_widgets.CharWidget())
-    parent = fields.Field(attribute='parent', column_name='parent', widget=widgets.ForeignKeyWidget(
+    title = fields.Field(column_name='title', attribute='title', widget=widgets_catalogue.CharWidget())
+    parent = fields.Field(attribute='parent', column_name='parent', widget=widgets_catalogue.ForeignKeyWidget(
         model=catalogue_models.Feature, field='slug'))
 
     class Meta:
@@ -282,14 +282,19 @@ class FeatureResource(ModelResource):
 
 
 class ProductFeatureResource(ModelResource):
-    product = fields.Field(column_name='product', attribute='product', widget=widgets.ForeignKeyWidget(
+    product = fields.Field(column_name='product', attribute='product', widget=widgets_catalogue.ForeignKeyWidget(
         model=catalogue_models.Product, field='slug'))
-    feature = fields.Field(column_name='feature', attribute='feature', widget=widgets.ForeignKeyWidget(
+    feature = fields.Field(column_name='feature', attribute='feature', widget=widgets_catalogue.ForeignKeyWidget(
         model=catalogue_models.Feature, field='slug'))
-    image = fields.Field(column_name='image', attribute='image', widget=catalogue_widgets.ImageForeignKeyWidget(
-        model=Image, field='original_filename'))
-    product_with_images = fields.Field(column_name='product_with_images', attribute='product_with_images',
-                                       widget=catalogue_widgets.ManyToManyWidget(model=catalogue_models.Product, field='slug'))
+    image = fields.Field(
+        column_name='image', attribute='image', widget=widgets_catalogue.ForeignKeyWidget(
+            model=Image, field='original_filename'
+        )
+    )
+    product_with_images = fields.Field(
+        column_name='product_with_images', attribute='product_with_images',
+        widget=widgets_catalogue.ManyToManyWidget(model=catalogue_models.Product, field='slug')
+    )
 
     class Meta:
         model = catalogue_models.ProductFeature
@@ -304,13 +309,13 @@ class ProductFeatureResource(ModelResource):
 
 
 class CategoryResource(ModelResource):
-    parent = fields.Field(attribute='parent', column_name='parent', widget=widgets.ForeignKeyWidget(
+    parent = fields.Field(attribute='parent', column_name='parent', widget=widgets_catalogue.ForeignKeyWidget(
         model=catalogue_models.Category, field='slug'))
-    icon = fields.Field(column_name='icon', attribute='icon', widget=catalogue_widgets.ImageForeignKeyWidget(
+    icon = fields.Field(column_name='icon', attribute='icon', widget=widgets_catalogue.ForeignKeyWidget(
         model=Image, field='original_filename'))
-    image_banner = fields.Field(column_name='image_banner', attribute='image_banner', widget=catalogue_widgets.ImageForeignKeyWidget(
+    image_banner = fields.Field(column_name='image_banner', attribute='image_banner', widget=widgets_catalogue.ForeignKeyWidget(
         model=Image, field='original_filename'))
-    image = fields.Field(column_name='image', attribute='image', widget=catalogue_widgets.ImageForeignKeyWidget(
+    image = fields.Field(column_name='image', attribute='image', widget=widgets_catalogue.ForeignKeyWidget(
         model=Image, field='original_filename'))
 
     class Meta:
@@ -323,11 +328,11 @@ class CategoryResource(ModelResource):
 class ProductImageResource(ModelResource):
     original = fields.Field(
         column_name='original', attribute='original',
-        widget=catalogue_widgets.ForeignKeyWidget(model=Image, field='original_filename')
+        widget=widgets_catalogue.ForeignKeyWidget(model=Image, field='original_filename')
     )
     product_slug = fields.Field(
         column_name='product', attribute='product',
-        widget=widgets.ForeignKeyWidget(model=catalogue_models.Product, field='slug')
+        widget=widgets_catalogue.ForeignKeyWidget(model=catalogue_models.Product, field='slug')
     )
 
     class Meta:
@@ -337,11 +342,11 @@ class ProductImageResource(ModelResource):
 
 
 class ProductRecommendationResource(ModelResource):
-    primary = fields.Field(column_name='primary', attribute='primary', widget=widgets.ForeignKeyWidget(
+    primary = fields.Field(column_name='primary', attribute='primary', widget=widgets_catalogue.ForeignKeyWidget(
         model=catalogue_models.Product, field='slug',
     ))
     recommendation = fields.Field(column_name='recommendation', attribute='recommendation',
-                                  widget=widgets.ForeignKeyWidget(
+                                  widget=widgets_catalogue.ForeignKeyWidget(
                                       model=catalogue_models.Product, field='slug',
                                   ))
 
@@ -353,12 +358,12 @@ class ProductRecommendationResource(ModelResource):
 
 class ProductResource(ModelResource):
     categories_slug = fields.Field(column_name='categories', attribute='categories',
-                                   widget=catalogue_widgets.ManyToManyWidget(model=catalogue_models.Category, field='slug'))
+                                   widget=widgets_catalogue.ManyToManyWidget(model=catalogue_models.Category, field='slug'))
     filters_slug = fields.Field(column_name='filters', attribute='filters',
-                                widget=catalogue_widgets.ManyToManyWidget(model=catalogue_models.Feature, field='slug'))
+                                widget=widgets_catalogue.ManyToManyWidget(model=catalogue_models.Feature, field='slug'))
     characteristics_slug = fields.Field(column_name='characteristics', attribute='characteristics',
-                                        widget=catalogue_widgets.ManyToManyWidget(model=catalogue_models.Feature, field='slug'))
-    parent = fields.Field(attribute='parent', column_name='parent', widget=widgets.ForeignKeyWidget(
+                                        widget=widgets_catalogue.ManyToManyWidget(model=catalogue_models.Feature, field='slug'))
+    parent = fields.Field(attribute='parent', column_name='parent', widget=widgets_catalogue.ForeignKeyWidget(
         model=catalogue_models.Product, field='slug'))
 
     class Meta:

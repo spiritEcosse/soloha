@@ -1,5 +1,4 @@
 from django.contrib import admin
-from django.db import models
 from django.forms import Textarea
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
