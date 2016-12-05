@@ -2,11 +2,7 @@ from decimal import Decimal as D
 
 from django.utils.translation import ugettext_lazy as _
 
-from oscar.core.loading import get_model
-from oscar.apps.order import exceptions
-
-ShippingEventQuantity = get_model('order', 'ShippingEventQuantity')
-PaymentEventQuantity = get_model('order', 'PaymentEventQuantity')
+from apps.order import exceptions
 
 
 class EventHandler(object):

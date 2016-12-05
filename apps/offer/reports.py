@@ -3,16 +3,8 @@ from decimal import Decimal as D
 
 from django.utils.translation import ugettext_lazy as _
 
-from oscar.core.loading import get_model, get_class
-
-
-ReportGenerator = get_class('dashboard.reports.reports', 'ReportGenerator')
-ReportCSVFormatter = get_class('dashboard.reports.reports',
-                               'ReportCSVFormatter')
-ReportHTMLFormatter = get_class('dashboard.reports.reports',
-                                'ReportHTMLFormatter')
-ConditionalOffer = get_model('offer', 'ConditionalOffer')
-OrderDiscount = get_model('order', 'OrderDiscount')
+from apps.dashboard.reports.reports import ReportHTMLFormatter, ReportGenerator, ReportCSVFormatter
+from apps.offer.models import OrderDiscount, ConditionalOffer
 
 
 class OfferReportCSVFormatter(ReportCSVFormatter):

@@ -1,6 +1,8 @@
 from collections import namedtuple
+
 from decimal import Decimal as D
-from oscar.apps.partner import availability, prices
+
+from apps.partner import availability, prices
 
 # A container for policies
 PurchaseInfo = namedtuple('PurchaseInfo', ['price', 'availability', 'stockrecord'])

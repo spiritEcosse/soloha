@@ -1,15 +1,10 @@
 from django.contrib import admin
-from oscar.core.loading import get_model
 
-Source = get_model('payment', 'Source')
-Transaction = get_model('payment', 'Transaction')
-SourceType = get_model('payment', 'SourceType')
-Bankcard = get_model('payment', 'Bankcard')
+from apps.payment.models import Source, Transaction, SourceType, Bankcard
 
 
 class SourceAdmin(admin.ModelAdmin):
-    list_display = ('order', 'source_type', 'amount_allocated',
-                    'amount_debited', 'balance', 'reference')
+    list_display = ('order', 'source_type', 'amount_allocated', 'amount_debited', 'balance', 'reference')
 
 
 class BankcardAdmin(admin.ModelAdmin):

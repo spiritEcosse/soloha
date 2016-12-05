@@ -3,16 +3,10 @@ from decimal import Decimal as D, ROUND_UP
 from django.utils import six
 from django.utils.translation import ungettext, ugettext_lazy as _
 
-from oscar.apps.offer import utils
-from oscar.core.loading import get_model
-from oscar.templatetags.currency_filters import currency
+from soloha.core.templatetags.currency_filters import currency
 
-
-Condition = get_model('offer', 'Condition')
-
-__all__ = [
-    'CountCondition', 'CoverageCondition', 'ValueCondition'
-]
+from apps.offer import utils
+from apps.offer.models import Condition
 
 
 class CountCondition(Condition):

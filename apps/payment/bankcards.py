@@ -1,7 +1,9 @@
 from django.utils.six.moves import map
+
 VISA, VISA_ELECTRON, MASTERCARD, AMEX, MAESTRO, DISCOVER = (
     'Visa', 'Visa Electron', 'Mastercard', 'American Express',
-    'Maestro', 'Discover')
+    'Maestro', 'Discover'
+)
 DINERS_CLUB = 'Diners Club'
 CHINA_UNIONPAY = 'China UnionPay'
 JCB = 'JCB'

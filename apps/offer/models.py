@@ -257,9 +257,9 @@ class ConditionalOffer(models.Model):
         return min(limits)
 
     def get_num_user_applications(self, user):
-        aggregates = OrderDiscount.objects.filter(offer_id=self.id,
-                                                  order__user=user)\
-            .aggregate(total=models.Sum('frequency'))
+        aggregates = OrderDiscount.objects.filter(
+            offer_id=self.id, order__user=user
+        ).aggregate(total=models.Sum('frequency'))
         return aggregates['total'] if aggregates['total'] is not None else 0
 
     def shipping_discount(self, charge):

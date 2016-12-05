@@ -1,15 +1,9 @@
 import datetime
 
-from oscar.core.loading import get_model
 from django.utils.translation import ugettext_lazy as _
 
-from oscar.core.loading import get_class
-ReportGenerator = get_class('dashboard.reports.reports', 'ReportGenerator')
-ReportCSVFormatter = get_class('dashboard.reports.reports',
-                               'ReportCSVFormatter')
-ReportHTMLFormatter = get_class('dashboard.reports.reports',
-                                'ReportHTMLFormatter')
-Order = get_model('order', 'Order')
+from apps.dashboard.reports.reports import ReportGenerator, ReportCSVFormatter, ReportHTMLFormatter
+from apps.order.models import Order
 
 
 class OrderReportCSVFormatter(ReportCSVFormatter):

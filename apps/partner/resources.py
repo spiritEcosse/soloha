@@ -1,12 +1,9 @@
 from apps.catalogue import resources
-from import_export import fields, widgets as import_export_widgets
-from oscar.core.loading import get_model
-from django.utils.translation import ugettext_lazy as _
+from import_export import fields
 from apps.catalogue import widgets
 from apps.catalogue.models import Product, Feature
 
-Partner = get_model('partner', 'Partner')
-StockRecord = get_model('partner', 'StockRecord')
+from apps.partner.models import Partner, StockRecord
 
 
 class StockRecordResource(resources.ModelResource):

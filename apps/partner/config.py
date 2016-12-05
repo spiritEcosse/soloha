@@ -1,5 +1,10 @@
-from oscar.apps.partner import config
+from django.apps import AppConfig
+from django.utils.translation import ugettext_lazy as _
 
 
-class PartnerConfig(config.PartnerConfig):
+class PartnerConfig(AppConfig):
     name = 'apps.partner'
+    verbose_name = _('Partner')
+
+    def ready(self):
+        from apps.partner import receivers  # noqa

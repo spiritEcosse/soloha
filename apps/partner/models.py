@@ -1,13 +1,15 @@
-from django.db.models import F
-from soloha.core.utils import CommonFeatureProduct
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _, pgettext_lazy
 from django.utils.timezone import now
-from oscar.core.utils import get_default_currency
-from oscar.core.compat import AUTH_USER_MODEL
-from oscar.apps.partner.exceptions import InvalidStockAdjustment
+from django.db.models import F
+
+from soloha.core.utils import CommonFeatureProduct, get_default_currency
+from soloha.core.compat import AUTH_USER_MODEL
 from soloha.core.models.fields import AutoSlugField
+
+from apps.partner.exceptions import InvalidStockAdjustment
+from apps.address.models import AbstractPartnerAddress
 
 
 class ProductiveStockRecordManager(models.Manager):
@@ -93,6 +95,10 @@ class Partner(models.Model):
         That can be useful when determining tax.
         """
         return self.primary_address
+
+
+class PartnerAddress(AbstractPartnerAddress):
+    pass
 
 
 @python_2_unicode_compatible

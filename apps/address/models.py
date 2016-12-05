@@ -10,7 +10,6 @@ from django.core import exceptions
 from soloha.core.compat import AUTH_USER_MODEL
 from soloha.core.models.fields import UppercaseCharField, PhoneNumberField
 
-from apps.partner.models import Partner
 
 @python_2_unicode_compatible
 class Country(models.Model):
@@ -70,7 +69,7 @@ class Country(models.Model):
 
 
 @python_2_unicode_compatible
-class Address(models.Model):
+class AbstractAddress(models.Model):
     """
     Superclass address object
 
@@ -296,6 +295,7 @@ class Address(models.Model):
         return self.summary
 
     class Meta:
+        abstract = True
         verbose_name = _('Address')
         verbose_name_plural = _('Addresses')
 
@@ -433,7 +433,7 @@ class Address(models.Model):
         return fields
 
 
-class ShippingAddress(Address):
+class AbstractShippingAddress(AbstractAddress):
     """
     A shipping address.
 
@@ -460,6 +460,7 @@ class ShippingAddress(Address):
     )
 
     class Meta:
+        abstract = True
         # ShippingAddress is registered in order/models.py
         app_label = 'order'
         verbose_name = _("Shipping address")
@@ -476,7 +477,7 @@ class ShippingAddress(Address):
             return None
 
 
-class UserAddress(ShippingAddress):
+class UserAddress(AbstractShippingAddress):
     """
     A user's address.  A user can have many of these and together they form an
     'address book' of sorts for the user.
@@ -505,6 +506,13 @@ class UserAddress(ShippingAddress):
     hash = models.CharField(_("Address Hash"), max_length=255, db_index=True, editable=False)
     date_created = models.DateTimeField(_("Date Created"), auto_now_add=True)
 
+    class Meta:
+        app_label = 'address'
+        verbose_name = _("User address")
+        verbose_name_plural = _("User addresses")
+        ordering = ['-num_orders']
+        unique_together = ('user', 'hash')
+
     def save(self, *args, **kwargs):
         """
         Save a hash of the address fields
@@ -528,13 +536,6 @@ class UserAddress(ShippingAddress):
                 .filter(user=self.user, is_default_for_billing=True)\
                 .update(is_default_for_billing=False)
 
-    class Meta:
-        app_label = 'address'
-        verbose_name = _("User address")
-        verbose_name_plural = _("User addresses")
-        ordering = ['-num_orders']
-        unique_together = ('user', 'hash')
-
     def validate_unique(self, exclude=None):
         super(Address, self).validate_unique(exclude)
         qs = self.__class__.objects.filter(
@@ -548,8 +549,9 @@ class UserAddress(ShippingAddress):
                               " book")]})
 
 
-class BillingAddress(Address):
+class AbstractBillingAddress(AbstractAddress):
     class Meta:
+        abstract = True
         # BillingAddress is registered in order/models.py
         app_label = 'order'
         verbose_name = _("Billing address")
@@ -566,14 +568,15 @@ class BillingAddress(Address):
             return None
 
 
-class PartnerAddress(Address):
+class AbstractPartnerAddress(AbstractAddress):
     """
     A partner can have one or more addresses. This can be useful e.g. when
     determining US tax which depends on the origin of the shipment.
     """
-    partner = models.ForeignKey(Partner, related_name='addresses', verbose_name=_('Partner'))
+    partner = models.ForeignKey('partner.Partner', related_name='addresses', verbose_name=_('Partner'))
 
     class Meta:
+        abstract = True
         app_label = 'partner'
         verbose_name = _("Partner address")
         verbose_name_plural = _("Partner addresses")

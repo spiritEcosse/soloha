@@ -3,11 +3,7 @@ from django import http
 from django.conf import settings
 from django.shortcuts import get_object_or_404
 
-from oscar.core.loading import get_model
-
-ConditionalOffer = get_model('offer', 'ConditionalOffer')
-Range = get_model('offer', 'Range')
-Product = get_model('catalogue', 'Product')
+from apps.offer.models import ConditionalOffer, Range
 
 
 class OfferListView(ListView):

@@ -5,8 +5,9 @@ from django.utils.translation import ugettext_lazy as _, pgettext_lazy
 from django.core.urlresolvers import reverse
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import fields
-from oscar.models.fields import ExtendedURLField
 
+from soloha.core.models.fields import ExtendedURLField
+from apps.catalogue.models import Product
 
 # Linking models - these link promotions to content (eg pages, or keywords)
 

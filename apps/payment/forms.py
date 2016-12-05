@@ -6,14 +6,14 @@ from django import forms
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.translation import ugettext_lazy as _
 
-from oscar.core.loading import get_model
-from oscar.apps.address.forms import AbstractAddressForm
-from oscar.views.generic import PhoneNumberMixin
-from . import bankcards
+from soloha.core.views.generic import PhoneNumberMixin
 
-Country = get_model('address', 'Country')
-BillingAddress = get_model('order', 'BillingAddress')
-Bankcard = get_model('payment', 'Bankcard')
+from apps.address.forms import AbstractAddressForm
+from apps.payment import bankcards
+from apps.address.models import Country
+from apps.order.models import BillingAddress
+from apps.payment.models import Bankcard
+
 
 # List of card names for all the card types supported in payment.bankcards
 VALID_CARDS = set([card_type[0] for card_type in bankcards.CARD_TYPES])
