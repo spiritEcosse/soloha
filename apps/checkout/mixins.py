@@ -2,25 +2,22 @@ import logging
 
 from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse, NoReverseMatch
-from django.contrib.sites.models import Site, get_current_site
+from django.contrib.sites.models import Site
+from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ObjectDoesNotExist
 
-from oscar.core.loading import get_class, get_model
 
-OrderCreator = get_class('order.utils', 'OrderCreator')
-Dispatcher = get_class('customer.utils', 'Dispatcher')
-CheckoutSessionMixin = get_class('checkout.session', 'CheckoutSessionMixin')
-ShippingAddress = get_model('order', 'ShippingAddress')
-OrderNumberGenerator = get_class('order.utils', 'OrderNumberGenerator')
-PaymentEventType = get_model('order', 'PaymentEventType')
-PaymentEvent = get_model('order', 'PaymentEvent')
-PaymentEventQuantity = get_model('order', 'PaymentEventQuantity')
-UserAddress = get_model('address', 'UserAddress')
-Basket = get_model('basket', 'Basket')
-CommunicationEventType = get_model('customer', 'CommunicationEventType')
-UnableToPlaceOrder = get_class('order.exceptions', 'UnableToPlaceOrder')
+from apps.order.utils import OrderCreator
+from apps.customer.utils import Dispatcher
+from apps.checkout.session import CheckoutSessionMixin
+from apps.order.models import PaymentEventType
+from apps.order.utils import OrderNumberGenerator
+from apps.order.models import PaymentEvent, PaymentEventQuantity
+from apps.address.models import UserAddress
+from apps.basket.models import Basket
+from apps.customer.models import CommunicationEventType
+from apps.checkout.signals import post_checkout
 
-post_checkout = get_class('checkout.signals', 'post_checkout')
 
 # Standard logger for checkout events
 logger = logging.getLogger('oscar.checkout')

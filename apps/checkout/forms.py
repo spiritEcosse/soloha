@@ -1,16 +1,16 @@
 from django import forms
-from oscar.core.loading import get_model
 from django.contrib.auth.forms import AuthenticationForm
 from django.utils.translation import ugettext_lazy as _
 
-from oscar.apps.address.forms import AbstractAddressForm
-from oscar.apps.customer.utils import normalise_email
-from oscar.core.compat import get_user_model
+from apps.address.forms import AbstractAddressForm
+from apps.customer.utils import normalise_email
+from apps.address.models import Country
 
-from oscar.views.generic import PhoneNumberMixin
+from soloha.core.loading import get_model
+from soloha.core.compat import get_user_model
+from soloha.core.views.generic import PhoneNumberMixin
 
 User = get_user_model()
-Country = get_model('address', 'Country')
 
 
 class ShippingAddressForm(PhoneNumberMixin, AbstractAddressForm):
@@ -74,4 +74,4 @@ class GatewayForm(AuthenticationForm):
         return self.cleaned_data.get('options', None) == self.NEW
 
 
-# The BillingAddress form is in oscar.apps.payment.forms
+# The BillingAddress form is in apps.payment.forms

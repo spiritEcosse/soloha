@@ -1,7 +1,6 @@
 from djangular.styling.bootstrap3.forms import Bootstrap3Form
 from django import forms
 from django.utils.translation import ugettext_lazy as _
-from models import ContactUs
 
 
 class Feedback(Bootstrap3Form):
@@ -23,6 +22,3 @@ class Feedback(Bootstrap3Form):
         label=_('Message'), required=True, widget=forms.Textarea(), min_length=1, max_length=3000,
         error_messages={'required': _('Please enter your message.')}
     )
-
-    # class Meta:
-    #     model = ContactUs

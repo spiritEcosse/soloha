@@ -1,10 +1,9 @@
 import json
 
 from django.conf import settings
-from oscar.core.loading import get_model, get_class
 
-product_viewed = get_class('catalogue.signals', 'product_viewed')
-Product = get_model('catalogue', 'Product')
+from apps.catalogue.signals import product_viewed
+from apps.catalogue.models import Product
 
 
 def get(request):
@@ -14,7 +13,7 @@ def get(request):
     ids = extract(request)
 
     # Reordering as the ID order gets messed up in the query
-    product_dict = Product.objects.browse().in_bulk(ids)
+    product_dict = Product.browsable.in_bulk(ids)
     ids.reverse()
     return [product_dict[id] for id in ids if id in product_dict]
 

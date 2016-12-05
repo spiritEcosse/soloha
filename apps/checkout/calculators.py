@@ -1,4 +1,4 @@
-from oscar.core import prices
+from soloha.core import prices
 
 
 class OrderTotalCalculator(object):

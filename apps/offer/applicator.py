@@ -4,10 +4,10 @@ import logging
 from django.db.models import Q
 from django.utils.timezone import now
 
-from oscar.core.loading import get_model
-from oscar.apps.offer import results
+from apps.offer import results
+from apps.offer.models import ConditionalOffer
 
-logger = logging.getLogger('oscar.offers')
+logger = logging.getLogger('offers')
 
 
 class OfferApplicationError(Exception):
@@ -75,7 +75,6 @@ class Applicator(object):
 
         nondate_based = Q(start_datetime=None, end_datetime=None)
 
-        ConditionalOffer = get_model('offer', 'ConditionalOffer')
         qs = ConditionalOffer.objects.filter(
             date_based | nondate_based,
             offer_type=ConditionalOffer.SITE,

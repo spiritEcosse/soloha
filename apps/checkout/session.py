@@ -6,17 +6,13 @@ from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext_lazy as _
 
-from oscar.core.loading import get_model, get_class
-from . import exceptions
+from apps.checkout import exceptions
 
-Repository = get_class('shipping.repository', 'Repository')
-OrderTotalCalculator = get_class(
-    'checkout.calculators', 'OrderTotalCalculator')
-CheckoutSessionData = get_class(
-    'checkout.utils', 'CheckoutSessionData')
-ShippingAddress = get_model('order', 'ShippingAddress')
-BillingAddress = get_model('order', 'BillingAddress')
-UserAddress = get_model('address', 'UserAddress')
+from apps.shipping.repository import Repository
+from apps.checkout.calculators import OrderTotalCalculator
+from apps.checkout.utils import CheckoutSessionData
+from apps.order.models import ShippingAddress, BillingAddress
+from apps.address.models import UserAddress
 
 
 class CheckoutSessionMixin(object):
