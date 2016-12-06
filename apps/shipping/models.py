@@ -1,17 +1,20 @@
 # -*- coding: utf-8 -*-
 from decimal import Decimal as D
+
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 from django.core.validators import MinValueValidator
-from oscar.core import prices
-from oscar.models.fields import AutoSlugField
+
+from soloha.core import prices
+from soloha.core.models.fields import AutoSlugField
+
 from apps.address.models import Country
 from apps.shipping.scales import Scale
 
 
 @python_2_unicode_compatible
-class Base(models.Model):
+class AbstractBase(models.Model):
     """
     Implements the interface declared by shipping.base.Base
     """
@@ -26,6 +29,7 @@ class Base(models.Model):
     is_discounted = False
 
     class Meta:
+        abstract = True
         app_label = 'shipping'
         ordering = ['name']
         verbose_name = _("Shipping Method")
@@ -35,7 +39,7 @@ class Base(models.Model):
         return self.name
 
 
-class OrderAndItemCharges(Base):
+class OrderAndItemCharges(AbstractBase):
     """
     Standard shipping method
 
@@ -79,7 +83,7 @@ class OrderAndItemCharges(Base):
             incl_tax=charge)
 
 
-class WeightBased(Base):
+class WeightBased(AbstractBase):
     # The attribute code to use to look up the weight of a product
     weight_attribute = 'weight'
 

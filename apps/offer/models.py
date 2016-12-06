@@ -141,7 +141,6 @@ class ConditionalOffer(models.Model):
     _voucher = None
 
     class Meta:
-        abstract = True
         app_label = 'offer'
         ordering = ['-priority']
         verbose_name = _("Conditional offer")

@@ -2,7 +2,7 @@ from decimal import Decimal as D
 
 from django.utils.translation import ugettext_lazy as _
 
-from oscar.core import prices
+from soloha.core import prices
 
 
 class Base(object):

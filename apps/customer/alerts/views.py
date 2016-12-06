@@ -1,18 +1,15 @@
 from django.http import Http404
 from django.views import generic
-from oscar.core.loading import get_model
 from django.shortcuts import get_object_or_404
 from django.contrib import messages
 from django.utils.translation import ugettext_lazy as _
 from django import http
 
-from oscar.core.loading import get_class
-from oscar.apps.customer.alerts import utils
-from oscar.apps.customer.mixins import PageTitleMixin
-
-Product = get_model('catalogue', 'Product')
-ProductAlert = get_model('customer', 'ProductAlert')
-ProductAlertForm = get_class('customer.forms', 'ProductAlertForm')
+from apps.customer.alerts import utils
+from apps.customer.mixins import PageTitleMixin
+from apps.catalogue.models import Product
+from apps.customer.models import ProductAlert
+from apps.customer.forms import ProductAlertForm
 
 
 class ProductAlertListView(PageTitleMixin, generic.ListView):

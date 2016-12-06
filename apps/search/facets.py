@@ -1,8 +1,8 @@
 from collections import OrderedDict
-
-from django.conf import settings
 from purl import URL
 from haystack.query import SearchQuerySet
+
+from django.conf import settings
 
 
 def base_sqs():

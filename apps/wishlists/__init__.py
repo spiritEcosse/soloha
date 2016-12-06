@@ -1,1 +1,1 @@
-default_app_config = 'oscar.apps.wishlists.config.WishlistsConfig'
+default_app_config = 'apps.wishlists.config.WishlistsConfig'

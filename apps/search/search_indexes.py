@@ -1,10 +1,10 @@
 from haystack import indexes
 
-from oscar.core.loading import get_model, get_class
+from apps.search.features import is_solr_supported
+from apps.partner.strategy import Selector
+from apps.catalogue.models import Product
 
 # Load default strategy (without a user/request)
-is_solr_supported = get_class('search.features', 'is_solr_supported')
-Selector = get_class('partner.strategy', 'Selector')
 strategy = Selector().strategy()
 
 
@@ -31,7 +31,7 @@ class ProductIndex(indexes.SearchIndex, indexes.Indexable):
     date_updated = indexes.DateTimeField(model_attr='date_updated')
 
     def get_model(self):
-        return get_model('catalogue', 'Product')
+        return Product
 
     def index_queryset(self, using=None):
         # Only index browsable products (not each individual child product)

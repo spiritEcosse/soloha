@@ -1,5 +1,5 @@
-from djangular.forms import NgModelFormMixin, NgFormValidationMixin, NgModelForm
-from djangular.styling.bootstrap3.forms import Bootstrap3Form
+from djng.forms import NgModelFormMixin, NgFormValidationMixin, NgModelForm
+from djng.styling.bootstrap3.forms import Bootstrap3Form
 from django.utils.translation import ugettext_lazy as _
 from django import forms
 

@@ -3,7 +3,7 @@ from decimal import Decimal as D
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.translation import ugettext_lazy as _
 
-from oscar.apps.shipping import methods as shipping_methods
+from apps.shipping import methods as shipping_methods
 
 
 class Repository(object):

@@ -1,6 +1,4 @@
-from oscar.core.loading import get_class
-
-SearchForm = get_class('search.forms', 'SearchForm')
+from apps.search.forms import SearchForm
 
 
 def search_form(request):

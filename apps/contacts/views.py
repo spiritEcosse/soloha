@@ -8,7 +8,7 @@ from django.views.generic import FormView
 from django.views.generic.base import ContextMixin
 from django.contrib.sites.shortcuts import get_current_site
 
-from djangular.forms import NgModelFormMixin, NgFormValidationMixin
+from djng.forms import NgModelFormMixin, NgFormValidationMixin
 
 from apps.contacts.forms import Feedback
 

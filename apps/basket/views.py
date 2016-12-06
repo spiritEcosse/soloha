@@ -21,7 +21,7 @@ from apps.basket.models import Basket, Line
 from apps.basket.forms import AddToBasketWithAttributesForm, BasketLineFormSet, BasketLineForm, AddToBasketForm, \
     BasketVoucherForm, SavedLineFormSet, SavedLineForm
 from apps.basket import signals
-from apps.offer.utils import Applicator
+from apps.offer.applicator import Applicator
 from apps.shipping.repository import Repository
 from apps.checkout.calculators import OrderTotalCalculator
 from apps.catalogue.models import Product

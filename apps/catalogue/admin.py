@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.forms import Textarea
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
-from django.db.models import Q
+from django.db.models import Q, TextField
 from django.db.models.query import Prefetch
 
 from mptt.admin import DraggableMPTTAdmin
@@ -10,7 +10,9 @@ from import_export.admin import ImportExportMixin, ImportExportActionModelAdmin
 import logging
 from dal import autocomplete
 
-from apps.catalogue import resources, models as catalogue_models, forms as catalogue_forms
+from apps.catalogue.models import Product, Category, Feature, ProductClass, ProductRecommendation, \
+    ProductAttributeValue, ProductAttribute, ProductFeature, ProductImage, AttributeOptionGroup, Option, AttributeOption
+from apps.catalogue import resources, forms as catalogue_forms
 from apps.partner import models as partner_models, forms as partner_forms
 
 logging.getLogger(__name__).addHandler(logging.NullHandler())
@@ -22,7 +24,7 @@ class ProductAutocomplete(autocomplete.Select2QuerySetView):
         return super(ProductAutocomplete, self).dispatch(*args, **kwargs)
 
     def get_queryset(self):
-        qs = catalogue_models.Product.objects.all().only('pk', 'title', 'slug', )
+        qs = Product.objects.all().only('pk', 'title', 'slug', )
 
         if self.q:
             try:
@@ -41,7 +43,7 @@ class CategoriesAutocomplete(autocomplete.Select2QuerySetView):
         return super(CategoriesAutocomplete, self).dispatch(*args, **kwargs)
 
     def get_queryset(self):
-        qs = catalogue_models.Category.objects.all().only('pk', 'name', 'slug', )
+        qs = Category.objects.all().only('pk', 'name', 'slug', )
 
         if self.q:
             try:
@@ -60,7 +62,7 @@ class FeatureAutocomplete(autocomplete.Select2QuerySetView):
         return super(FeatureAutocomplete, self).dispatch(*args, **kwargs)
 
     def get_queryset(self):
-        qs = catalogue_models.Feature.objects.all().only('pk', 'title', 'slug', )
+        qs = Feature.objects.all().only('pk', 'title', 'slug', )
 
         if self.q:
             try:
@@ -79,31 +81,31 @@ class StockRecordInline(admin.StackedInline):
 
 
 class ProductFeatureInline(admin.StackedInline):
-    model = catalogue_models.ProductFeature
+    model = ProductFeature
     form = catalogue_forms.ProductFeatureForm
 
 
 class AttributeInline(admin.TabularInline):
-    model = catalogue_models.ProductAttributeValue
+    model = ProductAttributeValue
 
 
 class ProductRecommendationInline(admin.TabularInline):
-    model = catalogue_models.ProductRecommendation
+    model = ProductRecommendation
     fk_name = 'primary'
     form = catalogue_forms.ProductRecommendationForm
 
 
 class ProductAttributeInline(admin.TabularInline):
-    model = catalogue_models.ProductAttribute
+    model = ProductAttribute
     extra = 2
 
 
 class AttributeOptionInline(admin.TabularInline):
-    model = catalogue_models.AttributeOption
+    model = AttributeOption
 
 
 class ProductImageInline(admin.TabularInline):
-    model = catalogue_models.ProductImage
+    model = ProductImage
 
 
 class ProductImageAdmin(ImportExportMixin, ImportExportActionModelAdmin):
@@ -174,7 +176,7 @@ class ProductAdmin(ImportExportMixin, ImportExportActionModelAdmin):
     def get_queryset(self, request):
         qs = super(ProductAdmin, self).get_queryset(request)
         return qs.only(*self.list_attr).order_by('-date_updated', 'title').prefetch_related(
-            Prefetch('images', queryset=catalogue_models.ProductImage.objects.only('original', 'product')),
+            Prefetch('images', queryset=ProductImage.objects.only('original', 'product')),
             Prefetch('images__original'),
             Prefetch('attribute_values'),
             Prefetch('attributes'),
@@ -221,7 +223,7 @@ class CategoryAdmin(ImportExportMixin, ImportExportActionModelAdmin, DraggableMP
     list_display = ('pk', 'indented_title', 'slug', 'parent', 'enable', 'sort', 'created')
     list_filter = ('enable', 'created', 'sort', )
     formfield_overrides = {
-        catalogue_models.TextField: {'widget': Textarea()},
+        TextField: {'widget': Textarea()},
     }
     mptt_level_indent = 20
     search_fields = ('name', 'slug', 'id', )
@@ -235,14 +237,14 @@ class CategoryAdmin(ImportExportMixin, ImportExportActionModelAdmin, DraggableMP
         )
 
 
-admin.site.register(catalogue_models.ProductClass, ProductClassAdmin)
-admin.site.register(catalogue_models.Product, ProductAdmin)
-admin.site.register(catalogue_models.ProductAttribute, ProductAttributeAdmin)
-admin.site.register(catalogue_models.ProductAttributeValue, ProductAttributeValueAdmin)
-admin.site.register(catalogue_models.AttributeOptionGroup, AttributeOptionGroupAdmin)
-admin.site.register(catalogue_models.Option, OptionAdmin)
-admin.site.register(catalogue_models.ProductImage, ProductImageAdmin)
-admin.site.register(catalogue_models.Category, CategoryAdmin)
-admin.site.register(catalogue_models.Feature, FeatureAdmin)
-admin.site.register(catalogue_models.ProductFeature, ProductFeatureAdmin)
-admin.site.register(catalogue_models.ProductRecommendation, ProductRecommendationAdmin)
+admin.site.register(ProductClass, ProductClassAdmin)
+admin.site.register(Product, ProductAdmin)
+admin.site.register(ProductAttribute, ProductAttributeAdmin)
+admin.site.register(ProductAttributeValue, ProductAttributeValueAdmin)
+admin.site.register(AttributeOptionGroup, AttributeOptionGroupAdmin)
+admin.site.register(Option, OptionAdmin)
+admin.site.register(ProductImage, ProductImageAdmin)
+admin.site.register(Category, CategoryAdmin)
+admin.site.register(Feature, FeatureAdmin)
+admin.site.register(ProductFeature, ProductFeatureAdmin)
+admin.site.register(ProductRecommendation, ProductRecommendationAdmin)

@@ -75,7 +75,7 @@ INSTALLED_APPS = \
         'apps.voucher',
         'compressor',
         'widget_tweaks',
-        'djangular',
+        'djng',
         'mptt',
         'feincms',
         'easy_thumbnails',

@@ -5,12 +5,11 @@ from django.contrib import messages
 from django.views import generic
 from django.conf import settings
 
-from oscar.core.loading import get_model
-from oscar.core.utils import redirect_to_referrer
-from oscar.apps.customer.mixins import PageTitleMixin
-from oscar.views.generic import BulkEditMixin
+from soloha.core.utils import redirect_to_referrer
+from soloha.core.views.generic import BulkEditMixin
 
-Notification = get_model('customer', 'Notification')
+from apps.customer.mixins import PageTitleMixin
+from apps.customer.models import Notification
 
 
 class NotificationListView(PageTitleMixin, generic.ListView):

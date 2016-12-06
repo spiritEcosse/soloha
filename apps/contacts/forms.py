@@ -1,4 +1,5 @@
-from djangular.styling.bootstrap3.forms import Bootstrap3Form
+from djng.styling.bootstrap3.forms import Bootstrap3Form
+
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 

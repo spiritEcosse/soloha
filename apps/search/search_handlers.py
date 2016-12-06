@@ -3,11 +3,8 @@ from django.utils.translation import ugettext_lazy as _
 
 from haystack import connections
 
-from oscar.core.loading import get_class
-from . import facets
-
-
-FacetMunger = get_class('search.facets', 'FacetMunger')
+from apps.search import facets
+from apps.search.facets import FacetMunger
 
 
 class SearchHandler(object):
