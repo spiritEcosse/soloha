@@ -801,6 +801,7 @@ class Product(models.Model, CommonFeatureProduct):
             "This flag indicates if this product can be used in an offer "
             "or not")
     )
+    objects = ProductiveProductManager()
 
     separator = ','
 

@@ -13,7 +13,7 @@ https://docs.djangoproject.com/en/1.8/ref/settings/
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
-from oscar.defaults import *
+from soloha.defaults import *
 from oscar import OSCAR_MAIN_TEMPLATE_DIR
 from django.utils.translation import ugettext_lazy as _
 import sys
@@ -36,58 +36,56 @@ ALLOWED_HOSTS = settings_local.ALLOWED_HOSTS
 
 # Application definition
 
-INSTALLED_APPS = \
-    (
-        'flat',
-        'dal',
-        'dal_select2',
-        'django.contrib.admin',
-        'django.contrib.sitemaps',
-        'debug_toolbar',
-        # 'django_select2',
-        # 'bootstrap_pagination',
-        'django.contrib.auth',
-        'django.contrib.contenttypes',
-        'django.contrib.sessions',
-        'django.contrib.sites',
-        'django.contrib.messages',
-        'django.contrib.staticfiles',
-        'django.contrib.flatpages',
-        'django.contrib.redirects',
-        'oscar',
-        'apps.contacts',
-        'apps.ex_sites',
-        'apps.ex_redirects',
-        'apps.sitemap',
-        'apps.subscribe',
-        'apps.ex_flatpages',
-        'apps.catalogue',
-        'apps.catalogue.reviews',
-        'apps.analytics',
-        'apps.checkout',
-        'apps.partner',
-        'apps.basket',
-        'apps.offer',
-        'apps.order',
-        'apps.customer',
-        'apps.promotions',
-        'apps.search',
-        'apps.voucher',
-        'compressor',
-        'widget_tweaks',
-        'djng',
-        'mptt',
-        'feincms',
-        'easy_thumbnails',
-        'filer',
-        'import_export',
-        'ckeditor',
-        'bootstrap_pagination',
-        'debug_panel',
-        'haystack',
-        'django_tables2',
-        'django_extensions',
-    )
+INSTALLED_APPS = (
+    'flat',
+    'dal',
+    'dal_select2',
+    'django.contrib.admin',
+    'django.contrib.sitemaps',
+    'debug_toolbar',
+    # 'django_select2',
+    # 'bootstrap_pagination',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.sites',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'django.contrib.flatpages',
+    'django.contrib.redirects',
+    'apps.contacts',
+    'apps.ex_sites',
+    'apps.ex_redirects',
+    'apps.sitemap',
+    'apps.subscribe',
+    'apps.ex_flatpages',
+    'apps.catalogue',
+    'apps.catalogue.reviews',
+    'apps.analytics',
+    'apps.checkout',
+    'apps.partner',
+    'apps.basket',
+    'apps.offer',
+    'apps.order',
+    'apps.customer',
+    'apps.promotions',
+    'apps.search',
+    'apps.voucher',
+    'compressor',
+    'widget_tweaks',
+    'djng',
+    'mptt',
+    'feincms',
+    'easy_thumbnails',
+    'filer',
+    'import_export',
+    'ckeditor',
+    'bootstrap_pagination',
+    'debug_panel',
+    'haystack',
+    'django_tables2',
+    'django_extensions',
+)
 
 SITE_ID = 1
 
@@ -106,9 +104,9 @@ TEMPLATES = [
         'OPTIONS': {
             'loaders': [
                 # ('django.template.loaders.cached.Loader', [
-                    'django.template.loaders.filesystem.Loader',
-                    'django.template.loaders.app_directories.Loader',
-                    'django.template.loaders.eggs.Loader',
+                'django.template.loaders.filesystem.Loader',
+                'django.template.loaders.app_directories.Loader',
+                'django.template.loaders.eggs.Loader',
                 # ]),
             ],
             'context_processors': [

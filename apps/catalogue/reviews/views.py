@@ -4,16 +4,11 @@ from django.contrib import messages
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 
-from oscar.core.loading import get_model, get_classes
-from oscar.core.utils import redirect_to_referrer
-from oscar.apps.catalogue.reviews.signals import review_added
-
-ProductReviewForm, VoteForm, SortReviewsForm = get_classes(
-    'catalogue.reviews.forms',
-    ['ProductReviewForm', 'VoteForm', 'SortReviewsForm'])
-Vote = get_model('reviews', 'vote')
-ProductReview = get_model('reviews', 'ProductReview')
-Product = get_model('catalogue', 'product')
+from soloha.core.utils import redirect_to_referrer
+from apps.catalogue.reviews.signals import review_added
+from apps.catalogue.reviews.forms import ProductReviewForm, VoteForm, SortReviewsForm
+from apps.catalogue.reviews.models import Vote, ProductReview
+from apps.catalogue.models import Product
 
 
 class CreateProductReview(CreateView):

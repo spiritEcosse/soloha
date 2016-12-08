@@ -10,12 +10,19 @@ strategy = Selector().strategy()
 
 class ProductIndex(indexes.SearchIndex, indexes.Indexable):
     # Search text
+    # Todo real needed template_name & use_template=True
     text = indexes.EdgeNgramField(
         document=True, use_template=True,
         template_name='oscar/search/indexes/product/item_text.txt')
 
     upc = indexes.CharField(model_attr="upc", null=True)
     title = indexes.EdgeNgramField(model_attr='title', null=True)
+
+    slug = indexes.CharField(model_attr='slug')
+    title_ngrams = indexes.EdgeNgramField(model_attr='title')
+    slug_ngrams = indexes.EdgeNgramField(model_attr='slug')
+    # id_ngrams = indexes.EdgeNgramField(model_attr='id')
+    product_id = indexes.IntegerField(model_attr='id')
 
     # Fields for faceting
     product_class = indexes.CharField(null=True, faceted=True)
@@ -25,6 +32,7 @@ class ProductIndex(indexes.SearchIndex, indexes.Indexable):
     rating = indexes.IntegerField(null=True, faceted=True)
 
     # Spelling suggestions
+    # solr needs suggestion
     suggestions = indexes.FacetCharField()
 
     date_created = indexes.DateTimeField(model_attr='date_created')
@@ -75,6 +83,12 @@ class ProductIndex(indexes.SearchIndex, indexes.Indexable):
         elif obj.has_stockrecords:
             result = strategy.fetch_for_product(obj)
             return result.stockrecord.net_stock_level
+
+    # needed for solr
+    def prepare_solr(self, obj):
+        prepared_data = super(ProductIndex, self).prepare(obj)
+        prepared_data['suggestions'] = prepared_data['text']
+        return prepared_data
 
     def prepare(self, obj):
         prepared_data = super(ProductIndex, self).prepare(obj)

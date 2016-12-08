@@ -42,50 +42,49 @@ sitemaps = {
     'info_page': FlatPageSitemap
 }
 
-urlpatterns = \
-    [
-        url(r'', include('apps.promotions.urls')),
-        url(r'^search/filter/(?P<filter_slug>[\w-]+(/[\w-]+)*)/', FacetedSearchView.as_view()),
-        url(r'^search/', FacetedSearchView.as_view()),
-        url(r'^contacts/', ContactsView.as_view(), name='contacts'),
-        url(r'^ckeditor/', include('ckeditor_uploader.urls')),
-        url(r'^filer/', include('filer.urls')),
-        url(r'^spirit/product-autocomplete/$', ProductAutocomplete.as_view(), name='product-autocomplete'),
-        url(r'^spirit/partner-autocomplete/$', PartnerAutocomplete.as_view(), name='partner-autocomplete'),
-        url(r'^spirit/feature-autocomplete/$', FeatureAutocomplete.as_view(), name='feature-autocomplete'),
-        url(r'^spirit/categories-autocomplete/$', CategoriesAutocomplete.as_view(), name='categories-autocomplete'),
-        url(r'^sitemap/', SitemapView.as_view()),
-        url(r'^subscribe/', SubscribeView.as_view()),
-        url(r'^pages/(?P<url>[\w-]+)/$', views.flatpage, name='pages'),
+urlpatterns = [
+    url(r'', include('apps.promotions.urls', namespace='promotions')),
+    url(r'^search/filter/(?P<filter_slug>[\w-]+(/[\w-]+)*)/', FacetedSearchView.as_view()),
+    url(r'^search/', FacetedSearchView.as_view()),
+    url(r'^contacts/', ContactsView.as_view(), name='contacts'),
+    url(r'^ckeditor/', include('ckeditor_uploader.urls')),
+    url(r'^filer/', include('filer.urls')),
+    url(r'^spirit/product-autocomplete/$', ProductAutocomplete.as_view(), name='product-autocomplete'),
+    url(r'^spirit/partner-autocomplete/$', PartnerAutocomplete.as_view(), name='partner-autocomplete'),
+    url(r'^spirit/feature-autocomplete/$', FeatureAutocomplete.as_view(), name='feature-autocomplete'),
+    url(r'^spirit/categories-autocomplete/$', CategoriesAutocomplete.as_view(), name='categories-autocomplete'),
+    url(r'^sitemap/', SitemapView.as_view()),
+    url(r'^subscribe/', SubscribeView.as_view()),
+    url(r'^pages/(?P<url>[\w-]+)/$', views.flatpage, name='pages'),
 
-        url(r'^catalogue/', include('apps.catalogue.urls')),
-        url(r'^basket/', include('apps.basket.urls')),
-        url(r'^checkout/', include('apps.checkout.urls')),
-        url(r'^accounts/', include('apps.customer.urls')),
-        url(r'^search/', include('apps.search.urls')),
-        # url(r'^dashboard/', include('apps.dashboard.urls')),
-        url(r'^offers/', include('apps.offer.urls')),
+    url(r'^catalogue/', include('apps.catalogue.urls', namespace='catalogue')),
+    url(r'^basket/', include('apps.basket.urls', namespace='basket')),
+    url(r'^checkout/', include('apps.checkout.urls', namespace='checkout')),
+    url(r'^accounts/', include('apps.customer.urls', namespace='customer')),
+    url(r'^search/', include('apps.search.urls', namespace='search')),
+    # url(r'^dashboard/', include('apps.dashboard.urls')),
+    url(r'^offers/', include('apps.offer.urls', namespace='offer')),
 
-        # Password reset - as we're using Django's default view functions,
-        # we can't namespace these urls as that prevents
-        # the reverse function from working.
-        url(r'^password-reset/$', login_forbidden(auth_views.password_reset), {
-            'password_reset_form': PasswordResetForm,
-            'post_reset_redirect': reverse_lazy('password-reset-done')
-        }, name='password-reset'
-            ),
-        url(r'^password-reset/done/$', login_forbidden(auth_views.password_reset_done),
-            name='password-reset-done'),
-        url(r'^password-reset/confirm/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>.+)/$',
-            login_forbidden(auth_views.password_reset_confirm), {
-                'post_reset_redirect': reverse_lazy('password-reset-complete'),
-                'set_password_form': SetPasswordForm,
-            },
-            name='password-reset-confirm'),
-        url(
-            r'^password-reset/complete/$', login_forbidden(auth_views.password_reset_complete),
-            name='password-reset-complete'
+    # Password reset - as we're using Django's default view functions,
+    # we can't namespace these urls as that prevents
+    # the reverse function from working.
+    url(r'^password-reset/$', login_forbidden(auth_views.password_reset), {
+        'password_reset_form': PasswordResetForm,
+        'post_reset_redirect': reverse_lazy('password-reset-done')
+    }, name='password-reset'
         ),
-        url(r'^spirit/', include(admin.site.urls)),
-        url(r'^sitemap\.xml$', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
-    ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    url(r'^password-reset/done/$', login_forbidden(auth_views.password_reset_done),
+        name='password-reset-done'),
+    url(r'^password-reset/confirm/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>.+)/$',
+        login_forbidden(auth_views.password_reset_confirm), {
+            'post_reset_redirect': reverse_lazy('password-reset-complete'),
+            'set_password_form': SetPasswordForm,
+        },
+        name='password-reset-confirm'),
+    url(
+        r'^password-reset/complete/$', login_forbidden(auth_views.password_reset_complete),
+        name='password-reset-complete'
+    ),
+    url(r'^spirit/', include(admin.site.urls)),
+    url(r'^sitemap\.xml$', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

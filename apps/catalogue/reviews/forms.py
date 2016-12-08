@@ -1,9 +1,7 @@
 from django import forms
-from oscar.core.loading import get_model
 from django.utils.translation import ugettext_lazy as _
 
-Vote = get_model('reviews', 'vote')
-ProductReview = get_model('reviews', 'productreview')
+from apps.catalogue.reviews.models import ProductReview, Vote
 
 
 class ProductReviewForm(forms.ModelForm):
