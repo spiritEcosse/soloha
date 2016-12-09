@@ -3,7 +3,7 @@ from django.views import generic
 from django.views.generic import View
 from django.views.generic.detail import SingleObjectMixin, ContextMixin
 from django.http import HttpResponsePermanentRedirect, HttpResponse, Http404
-from django.db.models import Min, Q, Prefetch, BooleanField, Case, When, Count
+from django.db.models import Min, Q, Prefetch, BooleanField, Case, When, Count, IntegerField
 from django.core.urlresolvers import reverse_lazy
 from django.views.generic.edit import FormView
 from django.core.mail import EmailMultiAlternatives
@@ -282,18 +282,14 @@ class ProductCategoryView(SingleObjectMixin, generic.ListView):
         filters = Feature.objects.browse().only('title', 'parent', 'slug').filter(
             level=1, filter_products__categories__in=self.object.get_descendants_through_children(),
             filter_products__enable=True, filter_products__categories__enable=True
-        ).prefetch_related(
-            Prefetch(
-                'filter_products',
-                queryset=Product.objects.filter(id__in=self.get_queryset()).count(),
-                to_attr='products'
+        ).annotate(
+            count_products=Count(
+                Case(
+                    When(filter_products__in=self.get_queryset(), then=1),
+                    default=0, output_field=IntegerField()
+                )
             )
         ).order_by(*self.feature_orders).distinct()
-
-        for feature in filters:
-            print feature
-            print type(feature.products)
-            print feature.products.count()
 
         context['filters'] = filters
         context['url_extra_kwargs'].update({'category_slug': self.kwargs.get('category_slug')})

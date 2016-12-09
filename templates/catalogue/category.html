@@ -93,7 +93,7 @@
                             {% for value in filter.list|dictsort:'title' %}
                                 {% assign add '' %}
 
-                                {% if filter_in_parents and value.potential_products_count %}
+                                {% if filter_in_parents and value.count_products %}
                                     {% assign add '+' %}
                                 {% endif %}
 
@@ -109,13 +109,13 @@
                                     <a href="{% reverse_url 'catalogue:category' url_extra_kwargs filter_slug=clear_filter|join_slug:"/"|default:None %}"
                                        class="btn btn-default btn-block
                                        {% if value|in_list:selected_filters %}active
-                                       {% elif not value.potential_products_count %} disabled{% endif %}"
+                                       {% elif not value.count_products %} disabled{% endif %}"
                                        title="{{ title }} {{ value.title|lower }}" aria-label="{{ title }} {{ value.title|lower }}">
                                         {{ value.title|truncatechars:trancate_filter_value }}
                                         {% if value|in_list:selected_filters %}
                                             <span class="glyphicon glyphicon-remove pull-right" aria-hidden="true"></span>
                                         {% else %}
-                                            <span class="count">({{ add }}{{ value.potential_products_count }})</span>
+                                            <span class="count">({{ add }}{{ value.count_products }})</span>
                                         {% endif %}
                                     </a>
                                 </li>
