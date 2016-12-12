@@ -20,7 +20,6 @@ from django.shortcuts import redirect
 
 from soloha.settings import OSCAR_PRODUCTS_PER_PAGE
 from soloha.core.templatetags.currency_filters import currency
-from apps.catalogue.signals import product_viewed
 
 import json
 import operator
@@ -30,7 +29,6 @@ import logging
 from braces import views
 from decimal import Decimal as D
 from decimal import ROUND_DOWN
-from forms import QuickOrderForm
 from easy_thumbnails.files import get_thumbnailer
 from collections import namedtuple
 from itertools import groupby
@@ -41,10 +39,12 @@ from apps.catalogue.reviews.models import ProductReview
 from apps.order.models import QuickOrder
 from apps.wishlists.models import WishList
 from apps.partner import prices
+from apps.catalogue.signals import product_viewed
+from apps.catalogue.forms import QuickOrderForm
 
 logger = logging.getLogger(__name__)
 
-NOT_SELECTED = unicode(_('Not selected'))
+NOT_SELECTED = str(_('Not selected'))
 ANSWER = str(_('Your message has been sent. We will contact you on the specified details.'))
 
 

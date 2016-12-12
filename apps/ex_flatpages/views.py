@@ -6,7 +6,8 @@ from django.shortcuts import get_object_or_404
 from django.template import loader
 from django.utils.safestring import mark_safe
 from django.views.decorators.csrf import csrf_protect
-from models import FlatPage
+
+from django.contrib.flatpages.models import FlatPage
 
 DEFAULT_TEMPLATE = 'flatpages/default.html'
 

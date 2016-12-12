@@ -2,6 +2,7 @@ from djng.forms import NgModelFormMixin, NgFormValidationMixin, NgModelForm
 from djng.styling.bootstrap3.forms import Bootstrap3Form
 from django.utils.translation import ugettext_lazy as _
 from django import forms
+from django.utils import six
 
 from dal import autocomplete
 
@@ -9,12 +10,7 @@ from apps.catalogue import models as catalogue_models
 from apps.order.models import QuickOrder
 
 
-class QuickOrderMeta(type(NgModelForm), type(Bootstrap3Form)):
-    pass
-
-
-class QuickOrderForm(NgModelForm, NgModelFormMixin, NgFormValidationMixin, Bootstrap3Form):
-    __metaclass__ = QuickOrderMeta
+class QuickOrderForm(NgModelFormMixin, NgFormValidationMixin, Bootstrap3Form):
     scope_prefix = 'quick_order_data'
     form_name = 'quick_order_form'
 

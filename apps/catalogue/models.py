@@ -31,6 +31,7 @@ from soloha.settings import MEDIA_ROOT
 from soloha.core.validators import non_python_keyword
 
 from apps.partner.models import StockRecord, Partner
+from apps.partner.strategy import Selector
 
 
 REGEXP_PHONE = r'/^((8|\+38)[\- ]?)?(\(?\d{3}\)?[\- ]?)?[\d\- ]{7,10}$/'
@@ -235,10 +236,6 @@ class MissingProductImage(object):
 
     def __init__(self, name=None):
         self.name = name if name else settings.OSCAR_MISSING_IMAGE_URL
-        media_file_path = os.path.join(settings.MEDIA_ROOT, self.name)
-        # don't try to symlink if MEDIA_ROOT is not set (e.g. running tests)
-        if settings.MEDIA_ROOT and not os.path.exists(media_file_path):
-            self.symlink_missing_image(media_file_path)
 
     @property
     def original(self):
@@ -247,24 +244,6 @@ class MissingProductImage(object):
     @property
     def is_missing(self):
         return True
-
-    def symlink_missing_image(self, media_file_path):
-        static_file_path = find('oscar/img/%s' % self.name)
-        if static_file_path is not None:
-            try:
-                os.symlink(static_file_path, media_file_path)
-            except OSError:
-                raise ImproperlyConfigured((
-                    "Please copy/symlink the "
-                    "'missing image' image at %s into your MEDIA_ROOT at %s. "
-                    "This exception was raised because Oscar was unable to "
-                    "symlink it for you.") % (media_file_path,
-                                              settings.MEDIA_ROOT))
-            else:
-                logging.info((
-                    "Symlinked the 'missing image' image at %s into your "
-                    "MEDIA_ROOT at %s") % (media_file_path,
-                                           settings.MEDIA_ROOT))
 
 
 @python_2_unicode_compatible
@@ -903,7 +882,7 @@ class Product(models.Model, CommonFeatureProduct):
         if not self.slug:
             self.slug = slugify(self.get_title())
 
-        super(AbstractProduct, self).save(*args, **kwargs)
+        super(Product, self).save(*args, **kwargs)
         self.characteristics.add(*self.filters.all())
 
     # Properties
@@ -1095,7 +1074,7 @@ class Product(models.Model, CommonFeatureProduct):
         return MissingProductImage()
 
     def thumb(self, image=None):
-        return super(AbstractProduct, self).thumb(image=self.primary_image())
+        return super(Product, self).thumb(image=self.primary_image())
 
     def primary_image(self):
         """
@@ -1589,7 +1568,7 @@ class ProductImage(models.Model, CommonFeatureProduct):
     class Meta:
         app_label = 'catalogue'
         # Any custom models should ensure that this ordering is unchanged, or
-        # your query count will explode. See AbstractProduct.primary_image.
+        # your query count will explode. See Product.primary_image.
         ordering = ("product", "display_order",)
         unique_together = ("product", "display_order")
         verbose_name = _('Product image')
@@ -1638,7 +1617,7 @@ class ProductImage(models.Model, CommonFeatureProduct):
 
         images = self.product.images.all().exclude(pk=self.pk)
 
-        super(AbstractProductImage, self).delete(*args, **kwargs)
+        super(ProductImage, self).delete(*args, **kwargs)
 
         for idx, image in enumerate(images):
             image.display_order = idx

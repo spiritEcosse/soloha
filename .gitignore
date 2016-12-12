@@ -13,6 +13,7 @@ local.py
 **/node_modules/
 **/bower_components/
 /media/*
+!/media/image_not_found.jpg
 /static_root/*
 
 # Vagrant

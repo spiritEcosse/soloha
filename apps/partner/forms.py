@@ -1,6 +1,6 @@
 from django import forms
 
-from models import StockRecord
+from apps.partner.models import StockRecord
 
 from dal import autocomplete
 

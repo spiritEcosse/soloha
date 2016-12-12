@@ -1,4 +1,3 @@
-#  -*- coding: utf-8 -*-
 """
 Django settings for soloha project.
 
@@ -35,7 +34,6 @@ ALLOWED_HOSTS = settings_local.ALLOWED_HOSTS
 # Application definition
 
 INSTALLED_APPS = (
-    'flat',
     'dal',
     'dal_select2',
     'django.contrib.admin',
@@ -219,7 +217,7 @@ OSCAR_FROM_EMAIL = DEFAULT_FROM_EMAIL
 
 
 AUTHENTICATION_BACKENDS = (
-    'oscar.apps.customer.auth_backends.EmailBackend',
+    'apps.customer.auth_backends.EmailBackend',
     'django.contrib.auth.backends.ModelBackend',
 )
 
@@ -239,7 +237,7 @@ AUTHENTICATION_BACKENDS = (
 #         'INDEX_NAME': 'haystack',
 #         'EXCLUDED_INDEXES': [
 #             'myproject.search.search_indexes.CoreProductIndex',
-#              'oscar.apps.search.search_indexes.ProductIndex',
+#              'apps.search.search_indexes.ProductIndex',
 #              ]
 #     },
 # }

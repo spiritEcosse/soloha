@@ -1,54 +1,7 @@
-
-import json
-import random
-from decimal import Decimal as D
-from django.core.paginator import Paginator
-from django.db import IntegrityError
-from django.db.models import Min, Sum, Count
-from django.db.models import Q
-from django.db.models.query import Prefetch
-from django.test import Client
-from django.test import TestCase
-from django.utils.translation import ugettext_lazy as _
-from oscar.apps.partner.strategy import Selector
-from oscar.core.loading import get_model
-from oscar.test import factories
-from selenium.webdriver.support.select import Select
-from apps.catalogue.views import ProductCategoryView, ProductDetailView
-from python_test.factories import catalogue
-from soloha import settings
-from soloha.settings import OSCAR_PRODUCTS_PER_PAGE
-from templatetags.filters_concatenation import concatenate
-import time
 from selenium import webdriver
-from django.db.models import Q, F
-from haystack.query import SearchQuerySet
-from apps.contacts.views import FeedbackForm
-from apps.catalogue.models import SiteInfo
-from apps.catalogue.views import NOT_SELECTED
-from soloha.settings import TEST_INDEX
-from django.test import TestCase, override_settings
-from django.core.management import call_command
-from django.contrib.auth.models import User
-from selenium.common.exceptions import NoSuchElementException
-from apps.ex_flatpages.models import InfoPage
-import haystack
-from pyvirtualdisplay import Display
-
-from django.test import LiveServerTestCase
-from selenium.webdriver.firefox.webdriver import WebDriver
 import functools
 
-# Product = get_model('catalogue', 'product')
-# ProductClass = get_model('catalogue', 'ProductClass')
-# Category = get_model('catalogue', 'category')
-# ProductOptions = get_model('catalogue', 'ProductOptions')
-# VersionAttribute = get_model('catalogue', 'VersionAttribute')
-# ProductCategory = get_model('catalogue', 'ProductCategory')
-# ProductVersion = get_model('catalogue', 'ProductVersion')
-# Feature = get_model('catalogue', 'Feature')
-# WishList = get_model('wishlists', 'WishList')
-# test_catalogue = catalogue.Test()
+from django.test import LiveServerTestCase
 
 STATUS_CODE_200 = 200
 
@@ -71,11 +24,12 @@ def run_through_drivers(driver_pool='drivers'):
 
 class TestCatalog(LiveServerTestCase):
     # fixtures = ['initial_test_data.json']
+    selenium = None
 
     @classmethod
     def setUpClass(cls):
         cls.drivers = (
-            webdriver.Chrome(),
+            # webdriver.Chrome('/home/igor/web/chromedriver'),
             webdriver.Firefox(),
             webdriver.PhantomJS
         )
@@ -89,7 +43,8 @@ class TestCatalog(LiveServerTestCase):
 
     @run_through_drivers()
     def test_example(self):
-        pass
+        self.selenium.get(self.live_server_url)
+
 
 
 #

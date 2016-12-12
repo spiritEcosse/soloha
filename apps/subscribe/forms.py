@@ -3,15 +3,11 @@ from djng.styling.bootstrap3.forms import Bootstrap3Form
 
 from django.utils.translation import ugettext_lazy as _
 from django import forms
+
 from apps.subscribe.models import Subscribe
 
 
-class SubscribeMeta(type(NgModelForm), type(Bootstrap3Form)):
-    pass
-
-
-class SubscribeForm(NgModelForm, NgModelFormMixin, NgFormValidationMixin, Bootstrap3Form):
-    __metaclass__ = SubscribeMeta
+class SubscribeForm(NgModelFormMixin, NgFormValidationMixin, Bootstrap3Form):
     scope_prefix = 'subscribe_data'
     form_name = 'subscribe_form'
 
