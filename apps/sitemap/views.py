@@ -1,10 +1,9 @@
 from django.views import generic
 from django.views.generic.detail import SingleObjectMixin
-from oscar.core.loading import get_model
 from django.contrib.sites.shortcuts import get_current_site
-from apps.ex_flatpages.models import FlatPage
 
-Category = get_model('catalogue', 'category')
+from apps.ex_flatpages.models import FlatPage
+from apps.catalogue.models import Category
 
 
 class SitemapView(generic.ListView):

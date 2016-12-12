@@ -1,9 +1,9 @@
-from oscar.core.loading import get_model
-from djangular.forms import NgModelFormMixin, NgFormValidationMixin, NgModelForm
-from djangular.styling.bootstrap3.forms import Bootstrap3Form
+from djng.forms import NgModelFormMixin, NgFormValidationMixin, NgModelForm
+from djng.styling.bootstrap3.forms import Bootstrap3Form
+
 from django.utils.translation import ugettext_lazy as _
 from django import forms
-from models import Subscribe
+from apps.subscribe.models import Subscribe
 
 
 class SubscribeMeta(type(NgModelForm), type(Bootstrap3Form)):

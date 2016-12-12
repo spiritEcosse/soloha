@@ -1,5 +1,7 @@
-from oscar.apps.checkout import config
+from django.apps import AppConfig
+from django.utils.translation import ugettext_lazy as _
 
 
-class CheckoutConfig(config.CheckoutConfig):
+class CheckoutConfig(AppConfig):
     name = 'apps.checkout'
+    verbose_name = _('Checkout')

@@ -5,21 +5,21 @@ from django import forms
 from django.conf import settings
 from django.contrib.auth import forms as auth_forms
 from django.contrib.auth.forms import AuthenticationForm
-from django.contrib.sites.models import get_current_site
+from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ValidationError
 from django.utils.http import is_safe_url
 from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import pgettext_lazy
 
-from oscar.core.loading import get_profile_class, get_class, get_model
-from oscar.core.compat import get_user_model, existing_user_fields
-from oscar.apps.customer.utils import get_password_reset_url, normalise_email
-from oscar.core.validators import password_validators
+from soloha.core.loading import get_profile_class
+from soloha.core.compat import get_user_model, existing_user_fields
+from soloha.core.validators import password_validators
 
+from apps.customer.utils import get_password_reset_url, normalise_email
+from apps.customer.utils import Dispatcher
+from apps.customer.mixins import CommunicationEventType
+from apps.customer.models import ProductAlert
 
-Dispatcher = get_class('customer.utils', 'Dispatcher')
-CommunicationEventType = get_model('customer', 'communicationeventtype')
-ProductAlert = get_model('customer', 'ProductAlert')
 User = get_user_model()
 
 
@@ -97,19 +97,9 @@ class EmailAuthenticationForm(AuthenticationForm):
     usernames. 75 character usernames are needed to support the EmailOrUsername
     auth backend.
     """
-    username = forms.EmailField(
-        label=_('Email address'),
-        widget=forms.EmailInput(
-            attrs={'ng-model': 'username'}
-        )
-    )
-    password = forms.CharField(
-        label=_("Password"),
-        widget=forms.PasswordInput(
-            attrs={'ng-model': 'password'}
-        )
-    )
-    redirect_url = forms.CharField(widget=forms.HiddenInput, required=False)
+    username = forms.EmailField(label=_('Email address'))
+    redirect_url = forms.CharField(
+        widget=forms.HiddenInput, required=False)
 
     def __init__(self, host, *args, **kwargs):
         self.host = host
@@ -142,25 +132,12 @@ class ConfirmPasswordForm(forms.Form):
 
 
 class EmailUserCreationForm(forms.ModelForm):
-    email = forms.EmailField(
-        label=_('Email address'),
-        widget=forms.EmailInput(
-            attrs={'ng-model': 'email'}
-        )
-    )
+    email = forms.EmailField(label=_('Email address'))
     password1 = forms.CharField(
-        label=_('Password'),
-        widget=forms.PasswordInput(
-            attrs={'ng-model': 'password1'}
-        ),
-        validators=password_validators
-    )
+        label=_('Password'), widget=forms.PasswordInput,
+        validators=password_validators)
     password2 = forms.CharField(
-        label=_('Confirm password'),
-        widget=forms.PasswordInput(
-            attrs={'ng-model': 'password2'}
-        )
-    )
+        label=_('Confirm password'), widget=forms.PasswordInput)
     redirect_url = forms.CharField(
         widget=forms.HiddenInput, required=False)
 

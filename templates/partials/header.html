@@ -16,7 +16,7 @@
                 </div>
 
                 <div class="collapse navbar-collapse" id="top-header-menu">
-                    {% if current_site.info.phone_numbers.exists %}
+                    {% if current_site.info.phone_numbers.all %}
                         {% with count_phone_numbers=current_site.info.phone_numbers.count phone_numbers_slice=current_site.info.phone_numbers.all|slice:"4:" %}
                             <ul class="nav navbar-nav">
                                 {% for phone in current_site.info.phone_numbers_slice %}
@@ -161,7 +161,7 @@
                                                     {% endfor %}
                                                     <li class="list-group-item" role="presentation">
                                                         <a href="{{ category.get_absolute_url }}">
-                                                            {{ category }}
+                                                            {{ category.name }}
                                                             <span class="glyphicon glyphicon-menu-right"></span>
                                                         </a>
                                                     </li>
@@ -191,7 +191,7 @@
                                             </div>
                                             {% if category.image_banner and category.link_banner %}
                                                 <div class="col-xs-12 text-right image">
-                                                    <img src="{{ category.image_banner }}" class="img-responsive pull-right" title="" alt=""/>
+                                                    <img src="{{ category.image_banner|thumbnail_url:"category_banner" }}" class="img-responsive pull-right" title="" alt=""/>
                                                     <a class="btn btn-default btn-menu btn-xs" href="{{ category.link_banner }}">{% trans "Хочу" %}</a>
                                                 </div>
                                             {% endif %}

@@ -36,7 +36,7 @@
                 </a>
             </div>
             <div class="filters">
-                {% regroup product.characteristics.all by parent as characteristics %}
+                {% regroup product.characteristics.all|slice:"10" by parent as characteristics %}
 
                 {% for characteristic in characteristics %}
                     <div class="rows">

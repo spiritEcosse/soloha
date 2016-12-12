@@ -1,17 +1,16 @@
 # -*- coding: utf-8 -*-
 
-from django.shortcuts import render
+import json
+from braces import views
+
 from django.core.mail import send_mail
 from django.views.generic import FormView
-from forms import Feedback
-from django.utils.translation import ugettext_lazy as _
-from djangular.forms import NgModelFormMixin, NgFormValidationMixin
-from django.http import HttpResponse
-import json
 from django.views.generic.base import ContextMixin
 from django.contrib.sites.shortcuts import get_current_site
-from braces import views
-from braces import views
+
+from djng.forms import NgModelFormMixin, NgFormValidationMixin
+
+from apps.contacts.forms import Feedback
 
 
 class FeedbackForm(NgModelFormMixin, NgFormValidationMixin, Feedback):

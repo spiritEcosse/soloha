@@ -1,53 +1,16 @@
-import json
-
-from oscar.apps.promotions.views import HomeView as CoreHomeView
 from braces import views
-from soloha.settings import MAX_COUNT_PRODUCT
+
 from django.db.models.query import Prefetch
 from django.views.generic.list import MultipleObjectMixin
 from django.views.generic import View
-from oscar.core.loading import get_model
+from django.views.generic import TemplateView, RedirectView
+from django.core.urlresolvers import reverse
 
+from soloha.settings import MAX_COUNT_PRODUCT
 
-Category = get_model('catalogue', 'category')
-Product = get_model('catalogue', 'product')
-Line = get_model('order', 'Line')
-PagePromotion = get_model('promotions', 'PagePromotion')
-ProductRecommendation = get_model('catalogue', 'ProductRecommendation')
+from apps.catalogue.models import Product, Category, ProductRecommendation
+from apps.order.models import Line
 
-
-class HomeView(CoreHomeView):
-    def get_context_data(self, **kwargs):
-        context = super(HomeView, self).get_context_data(**kwargs)
-        only = ['title', 'slug', 'structure', 'product_class', 'categories']
-
-        context['products_new'] = Product.objects.only(*only).select_related('product_class').prefetch_related(
-            Prefetch('images'),
-            Prefetch('product_class__options'),
-            Prefetch('stockrecords'),
-            Prefetch('categories__parent__parent')
-        ).order_by('-date_created')[:MAX_COUNT_PRODUCT]
-
-        context['products_recommend'] = Product.objects.filter(
-            productrecommendation__isnull=False
-        ).only(*only).select_related('product_class').prefetch_related(
-            Prefetch('images'),
-            Prefetch('product_class__options'),
-            Prefetch('stockrecords'),
-            Prefetch('categories__parent__parent')
-        ).order_by('-date_created')[:MAX_COUNT_PRODUCT]
-
-        context['products_order'] = Product.objects.filter(
-            line__isnull=False
-        ).only(*only).select_related('product_class').prefetch_related(
-            Prefetch('images'),
-            Prefetch('stockrecords'),
-            Prefetch('product_class__options'),
-            Prefetch('categories__parent__parent'),
-        ).order_by('-date_created')[:MAX_COUNT_PRODUCT]
-
-        context['products_special'] = []
-        return context
 
 queryset_product = Product.objects.only('title')
 
@@ -128,3 +91,28 @@ class CategoriesView(views.JSONResponseMixin, views.AjaxResponseMixin, View):
         categories = self.object_list
         return self.render_json_response(categories)
 
+
+class HomeView(TemplateView):
+    """
+    This is the home page and will typically live at /
+    """
+    template_name = 'promotions/home.html'
+
+
+class RecordClickView(RedirectView):
+    """
+    Simple RedirectView that helps recording clicks made on promotions
+    """
+    permanent = False
+    model = None
+
+    def get_redirect_url(self, **kwargs):
+        try:
+            prom = self.model.objects.get(pk=kwargs['pk'])
+        except self.model.DoesNotExist:
+            return reverse('promotions:home')
+
+        if prom.promotion.has_link:
+            prom.record_click()
+            return prom.link_url
+        return reverse('promotions:home')

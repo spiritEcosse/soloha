@@ -43,7 +43,6 @@
 
 {% block before_end_body %}{% endblock %}
 
-
 {% comment %}
     Scripts loaded from a CDN.  These can't be wrapped by the 'compress' tag and so we
     use a separate block for them.
@@ -51,47 +50,8 @@
 
 {% block cdn_scripts %}{% endblock %}
 
-{% if debug %}
-    {% block mainstyles %}
-        {% comment %}
-            We use an inner block to work-around the fact that django-compressor doesn't work with
-            template inheritance.  Ie, we can't just wrap the {% block mainstyles %} with compress tags and
-            expect it to compress CSS files added in child templates.
-            {% endcomment %}
-        {% block styles %}
-            <link rel="stylesheet" type="text/css" href="{% static 'bower_components/lightslider/dist/css/lightslider.css' %}">
-            <link rel="stylesheet" type="text/css" href="{% static "bower_components/yamm/assets/css/yamm.css" %}">
-            <link rel="stylesheet" type="text/css" href="{% static "djangular/css/bootstrap3.css" %}">
-            <link rel="stylesheet" type="text/css" href="{% static "djangular/css/styles.css" %}">
-            <link rel="stylesheet" type="text/css" href="{% static "bower_components/bootstrap-select/dist/css/bootstrap-select.min.css" %}">
-            <link rel="stylesheet" type="text/css" href="{% static 'src/css/main.css' %}">
-        {% endblock %}
-    {% endblock %}
-    {# Additional CSS - specific to certain pages #}
-    {% block extrastyles %}{% endblock %}
-
-    {# Local scripts #}
-    {% block scripts %}
-        <script src="{% static 'bower_components/jquery/dist/jquery.min.js' %}"></script>
-        <script src="{% static 'bower_components/bootstrap/dist/js/bootstrap.min.js' %}"></script>
-        <script src="{% static "bower_components/angular/angular.js" %}" type="text/javascript"></script>
-        <script src="{% static 'djangular/js/django-angular.js' %}"></script>
-        <script src="{% static 'bower_components/angular-resource/angular-resource.js' %}"></script>
-        <script src="{% static 'bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js' %}"></script>
-        <script src="{% static 'bower_components/lightslider/dist/js/lightslider.min.js' %}"></script>
-        <script src="{% static 'src/js/custom.js' %}"></script>
-        {#    <script src="{% static "bower_components/bootstrap-select/dist/js/bootstrap-select.min.js" %}"></script>#}
-        <script src="{% static 'bower_components/angular-route/angular-route.min.js' %}"></script>
-        <script src="{% static 'src/js/common.js' %}"></script>
-        <script src="{% static 'oscar/js/oscar/ui.js' %}"></script>
-    {% endblock %}
-
-    {# Additional JS scripts #}
-    {% block extrascripts %}{% endblock %}
-{% else %}
-    <link rel="stylesheet" type="text/css" href="{% static "build/css/style.min.css" %}">
-    <script src="{% static 'build/js/script.min.js' %}"></script>
-{% endif %}
+<link rel="stylesheet" type="text/css" href="{% static "build/css/style.min.css" %}">
+<script src="{% static 'build/js/script.min.js' %}"></script>
 
 {# Block for body onload functions #}
 <script type="text/javascript">

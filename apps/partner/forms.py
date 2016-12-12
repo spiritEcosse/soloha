@@ -1,5 +1,7 @@
 from django import forms
+
 from models import StockRecord
+
 from dal import autocomplete
 
 

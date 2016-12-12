@@ -1,14 +1,11 @@
 from django.utils import six
 from django.utils.six.moves.urllib import parse
-
-from django import template
-from oscar.core.loading import get_model
 from django.utils.translation import ugettext_lazy as _
 from django.core.urlresolvers import resolve, Resolver404
+from django import template
 
 from apps.customer import history
-
-Site = get_model('sites', 'Site')
+from django.contrib.sites.models import Site
 
 register = template.Library()
 

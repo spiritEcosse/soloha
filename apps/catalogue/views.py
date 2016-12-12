@@ -1,49 +1,48 @@
-from oscar.apps.catalogue.views import ProductDetailView as CoreProductDetailView
 from django.utils.translation import ugettext_lazy as _
 from django.views import generic
 from django.views.generic import View
-from oscar.core.loading import get_model
-from braces import views
 from django.views.generic.detail import SingleObjectMixin, ContextMixin
 from django.http import HttpResponsePermanentRedirect, HttpResponse, Http404
-from django.utils.http import urlquote
-from soloha.settings import OSCAR_PRODUCTS_PER_PAGE
-import json
-from django.db.models import Min, Q, Prefetch, BooleanField, Case, When, Count, Max
-import operator
-import functools
-import logging
-from decimal import Decimal as D
-from decimal import ROUND_DOWN
-from forms import QuickOrderForm
+from django.db.models import Min, Q, Prefetch, BooleanField, Case, When, Count, IntegerField
 from django.core.urlresolvers import reverse_lazy
 from django.views.generic.edit import FormView
 from django.core.mail import EmailMultiAlternatives
 from django.contrib.sites.shortcuts import get_current_site
 from django.template import loader, Context
-from easy_thumbnails.files import get_thumbnailer
 from django.core.exceptions import ObjectDoesNotExist
-from collections import namedtuple
-from itertools import groupby
-from oscar.apps.partner import prices
-from oscar.templatetags.currency_filters import currency
 from django.utils.functional import cached_property
 from django.template.defaultfilters import truncatechars
+from django.contrib.flatpages.models import FlatPage
+from django.contrib import messages
+from django.core.paginator import InvalidPage
+from django.utils.http import urlquote
+from django.shortcuts import redirect
+
+from soloha.settings import OSCAR_PRODUCTS_PER_PAGE
+from soloha.core.templatetags.currency_filters import currency
+from apps.catalogue.signals import product_viewed
+
+import json
+import operator
+import functools
+import logging
+
+from braces import views
+from decimal import Decimal as D
+from decimal import ROUND_DOWN
+from forms import QuickOrderForm
+from easy_thumbnails.files import get_thumbnailer
+from collections import namedtuple
+from itertools import groupby
+
+from apps.catalogue.models import Product, Category, Feature, ProductImage, ProductOptions, ProductFeature
+from apps.partner.models import StockRecord
+from apps.catalogue.reviews.models import ProductReview
+from apps.order.models import QuickOrder
+from apps.wishlists.models import WishList
+from apps.partner import prices
 
 logger = logging.getLogger(__name__)
-
-Product = get_model('catalogue', 'Product')
-StockRecord = get_model('partner', 'StockRecord')
-ProductReview = get_model('reviews', 'ProductReview')
-Category = get_model('catalogue', 'category')
-Feature = get_model('catalogue', 'Feature')
-ProductImage = get_model('catalogue', 'ProductImage')
-ProductOptions = get_model('catalogue', 'ProductOptions')
-ProductFeature = get_model('catalogue', 'ProductFeature')
-SiteInfo = get_model('sites', 'Info')
-QuickOrder = get_model('order', 'QuickOrder')
-WishList = get_model('wishlists', 'WishList')
-FlatPage = get_model('flatpages', 'FlatPage')
 
 NOT_SELECTED = unicode(_('Not selected'))
 ANSWER = str(_('Your message has been sent. We will contact you on the specified details.'))
@@ -88,10 +87,36 @@ class BaseCatalogue(ContextMixin):
         return context
 
 
-class CatalogueView(BaseCatalogue, generic.ListView):
+class CatalogueView(generic.ListView):
+    """
+    Browse all products in the catalogue
+    """
+    context_object_name = "products"
+    template_name = 'catalogue/browse.html'
     model = Product
     paginate_by = OSCAR_PRODUCTS_PER_PAGE
-    template_name = 'catalogue/browse.html'
+
+    def get(self, request, *args, **kwargs):
+        try:
+            self.search_handler = self.get_search_handler(
+                self.request.GET, request.get_full_path(), [])
+        except InvalidPage:
+            # Redirect to page one.
+            messages.error(request, _('The given page number was invalid.'))
+            return redirect('catalogue:index')
+        return super(CatalogueView, self).get(request, *args, **kwargs)
+
+    def get_search_handler(self, *args, **kwargs):
+        return get_product_search_handler_class()(*args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        ctx = {}
+        ctx['summary'] = _("All products")
+        search_context = self.search_handler.get_search_context_data(
+            self.context_object_name)
+        ctx.update(search_context)
+        ctx['summary'] = _("All products")
+        return ctx
 
     def get_queryset(self, **kwargs):
         sort_argument = self.kwargs.get('sort') or self.orders[0].argument
@@ -109,13 +134,12 @@ class CatalogueView(BaseCatalogue, generic.ListView):
         ).order_by(sort.column)
         return queryset
 
-    def get_context_data(self, **kwargs):
-        context = super(CatalogueView, self).get_context_data(**kwargs)
-        context['summary'] = _("All products")
-        return context
 
-
-class ProductCategoryView(BaseCatalogue, views.JSONResponseMixin, views.AjaxResponseMixin, SingleObjectMixin, generic.ListView):
+class ProductCategoryView(SingleObjectMixin, generic.ListView):
+    """
+    Browse products in a given category
+    """
+    context_object_name = "products"
     template_name = 'catalogue/category.html'
     enforce_paths = True
     model = Product
@@ -126,6 +150,33 @@ class ProductCategoryView(BaseCatalogue, views.JSONResponseMixin, views.AjaxResp
     feature_orders = ('parent__sort', 'parent__title',)
     filter_slug = 'filter_slug'
     url_view_name = 'catalogue:category'
+    queryset = Product.objects.list()
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object(queryset=self.model_category.objects.page())
+        self.kwargs['filter_slug_objects'] = self.selected_filters
+        potential_redirect = self.redirect_if_necessary(request.path, self.object)
+
+        if potential_redirect is not None:
+            return potential_redirect
+
+        try:
+            self.search_handler = self.get_search_handler(
+                request.GET, request.get_full_path(), self.get_categories())
+        except InvalidPage:
+            messages.error(request, _('The given page number was invalid.'))
+            return redirect(self.object.get_absolute_url())
+
+        return super(ProductCategoryView, self).get(request, *args, **kwargs)
+
+    def get_search_handler(self, *args, **kwargs):
+        return get_product_search_handler_class()(*args, **kwargs)
+
+    def get_categories(self):
+        """
+        Return a list of the current category and its ancestors
+        """
+        return self.category.get_descendants_and_self()
 
     def post(self, request, *args, **kwargs):
         if self.request.is_ajax():
@@ -159,18 +210,14 @@ class ProductCategoryView(BaseCatalogue, views.JSONResponseMixin, views.AjaxResp
         context['sorting_type'] = self.kwargs['sorting_type']
         return context
 
-    @property
-    def object(self):
-        return self.get_object(queryset=self.model_category.objects.filter(enable=True))
-
-    def get(self, request, *args, **kwargs):
-        self.kwargs['filter_slug_objects'] = self.selected_filters
-        potential_redirect = self.redirect_if_necessary(request.path, self.object)
-
-        if potential_redirect is not None:
-            return potential_redirect
-
-        return super(ProductCategoryView, self).get(request, *args, **kwargs)
+    # @property
+    # def object(self):
+    #     return self.get_object(queryset=self.model_category.objects.browse_lo_level()
+    #         # .prefetch_related(
+    #         # Prefetch('children', queryset=Category.objects.browse(level_up=False, fields=['id', 'parent__id']).select_related('parent')),
+    #         # Prefetch('children__children', queryset=Category.objects.browse(level_up=False, fields=['id', 'parent__id']).select_related('parent')),
+    #     # )
+    #     )
 
     @cached_property
     def selected_filters(self):
@@ -203,26 +250,18 @@ class ProductCategoryView(BaseCatalogue, views.JSONResponseMixin, views.AjaxResp
         sort = filter(lambda order: order.argument == sort_argument, self.orders)[0]
 
         queryset = super(ProductCategoryView, self).get_queryset()
-        queryset = queryset.filter(enable=True, categories=self.object.get_descendants(include_self=True), categories__enable=True)
-
+        queryset = queryset.filter(
+            categories__in=self.object.get_descendants_through_children(),
+            categories__enable=True
+        )
         selected_filters = list(self.selected_filters)[:]
-
-        if kwargs.get('potential_filter', None):
-            selected_filters.append(kwargs.get('potential_filter'))
-
         key = lambda feature: feature.parent.pk
         iter = groupby(sorted(selected_filters, key=key), key=key)
 
         for parent, values in iter:
             queryset = queryset.filter(filters__in=map(lambda obj: obj, values))
 
-        queryset = queryset.distinct().select_related('product_class').prefetch_related(
-            Prefetch('images'),
-            Prefetch('characteristics'),
-            Prefetch('product_class__options'),
-            Prefetch('stockrecords'),
-            Prefetch('categories__parent__parent'),
-        )
+        queryset = queryset.distinct()
 
         order = sort.column
 
@@ -236,53 +275,28 @@ class ProductCategoryView(BaseCatalogue, views.JSONResponseMixin, views.AjaxResp
         queryset = queryset.order_by(order)
         return queryset
 
-    def get_products(self, **kwargs):
-        queryset = Product.objects.filter(
-            enable=True, categories=self.object.get_descendants(include_self=True), categories__enable=True
-        )
-
-        selected_filters = list(self.selected_filters)[:]
-
-        if kwargs.get('potential_filter', None):
-            selected_filters.append(kwargs.get('potential_filter'))
-
-        key = lambda feature: feature.parent.pk
-        iter = groupby(sorted(selected_filters, key=key), key=key)
-
-        for parent, values in iter:
-            queryset = queryset.filter(filters__in=map(lambda obj: obj, values))
-
-        return queryset
-
     def get_context_data(self, **kwargs):
         context = super(ProductCategoryView, self).get_context_data(**kwargs)
 
-        # Todo replace on one query, without regroup
-        context['filters'] = Feature.objects.only(*self.feature_only).filter(
-            level=1, filter_products__categories=self.object.get_descendants(include_self=True),
+        context['filters'] = Feature.objects.browse().only('title', 'parent', 'slug').filter(
+            level=1, filter_products__categories__in=self.object.get_descendants_through_children(),
             filter_products__enable=True, filter_products__categories__enable=True
-        ).order_by(*self.feature_orders).select_related('parent').prefetch_related(
-            Prefetch('filter_products')
-        ).distinct()
-
-        products = lambda **kwargs: map(lambda obj: obj.id, self.get_products(**kwargs))
-        key = lambda feature: feature.parent.pk
-        # Todo really need sort by feature.parent.pk ?
-        iter = groupby(sorted(self.selected_filters, key=key), key=key)
-        filters_parent = map(lambda obj: obj[0], iter)
-
-        for feature in context['filters']:
-            feature.potential_products_count = feature.filter_products.filter(
-                id__in=products(potential_filter=feature)
+        ).annotate(
+            count_products=Count(
+                Case(
+                    When(filter_products__in=self.get_queryset(), then=1),
+                    default=0, output_field=IntegerField()
+                )
             )
-
-            if feature.parent.pk in filters_parent:
-                feature.potential_products_count = feature.potential_products_count.exclude(id__in=products)
-
-            feature.potential_products_count = feature.potential_products_count.count()
+        ).order_by(*self.feature_orders).distinct()
 
         context['url_extra_kwargs'].update({'category_slug': self.kwargs.get('category_slug')})
         context['selected_filters'] = self.selected_filters
+
+        context = super(ProductCategoryView, self).get_context_data(**kwargs)
+        context['category'] = self.object
+        search_context = self.search_handler.get_search_context_data(self.context_object_name)
+        context.update(search_context)
         return context
 
     def get_page_link(self, page_numbers, **kwargs):
@@ -362,10 +376,78 @@ class QuickOrderView(views.JSONResponseMixin, views.AjaxResponseMixin, FormView,
         msg.send()
 
 
-class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CoreProductDetailView, Filter):
+class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, Filter, generic.DetailView):
+    context_object_name = 'product'
+    model = Product
+    view_signal = product_viewed
+    template_folder = "catalogue"
     start_option = [{'pk': 0, 'title': NOT_SELECTED}]
     only = ['title', 'pk']
     lookup_parent = '__parent'
+
+    # Whether to redirect to the URL with the right path
+    enforce_paths = True
+
+    # Whether to redirect child products to their parent's URL
+    enforce_parent = True
+
+    def get(self, request, **kwargs):
+        """
+        Ensures that the correct URL is used before rendering a response
+        """
+        self.object = product = self.get_object()
+
+        redirect = self.redirect_if_necessary(request.path, product)
+        if redirect is not None:
+            return redirect
+
+        response = super(ProductDetailView, self).get(request, **kwargs)
+        self.send_signal(request, response, product)
+        return response
+
+    def get_alert_status(self):
+        # Check if this user already have an alert for this product
+        has_alert = False
+        if self.request.user.is_authenticated():
+            alerts = ProductAlert.objects.filter(
+                product=self.object, user=self.request.user,
+                status=ProductAlert.ACTIVE)
+            has_alert = alerts.exists()
+        return has_alert
+
+    def get_alert_form(self):
+        return ProductAlertForm(
+            user=self.request.user, product=self.object)
+
+    def get_reviews(self):
+        return self.object.reviews.filter(status=ProductReview.APPROVED)
+
+    def send_signal(self, request, response, product):
+        self.view_signal.send(
+            sender=self, product=product, user=request.user, request=request,
+            response=response)
+
+    def get_template_names(self):
+        """
+        Return a list of possible templates.
+
+        If an overriding class sets a template name, we use that. Otherwise,
+        we try 2 options before defaulting to catalogue/detail.html:
+            1). detail-for-upc-<upc>.html
+            2). detail-for-class-<classname>.html
+
+        This allows alternative templates to be provided for a per-product
+        and a per-item-class basis.
+        """
+        if self.template_name:
+            return [self.template_name]
+
+        return [
+            '%s/detail-for-upc-%s.html' % (
+                self.template_folder, self.object.upc),
+            '%s/detail-for-class-%s.html' % (
+                self.template_folder, self.object.get_product_class().slug),
+            '%s/detail.html' % (self.template_folder)]
 
     def get_object(self, queryset=None):
         if hasattr(self, 'object'):
@@ -547,6 +629,11 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
 
     def get_context_data(self, **kwargs):
         context = super(ProductDetailView, self).get_context_data(**kwargs)
+        # Todo: enables reviews
+        # context['reviews'] = self.get_reviews()
+        context['alert_form'] = self.get_alert_form()
+        context['has_active_alert'] = self.get_alert_status()
+
         context['reviews'] = []
         context['attributes'] = self.get_attributes()
         context['not_selected'] = NOT_SELECTED

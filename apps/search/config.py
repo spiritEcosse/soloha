@@ -1,5 +1,7 @@
-from oscar.apps.search import config
+from django.apps import AppConfig
+from django.utils.translation import ugettext_lazy as _
 
 
-class SearchConfig(config.SearchConfig):
+class SearchConfig(AppConfig):
     name = 'apps.search'
+    verbose_name = _('Search')

@@ -1,50 +1,21 @@
 from django.contrib import admin
-from django.db import models
-from oscar.core.loading import get_model
 from django.forms import Textarea
-from mptt.admin import DraggableMPTTAdmin
-from import_export.admin import ImportExportMixin, ImportExportActionModelAdmin
-from apps.catalogue import resources
-import logging  # isort:skip
-from dal import autocomplete
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
-from apps.catalogue import forms as catalogue_forms
-import apps.partner.forms as partner_forms
-from django.db.models import Q
+from django.db.models import Q, TextField
 from django.db.models.query import Prefetch
 
-#Todo change list import module
-try:  # Python 2.7+
-    from logging import NullHandler
-except ImportError:
-    class NullHandler(logging.Handler):
-        def emit(self, record):
-            pass
+from mptt.admin import DraggableMPTTAdmin
+from import_export.admin import ImportExportMixin, ImportExportActionModelAdmin
+import logging
+from dal import autocomplete
 
-logging.getLogger(__name__).addHandler(NullHandler())
+from apps.catalogue.models import Product, Category, Feature, ProductClass, ProductRecommendation, \
+    ProductAttributeValue, ProductAttribute, ProductFeature, ProductImage, AttributeOptionGroup, Option, AttributeOption
+from apps.catalogue import resources, forms as catalogue_forms
+from apps.partner import models as partner_models, forms as partner_forms
 
-try:
-    from django.utils.encoding import force_text
-except ImportError:
-    from django.utils.encoding import force_unicode as force_text
-
-
-Feature = get_model('catalogue', 'Feature')
-AttributeOption = get_model('catalogue', 'AttributeOption')
-AttributeOptionGroup = get_model('catalogue', 'AttributeOptionGroup')
-Category = get_model('catalogue', 'Category')
-Option = get_model('catalogue', 'Option')
-Product = get_model('catalogue', 'Product')
-ProductAttribute = get_model('catalogue', 'ProductAttribute')
-ProductAttributeValue = get_model('catalogue', 'ProductAttributeValue')
-ProductClass = get_model('catalogue', 'ProductClass')
-ProductImage = get_model('catalogue', 'ProductImage')
-ProductFeature = get_model('catalogue', 'ProductFeature')
-ProductRecommendation = get_model('catalogue', 'ProductRecommendation')
-StockRecord = get_model('partner', 'StockRecord')
-Partner = get_model('partner', 'Partner')
-Info = get_model('sites', 'Info')
+logging.getLogger(__name__).addHandler(logging.NullHandler())
 
 
 class ProductAutocomplete(autocomplete.Select2QuerySetView):
@@ -105,7 +76,7 @@ class FeatureAutocomplete(autocomplete.Select2QuerySetView):
 
 
 class StockRecordInline(admin.StackedInline):
-    model = StockRecord
+    model = partner_models.StockRecord
     form = partner_forms.StockRecordForm
 
 
@@ -252,7 +223,7 @@ class CategoryAdmin(ImportExportMixin, ImportExportActionModelAdmin, DraggableMP
     list_display = ('pk', 'indented_title', 'slug', 'parent', 'enable', 'sort', 'created')
     list_filter = ('enable', 'created', 'sort', )
     formfield_overrides = {
-        models.TextField: {'widget': Textarea()},
+        TextField: {'widget': Textarea()},
     }
     mptt_level_indent = 20
     search_fields = ('name', 'slug', 'id', )
@@ -260,8 +231,10 @@ class CategoryAdmin(ImportExportMixin, ImportExportActionModelAdmin, DraggableMP
     form = catalogue_forms.CategoryForm
 
     class Media:
-        js = ("https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css",
-              "https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js")
+        js = (
+            "https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css",
+            "https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js"
+        )
 
 
 admin.site.register(ProductClass, ProductClassAdmin)

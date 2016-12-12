@@ -19,6 +19,14 @@ HAYSTACK_CONNECTIONS = {
     },
 }
 
+FOLDER_STATIC = os.path.join(BASE_DIR, 'static')
+STATIC_URL = '/static_root/'
+FOLDER_STATIC_ROOT = os.path.join(BASE_DIR, STATIC_URL.strip("/"))
+
+STATICFILES_DIRS = (
+    FOLDER_STATIC,
+)
+
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
@@ -28,6 +36,7 @@ CACHES = {
 
 DEBUG_TOOLBAR_CONFIG = {
     'RENDER_PANELS': DEBUG,
+    'JQUERY_URL': os.path.join(STATIC_URL, 'bower_components/jquery/dist/jquery.min.js'),
 }
 
 CACHE_MIDDLEWARE_SECONDS = 24 * 60 * 60
@@ -48,7 +57,7 @@ MIDDLEWARE_CLASSES = (
     'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware',
     'django.middleware.locale.LocaleMiddleware',
-    'oscar.apps.basket.middleware.BasketMiddleware',
+    'apps.basket.middleware.BasketMiddleware',
     'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware',
     # 'django.middleware.cache.FetchFromCacheMiddleware',
 )

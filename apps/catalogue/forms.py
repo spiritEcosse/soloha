@@ -1,21 +1,12 @@
-from oscar.core.loading import get_model
-from djangular.forms import NgModelFormMixin, NgFormValidationMixin, NgModelForm
-from djangular.styling.bootstrap3.forms import Bootstrap3Form
+from djng.forms import NgModelFormMixin, NgFormValidationMixin, NgModelForm
+from djng.styling.bootstrap3.forms import Bootstrap3Form
 from django.utils.translation import ugettext_lazy as _
 from django import forms
-from apps.catalogue.abstract_models import REGEXP_PHONE
+
 from dal import autocomplete
 
-QuickOrder = get_model('order', 'QuickOrder')
-ProductRecommendation = get_model('catalogue', 'ProductRecommendation')
-Feature = get_model('catalogue', 'Feature')
-Category = get_model('catalogue', 'Category')
-Product = get_model('catalogue', 'Product')
-ProductImage = get_model('catalogue', 'ProductImage')
-ProductFeature = get_model('catalogue', 'ProductFeature')
-StockRecord = get_model('partner', 'StockRecord')
-Partner = get_model('partner', 'Partner')
-Info = get_model('sites', 'Info')
+from apps.catalogue import models as catalogue_models
+from apps.order.models import QuickOrder
 
 
 class QuickOrderMeta(type(NgModelForm), type(Bootstrap3Form)):
@@ -33,7 +24,9 @@ class QuickOrderForm(NgModelForm, NgModelFormMixin, NgFormValidationMixin, Boots
         widgets = {
             'comment': forms.Textarea(attrs={'title': _('You comment'), 'rows': 5}),
             'name': forms.TextInput(attrs={'title': _('You name')}),
-            'phone_number': forms.TextInput(attrs={'title': _('You phone number'), 'ng-pattern': REGEXP_PHONE}),
+            'phone_number': forms.TextInput(
+                attrs={'title': _('You phone number'), 'ng-pattern': catalogue_models.REGEXP_PHONE}
+            ),
             'email': forms.TextInput(attrs={'title': _('You email')}),
             'product': forms.HiddenInput()
         }
@@ -56,7 +49,7 @@ class QuickOrderForm(NgModelForm, NgModelFormMixin, NgFormValidationMixin, Boots
 class ProductImageForm(forms.ModelForm):
     class Meta:
         fields = '__all__'
-        model = ProductImage
+        model = catalogue_models.ProductImage
         widgets = {
             'product': autocomplete.ModelSelect2(url='product-autocomplete'),
         }
@@ -65,7 +58,7 @@ class ProductImageForm(forms.ModelForm):
 class FeatureForm(forms.ModelForm):
     class Meta:
         fields = '__all__'
-        model = Feature
+        model = catalogue_models.Feature
         widgets = {
             'parent': autocomplete.ModelSelect2(url='feature-autocomplete'),
         }
@@ -73,7 +66,7 @@ class FeatureForm(forms.ModelForm):
 
 class ProductRecommendationForm(forms.ModelForm):
     class Meta:
-        model = ProductRecommendation
+        model = catalogue_models.ProductRecommendation
         fields = '__all__'
         widgets = {
             'recommendation': autocomplete.ModelSelect2(url='product-autocomplete'),
@@ -84,7 +77,7 @@ class ProductRecommendationForm(forms.ModelForm):
 class ProductFeatureForm(forms.ModelForm):
     class Meta:
         fields = '__all__'
-        model = ProductFeature
+        model = catalogue_models.ProductFeature
         widgets = {
             'product': autocomplete.ModelSelect2(url='product-autocomplete'),
             'feature': autocomplete.ModelSelect2(url='feature-autocomplete'),
@@ -95,7 +88,7 @@ class ProductFeatureForm(forms.ModelForm):
 class CategoryForm(forms.ModelForm):
     class Meta:
         fields = '__all__'
-        model = Category
+        model = catalogue_models.Category
         widgets = {
             'parent': autocomplete.ModelSelect2(url='categories-autocomplete'),
         }
@@ -103,7 +96,7 @@ class CategoryForm(forms.ModelForm):
 
 class ProductForm(forms.ModelForm):
     class Meta:
-        model = Product
+        model = catalogue_models.Product
         fields = '__all__'
         widgets = {
             'parent': autocomplete.ModelSelect2(url='product-autocomplete'),

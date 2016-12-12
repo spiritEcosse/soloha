@@ -18,10 +18,7 @@ postgresql:
 	sudo -u postgres dropuser $(current_dir) --if-exists
 
     # Create user
-	sudo -u postgres psql -c "CREATE USER $(current_dir) WITH PASSWORD '$(current_dir)';"
-
-    # Grant privileges
-	sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE $(current_dir) TO $(current_dir);"
+	sudo -u postgres psql -c "CREATE USER $(current_dir) WITH PASSWORD '$(current_dir)' SUPERUSER;"
 
 libs:
     # Install compiler from less to css
@@ -38,11 +35,21 @@ libs:
     # Install other libs
 	sudo apt-get install libpq-dev
 	sudo apt-get install libmagickwand-dev
+	sudo apt-get install libjpeg-dev
 
     # Install gettext for run makemessages
 	sudo apt-get install gettext
 
 	sudo apt-get install libffi-dev
+
+	# Install grunt
+	sudo npm install -g grunt-cli
+
+	# Install npm libs
+	npm install
+
+	# Todo Move this to doc
+	# If use pycharm: add /usr/local/lib/node_modules/grunt-cli/ to Grunt Task in input - grunt cli package
 
 install_pip:
 	sudo apt-get install python-pip
@@ -60,6 +67,10 @@ debian_ubuntu_install_modules: postgresql libs install_pip
 
 site: debian_ubuntu_install_modules create_settings_local virtual_environment
 
+initial_db:
+	./initial_db.sh $(current_dir)
+
+reset_db: postgresql initial_db
 
 site3:
 	sudo apt-get install python3-dev libevent-dev python-psycopg2 libpq-dev

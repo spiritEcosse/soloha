@@ -13,16 +13,12 @@ https://docs.djangoproject.com/en/1.8/ref/settings/
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
-from oscar import get_core_apps
-from oscar.defaults import *
-from oscar import OSCAR_MAIN_TEMPLATE_DIR
+from soloha.defaults import *
 from django.utils.translation import ugettext_lazy as _
-from oscar import get_core_apps
 import sys
 from soloha import settings_local
 
 BASE_DIR = settings_local.BASE_DIR
-
 location = lambda x: os.path.join(os.path.dirname(os.path.realpath(__file__)), x)
 
 # Quick-start development settings - unsuitable for production
@@ -38,48 +34,60 @@ ALLOWED_HOSTS = settings_local.ALLOWED_HOSTS
 
 # Application definition
 
-INSTALLED_APPS = \
-    [
-        'flat',
-        'dal',
-        'dal_select2',
-        'django.contrib.admin',
-        'django.contrib.sitemaps',
-        'debug_toolbar',
-        # 'django_select2',
-        # 'bootstrap_pagination',
-        'django.contrib.auth',
-        'django.contrib.contenttypes',
-        'django.contrib.sessions',
-        'django.contrib.sites',
-        'django.contrib.messages',
-        'django.contrib.staticfiles',
-        'django.contrib.flatpages',
-        'django.contrib.redirects',
-        'compressor',
-        'widget_tweaks',
-        'djangular',
-        'mptt',
-        'feincms',
-        'easy_thumbnails',
-        'filer',
-        'apps.contacts',
-        'apps.ex_sites',
-        'apps.ex_redirects',
-        'import_export',
-        'ckeditor',
-        'apps.sitemap',
-        'apps.subscribe',
-        'apps.ex_flatpages',
-        'bootstrap_pagination',
-        'memoize',
-        'debug_panel',
-    ] + get_core_apps(
-        [
-            'apps.catalogue', 'apps.promotions', 'apps.partner', 'apps.search', 'apps.order',
-            'apps.basket', 'apps.checkout', 'apps.customer', 'apps.dashboard.promotions'
-        ]
-    )
+INSTALLED_APPS = (
+    'flat',
+    'dal',
+    'dal_select2',
+    'django.contrib.admin',
+    'django.contrib.sitemaps',
+    'debug_toolbar',
+    # 'django_select2',
+    # 'bootstrap_pagination',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.sites',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'django.contrib.flatpages',
+    'django.contrib.redirects',
+    'apps.analytics',
+    'apps.checkout',
+    'apps.address',
+    'apps.shipping',
+    'apps.catalogue',
+    'apps.catalogue.reviews',
+    'apps.partner',
+    'apps.basket',
+    'apps.payment',
+    'apps.offer',
+    'apps.order',
+    'apps.customer',
+    'apps.promotions',
+    'apps.search',
+    'apps.voucher',
+    'apps.wishlists',
+    'apps.contacts',
+    'apps.ex_sites',
+    'apps.ex_redirects',
+    'apps.sitemap',
+    'apps.subscribe',
+    'apps.ex_flatpages',
+    'compressor',
+    'widget_tweaks',
+    'djng',
+    'mptt',
+    'feincms',
+    'easy_thumbnails',
+    'filer',
+    'import_export',
+    'ckeditor',
+    'bootstrap_pagination',
+    'debug_panel',
+    'haystack',
+    'django_tables2',
+    'django_extensions',
+)
 
 SITE_ID = 1
 
@@ -93,14 +101,13 @@ TEMPLATES = [
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
             os.path.join(BASE_DIR, 'templates'),
-            OSCAR_MAIN_TEMPLATE_DIR
         ],
         'OPTIONS': {
             'loaders': [
                 # ('django.template.loaders.cached.Loader', [
-                    'django.template.loaders.filesystem.Loader',
-                    'django.template.loaders.app_directories.Loader',
-                    'django.template.loaders.eggs.Loader',
+                'django.template.loaders.filesystem.Loader',
+                'django.template.loaders.app_directories.Loader',
+                'django.template.loaders.eggs.Loader',
                 # ]),
             ],
             'context_processors': [
@@ -109,11 +116,11 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
 
-                'oscar.apps.search.context_processors.search_form',
+                'apps.search.context_processors.search_form',
                 'apps.promotions.context_processors.promotions',
-                'oscar.apps.checkout.context_processors.checkout',
-                'oscar.apps.customer.notifications.context_processors.notifications',
-                'oscar.core.context_processors.metadata',
+                'apps.checkout.context_processors.checkout',
+                'apps.customer.notifications.context_processors.notifications',
+                'soloha.core.context_processors.metadata',
                 'soloha.core.context_processors.context_data',
                 'apps.ex_flatpages.context_processors.context_data',
             ],
@@ -167,26 +174,24 @@ LANGUAGES = (
 
 import os
 location = lambda x: os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', x)
-from oscar import OSCAR_MAIN_TEMPLATE_DIR
 TEMPLATE_DIRS = (
     location('templates'),
 )
 
-STATIC_URL = '/static_root/'
-STATIC_ROOT = os.path.join(BASE_DIR,  'static_root')
+STATIC_URL = settings_local.STATIC_URL
+STATIC_ROOT = settings_local.FOLDER_STATIC_ROOT
 MEDIA_ROOT = os.path.join(BASE_DIR,  'media')
 MEDIA_URL = "/media/"
 
-STATICFILES_DIRS = (
-    os.path.join(BASE_DIR, 'static'),
-)
+STATICFILES_DIRS = settings_local.STATICFILES_DIRS
 
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
     'compressor.finders.CompressorFinder',
 )
-CKEDITOR_JQUERY_URL = '//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js'
+
+CKEDITOR_JQUERY_URL = os.path.join(STATIC_URL, 'bower_components/jquery/dist/jquery.min.js')
 CKEDITOR_UPLOAD_PATH = 'images/'
 
 CKEDITOR_CONFIGS = {
@@ -328,6 +333,7 @@ IMPORT_EXPORT_USE_TRANSACTIONS = True
 THUMBNAIL_ALIASES = {
     '': {
         'category_icon': {'size': (50, 30), 'crop': True},
+        'category_banner': {'size': (574, 230), 'crop': True},
         'basket_quick': {'size': (85, 50), 'crop': True},
         'basket_quick_product_image': {'size': (30, 30), 'crop': True},
         'basket_content': {'size': (150, 150), 'crop': True},
@@ -335,7 +341,6 @@ THUMBNAIL_ALIASES = {
         'home_thumb_slide': {'size': (1170, 392), 'crop': True},
     },
 }
-
 
 OSCAR_SHOP_NAME = 'soloha'
 DEBUG_TOOLBAR_CONFIG = settings_local.DEBUG_TOOLBAR_CONFIG
@@ -350,4 +355,3 @@ SECURE_CONTENT_TYPE_NOSNIFF = True
 #CSRF_COOKIE_SECURE = True
 SECURE_BROWSER_XSS_FILTER = True
 X_FRAME_OPTIONS = 'DENY'
-
