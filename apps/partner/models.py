@@ -5,8 +5,8 @@ from django.utils.timezone import now
 from django.db.models import F
 
 from soloha.core.utils import CommonFeatureProduct, get_default_currency
-from soloha.core.compat import AUTH_USER_MODEL
 from soloha.core.models.fields import AutoSlugField
+from soloha.core.compat import AUTH_USER_MODEL
 
 from apps.partner.exceptions import InvalidStockAdjustment
 from apps.address.models import AbstractPartnerAddress

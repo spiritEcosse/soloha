@@ -3,10 +3,10 @@ from django.db.models.fields import CharField, DecimalField
 from django.utils import six
 from django.utils.translation import ugettext_lazy as _
 
-from oscar.core import validators
-from oscar.forms import fields
+from soloha.core import validators
+from soloha.core.forms import fields
 
-import oscar.core.phonenumber as phonenumber
+import soloha.core.phonenumber as phonenumber
 # allow importing as oscar.models.fields.AutoSlugField
 from .autoslugfield import AutoSlugField
 AutoSlugField = AutoSlugField

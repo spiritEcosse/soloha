@@ -6,7 +6,7 @@ from django.core.urlresolvers import resolve
 from django.http import Http404
 from django.utils.translation import ugettext_lazy as _
 
-from oscar.core.loading import get_model
+from django.contrib.flatpages.models import FlatPage
 
 
 class ExtendedURLValidator(validators.URLValidator):
@@ -37,7 +37,6 @@ class ExtendedURLValidator(validators.URLValidator):
         except Http404:
             # We load flatpages here as it causes a circular reference problem
             # sometimes.  FlatPages is None if not installed
-            FlatPage = get_model('flatpages', 'FlatPage')
             if FlatPage is not None:
                 try:
                     FlatPage.objects.get(url=value)

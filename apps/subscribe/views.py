@@ -1,19 +1,20 @@
 import json
 
 from braces import views
-from oscar.core.loading import get_model
 from django.views.generic import FormView
 from django.utils.translation import ugettext_lazy as _
 from django.http import HttpResponse
-from forms import SubscribeForm
+
+from apps.subscribe.forms import SubscribeForm
+from apps.ex_sites.models import Info
+from apps.subscribe.models import Subscribe
+
 from django.core.mail import EmailMultiAlternatives
 from django.contrib.sites.shortcuts import get_current_site
 from django.template import loader, Context
 from django.core.urlresolvers import reverse_lazy
-from apps.ex_sites.models import Info
 
 
-Subscribe = get_model('subscribe', 'Subscribe')
 ANSWER = str(_('Subscribed successfully!'))
 
 

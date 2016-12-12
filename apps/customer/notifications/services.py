@@ -1,6 +1,4 @@
-from oscar.core.loading import get_model
-
-Notification = get_model('customer', 'Notification')
+from apps.customer.models import Notification
 
 
 def notify_user(user, msg, **kwargs):

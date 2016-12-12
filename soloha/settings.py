@@ -14,7 +14,6 @@ https://docs.djangoproject.com/en/1.8/ref/settings/
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 from soloha.defaults import *
-from oscar import OSCAR_MAIN_TEMPLATE_DIR
 from django.utils.translation import ugettext_lazy as _
 import sys
 from soloha import settings_local
@@ -53,24 +52,28 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.flatpages',
     'django.contrib.redirects',
-    'apps.contacts',
-    'apps.ex_sites',
-    'apps.ex_redirects',
-    'apps.sitemap',
-    'apps.subscribe',
-    'apps.ex_flatpages',
-    'apps.catalogue',
-    'apps.catalogue.reviews',
     'apps.analytics',
     'apps.checkout',
+    'apps.address',
+    'apps.shipping',
+    'apps.catalogue',
+    'apps.catalogue.reviews',
     'apps.partner',
     'apps.basket',
+    'apps.payment',
     'apps.offer',
     'apps.order',
     'apps.customer',
     'apps.promotions',
     'apps.search',
     'apps.voucher',
+    'apps.wishlists',
+    'apps.contacts',
+    'apps.ex_sites',
+    'apps.ex_redirects',
+    'apps.sitemap',
+    'apps.subscribe',
+    'apps.ex_flatpages',
     'compressor',
     'widget_tweaks',
     'djng',
@@ -99,7 +102,6 @@ TEMPLATES = [
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
             os.path.join(BASE_DIR, 'templates'),
-            OSCAR_MAIN_TEMPLATE_DIR
         ],
         'OPTIONS': {
             'loaders': [
@@ -115,11 +117,11 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
 
-                'oscar.apps.search.context_processors.search_form',
+                'apps.search.context_processors.search_form',
                 'apps.promotions.context_processors.promotions',
-                'oscar.apps.checkout.context_processors.checkout',
-                'oscar.apps.customer.notifications.context_processors.notifications',
-                'oscar.core.context_processors.metadata',
+                'apps.checkout.context_processors.checkout',
+                'apps.customer.notifications.context_processors.notifications',
+                'soloha.core.context_processors.metadata',
                 'soloha.core.context_processors.context_data',
                 'apps.ex_flatpages.context_processors.context_data',
             ],
@@ -173,7 +175,6 @@ LANGUAGES = (
 
 import os
 location = lambda x: os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', x)
-from oscar import OSCAR_MAIN_TEMPLATE_DIR
 TEMPLATE_DIRS = (
     location('templates'),
 )

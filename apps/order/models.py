@@ -17,7 +17,7 @@ from soloha.core.models.fields import AutoSlugField
 
 from apps.order import exceptions
 from apps.catalogue.models import Product
-from apps.address.models import (AbstractShippingAddress, AbstractBillingAddress)
+from apps.address.models import AbstractShippingAddress, AbstractBillingAddress
 
 
 @python_2_unicode_compatible

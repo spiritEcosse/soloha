@@ -32,16 +32,16 @@ django-flat-theme==1.1.3
 django-htmlmin==0.9.1
 django-import-export==0.4.5
 django-mptt==0.8.6
-django-oscar==1.1.1
+django-oscar==1.3
 django-oscar-accounts==0.3
 django-phonenumber-field==1.1.0
 django-polymorphic==1.0.2
-django-pybrowscap==1.0.0
 django-selenium==0.9.8
 django-smart-load-tag==0.3.2
 django-smartagent==0.1.1
 django-suit==0.2.15
 django-tables2==1.0.6
+django-treebeard==4.1.0
 django-widget-tweaks==1.3
 docopt==0.6.2
 easy-thumbnails==2.3
@@ -78,7 +78,6 @@ ptyprocess==0.5.1
 purl==1.1
 pyasn1==0.1.9
 pyasn1-modules==0.0.8
-pybrowscap==2.0
 pycparser==2.14
 pycrypto==2.6.1
 Pygments==2.1.3
@@ -89,6 +88,7 @@ pysolr==3.3.3
 pytest-spec==0.2.24
 python-dateutil==2.1
 python-memcached==1.57
+python-wd-parallel==0.1.1
 pytz==2015.7
 PyVirtualDisplay==0.2
 PyYAML==3.11
@@ -100,6 +100,7 @@ simplegeneric==0.8.1
 simplejson==3.8.2
 singledispatch==3.4.0.3
 six==1.10.0
+sorl-thumbnail==12.4a1
 sqlparse==0.1.18
 tablib==0.11.2
 texttable==0.8.4

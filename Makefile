@@ -18,10 +18,7 @@ postgresql:
 	sudo -u postgres dropuser $(current_dir) --if-exists
 
     # Create user
-	sudo -u postgres psql -c "CREATE USER $(current_dir) WITH PASSWORD '$(current_dir)';"
-
-    # Grant privileges
-	sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE $(current_dir) TO $(current_dir);"
+	sudo -u postgres psql -c "CREATE USER $(current_dir) WITH PASSWORD '$(current_dir)' SUPERUSER;"
 
 libs:
     # Install compiler from less to css
@@ -70,6 +67,10 @@ debian_ubuntu_install_modules: postgresql libs install_pip
 
 site: debian_ubuntu_install_modules create_settings_local virtual_environment
 
+initial_db:
+	./initial_db.sh $(current_dir)
+
+reset_db: postgresql initial_db
 
 
 sandbox_image:

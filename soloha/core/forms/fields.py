@@ -1,6 +1,6 @@
 from django.forms import fields, TextInput
 
-from oscar.core import validators
+from soloha.core import validators
 
 
 class ExtendedURLField(fields.URLField):

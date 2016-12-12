@@ -7,8 +7,8 @@ from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _, pgettext_lazy
 from django.core import exceptions
 
-from soloha.core.compat import AUTH_USER_MODEL
 from soloha.core.models.fields import UppercaseCharField, PhoneNumberField
+from soloha.core.compat import AUTH_USER_MODEL
 
 
 @python_2_unicode_compatible
@@ -303,7 +303,7 @@ class AbstractAddress(models.Model):
 
     def save(self, *args, **kwargs):
         self._update_search_text()
-        super(Address, self).save(*args, **kwargs)
+        super(AbstractAddress, self).save(*args, **kwargs)
 
     def clean(self):
         # Strip all whitespace
@@ -537,7 +537,7 @@ class UserAddress(AbstractShippingAddress):
                 .update(is_default_for_billing=False)
 
     def validate_unique(self, exclude=None):
-        super(Address, self).validate_unique(exclude)
+        super(AbstractAddress, self).validate_unique(exclude)
         qs = self.__class__.objects.filter(
             user=self.user,
             hash=self.generate_hash())

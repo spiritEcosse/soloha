@@ -14,8 +14,8 @@ from django.views.generic.base import View
 
 import phonenumbers
 
-from oscar.core.utils import safe_referrer
-from oscar.core.phonenumber import PhoneNumber
+from soloha.core.utils import safe_referrer
+from soloha.core.phonenumber import PhoneNumber
 
 
 class PostActionMixin(object):

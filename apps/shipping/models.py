@@ -59,7 +59,7 @@ class OrderAndItemCharges(AbstractBase):
         _("Free Shipping"), decimal_places=2, max_digits=12, blank=True, null=True
     )
 
-    class Meta(Base.Meta):
+    class Meta(AbstractBase.Meta):
         app_label = 'shipping'
         verbose_name = _("Order and Item Charge")
         verbose_name_plural = _("Order and Item Charges")
@@ -87,8 +87,8 @@ class WeightBased(AbstractBase):
     # The attribute code to use to look up the weight of a product
     weight_attribute = 'weight'
 
-    code = 'weight-based-shipping'
-    name = _('Weight-based shipping')
+    # code = 'weight-based-shipping'
+    # name = _('Weight-based shipping')
     offer = None
 
     # The default weight to use (in kg) when a product doesn't have a weight
@@ -101,7 +101,7 @@ class WeightBased(AbstractBase):
                     "is defined")
     )
 
-    class Meta(Base.Meta):
+    class Meta(AbstractBase.Meta):
         app_label = 'shipping'
         verbose_name = _("Weight-based Shipping Method")
         verbose_name_plural = _("Weight-based Shipping Methods")

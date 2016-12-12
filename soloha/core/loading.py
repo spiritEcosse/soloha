@@ -7,8 +7,7 @@ from django.apps.config import MODELS_MODULE_NAME
 from django.conf import settings
 from django.core.exceptions import AppRegistryNotReady
 
-from oscar.core.exceptions import (ModuleNotFoundError, ClassNotFoundError,
-                                   AppNotFoundError)
+from soloha.core.exceptions import (ModuleNotFoundError, ClassNotFoundError, AppNotFoundError)
 
 
 def get_class(module_label, classname):

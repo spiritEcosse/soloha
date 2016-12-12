@@ -6,12 +6,10 @@ from django.template import loader, Context
 from django.contrib.sites.models import Site
 from django.db.models import Max
 
-from oscar.apps.customer.notifications import services
-from oscar.core.loading import get_class, get_model
-
-ProductAlert = get_model('customer', 'ProductAlert')
-Product = get_model('catalogue', 'Product')
-Selector = get_class('partner.strategy', 'Selector')
+from apps.customer.notifications import services
+from apps.catalogue.models import Product
+from apps.customer.models import ProductAlert
+from apps.partner.strategy import Selector
 
 logger = logging.getLogger('oscar.alerts')
 

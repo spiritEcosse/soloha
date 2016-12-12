@@ -782,7 +782,7 @@ class Product(models.Model, CommonFeatureProduct):
     )
     recommended_products = models.ManyToManyField(
         'self', through='catalogue.ProductRecommendation', blank=True,
-        verbose_name=_("Recommended products"),
+        verbose_name=_("Recommended products"), symmetrical=False,
         help_text=_("These are products that are recommended to accompany the "
                     "main product.")
     )

@@ -34,7 +34,7 @@ try:
 except ImportError:
     from django.utils.encoding import force_text as force_unicode  # NOQA
 
-from oscar.core.utils import slugify
+from soloha.core.utils import slugify
 
 
 class AutoSlugField(SlugField):
