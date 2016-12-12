@@ -278,8 +278,7 @@ class ProductCategoryView(SingleObjectMixin, generic.ListView):
     def get_context_data(self, **kwargs):
         context = super(ProductCategoryView, self).get_context_data(**kwargs)
 
-        # Todo replace on one query, without regroup
-        filters = Feature.objects.browse().only('title', 'parent', 'slug').filter(
+        context['filters'] = Feature.objects.browse().only('title', 'parent', 'slug').filter(
             level=1, filter_products__categories__in=self.object.get_descendants_through_children(),
             filter_products__enable=True, filter_products__categories__enable=True
         ).annotate(
@@ -291,7 +290,6 @@ class ProductCategoryView(SingleObjectMixin, generic.ListView):
             )
         ).order_by(*self.feature_orders).distinct()
 
-        context['filters'] = filters
         context['url_extra_kwargs'].update({'category_slug': self.kwargs.get('category_slug')})
         context['selected_filters'] = self.selected_filters
 
