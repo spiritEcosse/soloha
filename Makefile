@@ -65,15 +65,16 @@ create_settings_local:
 
 debian_ubuntu_install_modules: postgresql libs install_pip
 
-site: debian_ubuntu_install_modules create_settings_local virtual_environment
-
 initial_db:
 	./initial_db.sh $(current_dir)
 
 reset_db: postgresql initial_db
 
-site3:
-	sudo apt-get install python3-dev libevent-dev python-psycopg2 libpq-dev
+python3:
+	sudo apt-get install python3-dev libevent-dev python-psycopg2
+
+site: debian_ubuntu_install_modules create_settings_local virtual_environment
+site3: debian_ubuntu_install_modules create_settings_local python3 virtual_environment
 
 
 sandbox_image:
