@@ -133,3 +133,5 @@ release: clean
 	rm -rf dist/*
 	python setup.py sdist bdist_wheel
 	twine upload -s dist/*
+
+#./manage.py dumpdata --indent 4 --natural-primary --natural-foreign -e contenttypes -e auth.Permission -e sessions -e admin > data/fixtures/all.json
