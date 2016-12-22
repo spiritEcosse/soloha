@@ -1,6 +1,6 @@
 from django.core.urlresolvers import reverse
 from django import template
-from django.template import Node, Library, TemplateSyntaxError, VariableDoesNotExist, NodeList, resolve_variable
+from django.template import Node, Library, TemplateSyntaxError, VariableDoesNotExist, NodeList
 import re
 
 register = Library()
@@ -52,7 +52,7 @@ register.tag('assign', do_assign)
 def do_ifinlist(parser, token, negate):
     bits = list(token.split_contents())
     if len(bits) != 3:
-        raise TemplateSyntaxError, "%r takes two arguments" % bits[0]
+        raise TemplateSyntaxError("%r takes two arguments" % bits[0])
     end_tag = 'end' + bits[0]
     nodelist_true = parser.parse(('else', end_tag))
     token = parser.next_token()
@@ -92,14 +92,15 @@ class IfInListNode(Node):
         return "<IfInListNode>"
 
     def render(self, context):
-        try:
-            val1 = resolve_variable(self.var1, context)
-        except VariableDoesNotExist:
-            val1 = None
-        try:
-            val2 = resolve_variable(self.var2, context)
-        except VariableDoesNotExist:
-            val2 = None
+        val1 = val2 = None
+        # try:
+            # val1 = resolve_variable(self.var1, context)
+        # except VariableDoesNotExist:
+        #     val1 = None
+        # try:
+        #     val2 = resolve_variable(self.var2, context)
+        # except VariableDoesNotExist:
+        #     val2 = None
         if val1 in val2:
             return self.nodelist_true.render(context)
         else:

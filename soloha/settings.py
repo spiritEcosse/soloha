@@ -38,6 +38,7 @@ INSTALLED_APPS = (
     'dal_select2',
     'django.contrib.admin',
     'django.contrib.sitemaps',
+    'django.contrib.staticfiles',
     'debug_toolbar',
     # 'django_select2',
     # 'bootstrap_pagination',
@@ -46,7 +47,6 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.sites',
     'django.contrib.messages',
-    'django.contrib.staticfiles',
     'django.contrib.flatpages',
     'django.contrib.redirects',
     'apps.analytics',
@@ -75,7 +75,6 @@ INSTALLED_APPS = (
     'widget_tweaks',
     'djng',
     'mptt',
-    'feincms',
     'easy_thumbnails',
     'filer',
     'import_export',
@@ -85,6 +84,11 @@ INSTALLED_APPS = (
     'haystack',
     'django_tables2',
     'django_extensions',
+    'django_jenkins',
+)
+
+JENKINS_TASKS = (
+    'django_jenkins.tasks.run_pylint',
 )
 
 SITE_ID = 1
@@ -341,9 +345,10 @@ THUMBNAIL_ALIASES = {
 }
 
 OSCAR_SHOP_NAME = 'soloha'
-DEBUG_TOOLBAR_CONFIG = settings_local.DEBUG_TOOLBAR_CONFIG
+# DEBUG_TOOLBAR_CONFIG = settings_local.DEBUG_TOOLBAR_CONFIG
 SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
 USE_ETAGS = not DEBUG
+INTERNAL_IPS = settings_local.INTERNAL_IPS
 
 HTML_MINIFY = not DEBUG
 KEEP_COMMENTS_ON_MINIFYING = False
@@ -353,3 +358,8 @@ SECURE_CONTENT_TYPE_NOSNIFF = True
 #CSRF_COOKIE_SECURE = True
 SECURE_BROWSER_XSS_FILTER = True
 X_FRAME_OPTIONS = 'DENY'
+
+PASSWORD_HASHERS = (
+    'django.contrib.auth.hashers.MD5PasswordHasher',
+)
+DATA_FIXTURES = os.path.join(BASE_DIR, 'data/fixtures/all.json')

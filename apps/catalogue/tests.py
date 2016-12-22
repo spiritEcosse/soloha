@@ -1,7 +1,10 @@
 from selenium import webdriver
 import functools
-
+from django.test import tag
+from django.test import override_settings
 from django.test import LiveServerTestCase
+
+from soloha.settings import DATA_FIXTURES
 
 STATUS_CODE_200 = 200
 
@@ -22,28 +25,28 @@ def run_through_drivers(driver_pool='drivers'):
     return wrapped
 
 
-class TestCatalog(LiveServerTestCase):
-    # fixtures = ['initial_test_data.json']
-    selenium = None
-
-    @classmethod
-    def setUpClass(cls):
-        cls.drivers = (
-            # webdriver.Chrome('/home/igor/web/chromedriver'),
-            webdriver.Firefox(),
-            webdriver.PhantomJS
-        )
-        super(TestCatalog, cls).setUpClass()
-
-    @classmethod
-    def tearDownClass(cls):
-        for driver in cls.drivers:
-            driver.quit()
-        super(TestCatalog, cls).tearDownClass()
-
-    @run_through_drivers()
-    def test_example(self):
-        self.selenium.get(self.live_server_url)
+# @override_settings(DEBUG=False)
+# class TestCatalog(LiveServerTestCase):
+#     selenium = None
+#
+#     @classmethod
+#     def setUpClass(cls):
+#         cls.drivers = (
+#             webdriver.Chrome('/home/igor/web/chromedriver'),
+#             webdriver.Firefox(),
+#         )
+#         super(TestCatalog, cls).setUpClass()
+#
+#     @classmethod
+#     def tearDownClass(cls):
+#         for driver in cls.drivers:
+#             driver.quit()
+#         super(TestCatalog, cls).tearDownClass()
+#
+#     @run_through_drivers()
+#     @tag('fast')
+#     def test_status_code(self):
+#         self.selenium.get(self.live_server_url)
 
 
 

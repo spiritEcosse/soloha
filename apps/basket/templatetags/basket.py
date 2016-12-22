@@ -2,7 +2,7 @@ import re
 from widget_tweaks.templatetags.widget_tweaks import FieldAttributeNode
 
 from django.template import TemplateSyntaxError
-from django.template.context_processors import DebugParser
+# from django.template.context_processors import DebugParser
 from django import template
 
 from apps.basket.forms import AddToBasketWithAttributesForm
@@ -10,7 +10,7 @@ from apps.basket.forms import AddToBasketForm, SimpleAddToBasketForm
 from apps.catalogue.models import Product
 
 QNT_SINGLE, QNT_MULTIPLE = 'single', 'multiple'
-parser = DebugParser
+# parser = DebugParser
 
 register = template.Library()
 
@@ -40,23 +40,24 @@ def basket_render_field(*args, **kwargs):
     or attribute+="value" for appending.
     """
     # error_msg = '%r tag requires a form field followed by a list of attributes and values in the form attr="value"' % token.split_contents()[0]
-    form_field = parser.compile_filter(form_field)
-
-    set_attrs = []
-    append_attrs = []
-    for pair in kwargs.items():
-        match = ATTRIBUTE_RE.match(pair)
-        if not match:
-            raise TemplateSyntaxError(error_msg + ": %s" % pair)
-        dct = match.groupdict()
-        attr, sign, value = dct['attr'], dct['sign'], parser.compile_filter(dct['value'])
-
-        if sign == "=":
-            set_attrs.append((attr, value))
-        else:
-            append_attrs.append((attr, value))
-
-    return FieldAttributeNode(form_field, set_attrs, append_attrs)
+    # form_field = parser.compile_filter(form_field)
+    #
+    # set_attrs = []
+    # append_attrs = []
+    # for pair in kwargs.items():
+    #     match = ATTRIBUTE_RE.match(pair)
+    #     if not match:
+    #         raise TemplateSyntaxError(error_msg + ": %s" % pair)
+    #     dct = match.groupdict()
+    #     attr, sign, value = dct['attr'], dct['sign'], parser.compile_filter(dct['value'])
+    #
+    #     if sign == "=":
+    #         set_attrs.append((attr, value))
+    #     else:
+    #         append_attrs.append((attr, value))
+    #
+    # return FieldAttributeNode(form_field, set_attrs, append_attrs)
+    pass
 
 
 @register.assignment_tag()

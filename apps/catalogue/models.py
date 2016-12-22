@@ -1622,3 +1622,5 @@ class ProductImage(models.Model, CommonFeatureProduct):
         for idx, image in enumerate(images):
             image.display_order = idx
             image.save()
+
+

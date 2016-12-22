@@ -135,3 +135,4 @@ release: clean
 	twine upload -s dist/*
 
 #./manage.py dumpdata --indent 4 --natural-primary --natural-foreign -e contenttypes -e auth.Permission -e sessions -e admin > data/fixtures/all.json
+#for tests :run in shell for webdriver.Firefox():export PATH=$PATH:/home/igor/web/

@@ -2,7 +2,7 @@ from django.conf import settings
 from django.core.signing import Signer, BadSignature
 from django.utils.functional import SimpleLazyObject, empty
 
-from apps.offer.utils import Applicator
+from apps.offer.applicator import Applicator
 from apps.basket.models import Basket
 from apps.partner.strategy import Selector
 

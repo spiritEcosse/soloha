@@ -9,7 +9,6 @@ local.py
 /data/fixtures/*
 !/data/fixtures/all.tar.gz
 .idea/
-**/whoosh_index/
 **/node_modules/
 **/bower_components/
 /media/*
@@ -19,7 +18,7 @@ local.py
 # Vagrant
 .vagrant
 npm-debug.log
-
+*.log
 # Temporary/OS files
 *.swp
 *.swo
