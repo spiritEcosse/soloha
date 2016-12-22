@@ -11,7 +11,7 @@ mkvirtualenv $1 --python=`which python3`
 pip install -r requirements.txt
 
 # Update migrations
-./manage.py makemigrations
+./manage.py makemigrations analytics checkout address shipping catalogue reviews partner basket payment offer order customer promotions search voucher wishlists contacts ex_sites ex_redirects sitemap subscribe ex_flatpages
 
 # Apply migrate
 ./manage.py migrate
