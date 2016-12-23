@@ -1,1 +1,1 @@
-from oscar.apps.dashboard.models import *  # noqa
+from apps.dashboard.models import *  # noqa

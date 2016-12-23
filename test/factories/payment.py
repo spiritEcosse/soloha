@@ -1,6 +1,6 @@
 import factory
 
-from oscar.core.loading import get_model
+from soloha.core.loading import get_model
 
 __all__ = [
     'SourceTypeFactory', 'SourceFactory', 'TransactionFactory',
@@ -17,7 +17,7 @@ class SourceTypeFactory(factory.DjangoModelFactory):
 
 class SourceFactory(factory.DjangoModelFactory):
     order = factory.SubFactory(
-        'oscar.test.factories.OrderFactory')
+        'test.factories.OrderFactory')
     source_type = factory.SubFactory(SourceTypeFactory)
 
     class Meta:

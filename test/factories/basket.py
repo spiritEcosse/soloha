@@ -16,7 +16,7 @@ class BasketFactory(factory.DjangoModelFactory):
 
 
 class BasketLineAttributeFactory(factory.DjangoModelFactory):
-    option = factory.SubFactory('oscar.test.factories.OptionFactory')
+    option = factory.SubFactory('test.factories.OptionFactory')
 
     class Meta:
         model = LineAttribute

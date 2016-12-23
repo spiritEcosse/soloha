@@ -11,7 +11,7 @@ from django.core.exceptions import FieldError
 from django.db.transaction import atomic
 from django.utils.translation import ugettext_lazy as _
 
-from oscar.apps.catalogue.exceptions import (ImageImportError, IdenticalImageError, InvalidImageArchive)
+from apps.catalogue.exceptions import (ImageImportError, IdenticalImageError, InvalidImageArchive)
 
 from apps.catalogue.models import Product, ProductImage
 

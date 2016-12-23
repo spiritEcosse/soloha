@@ -4,9 +4,9 @@ from django.forms.models import inlineformset_factory
 from django.utils.translation import ugettext_lazy as _
 from treebeard.forms import movenodeform_factory
 
-from oscar.core.loading import get_class, get_model
-from oscar.core.utils import slugify
-from oscar.forms.widgets import ImageInput
+from soloha.core.loading import get_class, get_model
+from soloha.core.utils import slugify
+from soloha.core.forms.widgets import ImageInput
 
 Product = get_model('catalogue', 'Product')
 ProductClass = get_model('catalogue', 'ProductClass')

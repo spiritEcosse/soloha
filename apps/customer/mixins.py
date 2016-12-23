@@ -12,7 +12,7 @@ from apps.customer.utils import Dispatcher
 
 User = get_user_model()
 
-logger = logging.getLogger('oscar.customer')
+logger = logging.getLogger('customer')
 
 
 class PageTitleMixin(object):

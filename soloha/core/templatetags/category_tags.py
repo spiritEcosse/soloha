@@ -1,5 +1,5 @@
 from django import template
-from oscar.core.loading import get_model
+from soloha.core.loading import get_model
 
 register = template.Library()
 Category = get_model('catalogue', 'category')

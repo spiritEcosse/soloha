@@ -1,8 +1,8 @@
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 
-from oscar.core.loading import get_model
-from oscar.forms import widgets
+from soloha.core.loading import get_model
+from soloha.core.forms import widgets
 
 Voucher = get_model('voucher', 'Voucher')
 Benefit = get_model('offer', 'Benefit')

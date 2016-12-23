@@ -3,9 +3,9 @@ from decimal import Decimal as D
 import factory
 from django.conf import settings
 
-from oscar.core.loading import get_model
-from oscar.core.utils import slugify
-from oscar.test.factories.utils import tax_add, tax_subtract
+from soloha.core.loading import get_model
+from soloha.core.utils import slugify
+from test.factories.utils import tax_add, tax_subtract
 
 __all__ = [
     'BillingAddressFactory', 'ShippingAddressFactory', 'OrderDiscountFactory',
@@ -15,7 +15,7 @@ __all__ = [
 
 
 class BillingAddressFactory(factory.DjangoModelFactory):
-    country = factory.SubFactory('oscar.test.factories.CountryFactory')
+    country = factory.SubFactory('test.factories.CountryFactory')
 
     first_name = 'John'
     last_name = 'Doe'
@@ -29,7 +29,7 @@ class BillingAddressFactory(factory.DjangoModelFactory):
 
 
 class ShippingAddressFactory(factory.DjangoModelFactory):
-    country = factory.SubFactory('oscar.test.factories.CountryFactory')
+    country = factory.SubFactory('test.factories.CountryFactory')
 
     first_name = 'John'
     last_name = 'Doe'
@@ -60,7 +60,7 @@ class OrderFactory(factory.DjangoModelFactory):
     site_id = settings.SITE_ID
     number = factory.LazyAttribute(lambda o: '%d' % (100000 + o.basket.pk))
     basket = factory.SubFactory(
-        'oscar.test.factories.BasketFactory')
+        'test.factories.BasketFactory')
 
     shipping_code = 'delivery'
     shipping_incl_tax = D('4.95')
@@ -94,7 +94,7 @@ class OrderFactory(factory.DjangoModelFactory):
 class OrderLineFactory(factory.DjangoModelFactory):
     order = factory.SubFactory(OrderFactory)
     product = factory.SubFactory(
-        'oscar.test.factories.ProductFactory')
+        'test.factories.ProductFactory')
     partner_sku = factory.LazyAttribute(lambda l: l.product.upc)
     stockrecord = factory.LazyAttribute(
         lambda l: l.product.stockrecords.first())

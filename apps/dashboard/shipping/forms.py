@@ -1,6 +1,6 @@
 from django import forms
 
-from oscar.core.loading import get_model
+from soloha.core.loading import get_model
 
 
 class WeightBasedForm(forms.ModelForm):

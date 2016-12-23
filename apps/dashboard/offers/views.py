@@ -10,8 +10,8 @@ from django.utils.translation import ugettext_lazy as _
 from django.core import serializers
 from django.core.serializers.json import DjangoJSONEncoder
 
-from oscar.core.loading import get_classes, get_class, get_model
-from oscar.views import sort_queryset
+from soloha.core.loading import get_classes, get_class, get_model
+from soloha.core.views import sort_queryset
 
 ConditionalOffer = get_model('offer', 'ConditionalOffer')
 Condition = get_model('offer', 'Condition')

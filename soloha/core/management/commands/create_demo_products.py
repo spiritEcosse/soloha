@@ -3,7 +3,7 @@ from optparse import make_option
 
 from django.core.management.base import BaseCommand, CommandError
 
-from oscar.apps.partner.importers import DemoSiteImporter
+from apps.partner.importers import DemoSiteImporter
 
 
 class Command(BaseCommand):

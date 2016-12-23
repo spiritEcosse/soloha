@@ -20,7 +20,7 @@ from apps.checkout.signals import post_checkout
 
 
 # Standard logger for checkout events
-logger = logging.getLogger('oscar.checkout')
+logger = logging.getLogger('checkout')
 
 
 class OrderPlacementMixin(CheckoutSessionMixin):

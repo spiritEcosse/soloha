@@ -5,7 +5,7 @@ import shutil
 import logging
 import textwrap
 
-import oscar
+import soloha
 
 
 def create_local_app_folder(local_app_path):
@@ -49,7 +49,7 @@ def inherit_app_config(local_app_path, app_package, app_label):
             app_package=app_package, config_name=config_name))
     create_file(
         join(local_app_path, 'config.py'),
-        "from oscar.apps.{app_label} import config\n\n\n"
+        "from apps.{app_label} import config\n\n\n"
         "class {config_name}(config.{config_name}):\n"
         "    name = '{app_package}'\n".format(
             app_package=app_package,
@@ -68,8 +68,7 @@ def fork_app(label, folder_path, logger=None):
         logger = logging.getLogger(__name__)
 
     # Check label is valid
-    valid_labels = [x.replace('oscar.apps.', '') for x in oscar.OSCAR_CORE_APPS
-                    if x.startswith('oscar')]
+    valid_labels = [x.replace('apps.', '') for x in soloha.CORE_INSTALLED_APPS if x.startswith('soloha')]
     if label not in valid_labels:
         raise ValueError("There is no Oscar app that matches '%s'" % label)
 
@@ -86,25 +85,25 @@ def fork_app(label, folder_path, logger=None):
     # Create minimum app files
     app_package = local_app_path.replace('/', '.')
 
-    oscar_app_path = join(oscar.__path__[0], 'apps', label_folder)
-    if exists(os.path.join(oscar_app_path, 'admin.py')):
+    soloha_app_path = join(soloha.__path__[0], 'apps', label_folder)
+    if exists(os.path.join(soloha_app_path, 'admin.py')):
         logger.info("Creating admin.py")
         create_file(join(local_app_path, 'admin.py'),
-                    "from oscar.apps.%s.admin import *  # noqa\n" % label)
+                    "from apps.%s.admin import *  # noqa\n" % label)
 
     logger.info("Creating app config")
     inherit_app_config(local_app_path, app_package, label)
 
     # Only create models.py and migrations if it exists in the Oscar app
-    oscar_models_path = join(oscar_app_path, 'models.py')
-    if exists(oscar_models_path):
+    soloha_models_path = join(soloha_app_path, 'models.py')
+    if exists(soloha_models_path):
         logger.info("Creating models.py")
         create_file(
             join(local_app_path, 'models.py'),
-            "from oscar.apps.%s.models import *  # noqa\n" % label)
+            "from apps.%s.models import *  # noqa\n" % label)
 
         migrations_path = 'migrations'
-        source = join(oscar_app_path, migrations_path)
+        source = join(soloha_app_path, migrations_path)
         if exists(source):
             logger.info("Creating %s folder", migrations_path)
             destination = join(local_app_path, migrations_path)
@@ -123,7 +122,7 @@ def fork_app(label, folder_path, logger=None):
         "      'django.contrib.auth',\n"
         "      ...\n"
         "  ]\n"
-        "  from oscar import get_core_apps\n"
+        "  from soloha import get_core_apps\n"
         "  INSTALLED_APPS = INSTALLED_APPS + get_core_apps(\n"
         "      ['%s'])"
     ) % app_package

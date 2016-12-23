@@ -23,8 +23,8 @@ class ProductFactory(factory.DjangoModelFactory):
     title = "A confederacy of dunces"
     product_class = factory.SubFactory(ProductClassFactory)
 
-    stockrecords = factory.RelatedFactory('oscar.test.factories.StockRecordFactory', 'product')
-    categories = factory.RelatedFactory('oscar.test.factories.ProductCategoryFactory', 'product')
+    stockrecords = factory.RelatedFactory('test.factories.StockRecordFactory', 'product')
+    categories = factory.RelatedFactory('test.factories.ProductCategoryFactory', 'product')
 
 
 class CategoryFactory(factory.DjangoModelFactory):

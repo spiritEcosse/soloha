@@ -12,8 +12,8 @@ from django.views.generic import (
     ListView, DeleteView, CreateView, UpdateView, View)
 
 
-from oscar.views.generic import BulkEditMixin
-from oscar.core.loading import get_classes, get_model
+from soloha.core.views.generic import BulkEditMixin
+from soloha.core.loading import get_classes, get_model
 
 Range = get_model('offer', 'Range')
 RangeProduct = get_model('offer', 'RangeProduct')

@@ -1,4 +1,4 @@
-from oscar.apps.dashboard import config
+from apps.dashboard import config
 
 
 class DashboardDashboardConfig(config.DashboardConfig):

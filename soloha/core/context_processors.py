@@ -3,7 +3,7 @@ from apps.catalogue.models import Category
 from apps.subscribe.forms import SubscribeForm
 from soloha.settings import MAX_COUNT_CATEGORIES
 from django.utils.translation import ugettext_lazy as _
-import oscar
+import soloha
 import re
 import platform
 import django
@@ -51,7 +51,7 @@ def usage_statistics_string():
         params = {
             'django': django.get_version(),
             'python': platform.python_version(),
-            'oscar': oscar.get_version(),
+            'oscar': soloha.get_version(),
         }
         return mark_safe(parse.urlencode(params))
     else:

@@ -16,6 +16,7 @@ from soloha.defaults import *
 from django.utils.translation import ugettext_lazy as _
 import sys
 from soloha import settings_local
+import soloha
 
 BASE_DIR = settings_local.BASE_DIR
 location = lambda x: os.path.join(os.path.dirname(os.path.realpath(__file__)), x)
@@ -33,59 +34,7 @@ ALLOWED_HOSTS = settings_local.ALLOWED_HOSTS
 
 # Application definition
 
-INSTALLED_APPS = (
-    'dal',
-    'dal_select2',
-    'django.contrib.admin',
-    'django.contrib.sitemaps',
-    'django.contrib.staticfiles',
-    'debug_toolbar',
-    # 'django_select2',
-    # 'bootstrap_pagination',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.sites',
-    'django.contrib.messages',
-    'django.contrib.flatpages',
-    'django.contrib.redirects',
-    'apps.analytics',
-    'apps.checkout',
-    'apps.address',
-    'apps.shipping',
-    'apps.catalogue',
-    'apps.catalogue.reviews',
-    'apps.partner',
-    'apps.basket',
-    'apps.payment',
-    'apps.offer',
-    'apps.order',
-    'apps.customer',
-    'apps.promotions',
-    'apps.search',
-    'apps.voucher',
-    'apps.wishlists',
-    'apps.contacts',
-    'apps.ex_sites',
-    'apps.ex_redirects',
-    'apps.sitemap',
-    'apps.subscribe',
-    'apps.ex_flatpages',
-    'compressor',
-    'widget_tweaks',
-    'djng',
-    'mptt',
-    'easy_thumbnails',
-    'filer',
-    'import_export',
-    'ckeditor',
-    'bootstrap_pagination',
-    'debug_panel',
-    'haystack',
-    'django_tables2',
-    'django_extensions',
-    'django_jenkins',
-)
+INSTALLED_APPS = soloha.CORE_INSTALLED_APPS
 
 JENKINS_TASKS = (
     'django_jenkins.tasks.run_pylint',
@@ -106,11 +55,11 @@ TEMPLATES = [
         ],
         'OPTIONS': {
             'loaders': [
-                # ('django.template.loaders.cached.Loader', [
-                'django.template.loaders.filesystem.Loader',
-                'django.template.loaders.app_directories.Loader',
-                'django.template.loaders.eggs.Loader',
-                # ]),
+                ('django.template.loaders.cached.Loader', [
+                    'django.template.loaders.filesystem.Loader',
+                    'django.template.loaders.app_directories.Loader',
+                    'django.template.loaders.eggs.Loader',
+                ]),
             ],
             'context_processors': [
                 'django.template.context_processors.debug',
@@ -157,7 +106,7 @@ DATABASES = {
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/
 
-LANGUAGE_CODE = 'ru'
+LANGUAGE_CODE = 'ru-RU'
 
 TIME_ZONE = 'UTC'
 
@@ -225,39 +174,7 @@ AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
 )
 
-# HAYSTACK_CONNECTIONS = {
-#     'default': {
-#         'ENGINE': 'haystack.backends.simple_backend.SimpleEngine',
-#         # 'ENGINE': 'haystack.backends.solr_backend.SolrEngine',
-#         # 'URL': 'http://127.0.0.1:8983/solr',
-#         # 'INCLUDE_SPELLING': True,
-#     },
-# }
-
-# HAYSTACK_CONNECTIONS = {
-#     'default': {
-#         'ENGINE': 'haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine',
-#         'URL': 'http://127.0.0.1:9200/',
-#         'INDEX_NAME': 'haystack',
-#         'EXCLUDED_INDEXES': [
-#             'myproject.search.search_indexes.CoreProductIndex',
-#              'apps.search.search_indexes.ProductIndex',
-#              ]
-#     },
-# }
-
-
 HAYSTACK_CONNECTIONS = settings_local.HAYSTACK_CONNECTIONS
-
-
-# HAYSTACK_CONNECTIONS = {
-#     'default': {
-#         'ENGINE': 'haystack.backends.solr_backend.SolrEngine',
-#         'URL': 'http://127.0.0.1:8983/solr/',
-#     },
-# }
-
-# HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
 
 OSCAR_MISSING_IMAGE_URL = 'image_not_found.jpg'
 
@@ -363,3 +280,4 @@ PASSWORD_HASHERS = (
     'django.contrib.auth.hashers.MD5PasswordHasher',
 )
 DATA_FIXTURES = os.path.join(BASE_DIR, 'data/fixtures/all.json')
+APPEND_SLASH = True

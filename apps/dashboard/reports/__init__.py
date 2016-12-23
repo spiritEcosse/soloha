@@ -1,2 +1,2 @@
 default_app_config = (
-    'oscar.apps.dashboard.reports.config.ReportsDashboardConfig')
+    'apps.dashboard.reports.config.ReportsDashboardConfig')

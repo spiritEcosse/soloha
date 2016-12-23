@@ -1,8 +1,8 @@
 from django.conf.urls import url
 
-from oscar.core.application import Application
-from oscar.core.loading import get_class
-from oscar.apps.promotions.conf import PROMOTION_CLASSES
+from soloha.core.application import Application
+from soloha.core.loading import get_class
+from apps.promotions.conf import PROMOTION_CLASSES
 
 
 class PromotionsDashboardApplication(Application):

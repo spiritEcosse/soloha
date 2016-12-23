@@ -6,10 +6,10 @@ from django.utils.translation import ugettext_lazy as _
 from django.template.loader import render_to_string
 from django.views import generic
 
-from oscar.apps.customer.utils import normalise_email
-from oscar.core.loading import get_classes, get_model
-from oscar.core.compat import get_user_model
-from oscar.views import sort_queryset
+from apps.customer.utils import normalise_email
+from soloha.core.loading import get_classes, get_model
+from soloha.core.compat import get_user_model
+from soloha.core.views import sort_queryset
 
 User = get_user_model()
 Partner = get_model('partner', 'Partner')

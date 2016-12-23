@@ -4,8 +4,8 @@ from django.utils import six
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 
-from oscar.core.loading import get_model
-from oscar.forms import widgets
+from soloha.core.loading import get_model
+from soloha.core.forms import widgets
 
 ConditionalOffer = get_model('offer', 'ConditionalOffer')
 Condition = get_model('offer', 'Condition')

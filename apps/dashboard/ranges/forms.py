@@ -4,7 +4,7 @@ from django import forms
 from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 
-from oscar.core.loading import get_model
+from soloha.core.loading import get_model
 
 Product = get_model('catalogue', 'Product')
 Range = get_model('offer', 'Range')

@@ -8,10 +8,10 @@ from django.views import generic
 from django.views.generic import ListView
 from django.conf import settings
 
-from oscar.core.loading import get_model
-from oscar.core.utils import slugify
-from oscar.core.validators import URLDoesNotExistValidator
-from oscar.apps.dashboard.pages import forms
+from soloha.core.loading import get_model
+from soloha.core.utils import slugify
+from soloha.core.validators import URLDoesNotExistValidator
+from apps.dashboard.pages import forms
 
 
 FlatPage = get_model('flatpages', 'FlatPage')

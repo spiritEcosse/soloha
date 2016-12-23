@@ -11,7 +11,7 @@ from apps.catalogue.models import Product
 from apps.customer.models import ProductAlert
 from apps.partner.strategy import Selector
 
-logger = logging.getLogger('oscar.alerts')
+logger = logging.getLogger('alerts')
 
 
 def send_alerts():

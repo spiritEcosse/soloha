@@ -13,7 +13,7 @@ from apps.order.signals import order_placed
 
 # Helpers
 
-logger = logging.getLogger('oscar.analytics')
+logger = logging.getLogger('analytics')
 
 
 def _update_counter(model, field_name, filter_kwargs, increment=1):

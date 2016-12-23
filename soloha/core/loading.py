@@ -54,14 +54,14 @@ def get_classes(module_label, classnames):
         Load a single class:
 
         >>> get_class('dashboard.catalogue.forms', 'ProductForm')
-        oscar.apps.dashboard.catalogue.forms.ProductForm
+        apps.dashboard.catalogue.forms.ProductForm
 
         Load a list of classes:
 
         >>> get_classes('dashboard.catalogue.forms',
         ...             ['ProductForm', 'StockRecordForm'])
-        [oscar.apps.dashboard.catalogue.forms.ProductForm,
-         oscar.apps.dashboard.catalogue.forms.StockRecordForm]
+        [apps.dashboard.catalogue.forms.ProductForm,
+         apps.dashboard.catalogue.forms.StockRecordForm]
 
     Raises:
 
@@ -80,15 +80,15 @@ def get_classes(module_label, classnames):
             "Importing from top-level modules is not supported")
 
     # import from Oscar package (should succeed in most cases)
-    # e.g. 'oscar.apps.dashboard.catalogue.forms'
-    oscar_module_label = "oscar.apps.%s" % module_label
+    # e.g. 'apps.dashboard.catalogue.forms'
+    oscar_module_label = "apps.%s" % module_label
     oscar_module = _import_module(oscar_module_label, classnames)
 
-    # returns e.g. 'oscar.apps.dashboard.catalogue',
+    # returns e.g. 'apps.dashboard.catalogue',
     # 'yourproject.apps.dashboard.catalogue' or 'dashboard.catalogue',
     # depending on what is set in INSTALLED_APPS
     installed_apps_entry, app_name = _find_installed_apps_entry(module_label)
-    if installed_apps_entry.startswith('oscar.apps.'):
+    if installed_apps_entry.startswith('apps.'):
         # The entry is obviously an Oscar one, we don't import again
         local_module = None
     else:

@@ -422,7 +422,7 @@ class Benefit(models.Model):
         verbose_name_plural = _("Benefits")
 
     def proxy(self):
-        from oscar.apps.offer import benefits
+        from apps.offer import benefits
 
         klassmap = {
             self.PERCENTAGE: benefits.PercentageDiscountBenefit,
@@ -644,7 +644,7 @@ class Condition(models.Model):
         """
         Return the proxy model
         """
-        from oscar.apps.offer import conditions
+        from apps.offer import conditions
 
         klassmap = {
             self.COUNT: conditions.CountCondition,

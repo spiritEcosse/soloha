@@ -1,12 +1,12 @@
 from django.conf import settings
-from oscar.core.loading import get_model
+from soloha.core.loading import get_model
 from django.db.models.signals import post_save
 
 
 def send_product_alerts(sender, instance, created, **kwargs):
     if kwargs.get('raw', False):
         return
-    from oscar.apps.customer.alerts import utils
+    from apps.customer.alerts import utils
     utils.send_product_alerts(instance.product)
 
 

@@ -1,6 +1,6 @@
 from django import template
 
-from oscar.core.loading import get_class
+from soloha.core.loading import get_class
 
 get_nodes = get_class('dashboard.menu', 'get_nodes')
 register = template.Library()

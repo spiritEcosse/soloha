@@ -1,4 +1,4 @@
-from oscar.apps.voucher import config
+from apps.voucher import config
 
 
 class VoucherConfig(config.VoucherConfig):

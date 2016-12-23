@@ -1,11 +1,7 @@
 from django import template
-from oscar.core.loading import get_model
 
-from oscar.core.loading import get_class
-
-AddToBasketForm = get_class('basket.forms', 'AddToBasketForm')
-SimpleAddToBasketForm = get_class('basket.forms', 'SimpleAddToBasketForm')
-Product = get_model('catalogue', 'product')
+from apps.basket.forms import AddToBasketForm, SimpleAddToBasketForm
+from apps.catalogue.models import Product
 
 register = template.Library()
 

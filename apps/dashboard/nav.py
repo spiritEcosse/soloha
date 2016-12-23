@@ -2,8 +2,8 @@ import re
 from django.core.urlresolvers import reverse, resolve, NoReverseMatch
 from django.core.exceptions import ImproperlyConfigured
 from django.http import Http404
-from oscar.core.loading import get_class, AppNotFoundError
-from oscar.views.decorators import check_permissions
+from soloha.core.loading import get_class, AppNotFoundError
+from soloha.core.views.decorators import check_permissions
 
 
 class Node(object):
@@ -82,7 +82,7 @@ def default_access_fn(user, url_name, url_args=None, url_kwargs=None):
 
     # We can't assume that the view has the same parent module as the app,
     # as either the app or view can be customised. So we turn the module
-    # string (e.g. 'oscar.apps.dashboard.catalogue.views') into an app
+    # string (e.g. 'apps.dashboard.catalogue.views') into an app
     # label that can be loaded by get_class (e.g.
     # 'dashboard.catalogue.app), which then essentially checks
     # INSTALLED_APPS for the right module to load

@@ -19,6 +19,15 @@ HAYSTACK_CONNECTIONS = {
     },
 }
 
+# HAYSTACK_CONNECTIONS = {
+#     'default': {
+#         'ENGINE': 'haystack.backends.solr_backend.SolrEngine',
+#         'URL': 'http://127.0.0.1:8983/solr/',
+#     },
+# }
+
+# HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
+
 FOLDER_STATIC = os.path.join(BASE_DIR, 'static')
 STATIC_URL = '/static_root/'
 FOLDER_STATIC_ROOT = os.path.join(BASE_DIR, STATIC_URL.strip("/"))
@@ -44,7 +53,6 @@ CACHE_MIDDLEWARE_KEY_PREFIX = PROJECT_DIR
 KEY_PREFIX = CACHE_MIDDLEWARE_KEY_PREFIX
 
 MIDDLEWARE_CLASSES = (
-    # 'django.middleware.cache.UpdateCacheMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.gzip.GZipMiddleware',
@@ -55,11 +63,9 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
-    'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware',
     'django.middleware.locale.LocaleMiddleware',
     'apps.basket.middleware.BasketMiddleware',
     'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware',
-    # 'django.middleware.cache.FetchFromCacheMiddleware',
 )
 
 ALLOWED_HOSTS = ['*']

@@ -4,8 +4,8 @@ from django.http import HttpResponse
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 
-from oscar.core import utils
-from oscar.core.compat import UnicodeCSVWriter
+from soloha.core import utils
+from soloha.core.compat import UnicodeCSVWriter
 
 
 class ReportGenerator(object):

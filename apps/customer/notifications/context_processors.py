@@ -1,4 +1,4 @@
-from oscar.core.loading import get_model
+from soloha.core.loading import get_model
 
 Notification = get_model('customer', 'Notification')
 

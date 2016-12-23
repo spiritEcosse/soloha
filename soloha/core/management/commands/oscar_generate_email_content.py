@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand, CommandError
-from oscar.core.loading import get_model
+from soloha.core.loading import get_model
 
-from oscar.core.loading import get_class
+from soloha.core.loading import get_class
 Order = get_model('order', 'Order')
 CommunicationEventType = get_model('customer', 'CommunicationEventType')
 Dispatcher = get_class('customer.utils', 'Dispatcher')

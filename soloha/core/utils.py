@@ -119,7 +119,7 @@ def format_datetime(dt, format=None):
     if is_naive(dt):
         localtime = make_aware(dt, get_current_timezone())
         logging.warning(
-            "oscar.core.utils.format_datetime received native datetime")
+            "soloha.core.utils.format_datetime received native datetime")
     else:
         localtime = dt.astimezone(get_current_timezone())
     return date_filter(localtime, format)

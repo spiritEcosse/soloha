@@ -2,8 +2,8 @@ from django import forms
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 
-from oscar.forms.fields import ExtendedURLField
-from oscar.core.loading import get_classes
+from soloha.core.forms.fields import ExtendedURLField
+from soloha.core.loading import get_classes
 
 RawHTML, PagePromotion = get_classes('promotions.models', ['RawHTML', 'PagePromotion'])
 

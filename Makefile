@@ -73,8 +73,13 @@ reset_db: postgresql initial_db
 python3:
 	sudo apt-get install python3-dev libevent-dev python-psycopg2
 
+run_test:
+	detox
+
 site: debian_ubuntu_install_modules create_settings_local virtual_environment
 site3: debian_ubuntu_install_modules create_settings_local python3 virtual_environment
+test: run_test
+
 
 
 sandbox_image:
@@ -136,3 +141,16 @@ release: clean
 
 #./manage.py dumpdata --indent 4 --natural-primary --natural-foreign -e contenttypes -e auth.Permission -e sessions -e admin > data/fixtures/all.json
 #for tests :run in shell for webdriver.Firefox():export PATH=$PATH:/home/igor/web/
+# run all tests under all envs
+#$ tox
+#
+## run tests under specific env
+#$ TOXENV=py34-dj18 tox
+#
+## run specific test
+#$ TOXENV=py34-dj18 tox python manage.py test tests.test_flow_signal.Test.test_signal_usecase
+#
+## run examples
+#$ TOXENV=py34-dj18 tox python manage.py migrate --settings=examples.settings
+#$ TOXENV=py34-dj18 tox python manage.py loaddata <path_to_json> --settings=examples.settings
+#$ TOXENV=py34-dj18 tox python manage.py runserver --settings=examples.settings

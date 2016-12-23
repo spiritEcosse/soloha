@@ -3,7 +3,7 @@ import datetime
 import factory
 from django.utils.timezone import now
 
-from oscar.core.loading import get_model
+from soloha.core.loading import get_model
 
 __all__ = ['VoucherFactory']
 

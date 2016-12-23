@@ -3,7 +3,7 @@ from django.utils.translation import ugettext_lazy as _, ungettext_lazy
 
 from django_tables2 import Column, LinkColumn, TemplateColumn, A
 
-from oscar.core.loading import get_class, get_model
+from soloha.core.loading import get_class, get_model
 
 DashboardTable = get_class('dashboard.tables', 'DashboardTable')
 Product = get_model('catalogue', 'Product')

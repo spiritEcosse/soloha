@@ -1,10 +1,10 @@
 from django.utils import six
 
 from django import forms
-from oscar.core.loading import get_model
+from soloha.core.loading import get_model
 from django.template import Template, TemplateSyntaxError
 from django.utils.translation import ugettext_lazy as _
-from oscar.apps.customer.utils import normalise_email
+from apps.customer.utils import normalise_email
 
 CommunicationEventType = get_model('customer', 'CommunicationEventType')
 Order = get_model('order', 'Order')

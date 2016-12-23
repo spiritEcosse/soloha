@@ -5,10 +5,10 @@ from django.http import QueryDict
 from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import pgettext_lazy
 
-from oscar.apps.address.forms import AbstractAddressForm
-from oscar.core.loading import get_model
-from oscar.forms.widgets import DatePickerInput
-from oscar.views.generic import PhoneNumberMixin
+from apps.address.forms import AbstractAddressForm
+from soloha.core.loading import get_model
+from soloha.core.forms.widgets import DatePickerInput
+from soloha.core.views.generic import PhoneNumberMixin
 
 Order = get_model('order', 'Order')
 OrderNote = get_model('order', 'OrderNote')

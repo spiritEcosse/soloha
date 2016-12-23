@@ -4,5 +4,5 @@ from django.utils.translation import ugettext_lazy as _
 
 class CommunicationsDashboardConfig(AppConfig):
     label = 'communications_dashboard'
-    name = 'oscar.apps.dashboard.communications'
+    name = 'apps.dashboard.communications'
     verbose_name = _('Communications dashboard')

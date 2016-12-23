@@ -2,7 +2,7 @@ import logging
 from optparse import make_option
 from datetime import timedelta
 
-from oscar.core.loading import get_model
+from soloha.core.loading import get_model
 from django.utils.timezone import now
 from django.core.management.base import BaseCommand
 

@@ -8,11 +8,11 @@ from django.shortcuts import get_object_or_404, redirect
 from django.template.loader import render_to_string
 from django.conf import settings
 
-from oscar.core.loading import get_classes, get_model
+from soloha.core.loading import get_classes, get_model
 
 from django_tables2 import SingleTableMixin
 
-from oscar.views.generic import ObjectLookupView
+from soloha.core.views.generic import ObjectLookupView
 
 (ProductForm,
  ProductClassSelectForm,

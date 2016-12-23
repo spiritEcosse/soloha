@@ -3,11 +3,11 @@ from decimal import Decimal as D, ROUND_UP
 
 from django.utils.timezone import now
 from django.views.generic import TemplateView
-from oscar.core.loading import get_model
+from soloha.core.loading import get_model
 from django.db.models import Avg, Sum, Count
 
-from oscar.core.compat import get_user_model
-from oscar.apps.promotions.models import AbstractPromotion
+from soloha.core.compat import get_user_model
+from apps.promotions.models import AbstractPromotion
 
 ConditionalOffer = get_model('offer', 'ConditionalOffer')
 Voucher = get_model('voucher', 'Voucher')

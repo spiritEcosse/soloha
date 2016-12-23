@@ -1,7 +1,7 @@
 from django.conf.urls import url
 
-from oscar.core.loading import get_class
-from oscar.core.application import Application
+from soloha.core.loading import get_class
+from soloha.core.application import Application
 
 
 class OffersDashboardApplication(Application):

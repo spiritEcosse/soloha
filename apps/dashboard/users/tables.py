@@ -1,6 +1,6 @@
 from django_tables2 import LinkColumn, TemplateColumn, Column, A
 
-from oscar.core.loading import get_class
+from soloha.core.loading import get_class
 
 DashboardTable = get_class('dashboard.tables', 'DashboardTable')
 

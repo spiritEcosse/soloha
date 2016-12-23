@@ -1,5 +1,5 @@
 from django import forms
-from oscar.core.loading import get_model
+from soloha.core.loading import get_model
 from django.utils.translation import ugettext_lazy as _
 
 ProductReview = get_model('reviews', 'productreview')

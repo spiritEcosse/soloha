@@ -4,7 +4,7 @@ from django.core.urlresolvers import reverse
 from django.template.loader import render_to_string
 from django.views import generic
 
-from oscar.core.loading import get_model, get_classes
+from soloha.core.loading import get_model, get_classes
 
 WeightBandForm, WeightBasedForm = get_classes(
     'dashboard.shipping.forms', ['WeightBandForm', 'WeightBasedForm'])

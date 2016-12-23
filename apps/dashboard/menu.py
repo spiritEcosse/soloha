@@ -2,7 +2,7 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.module_loading import import_string
 
-from oscar.core.loading import get_class
+from soloha.core.loading import get_class
 
 
 Node = get_class('dashboard.nav', 'Node')

@@ -3,11 +3,11 @@ from optparse import make_option
 
 from django.core.management.base import BaseCommand, CommandError
 
-from oscar.core.loading import get_class
+from soloha.core.loading import get_class
 
 Importer = get_class('catalogue.utils', 'Importer')
 
-logger = logging.getLogger('oscar.catalogue.import')
+logger = logging.getLogger('catalogue.import')
 
 
 class Command(BaseCommand):

@@ -1,5 +1,5 @@
 from itertools import chain
-from oscar.apps.promotions.models import PagePromotion, KeywordPromotion, AutomaticProductList
+from apps.promotions.models import PagePromotion, KeywordPromotion, AutomaticProductList
 from django.db.models import Prefetch
 
 

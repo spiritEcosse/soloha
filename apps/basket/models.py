@@ -103,7 +103,7 @@ class Basket(models.Model):
             raise RuntimeError(
                 "No strategy class has been assigned to this basket. "
                 "This is normally assigned to the incoming request in "
-                "oscar.apps.basket.middleware.BasketMiddleware. "
+                "apps.basket.middleware.BasketMiddleware. "
                 "Since it is missing, you must be doing something different. "
                 "Ensure that a strategy instance is assigned to the basket!"
             )

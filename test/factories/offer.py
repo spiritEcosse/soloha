@@ -1,6 +1,6 @@
 import factory
 
-from oscar.core.loading import get_model
+from apps.offer.models import RangeProduct, Benefit, Range, Condition, ConditionalOffer
 
 __all__ = [
     'RangeFactory', 'ConditionFactory', 'BenefitFactory',
@@ -13,36 +13,34 @@ class RangeFactory(factory.DjangoModelFactory):
     slug = factory.Sequence(lambda n: 'range-%d' % n)
 
     class Meta:
-        model = get_model('offer', 'Range')
+        model = Range
 
     @factory.post_generation
     def products(self, create, extracted, **kwargs):
         if not create or not extracted:
             return
 
-        RangeProduct = get_model('offer', 'RangeProduct')
-
         for product in extracted:
             RangeProduct.objects.create(product=product, range=self)
 
 
 class BenefitFactory(factory.DjangoModelFactory):
-    type = get_model('offer', 'Benefit').PERCENTAGE
+    type = Benefit.PERCENTAGE
     value = 10
     max_affected_items = None
     range = factory.SubFactory(RangeFactory)
 
     class Meta:
-        model = get_model('offer', 'Benefit')
+        model = Benefit
 
 
 class ConditionFactory(factory.DjangoModelFactory):
-    type = get_model('offer', 'Condition').COUNT
+    type = Condition.COUNT
     value = 10
     range = factory.SubFactory(RangeFactory)
 
     class Meta:
-        model = get_model('offer', 'Condition')
+        model = Condition
 
 
 class ConditionalOfferFactory(factory.DjangoModelFactory):
@@ -51,4 +49,4 @@ class ConditionalOfferFactory(factory.DjangoModelFactory):
     condition = factory.SubFactory(ConditionFactory)
 
     class Meta:
-        model = get_model('offer', 'ConditionalOffer')
+        model = ConditionalOffer

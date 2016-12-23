@@ -1,12 +1,12 @@
 # from django.test import TestCase
 # from django.test import Client
 # from django.core.urlresolvers import reverse
-# from oscar.test import factories
+# from test import factories
 # from soloha.settings import MAX_COUNT_PRODUCT, MAX_COUNT_CATEGORIES
 # import json
 # from django.db.models.query import Prefetch
-# from oscar.core.loading import get_model
-# from oscar.apps.catalogue.categories import create_from_breadcrumbs
+# from soloha.core.loading import get_model
+# from apps.catalogue.categories import create_from_breadcrumbs
 # from python_test.factories import catalogue
 # from apps.promotions.views import HomeView
 # from apps.catalogue.models import SiteInfo

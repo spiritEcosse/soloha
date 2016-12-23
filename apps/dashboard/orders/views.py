@@ -12,13 +12,13 @@ from django.utils.datastructures import SortedDict
 from django.views.generic import ListView, DetailView, UpdateView, FormView
 from django.conf import settings
 
-from oscar.core.loading import get_class, get_model
-from oscar.core.utils import format_datetime, datetime_combine
-from oscar.core.compat import UnicodeCSVWriter
-from oscar.views import sort_queryset
-from oscar.views.generic import BulkEditMixin
-from oscar.apps.payment.exceptions import PaymentError
-from oscar.apps.order import exceptions as order_exceptions
+from soloha.core.loading import get_class, get_model
+from soloha.core.utils import format_datetime, datetime_combine
+from soloha.core.compat import UnicodeCSVWriter
+from soloha.core.views import sort_queryset
+from soloha.core.views.generic import BulkEditMixin
+from apps.payment.exceptions import PaymentError
+from apps.order import exceptions as order_exceptions
 
 Partner = get_model('partner', 'Partner')
 Transaction = get_model('payment', 'Transaction')

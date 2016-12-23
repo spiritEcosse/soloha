@@ -2,7 +2,7 @@ from decimal import Decimal as D
 
 import factory
 
-from oscar.core.loading import get_model
+from soloha.core.loading import get_model
 
 __all__ = [
     'PartnerFactory', 'StockRecordFactory',

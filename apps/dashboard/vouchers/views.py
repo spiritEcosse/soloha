@@ -3,21 +3,15 @@ import datetime
 from django.conf import settings
 from django.contrib import messages
 from django.core.urlresolvers import reverse
-from oscar.core.loading import get_model
 from django.http import HttpResponseRedirect
 from django.utils.translation import ugettext_lazy as _
 from django.views import generic
 
-from oscar.core.loading import get_class
-from oscar.views import sort_queryset
+from soloha.core.views import sort_queryset
 
-VoucherForm = get_class('dashboard.vouchers.forms', 'VoucherForm')
-VoucherSearchForm = get_class('dashboard.vouchers.forms', 'VoucherSearchForm')
-Voucher = get_model('voucher', 'Voucher')
-ConditionalOffer = get_model('offer', 'ConditionalOffer')
-Benefit = get_model('offer', 'Benefit')
-Condition = get_model('offer', 'Condition')
-OrderDiscount = get_model('order', 'OrderDiscount')
+from apps.dashboard.vouchers.forms import VoucherForm, VoucherSearchForm
+from apps.offer.models import ConditionalOffer, Benefit, Condition, OrderDiscount
+from apps.voucher.models import Voucher
 
 
 class VoucherListView(generic.ListView):

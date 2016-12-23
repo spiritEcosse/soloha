@@ -11,10 +11,10 @@ from django.views.generic.edit import FormMixin
 
 from django_tables2 import SingleTableMixin
 
-from oscar.apps.customer.utils import normalise_email
-from oscar.views.generic import BulkEditMixin
-from oscar.core.compat import get_user_model
-from oscar.core.loading import get_class, get_classes, get_model
+from apps.customer.utils import normalise_email
+from soloha.core.views.generic import BulkEditMixin
+from soloha.core.compat import get_user_model
+from soloha.core.loading import get_class, get_classes, get_model
 
 UserSearchForm, ProductAlertSearchForm, ProductAlertUpdateForm = get_classes(
     'dashboard.users.forms', ('UserSearchForm', 'ProductAlertSearchForm',

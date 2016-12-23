@@ -1,17 +1,17 @@
 import factory
 
-from oscar.core.compat import get_user_model
-from oscar.core.loading import get_model
+from apps.customer.models import ProductAlert
+from soloha.core.compat import get_user_model
 
 __all__ = ['ProductAlertFactory', 'UserFactory']
 
 
 class ProductAlertFactory(factory.DjangoModelFactory):
     class Meta:
-        model = get_model('customer', 'ProductAlert')
+        model = ProductAlert
 
-    product = factory.SubFactory('oscar.test.factories.ProductFactory')
-    user = factory.SubFactory('oscar.test.factories.customer.UserFactory')
+    product = factory.SubFactory('test.factories.ProductFactory')
+    user = factory.SubFactory('test.factories.customer.UserFactory')
     status = Meta.model.ACTIVE
 
 

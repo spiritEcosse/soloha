@@ -1,6 +1,6 @@
 from django.core.urlresolvers import reverse_lazy
 
-from oscar.forms.widgets import RemoteSelect, MultipleRemoteSelect
+from soloha.core.forms.widgets import RemoteSelect, MultipleRemoteSelect
 
 
 class ProductSelect(RemoteSelect):

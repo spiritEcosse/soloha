@@ -2,10 +2,10 @@ from django import forms
 from django.contrib.auth.models import Permission
 from django.utils.translation import ugettext_lazy as _, pgettext_lazy
 
-from oscar.core.loading import get_model
-from oscar.core.compat import existing_user_fields, get_user_model
-from oscar.apps.customer.forms import EmailUserCreationForm
-from oscar.core.validators import password_validators
+from soloha.core.loading import get_model
+from soloha.core.compat import existing_user_fields, get_user_model
+from apps.customer.forms import EmailUserCreationForm
+from soloha.core.validators import password_validators
 
 User = get_user_model()
 Partner = get_model('partner', 'Partner')
