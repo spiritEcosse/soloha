@@ -120,7 +120,7 @@ class Basket(models.Model):
         """
         # We enfore a max threshold to prevent a DOS attack via the offers
         # system.
-        basket_threshold = settings.OSCAR_MAX_BASKET_QUANTITY_THRESHOLD
+        basket_threshold = settings.MAX_BASKET_QUANTITY_THRESHOLD
         if basket_threshold:
             total_basket_quantity = self.num_items
             max_allowed = basket_threshold - total_basket_quantity

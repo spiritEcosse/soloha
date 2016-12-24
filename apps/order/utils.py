@@ -42,8 +42,8 @@ class OrderCreator(object):
         if not order_number:
             generator = OrderNumberGenerator()
             order_number = generator.order_number(basket)
-        if not status and hasattr(settings, 'OSCAR_INITIAL_ORDER_STATUS'):
-            status = getattr(settings, 'OSCAR_INITIAL_ORDER_STATUS')
+        if not status and hasattr(settings, 'INITIAL_ORDER_STATUS'):
+            status = getattr(settings, 'INITIAL_ORDER_STATUS')
         try:
             Order._default_manager.get(number=order_number)
         except Order.DoesNotExist:
@@ -162,10 +162,10 @@ class OrderCreator(object):
             basket_line.purchase_info.availability.dispatch_date
         }
         extra_line_fields = extra_line_fields or {}
-        if hasattr(settings, 'OSCAR_INITIAL_LINE_STATUS'):
+        if hasattr(settings, 'INITIAL_LINE_STATUS'):
             if not (extra_line_fields and 'status' in extra_line_fields):
                 extra_line_fields['status'] = getattr(
-                    settings, 'OSCAR_INITIAL_LINE_STATUS')
+                    settings, 'INITIAL_LINE_STATUS')
         if extra_line_fields:
             line_data.update(extra_line_fields)
 

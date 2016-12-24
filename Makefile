@@ -76,8 +76,8 @@ python3:
 run_test:
 	detox
 
-site: debian_ubuntu_install_modules create_settings_local virtual_environment
-site3: debian_ubuntu_install_modules create_settings_local python3 virtual_environment
+#site: debian_ubuntu_install_modules create_settings_local virtual_environment
+site: debian_ubuntu_install_modules create_settings_local python3 virtual_environment
 test: run_test
 
 

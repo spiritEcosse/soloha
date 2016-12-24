@@ -19,8 +19,8 @@ def get_product_search_handler_class():
     back to rudimentary category browsing if that isn't enabled.
     """
     # Use get_class to ensure overridability
-    if settings.OSCAR_PRODUCT_SEARCH_HANDLER is not None:
-        return import_string(settings.OSCAR_PRODUCT_SEARCH_HANDLER)
+    if settings.PRODUCT_SEARCH_HANDLER is not None:
+        return import_string(settings.PRODUCT_SEARCH_HANDLER)
     if is_solr_supported():
         return ProductSearchHandler
     elif is_elasticsearch_supported():
@@ -36,7 +36,7 @@ class SolrProductSearchHandler(SearchHandler):
     """
     form_class = BrowseCategoryForm
     model_whitelist = [Product]
-    paginate_by = settings.OSCAR_PRODUCTS_PER_PAGE
+    paginate_by = settings.PRODUCTS_PER_PAGE
 
     def __init__(self, request_data, full_path, categories=None):
         self.categories = categories
@@ -64,7 +64,7 @@ class ESProductSearchHandler(SearchHandler):
     """
     form_class = BrowseCategoryForm
     model_whitelist = [Product]
-    paginate_by = settings.OSCAR_PRODUCTS_PER_PAGE
+    paginate_by = settings.PRODUCTS_PER_PAGE
 
     def __init__(self, request_data, full_path, categories=None):
         self.categories = categories
@@ -87,7 +87,7 @@ class SimpleProductSearchHandler(MultipleObjectMixin):
     Note that is meant as a replacement search handler and not as a view
     mixin; the mixin just does most of what we need it to do.
     """
-    paginate_by = settings.OSCAR_PRODUCTS_PER_PAGE
+    paginate_by = settings.PRODUCTS_PER_PAGE
 
     def __init__(self, request_data, full_path, categories=None):
         self.categories = categories

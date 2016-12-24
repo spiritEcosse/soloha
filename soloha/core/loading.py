@@ -81,8 +81,8 @@ def get_classes(module_label, classnames):
 
     # import from Oscar package (should succeed in most cases)
     # e.g. 'apps.dashboard.catalogue.forms'
-    oscar_module_label = "apps.%s" % module_label
-    oscar_module = _import_module(oscar_module_label, classnames)
+    module_label = "apps.%s" % module_label
+    module = _import_module(module_label, classnames)
 
     # returns e.g. 'apps.dashboard.catalogue',
     # 'yourproject.apps.dashboard.catalogue' or 'dashboard.catalogue',
@@ -98,7 +98,7 @@ def get_classes(module_label, classnames):
         local_module_label = installed_apps_entry + sub_module
         local_module = _import_module(local_module_label, classnames)
 
-    if oscar_module is local_module is None:
+    if module is local_module is None:
         # This intentionally doesn't raise an ImportError, because ImportError
         # can get masked in complex circular import scenarios.
         raise ModuleNotFoundError(
@@ -108,7 +108,7 @@ def get_classes(module_label, classnames):
         )
 
     # return imported classes, giving preference to ones from the local package
-    return _pluck_classes([local_module, oscar_module], classnames)
+    return _pluck_classes([local_module, module], classnames)
 
 
 def _import_module(module_label, classnames):
@@ -217,7 +217,7 @@ def feature_hidden(feature_name):
     Test if a certain Oscar feature is disabled.
     """
     return (feature_name is not None and
-            feature_name in settings.OSCAR_HIDDEN_FEATURES)
+            feature_name in settings.HIDDEN_FEATURES)
 
 
 def get_model(app_label, model_name):

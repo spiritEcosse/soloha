@@ -41,7 +41,7 @@ def send_alert_confirmation(alert):
     mail.send_mail(
         subject_tpl.render(ctx).strip(),
         body_tpl.render(ctx),
-        settings.OSCAR_FROM_EMAIL,
+        settings.FROM_EMAIL,
         [alert.email],
     )
 
@@ -106,7 +106,7 @@ def send_product_alerts(product):
             mail.EmailMessage(
                 email_subject_tpl.render(ctx).strip(),
                 email_body_tpl.render(ctx),
-                settings.OSCAR_FROM_EMAIL,
+                settings.FROM_EMAIL,
                 [alert.get_email_address()],
             )
         )

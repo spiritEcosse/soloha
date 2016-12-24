@@ -79,7 +79,7 @@ class PageDetailView(generic.TemplateView):
 
     def get_positions_context_data(self, path):
         ctx = []
-        for code, name in settings.OSCAR_PROMOTION_POSITIONS:
+        for code, name in settings.PROMOTION_POSITIONS:
             promotions = PagePromotion._default_manager.select_related() \
                                                        .filter(page_url=path,
                                                                position=code)

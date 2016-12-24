@@ -39,12 +39,12 @@ class AccountSummaryView(generic.RedirectView):
     called when the user clicks on "Account" in the navbar.
 
     Oscar defaults to just redirecting to the profile summary page (and
-    that redirect can be configured via OSCAR_ACCOUNT_REDIRECT_URL), but
+    that redirect can be configured via ACCOUNT_REDIRECT_URL), but
     it's also likely you want to display an 'account overview' page or
     such like. The presence of this view allows just that, without
     having to change a lot of templates.
     """
-    pattern_name = settings.OSCAR_ACCOUNTS_REDIRECT_URL
+    pattern_name = settings.ACCOUNTS_REDIRECT_URL
 
 
 class AccountRegistrationView(RegisterUserMixin, generic.FormView):
@@ -219,14 +219,14 @@ class AccountAuthView(RegisterUserMixin, generic.TemplateView):
 
 
 class LogoutView(generic.RedirectView):
-    url = settings.OSCAR_HOMEPAGE
+    url = settings.HOMEPAGE
     permanent = False
 
     def get(self, request, *args, **kwargs):
         auth_logout(request)
         response = super(LogoutView, self).get(request, *args, **kwargs)
 
-        for cookie in settings.OSCAR_COOKIES_DELETE_ON_LOGOUT:
+        for cookie in settings.COOKIES_DELETE_ON_LOGOUT:
             response.delete_cookie(cookie)
 
         return response
@@ -338,7 +338,7 @@ class ProfileDeleteView(PageTitleMixin, generic.FormView):
     template_name = 'customer/profile/profile_delete.html'
     page_title = _('Delete profile')
     active_tab = 'profile'
-    success_url = settings.OSCAR_HOMEPAGE
+    success_url = settings.HOMEPAGE
 
     def get_form_kwargs(self):
         kwargs = super(ProfileDeleteView, self).get_form_kwargs()
@@ -389,7 +389,7 @@ class ChangePasswordView(PageTitleMixin, generic.FormView):
 class EmailHistoryView(PageTitleMixin, generic.ListView):
     context_object_name = "emails"
     template_name = 'customer/email/email_list.html'
-    paginate_by = settings.OSCAR_EMAILS_PER_PAGE
+    paginate_by = settings.EMAILS_PER_PAGE
     page_title = _('Email History')
     active_tab = 'emails'
 
@@ -422,7 +422,7 @@ class OrderHistoryView(PageTitleMixin, generic.ListView):
     """
     context_object_name = "orders"
     template_name = 'customer/order/order_list.html'
-    paginate_by = settings.OSCAR_ORDERS_PER_PAGE
+    paginate_by = settings.ORDERS_PER_PAGE
     model = Order
     form_class = OrderSearchForm
     page_title = _('Order History')
@@ -602,7 +602,7 @@ class AddressListView(PageTitleMixin, generic.ListView):
     """Customer address book"""
     context_object_name = "addresses"
     template_name = 'customer/address/address_list.html'
-    paginate_by = settings.OSCAR_ADDRESSES_PER_PAGE
+    paginate_by = settings.ADDRESSES_PER_PAGE
     active_tab = 'addresses'
     page_title = _('Address Book')
 

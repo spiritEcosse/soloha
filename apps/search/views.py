@@ -13,7 +13,7 @@ from django.utils.translation import ugettext_lazy as _
 from apps.search import signals
 from apps.catalogue.models import Product, Feature
 
-OSCAR_PRODUCTS_PER_PAGE = getattr(settings, 'OSCAR_PRODUCTS_PER_PAGE', 24)
+PRODUCTS_PER_PAGE = getattr(settings, 'PRODUCTS_PER_PAGE', 24)
 
 
 class CoreFacetedSearchView(FacetedSearchView):
@@ -80,7 +80,7 @@ class CoreFacetedSearchView(FacetedSearchView):
 class FacetedSearchView(views.JSONResponseMixin, views.AjaxResponseMixin, CoreFacetedSearchView, generic.ListView):
     template_name = 'search/results.html'
     model = Product
-    paginate_by = OSCAR_PRODUCTS_PER_PAGE
+    paginate_by = PRODUCTS_PER_PAGE
 
     def post(self, request, *args, **kwargs):
         if self.request.is_ajax() and self.request.GET.get('q'):
@@ -108,7 +108,7 @@ class FacetedSearchView(views.JSONResponseMixin, views.AjaxResponseMixin, CoreFa
                                   'price_descending': '-stockrecords__price_excl_tax'}
         self.kwargs['sorting_type'] = dict_new_sorting_types.get(self.kwargs.get('sorting_type', 'popularity'))
         self.products_on_page = self.get_queryset()
-        self.paginator = self.get_paginator(self.products_on_page, OSCAR_PRODUCTS_PER_PAGE)
+        self.paginator = self.get_paginator(self.products_on_page, PRODUCTS_PER_PAGE)
         self.products_current_page = self.paginator.page(self.page_number).object_list
         self.paginated_products = []
         if (int(self.page_number)) != self.paginator.num_pages:

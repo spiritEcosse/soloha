@@ -2,7 +2,7 @@
 #
 # import random
 # from test import factories
-# from soloha.settings import OSCAR_MISSING_IMAGE_URL
+# from soloha.settings import MISSING_IMAGE_URL
 # from soloha.settings import MAX_COUNT_PRODUCT, MAX_COUNT_CATEGORIES
 # from django.core.management import call_command
 # from apps.partner import strategy, availability, prices
@@ -88,7 +88,7 @@
 #     # @classmethod
 #     # def create_stockrecord(cls, product=None, price_excl_tax=None, partner_sku=None,
 #     #                        num_in_stock=None, partner_name=None,
-#     #                        currency=OSCAR_DEFAULT_CURRENCY,
+#     #                        currency=DEFAULT_CURRENCY,
 #     #                        partner_users=None, product_version=None, product_option=None):
 #     #     if product is None:
 #     #         product = factories.create_product(title='Product 1000')
@@ -287,7 +287,7 @@
 #         for num in xrange(1, 10):
 #             product = factories.create_product(slug='product-{}'.format(num), title='Product {}'.format(num), price=num)
 #             self.create_attributes(product=product)
-#             factories.create_product_image(product=product, original=OSCAR_MISSING_IMAGE_URL)
+#             factories.create_product_image(product=product, original=MISSING_IMAGE_URL)
 #             category_123 = Category.objects.get(name='Category-123')
 #             category_3 = Category.objects.get(name='Category-3')
 #             category_32 = Category.objects.get(name='Category-32')
@@ -308,7 +308,7 @@
 #         for num in xrange(40, 50):
 #             product = factories.create_product(slug='product-{}'.format(num), title='Product {}'.format(num), price=num)
 #             self.create_attributes(product=product)
-#             factories.create_product_image(product=product, original=OSCAR_MISSING_IMAGE_URL)
+#             factories.create_product_image(product=product, original=MISSING_IMAGE_URL)
 #             category_321 = Category.objects.get(name='Category-321')
 #             product.categories.add(category_321)
 #

@@ -82,8 +82,8 @@ class BasketMiddleware(object):
             cookie = self.get_basket_hash(request.basket.id)
             response.set_cookie(
                 cookie_key, cookie,
-                max_age=settings.OSCAR_BASKET_COOKIE_LIFETIME,
-                secure=settings.OSCAR_BASKET_COOKIE_SECURE, httponly=True)
+                max_age=settings.BASKET_COOKIE_LIFETIME,
+                secure=settings.BASKET_COOKIE_SECURE, httponly=True)
         return response
 
     def get_cookie_key(self, request):
@@ -93,7 +93,7 @@ class BasketMiddleware(object):
         The method serves as a useful hook in multi-site scenarios where
         different baskets might be needed.
         """
-        return settings.OSCAR_BASKET_COOKIE_OPEN
+        return settings.BASKET_COOKIE_OPEN
 
     def process_template_response(self, request, response):
         if hasattr(response, 'context_data'):

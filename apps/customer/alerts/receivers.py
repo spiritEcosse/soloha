@@ -10,6 +10,6 @@ def send_product_alerts(sender, instance, created, **kwargs):
     utils.send_product_alerts(instance.product)
 
 
-if settings.OSCAR_EAGER_ALERTS:
+if settings.EAGER_ALERTS:
     StockRecord = get_model('partner', 'StockRecord')
     post_save.connect(send_product_alerts, sender=StockRecord)

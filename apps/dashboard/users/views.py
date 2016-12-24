@@ -158,7 +158,7 @@ class ProductAlertListView(ListView):
     form_class = ProductAlertSearchForm
     context_object_name = 'alerts'
     template_name = 'dashboard/users/alerts/list.html'
-    paginate_by = settings.OSCAR_DASHBOARD_ITEMS_PER_PAGE
+    paginate_by = settings.DASHBOARD_ITEMS_PER_PAGE
     base_description = _('All Alerts')
     description = ''
 

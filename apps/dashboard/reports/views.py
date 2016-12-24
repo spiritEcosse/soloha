@@ -12,7 +12,7 @@ GeneratorRepository = get_class('dashboard.reports.utils',
 
 class IndexView(ListView):
     template_name = 'dashboard/reports/index.html'
-    paginate_by = settings.OSCAR_DASHBOARD_ITEMS_PER_PAGE
+    paginate_by = settings.DASHBOARD_ITEMS_PER_PAGE
     context_object_name = 'objects'
     report_form_class = ReportForm
     generator_repository = GeneratorRepository

@@ -2,7 +2,7 @@
 
 from django.conf import settings
 
-if settings.OSCAR_DELETE_IMAGE_FILES:
+if settings.DELETE_IMAGE_FILES:
     from django.db import models
     from django.db.models.signals import post_delete
 

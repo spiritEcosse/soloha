@@ -18,7 +18,7 @@ from django.core.paginator import InvalidPage
 from django.utils.http import urlquote
 from django.shortcuts import redirect
 
-from soloha.settings import OSCAR_PRODUCTS_PER_PAGE
+from soloha.settings import PRODUCTS_PER_PAGE
 from soloha.core.templatetags.currency_filters import currency
 
 import json
@@ -94,7 +94,7 @@ class CatalogueView(generic.ListView):
     context_object_name = "products"
     template_name = 'catalogue/browse.html'
     model = Product
-    paginate_by = OSCAR_PRODUCTS_PER_PAGE
+    paginate_by = PRODUCTS_PER_PAGE
 
     def get(self, request, *args, **kwargs):
         try:
@@ -144,7 +144,7 @@ class ProductCategoryView(SingleObjectMixin, generic.ListView):
     enforce_paths = True
     model = Product
     model_category = Category
-    paginate_by = OSCAR_PRODUCTS_PER_PAGE
+    paginate_by = PRODUCTS_PER_PAGE
     use_keys = ('sort', 'filter_slug', )
     feature_only = ('title', 'slug', 'parent__id', 'parent__title', )
     feature_orders = ('parent__sort', 'parent__title',)
@@ -196,7 +196,7 @@ class ProductCategoryView(SingleObjectMixin, generic.ListView):
         self.object = self.get_object()
         self.products_on_page = self.get_queryset()
 
-        self.paginator = self.get_paginator(self.products_on_page, OSCAR_PRODUCTS_PER_PAGE)
+        self.paginator = self.get_paginator(self.products_on_page, PRODUCTS_PER_PAGE)
         self.products_current_page = self.paginator.page(self.page_number).object_list
         self.paginated_products = []
         if (int(self.page_number)) != self.paginator.num_pages:

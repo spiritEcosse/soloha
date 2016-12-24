@@ -110,13 +110,13 @@ class Order(models.Model):
     #: Order status pipeline.  This should be a dict where each (key, value) #:
     #: corresponds to a status and a list of possible statuses that can follow
     #: that one.
-    pipeline = getattr(settings, 'OSCAR_ORDER_STATUS_PIPELINE', {})
+    pipeline = getattr(settings, 'ORDER_STATUS_PIPELINE', {})
 
     #: Order status cascade pipeline.  This should be a dict where each (key,
     #: value) pair corresponds to an *order* status and the corresponding
     #: *line* status that needs to be set when the order is set to the new
     #: status
-    cascade = getattr(settings, 'OSCAR_ORDER_STATUS_CASCADE', {})
+    cascade = getattr(settings, 'ORDER_STATUS_CASCADE', {})
 
     class Meta:
         app_label = 'order'
@@ -514,7 +514,7 @@ class Line(models.Model):
     #: Order status pipeline.  This should be a dict where each (key, value)
     #: corresponds to a status and the possible statuses that can follow that
     #: one.
-    pipeline = getattr(settings, 'OSCAR_LINE_STATUS_PIPELINE', {})
+    pipeline = getattr(settings, 'LINE_STATUS_PIPELINE', {})
 
     class Meta:
         app_label = 'order'

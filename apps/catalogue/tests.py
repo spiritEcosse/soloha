@@ -128,7 +128,7 @@ def run_through_drivers(driver_pool='drivers'):
 #                 if attribute.price_retail is not None:
 #                     price += attribute.price_retail
 #             context['price'] = price
-#             context['currency'] = settings.OSCAR_DEFAULT_CURRENCY
+#             context['currency'] = settings.DEFAULT_CURRENCY
 #         return context
 #
 #     def get_attributes_for_attribute(self, product, attribute):
@@ -639,7 +639,7 @@ def run_through_drivers(driver_pool='drivers'):
 #         self.assertions_category(category=category, dict_values=dict_values)
 #
 #     def assertions_category(self, category, dict_values={}):
-#         paginate_by = OSCAR_PRODUCTS_PER_PAGE
+#         paginate_by = PRODUCTS_PER_PAGE
 #         # only = ['title', 'slug', 'structure', 'product_class', 'enable', 'categories', 'filters']
 #         only = ['title', 'slug', 'structure', 'product_class', 'categories']
 #         dict_filter = {'enable': True, 'categories__in': category.get_descendants(include_self=True)}
@@ -690,7 +690,7 @@ def run_through_drivers(driver_pool='drivers'):
 #                                     HTTP_X_REQUESTED_WITH='XMLHttpRequest')
 #         context = dict()
 #         context['products'] = []
-#         for product in products[OSCAR_PRODUCTS_PER_PAGE*(int(dict_values['page'])-1):OSCAR_PRODUCTS_PER_PAGE*(int(dict_values['page']))]:
+#         for product in products[PRODUCTS_PER_PAGE*(int(dict_values['page'])-1):PRODUCTS_PER_PAGE*(int(dict_values['page']))]:
 #             product_values = product.get_values()
 #             product_values['id'] = product.id
 #             context['products'].append(product_values)
@@ -971,7 +971,7 @@ def run_through_drivers(driver_pool='drivers'):
 #         self.assertions_product_search(dict_values=dict_values)
 #
 #     def assertions_product_search(self, dict_values=None):
-#         paginate_by = OSCAR_PRODUCTS_PER_PAGE
+#         paginate_by = PRODUCTS_PER_PAGE
 #         dict_filter = dict()
 #
 #         if dict_values.get('filter_slug'):
@@ -1000,7 +1000,7 @@ def run_through_drivers(driver_pool='drivers'):
 #         ).distinct()
 #
 #         response_titles = [product.title for product in list(response.context['page_obj'])]
-#         products_titles = [product['title'] for product in searched_products][:OSCAR_PRODUCTS_PER_PAGE]
+#         products_titles = [product['title'] for product in searched_products][:PRODUCTS_PER_PAGE]
 #         p = Paginator(searched_products, paginate_by)
 #
 #         self.assertEqual(response.status_code, STATUS_CODE_200)
@@ -1023,7 +1023,7 @@ def run_through_drivers(driver_pool='drivers'):
 #                               'title': obj.title,
 #                               'image': obj.object.get_values()['image'],
 #                               'absolute_url': obj.object.get_absolute_url(),
-#                               'price': obj.object.get_values()['price']} for obj in sqs][OSCAR_PRODUCTS_PER_PAGE*(int(dict_values['page'])-1):OSCAR_PRODUCTS_PER_PAGE*(int(dict_values['page']))]
+#                               'price': obj.object.get_values()['price']} for obj in sqs][PRODUCTS_PER_PAGE*(int(dict_values['page'])-1):PRODUCTS_PER_PAGE*(int(dict_values['page']))]
 #         content = json.loads(response.content)
 #         self.assertListEqual(context['searched_products'], content['products'])
 #
@@ -1035,7 +1035,7 @@ def run_through_drivers(driver_pool='drivers'):
 #             sqs_title = sqs.autocomplete(title_ngrams=dict_values['search_string'])
 #             sqs_slug = sqs.autocomplete(slug_ngrams=dict_values['search_string'])
 #             sqs_id = sqs.autocomplete(product_id=dict_values['search_string'])
-#             sqs_search = (sqs_title or sqs_slug or sqs_id) #[:OSCAR_PRODUCTS_PER_PAGE]
+#             sqs_search = (sqs_title or sqs_slug or sqs_id) #[:PRODUCTS_PER_PAGE]
 #         return sqs_search
 #
 #     # test input search field in all pages

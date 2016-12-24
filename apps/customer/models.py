@@ -231,7 +231,7 @@ class CommunicationEventType(models.Model):
         if ctx is None:
             ctx = {}
         ctx['static_base_url'] = getattr(
-            settings, 'OSCAR_STATIC_BASE_URL', None)
+            settings, 'STATIC_BASE_URL', None)
 
         messages = {}
         for name, template in templates.items():

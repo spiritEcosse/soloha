@@ -235,7 +235,7 @@ class MissingProductImage(object):
     """
 
     def __init__(self, name=None):
-        self.name = name if name else settings.OSCAR_MISSING_IMAGE_URL
+        self.name = name if name else settings.MISSING_IMAGE_URL
 
     @property
     def original(self):
@@ -1117,13 +1117,13 @@ class Product(models.Model, CommonFeatureProduct):
         """
         Determines whether a user may add a review on this product.
 
-        Default implementation respects OSCAR_ALLOW_ANON_REVIEWS and only
+        Default implementation respects ALLOW_ANON_REVIEWS and only
         allows leaving one review per user and product.
 
         Override this if you want to alter the default behaviour; e.g. enforce
         that a user purchased the product to be allowed to leave a review.
         """
-        if user.is_authenticated() or settings.OSCAR_ALLOW_ANON_REVIEWS:
+        if user.is_authenticated() or settings.ALLOW_ANON_REVIEWS:
             return not self.has_review_by(user)
         else:
             return False
@@ -1475,8 +1475,8 @@ class ProductAttributeValue(models.Model):
     value_richtext = models.TextField(_('Richtext'), blank=True, null=True)
     value_date = models.DateField(_('Date'), blank=True, null=True)
     value_option = models.ForeignKey(AttributeOption, blank=True, null=True, verbose_name=_("Value option"))
-    value_file = models.FileField(upload_to=settings.OSCAR_IMAGE_FOLDER, max_length=255, blank=True, null=True)
-    value_image = models.ImageField(upload_to=settings.OSCAR_IMAGE_FOLDER, max_length=255, blank=True, null=True)
+    value_file = models.FileField(upload_to=settings.IMAGE_FOLDER, max_length=255, blank=True, null=True)
+    value_image = models.ImageField(upload_to=settings.IMAGE_FOLDER, max_length=255, blank=True, null=True)
     value_entity = fields.GenericForeignKey('entity_content_type', 'entity_object_id')
 
     entity_content_type = models.ForeignKey(ContentType, null=True, blank=True, editable=False)

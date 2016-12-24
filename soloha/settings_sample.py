@@ -12,6 +12,8 @@ EMAIL_USE_TLS = True
 DEBUG = True
 THUMBNAIL_DEBUG = DEBUG
 
+INTERNAL_IPS = ('localhost', )
+
 HAYSTACK_CONNECTIONS = {
     'default': {
         'ENGINE': 'haystack.backends.whoosh_backend.WhooshEngine',

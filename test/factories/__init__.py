@@ -32,7 +32,7 @@ from apps.shipping.models import WeightBand, WeightBased
 
 def create_stockrecord(product=None, price_excl_tax=None, partner_sku=None,
                        num_in_stock=None, partner_name=None,
-                       currency=settings.OSCAR_DEFAULT_CURRENCY,
+                       currency=settings.DEFAULT_CURRENCY,
                        partner_users=None):
     if product is None:
         product = create_product()
