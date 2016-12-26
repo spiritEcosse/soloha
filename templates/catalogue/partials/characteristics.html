@@ -10,7 +10,6 @@
         {% trans 'Characteristics' %}:
     </div>
     <div class="panel-body">
-        <div class="row option">
         {% regroup product.characteristics.all by parent as characteristics %}
 
         {% for characteristic in characteristics %}
