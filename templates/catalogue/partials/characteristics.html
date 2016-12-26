@@ -11,13 +11,6 @@
     </div>
     <div class="panel-body">
         <div class="row option">
-            <div class="col-xs-12">
-                {% trans "ISBN" %}:
-            </div>
-            <div class="col-xs-12 values">
-                {{ product.id }}
-            </div>
-        </div>
         {% regroup product.characteristics.all by parent as characteristics %}
 
         {% for characteristic in characteristics %}
