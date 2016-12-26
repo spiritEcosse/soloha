@@ -56,6 +56,10 @@ class MissingProductImage(object):
     def is_missing(self):
         return True
 
+    @property
+    def caption(self):
+        return ''
+
     def symlink_missing_image(self, media_file_path):
         static_file_path = find('oscar/img/%s' % self.name)
         if static_file_path is not None:

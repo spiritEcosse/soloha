@@ -408,11 +408,13 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
                 if selected_val.features_by_product:
                     for product in selected_val.features_by_product[0].product_with_images.all()[:5]:
                         product_image = product.primary_image()
-                        images.append({
-                            'title': product_image.caption or product.get_title(),
-                            'pk': product_image.pk,
-                            'thumb_url': get_thumbnailer(product_image.original).get_thumbnail(options_small_thumb).url
-                        })
+
+                        if not product_image.is_missing:
+                            images.append({
+                                'title': product_image.caption or product.get_title(),
+                                'pk': product_image.pk,
+                                'thumb_url': get_thumbnailer(product_image.original).get_thumbnail(options_small_thumb).url
+                            })
 
                 selected_val = {
                     'pk': selected_val.pk,
@@ -594,9 +596,9 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
         if stockrecord:
             stockrecord = stockrecord.attributes.prefetch_related(
                 Prefetch('product_features', queryset=ProductFeature.objects.filter(
-                        **self.filter_feature_parent()
-                    ).select_related('product').prefetch_related('product__images__original'), to_attr='features_by_product'
-                )
+                    **self.filter_feature_parent()
+                ).select_related('product').prefetch_related('product__images__original'), to_attr='features_by_product'
+                         )
             )
 
         attributes = Feature.objects.only(*self.only).filter(**self.filter_feature()).prefetch_related(
@@ -609,9 +611,9 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
                 'children', queryset=stockrecord, to_attr='selected_val'
             ),
             Prefetch('product_features', queryset=ProductFeature.objects.filter(
-                    **self.filter_product_feature()
-                ).select_related('product').prefetch_related('product__images__original'), to_attr='features_by_product'
-            )
+                **self.filter_product_feature()
+            ).select_related('product').prefetch_related('product__images__original'), to_attr='features_by_product'
+                     )
         ).annotate(
             price=Min('children__stockrecords__price_excl_tax'), count_child=Count('children', distinct=True)
         ).order_by('product_features__sort', 'price', '-count_child', 'title', 'pk')

@@ -10,10 +10,10 @@
         {% csrf_token %}
         {{ basket_form.as_p }}
 
-        <button type="submit" class="btn btn-primary btn-block" data-loading-text="{% trans 'Adding...' %}">
-            {% trans "Add to basket" %}
+        <button type="submit" class="btn btn-primary btn-block" data-loading-text="{% trans '...' %}">
+            {% trans "Buy" %}
         </button>
     </form>
 {% else %}
-    <button class="btn btn-primary btn-block disabled">{% trans "Add to basket" %}</button>
+    <button class="btn btn-primary btn-block disabled">{% trans "Buy" %}</button>
 {% endif %}
