@@ -161,3 +161,4 @@ fabric.properties
 Будет удалено apps/flatpages/
 Будет удалено data/
 Будет удалено static_root/
+*.log

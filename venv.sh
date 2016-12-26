@@ -24,7 +24,7 @@ tar -xzvf data/fixtures/all.tar.gz -C data/fixtures/
 
 # Load initial data from fixtures.
 ./manage.py loaddata data/fixtures/*.json
-./manage.py oscar_populate_countries --initial-only
+./manage.py oscar_populate_countries
 ./manage.py clear_index --noinput
 ./manage.py update_index catalogue
 
