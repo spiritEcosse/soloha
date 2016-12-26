@@ -40,9 +40,9 @@ class Basket(AbstractBasket):
                 ).prefetch_related(
                     Prefetch('attributes', queryset=LineAttribute.objects.browse()),
                     Prefetch('attributes__feature', queryset=Feature.objects.browse()),
-                    Prefetch('attributes__product_images', queryset=ProductImage.objects.browse().select_related('product')),
+                    Prefetch('attributes__product_images', queryset=ProductImage.objects.browse()),
                     Prefetch('product__images', queryset=ProductImage.objects.browse()),
-                    Prefetch('product__categories', queryset=Category.objects.browse_lo_level().select_related('parent__parent')),
+                    Prefetch('product__categories', queryset=Category.objects.product_url()),
                 ).only(
                     'product__id',
                     'product__structure',

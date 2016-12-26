@@ -40,10 +40,18 @@
     {{ product.meta_keywords|default:""|striptags }}
 {% endblock %}
 
+{% block breadcrumbs_child %}
+{% endblock %}
+
 {% block breadcrumbs %}
     <ul class="breadcrumb">
         <li>
             <a href="{{ homepage_url }}">{% trans "Home" %}</a>
+        </li>
+        <li>
+            <a href="{% url 'catalogue:index' %}">
+                {% trans 'All products' %}
+            </a>
         </li>
         {% with category=product.categories.all.0 %}
             {% for c in category.get_ancestors_and_self %}

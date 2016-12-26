@@ -26,7 +26,17 @@
         <li>
             <a href="{{ homepage_url }}">{% trans "Home" %}</a>
         </li>
-        <li class="active">{{ summary }}</li>
+        {% if summary %}
+            <li class="active">{{ summary }}</li>
+        {% else %}
+            <li>
+                <a href="{% url 'catalogue:index' %}">
+                    {% trans 'All products' %}
+                </a>
+            </li>
+        {% endif %}
+
+        {% block breadcrumbs_child %}{% endblock %}
     </ul>
 {% endblock breadcrumbs %}
 

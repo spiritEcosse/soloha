@@ -196,6 +196,21 @@ class ProductiveProductQuerySet(models.QuerySet):
             'upc',
         )
 
+    def only_detail(self):
+        return self.only(
+            'title',
+            'slug',
+            'product_class__id',
+            'product_class__track_stock',
+            'product_class__slug',
+            'structure',
+            'h1',
+            'meta_title',
+            'meta_description',
+            'meta_keywords',
+            'description',
+        )
+
     def order_simple(self):
         return self.order_by()
 
@@ -212,6 +227,9 @@ class ProductiveProductManager(models.Manager):
 
     def common(self):
         return self.get_queryset().included().order_simple()
+
+    def detail(self):
+        return self.list().only_detail()
 
     def list(self):
         return self.common().select_list().prefetch_list().only_list()

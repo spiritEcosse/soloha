@@ -336,40 +336,13 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
             return self.object
 
         self.kwargs['slug'] = self.kwargs['product_slug']
-        return super(ProductDetailView, self).get_object(queryset)
+        return super(ProductDetailView, self).get_object(self.model.objects.detail())
 
     def redirect_if_necessary(self, current_path, product):
         if self.enforce_paths:
             expected_path = product.get_absolute_url
             if expected_path != urlquote(current_path):
                 return HttpResponsePermanentRedirect(expected_path)
-
-    def get_queryset(self):
-        queryset = super(ProductDetailView, self).get_queryset()
-        return queryset.filter(enable=True).select_related('parent__product_class').prefetch_related(
-            Prefetch('reviews', queryset=ProductReview.objects.filter(status=ProductReview.APPROVED), to_attr='reviews_approved'),
-            Prefetch('options', queryset=Feature.objects.filter(level=0), to_attr='options_enabled'),
-            Prefetch('images', queryset=ProductImage.objects.only('original', 'product')),
-            Prefetch('categories__parent__parent'),
-            Prefetch('stockrecords', queryset=StockRecord.objects.order_by('price_excl_tax'),
-                     to_attr='stockrecords_list'),
-            Prefetch('children__stockrecords', queryset=StockRecord.objects.order_by('price_excl_tax'),
-                     to_attr='children_stock_list'),
-            'characteristics__parent',
-        )
-        # .select_related('product_class').prefetch_related(
-        # Prefetch('images', queryset=ProductImage.objects.only('original', 'product')),
-        # Prefetch('images__original'),
-        # Prefetch('attributes'),
-        # Prefetch('categories__parent__parent'),
-        # Prefetch('filters'),
-        # Prefetch('reviews'),
-        # Prefetch('children__categories__parent__parent'),
-        # Prefetch('children__characteristics'),
-        # Prefetch('children__images'),
-        # Prefetch('stockrecords__partner'),
-        # Prefetch('characteristics'),
-        # )
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -595,10 +568,12 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
 
         if stockrecord:
             stockrecord = stockrecord.attributes.prefetch_related(
-                Prefetch('product_features', queryset=ProductFeature.objects.filter(
-                    **self.filter_feature_parent()
-                ).select_related('product').prefetch_related('product__images__original'), to_attr='features_by_product'
-                         )
+                Prefetch(
+                    'product_features', queryset=ProductFeature.objects.filter(
+                        **self.filter_feature_parent()
+                    ).select_related('product').prefetch_related('product__images__original'),
+                    to_attr='features_by_product'
+                )
             )
 
         attributes = Feature.objects.only(*self.only).filter(**self.filter_feature()).prefetch_related(
