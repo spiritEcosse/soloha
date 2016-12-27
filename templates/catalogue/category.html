@@ -18,7 +18,7 @@
     {% if selected_filters %}
         {% include 'catalogue/partials/meta_tags.html' %}.
     {% endif %}
-    {{ category.get_meta_title }} | {{ block.super }}
+    {{ object.get_meta_title }} | {{ block.super }}
 {% endblock %}
 
 {# Todo refactoring remove {% regroup selected_filters by parent as group_filters %} and query from db #}
@@ -26,7 +26,7 @@
     {% if selected_filters.exists %}
         {% include 'catalogue/partials/meta_tags.html' %}.
     {% endif %}
-    {{ category.get_meta_description|default:""|striptags }}
+    {{ object.get_meta_description|default:""|striptags }}
 {% endblock %}
 
 {# Todo refactoring remove {% regroup selected_filters by parent as group_filters %} and query from db #}
@@ -34,132 +34,126 @@
     {% if selected_filters.exists %}
         {% include 'catalogue/partials/meta_tags.html' %}
     {% else %}
-        {{ category.meta_keywords|default:""|striptags }}
+        {{ object.meta_keywords|default:""|striptags }}
     {% endif %}
 {% endblock %}
 
-{% block column_left %}
-    {% if filters.exists %}
-        {% assign trancate_filter 32 %}
-        {% assign trancate_filter_value 23 %}
-        {% if selected_filters.exists %}
-            {% regroup selected_filters by parent as group_filters %}
-            {% assign filter_parents group_filters|fetch_from_dict:'grouper' %}
+{#{% block column_left %}#}
+{#    {% if filters %}#}
+{#        {% assign trancate_filter 32 %}#}
+{#        {% assign trancate_filter_value 23 %}#}
+{#        {% if selected_filters.exists %}#}
+{#            {% regroup selected_filters by parent as group_filters %}#}
+{#            {% assign filter_parents group_filters|fetch_from_dict:'grouper' %}#}
+{##}
+{#            <div class="heading">{% trans 'Selected' %}</div>#}
+{#            <div class="filter">#}
+{#                {% for filter in group_filters %}#}
+{#                    <div class="items">#}
+{#                        <div class="name text-center" title="{{ filter.grouper.title }}">#}
+{#                            {{ filter.grouper.title|truncatechars:trancate_filter }}#}
+{#                        </div>#}
+{#                        <div class="values">#}
+{#                            <ul class="list-group">#}
+{#                                {% for value in filter.list|dictsort:'title' %}#}
+{#                                    <li class="list-group-item checkbox">#}
+{#                                        {% assign clear_filter selected_filters|remove:value %}#}
+{#                                        {% trans 'Clear' as title %}#}
+{##}
+{#                                        <a class="btn btn-default btn-block active"#}
+{#                                           href="{% reverse_url 'catalogue:category' url_extra_kwargs filter_slug=clear_filter|join_slug:"/"|default:None %}"#}
+{#                                           title="{{ title }} {{ value.title|lower }}" aria-label="{{ title }} {{ value.title|lower }}">#}
+{#                                            {{ value.title|truncatechars:trancate_filter_value }}#}
+{#                                            <span class="glyphicon glyphicon-remove pull-right" aria-hidden="true"></span>#}
+{#                                        </a>#}
+{#                                    </li>#}
+{#                                {% endfor %}#}
+{#                            </ul>#}
+{#                        </div>#}
+{#                    </div>#}
+{#                {% endfor %}#}
+{#            </div>#}
+{#        {% endif %}#}
+{##}
+{#        <div class="heading">{% trans 'Selection of parameters' %}</div>#}
+{#        <div class="filter">#}
+{#            {% regroup filters by parent as filters %}#}
+{##}
+{#            {% for filter in filters %}#}
+{#                {% if filter_parents %}#}
+{#                    {% assign filter_in_parents filter.grouper|in_list:filter_parents %}#}
+{#                {% endif %}#}
+{##}
+{#                <div class="items">#}
+{#                    <div class="name text-center" title="{{ filter.grouper.title }}">#}
+{#                        {{ filter.grouper.title|truncatechars:trancate_filter }}#}
+{#                    </div>#}
+{#                    <div class="values">#}
+{#                        <ul class="list-group">#}
+{#                            {% for value in filter.list|dictsort:'title' %}#}
+{#                                {% assign add '' %}#}
+{##}
+{#                                {% if filter_in_parents and value.potential_products_count %}#}
+{#                                    {% assign add '+' %}#}
+{#                                {% endif %}#}
+{##}
+{#                                <li class="list-group-item checkbox">#}
+{#                                    {% if value|in_list:selected_filters %}#}
+{#                                        {% assign clear_filter selected_filters|remove:value %}#}
+{#                                        {% trans 'Clear' as title %}#}
+{#                                    {% else %}#}
+{#                                        {% assign clear_filter selected_filters|append:value|dictsort:'pk' %}#}
+{#                                        {% trans 'Choose' as title %}#}
+{#                                    {% endif %}#}
+{##}
+{#                                    <a href="{% reverse_url 'catalogue:category' url_extra_kwargs filter_slug=clear_filter|join_slug:"/"|default:None %}"#}
+{#                                       class="btn btn-default btn-block#}
+{#                                       {% if value|in_list:selected_filters %}active#}
+{#                                       {% elif not value.potential_products_count %} disabled{% endif %}"#}
+{#                                       title="{{ title }} {{ value.title|lower }}" aria-label="{{ title }} {{ value.title|lower }}">#}
+{#                                        {{ value.title|truncatechars:trancate_filter_value }}#}
+{#                                        {% if value|in_list:selected_filters %}#}
+{#                                            <span class="glyphicon glyphicon-remove pull-right" aria-hidden="true"></span>#}
+{#                                        {% else %}#}
+{#                                            <span class="count">({{ add }}{{ value.potential_products_count }})</span>#}
+{#                                        {% endif %}#}
+{#                                    </a>#}
+{#                                </li>#}
+{#                            {% endfor %}#}
+{#                        </ul>#}
+{#                    </div>#}
+{#                </div>#}
+{#            {% endfor %}#}
+{#        </div>#}
+{#    {% endif %}#}
+{#{% endblock %}#}
 
-            <div class="heading">{% trans 'Selected' %}</div>
-            <div class="filter">
-                {% for filter in group_filters %}
-                    <div class="items">
-                        <div class="name text-center" title="{{ filter.grouper.title }}">
-                            {{ filter.grouper.title|truncatechars:trancate_filter }}
-                        </div>
-                        <div class="values">
-                            <ul class="list-group">
-                                {% for value in filter.list|dictsort:'title' %}
-                                    <li class="list-group-item checkbox">
-                                        {% assign clear_filter selected_filters|remove:value %}
-                                        {% trans 'Clear' as title %}
-
-                                        <a class="btn btn-default btn-block active"
-                                           href="{% reverse_url 'catalogue:category' url_extra_kwargs filter_slug=clear_filter|join_slug:"/"|default:None %}"
-                                           title="{{ title }} {{ value.title|lower }}" aria-label="{{ title }} {{ value.title|lower }}">
-                                            {{ value.title|truncatechars:trancate_filter_value }}
-                                            <span class="glyphicon glyphicon-remove pull-right" aria-hidden="true"></span>
-                                        </a>
-                                    </li>
-                                {% endfor %}
-                            </ul>
-                        </div>
-                    </div>
-                {% endfor %}
-            </div>
-        {% endif %}
-
-        <div class="heading">{% trans 'Selection of parameters' %}</div>
-        <div class="filter">
-            {% regroup filters by parent as filters %}
-
-            {% for filter in filters %}
-                {% if filter_parents %}
-                    {% assign filter_in_parents filter.grouper|in_list:filter_parents %}
-                {% endif %}
-
-                <div class="items">
-                    <div class="name text-center" title="{{ filter.grouper.title }}">
-                        {{ filter.grouper.title|truncatechars:trancate_filter }}
-                    </div>
-                    <div class="values">
-                        <ul class="list-group">
-                            {% for value in filter.list|dictsort:'title' %}
-                                {% assign add '' %}
-
-                                {% if filter_in_parents and value.potential_products_count %}
-                                    {% assign add '+' %}
-                                {% endif %}
-
-                                <li class="list-group-item checkbox">
-                                    {% if value|in_list:selected_filters %}
-                                        {% assign clear_filter selected_filters|remove:value %}
-                                        {% trans 'Clear' as title %}
-                                    {% else %}
-                                        {% assign clear_filter selected_filters|append:value|dictsort:'pk' %}
-                                        {% trans 'Choose' as title %}
-                                    {% endif %}
-
-                                    <a href="{% reverse_url 'catalogue:category' url_extra_kwargs filter_slug=clear_filter|join_slug:"/"|default:None %}"
-                                       class="btn btn-default btn-block
-                                       {% if value|in_list:selected_filters %}active
-                                       {% elif not value.potential_products_count %} disabled{% endif %}"
-                                       title="{{ title }} {{ value.title|lower }}" aria-label="{{ title }} {{ value.title|lower }}">
-                                        {{ value.title|truncatechars:trancate_filter_value }}
-                                        {% if value|in_list:selected_filters %}
-                                            <span class="glyphicon glyphicon-remove pull-right" aria-hidden="true"></span>
-                                        {% else %}
-                                            <span class="count">({{ add }}{{ value.potential_products_count }})</span>
-                                        {% endif %}
-                                    </a>
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    </div>
-                </div>
-            {% endfor %}
-        </div>
-    {% endif %}
-{% endblock %}
-
-{% block breadcrumbs %}
-    <ol class="breadcrumb">
+{% block breadcrumbs_child %}
+    {% for category in object.get_ancestors %}
         <li>
-            <a href="{{ homepage_url }}">{% trans "Home" %}</a>
+            <a href="{{ category.get_absolute_url }}">{{ category.name }}</a>
         </li>
-        {% for category in category.get_ancestors %}
-            <li>
-                <a href="{{ category.get_absolute_url }}">{{ category.name }}</a>
-            </li>
-        {% endfor %}
-        <li class="active">{{ category.name }}</li>
-    </ol>
+    {% endfor %}
+    <li class="active">{{ object.name }}</li>
 {% endblock %}
 
-{% block headertext %}{{ category.get_h1 }}{% endblock %}
+{% block headertext %}{{ object.get_h1 }}{% endblock %}
 
 {% block post_content %}
-    {#    <div class="row">#}
-    {#        <div class="col-xs-24 category">#}
-    {#            <div class="description">#}
-    {#                {{ category.description|default:""|striptags }}#}
-    {#                <div class="gradientback"></div>#}
-    {#            </div>#}
-    {#            <div class="text-right">#}
-    {#                <a href="#" class="more">Читать полностью --></a>#}
-    {#            </div>#}
-    {#        </div>#}
-    {#    </div>#}
-
     <div class="row">
         <div class="col-xs-24 category">
-            {{ category.description|safe }}
+            <div>
+                <input type="checkbox" class="read-more-state" id="post-1"/>
+
+                <div class="read-more-wrap">
+                    <div class="short">{{ object.description|safe|truncatewords_html:"100" }}</div>
+
+                    <div class="read-more-target">
+                        {{ object.description|safe }}
+                    </div>
+                </div>
+                <label for="post-1" class="read-more-trigger pull-right"></label>
+            </div>
         </div>
     </div>
 {% endblock %}

@@ -40,10 +40,18 @@
     {{ product.meta_keywords|default:""|striptags }}
 {% endblock %}
 
+{% block breadcrumbs_child %}
+{% endblock %}
+
 {% block breadcrumbs %}
     <ul class="breadcrumb">
         <li>
             <a href="{{ homepage_url }}">{% trans "Home" %}</a>
+        </li>
+        <li>
+            <a href="{% url 'catalogue:index' %}">
+                {% trans 'All products' %}
+            </a>
         </li>
         {% with category=product.categories.all.0 %}
             {% for c in category.get_ancestors_and_self %}
@@ -121,7 +129,7 @@
                                     <li><a data-toggle="tab" href="#description">{% trans 'Description' %}</a></li>
                                 {% endif %}
 
-                                <li><a data-toggle="tab" href="#reviews">{% trans 'Reviews' %}</a></li>
+{#                                <li><a data-toggle="tab" href="#reviews">{% trans 'Reviews' %}</a></li>#}
 
                                 {% if pages_delivery_and_pay %}
                                     <li><a data-toggle="tab" href="#delivery">{% trans 'Shipping and payment' %}</a></li>
@@ -189,59 +197,60 @@
                     {% endif %}
                 {% endblock %}
 
-                <div class="panel panel-default reviews" id="reviews">
-                    <div class="panel-heading text-center">{% trans "Reviews" %}</div>
-                    <div class="panel-body">
-                        <div class="write">
-                            {% url 'catalogue:reviews-add' product_slug=product.slug product_pk=product.id as add_review_url %}
-                            {% blocktrans %}
-                                <a href="{{ add_review_url }}#addreview">
-                                    <span class="glyphicon glyphicon-pencil"></span>
-                                    Write Review
-                                </a>
-                            {% endblocktrans %}
-                        </div>
-                        <div class="row list">
-                            {% iffeature "reviews" %}
-                                {% block product_review %}
-                                    <section>
-                                        <div id="reviews" class="sub-header">
-                                            {% if product.num_approved_reviews > 3 %}
-                                                <a href="{% url 'catalogue:reviews-list' product_slug=product.slug product_pk=product.id %}" class="btn pull-right">{% trans "See all reviews" %}</a>
-                                            {% endif %}
-                                            <h2>{% trans "Customer Reviews" %}</h2>
-                                        </div>
-                                        {% if product.num_approved_reviews == 0 %}
-                                            <p>
-                                                {% if is_review_permitted %}
-                                                    {% url 'catalogue:reviews-add' product_slug=product.slug product_pk=product.id as add_review_url %}
-                                                    {% blocktrans %}This product does not have any reviews yet -
-                                                        <a href="{{ add_review_url }}#addreview">be the first to write one</a>.
-                                                    {% endblocktrans %}
-                                                {% else %}
-                                                    {% trans "This product does not have any reviews yet" %}.
-                                                {% endif %}
-                                            </p>
-                                        {% else %}
-                                            <ol class="list-unstyled review-list">
-                                                {% for review in reviews|slice:":3" %}
-                                                    <div class="col-xs-24 head">
-                                                        <li>
-                                                            {% include 'catalogue/partials/review.html' %}
-                                                        </li>
-                                                    </div>
-                                                {% endfor %}
-                                            </ol>
-                                        {% endif %}
-                                    </section>
-                                {% endblock product_review %}
-                            {% endiffeature %}
-                            <div class="col-xs-24">
-                                <a class="pull-right more" href="{% url 'catalogue:reviews-list' product_slug=product.slug product_pk=product.id %}">{% trans "View all comments >>" %}</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+{#                <div class="panel panel-default reviews" id="reviews">#}
+{#                    <div class="panel-heading text-center">{% trans "Reviews" %}</div>#}
+{#                    <div class="panel-body">#}
+{#                        <div class="write">#}
+{#                            {% url 'catalogue:reviews-add' product_slug=product.slug product_pk=product.id as add_review_url %}#}
+{#                            {% blocktrans %}#}
+{#                                <a href="{{ add_review_url }}#addreview">#}
+{#                                    <span class="glyphicon glyphicon-pencil"></span>#}
+{#                                    Write Review#}
+{#                                </a>#}
+{#                            {% endblocktrans %}#}
+{#                        </div>#}
+{#                        <div class="row list">#}
+{#                            {% iffeature "reviews" %}#}
+{#                                {% block product_review %}#}
+{#                                    <section>#}
+{#                                        <div id="reviews" class="sub-header">#}
+{#                                            {% if product.num_approved_reviews > 3 %}#}
+{#                                                <a href="{% url 'catalogue:reviews-list' product_slug=product.slug product_pk=product.id %}" class="btn pull-right">{% trans "See all reviews" %}</a>#}
+{#                                            {% endif %}#}
+{#                                            <h2>{% trans "Customer Reviews" %}</h2>#}
+{#                                        </div>#}
+{#                                        {% if product.num_approved_reviews == 0 %}#}
+{#                                            <p>#}
+{#                                                {% if is_review_permitted %}#}
+{#                                                    {% url 'catalogue:reviews-add' product_slug=product.slug product_pk=product.id as add_review_url %}#}
+{#                                                    {% blocktrans %}This product does not have any reviews yet -#}
+{#                                                        <a href="{{ add_review_url }}#addreview">be the first to write one</a>.#}
+{#                                                    {% endblocktrans %}#}
+{#                                                {% else %}#}
+{#                                                    {% trans "This product does not have any reviews yet" %}.#}
+{#                                                {% endif %}#}
+{#                                            </p>#}
+{#                                        {% else %}#}
+{#                                            <ol class="list-unstyled review-list">#}
+{#                                                {% for review in reviews|slice:":3" %}#}
+{#                                                    <div class="col-xs-24 head">#}
+{#                                                        <li>#}
+{#                                                            {% include 'catalogue/partials/review.html' %}#}
+{#                                                        </li>#}
+{#                                                    </div>#}
+{#                                                {% endfor %}#}
+{#                                            </ol>#}
+{#                                        {% endif %}#}
+{#                                    </section>#}
+{#                                {% endblock product_review %}#}
+{#                            {% endiffeature %}#}
+{#                            <div class="col-xs-24">#}
+{#                                <a class="pull-right more" href="{% url 'catalogue:reviews-list' product_slug=product.slug product_pk=product.id %}">{% trans "View all comments >>" %}</a>#}
+{#                            </div>#}
+{#                        </div>#}
+{#                    </div>#}
+{#                </div>#}
+
                 {% if pages_delivery_and_pay %}
                     <div class="panel panel-default" id="delivery">
                         <div class="panel-heading text-center">{% trans 'Shipping and payment' %}:</div>

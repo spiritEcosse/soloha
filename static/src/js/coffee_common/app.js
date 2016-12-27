@@ -55,7 +55,7 @@
 
   /* Controllers */
   var app, app_name,
-    __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
+    indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
   app_name = 'soloha';
 
@@ -65,15 +65,15 @@
     return function(list, needle) {
       var val;
       if (list && needle) {
-        if (__indexOf.call([
+        if (indexOf.call([
           (function() {
-            var _i, _len, _results;
-            _results = [];
-            for (_i = 0, _len = list.length; _i < _len; _i++) {
-              val = list[_i];
-              _results.push(val.title);
+            var i, len, results1;
+            results1 = [];
+            for (i = 0, len = list.length; i < len; i++) {
+              val = list[i];
+              results1.push(val.title);
             }
-            return _results;
+            return results1;
           })()
         ][0], needle) >= 0) {
           return true;
@@ -92,15 +92,15 @@
         needle = needle.toString();
         new_list = [
           (function() {
-            var _i, _len, _results;
-            _results = [];
-            for (_i = 0, _len = list.length; _i < _len; _i++) {
-              val = list[_i];
+            var i, len, results1;
+            results1 = [];
+            for (i = 0, len = list.length; i < len; i++) {
+              val = list[i];
               if (val.title.toString().indexOf(needle) > -1) {
-                _results.push(val);
+                results1.push(val);
               }
             }
-            return _results;
+            return results1;
           })()
         ];
         if (new_list.length) {
@@ -198,20 +198,20 @@
             'selected_attributes': selected_attributes,
             'current_attr': $scope.product.attributes[attr_pk]
           }).success(function(data) {
-            var key, _ref, _results;
+            var key, ref, results1;
             if (data.error == null) {
               $scope.price = data.price;
               if ($scope.product.custom_value[attr_pk] && !$filter('search_by_title')($scope.product.custom_values[attr_pk], $scope.product.custom_value[attr_pk].title)) {
                 return $scope.product.custom_values[attr_pk].push($scope.product.custom_value[attr_pk]);
               }
             } else {
-              _ref = data.error;
-              _results = [];
-              for (key in _ref) {
-                value = _ref[key];
-                _results.push($scope.product.attributes[key].error = value);
+              ref = data.error;
+              results1 = [];
+              for (key in ref) {
+                value = ref[key];
+                results1.push($scope.product.attributes[key].error = value);
               }
-              return _results;
+              return results1;
             }
           }).error(function() {
             return console.error('An error occurred during submission');
@@ -404,11 +404,11 @@
           'page': $scope.page_number,
           'sorting_type': $scope.sorting_type
         }).success(function(data) {
-          var clear, page_active, _i, _ref, _ref1;
+          var clear, i, page_active, ref, ref1;
           clear = angular.element('.clear_pagination');
           clear.remove();
           $scope.pages = data.pages;
-          for (page_active = _i = _ref = parseInt($scope.initial_page_number) - 1, _ref1 = parseInt($scope.page_number); _ref <= _ref1 ? _i <= _ref1 : _i >= _ref1; page_active = _ref <= _ref1 ? ++_i : --_i) {
+          for (page_active = i = ref = parseInt($scope.initial_page_number) - 1, ref1 = parseInt($scope.page_number); ref <= ref1 ? i <= ref1 : i >= ref1; page_active = ref <= ref1 ? ++i : --i) {
             $scope.pages[page_active].active = "True";
             $scope.pages[page_active].link = "";
           }
@@ -504,11 +504,11 @@
           'page': $scope.page_number,
           'sorting_type': $scope.sorting_type
         }).success(function(data) {
-          var clear, page_active, _i, _ref, _ref1;
+          var clear, i, page_active, ref, ref1;
           clear = angular.element('.clear_pagination');
           clear.remove();
           $scope.pages = data.pages;
-          for (page_active = _i = _ref = parseInt($scope.initial_page_number) - 1, _ref1 = parseInt($scope.page_number); _ref <= _ref1 ? _i <= _ref1 : _i >= _ref1; page_active = _ref <= _ref1 ? ++_i : --_i) {
+          for (page_active = i = ref = parseInt($scope.initial_page_number) - 1, ref1 = parseInt($scope.page_number); ref <= ref1 ? i <= ref1 : i >= ref1; page_active = ref <= ref1 ? ++i : --i) {
             $scope.pages[page_active].active = "True";
             $scope.pages[page_active].link = "";
           }

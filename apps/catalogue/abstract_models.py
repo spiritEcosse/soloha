@@ -56,6 +56,10 @@ class MissingProductImage(object):
     def is_missing(self):
         return True
 
+    @property
+    def caption(self):
+        return ''
+
     def symlink_missing_image(self, media_file_path):
         static_file_path = find('oscar/img/%s' % self.name)
         if static_file_path is not None:
@@ -114,7 +118,7 @@ class AbstractProduct(models.Model, CommonFeatureProduct):
                     "stand-alone product (i.e. there is only one version of"
                     " this product)."))
 
-    date_created = models.DateTimeField(_("Date created"), auto_now_add=True)
+    date_created = models.DateTimeField(_("Date created"), auto_now_add=True, db_index=True)
 
     # This field is used by Haystack to reindex search
     date_updated = models.DateTimeField(
@@ -155,9 +159,6 @@ class AbstractProduct(models.Model, CommonFeatureProduct):
             "This flag indicates if this product can be used in an offer "
             "or not"))
 
-    objects = ProductManager()
-    objects_enable = EnableManagerProduct()
-    browsable = BrowsableProductManager()
     separator = ','
 
     class Meta:
@@ -549,11 +550,11 @@ class AbstractProduct(models.Model, CommonFeatureProduct):
 
 @python_2_unicode_compatible
 class AbstractFeature(MPTTModel):
-    title = models.CharField(max_length=255)
+    title = models.CharField(max_length=255, db_index=True)
     slug = models.SlugField(verbose_name=_('Slug'), max_length=255, unique=True, blank=True, db_index=True)
     parent = TreeForeignKey('self', verbose_name=_('Parent'), related_name='children', blank=True, null=True, db_index=True)
-    sort = models.IntegerField(blank=True, null=True, default=0)
-    created = models.DateTimeField(auto_now_add=True)
+    sort = models.IntegerField(blank=True, null=True, default=0, db_index=True)
+    created = models.DateTimeField(auto_now_add=True, db_index=True)
     bottom_line = models.IntegerField(verbose_name=_('Bottom line size'), blank=True, null=True)
     top_line = models.IntegerField(verbose_name=_('Top line size'), blank=True, null=True)
     slug_separator = '/'
@@ -749,6 +750,14 @@ class CustomAbstractCategory(MPTTModel):
         slugs = [str(category.slug) for category in self.get_ancestors_through_parent(include_self=True)]
         return self._slug_separator.join(slugs)
 
+    def get_descendants_through_children(self):
+        children = list(self.children.all())
+
+        for category in children[:]:
+            children += list(category.children.all())
+
+        return children + [self]
+
     def get_ancestors_through_parent(self, include_self=True):
         """
         Get ancestors through the field of the parent.
@@ -766,9 +775,10 @@ class CustomAbstractCategory(MPTTModel):
         return parents
 
     def get_parents(self, obj, parents):
-        if obj.parent:
+        if obj.parent_id is not None:
             parents.append(obj.parent)
             return self.get_parents(obj=obj.parent, parents=parents)
+
         parents.reverse()
         return parents
 

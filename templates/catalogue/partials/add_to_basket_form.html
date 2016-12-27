@@ -13,8 +13,8 @@
         {% include "partials/form_fields.html" with form=basket_form %}
         <button {% if not session.availability.is_available_to_buy %} disabled {% endif %}
                 type="submit" class="btn btn-block btn-md btn-success btn-add-to-basket"
-                value="{% trans "Buy" %}" data-loading-text="{% trans 'In process...' %}">
-            {% trans 'By' %}
+                value="{% trans "Buy" %}" data-loading-text="{% trans '...' %}">
+            {% trans 'Buy' %}
         </button>
     </form>
 </div>

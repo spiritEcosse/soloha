@@ -12,7 +12,6 @@ cryptography==1.4
 DAWG-Python==0.7.2
 decorator==4.0.10
 diff-match-patch==20121119
-Django==1.8.7
 django-admin-bootstrapped==2.5.7
 django-angular==0.7.15
 django-appconf==1.0.1
@@ -101,7 +100,6 @@ simplegeneric==0.8.1
 simplejson==3.8.2
 singledispatch==3.4.0.3
 six==1.10.0
-sorl-thumbnail==12.2
 sqlparse==0.1.18
 tablib==0.11.2
 texttable==0.8.4

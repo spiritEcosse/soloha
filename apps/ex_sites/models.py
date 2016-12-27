@@ -29,8 +29,16 @@ class Info(models.Model):
         return self.phone_numbers.all()[:4]
 
 
+class PhoneNumberManager(models.Manager):
+    def browse(self):
+        return self.get_queryset().only(
+            'phone_number',
+        )
+
+
 class PhoneNumber(models.Model):
     phone_number = PhoneNumberField(verbose_name=_('Phone number'), blank=True)
+    objects = PhoneNumberManager()
 
     class Meta:
         app_label = 'sites'

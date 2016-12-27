@@ -1,49 +1,24 @@
 {
   "name": "soloha",
   "version": "1.0.0",
-  "description": "Project soloha",
+  "description": "",
   "main": "index.js",
-  "dependencies": {
-    "blueimp-gallery": "^2.21.3",
-    "grunt-contrib-cssmin": "^1.0.1",
-    "grunt-contrib-less": "^1.3.0",
-    "grunt-contrib-uglify": "^2.0.0",
-    "maxmin": "^2.1.0"
-  },
-  "devDependencies": {
-    "grunt": "^0.4.5",
-    "grunt-coffee-build": "^1.4.12",
-    "grunt-contrib": "^0.11.0",
-    "grunt-contrib-coffee": "^0.10.0",
-    "grunt-contrib-cssmin": "^1.0.1",
-    "grunt-contrib-imagemin": "^1.0.1",
-    "grunt-contrib-less": "^0.11.0",
-    "grunt-contrib-uglify": "^2.0.0",
-    "grunt-image": "^2.1.0",
-    "grunt-yui-compressor": "^0.4.0",
-    "jasmine-core": "^2.4.1",
-    "karma": "^0.13.22",
-    "karma-chrome-launcher": "^0.2.3",
-    "karma-coffee-preprocessor": "^0.3.0",
-    "karma-firefox-launcher": "^0.1.7",
-    "karma-jasmine": "~0.3.8"
-  },
   "scripts": {
-    "prestart": "npm install",
-    "start": "http-server -a 0.0.0.0 -p 8000",
-    "pretest": "npm install",
-    "test": "node node_modules/karma/bin/karma start angular_test/karma.conf.js",
-    "test-single-run": "node node_modules/karma/bin/karma start angular_test/karma.conf.js  --single-run",
-    "preupdate-webdriver": "npm install",
-    "update-webdriver": "webdriver-manager update",
-    "preprotractor": "npm run update-webdriver",
-    "protractor": "protractor angular_test/protractor-conf.js",
-    "update-index-async": "node -e \"require('shelljs/global'); sed('-i', /\\/\\/@@NG_LOADER_START@@[\\s\\S]*\\/\\/@@NG_LOADER_END@@/, '//@@NG_LOADER_START@@\\n' + cat('bower_components/angular-loader/angular-loader.min.js') + '\\n//@@NG_LOADER_END@@', 'app/index-async.html');\""
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "ssh://root@78.24.216.187/home/igor/web/www/soloha/.git"
+    "url": "git+ssh://git@bitbucket.org/spiritEcosse/soloha.git"
   },
-  "author": "Igor",
-  "license": "ISC"
+  "author": "igor",
+  "license": "ISC",
+  "homepage": "https://bitbucket.org/spiritEcosse/soloha#readme",
+  "devDependencies": {
+    "grunt": "^1.0.1",
+    "grunt-contrib-coffee": "^1.0.0",
+    "grunt-contrib-cssmin": "^1.0.2",
+    "grunt-contrib-imagemin": "^1.0.1",
+    "grunt-contrib-less": "^1.4.0",
+    "grunt-contrib-uglify": "^2.0.0"
+  }
 }

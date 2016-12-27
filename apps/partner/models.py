@@ -7,9 +7,16 @@ from django.db.models import F
 __all__ = []
 
 
+class ProductiveStockRecordManager(models.Manager):
+    def browse(self):
+        return self.get_queryset().only(
+            self.model.order_by_price(), 'product', 'price_currency'
+        ).order_by(self.model.order_by_price())
+
+
 if not is_model_registered('partner', 'StockRecord'):
     class StockRecord(AbstractStockRecord):
-        pass
+        objects = ProductiveStockRecordManager()
 
     __all__.append('StockRecord')
 

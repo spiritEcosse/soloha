@@ -1,6 +1,7 @@
 from oscar.apps.catalogue.views import ProductDetailView as CoreProductDetailView
 from django.utils.translation import ugettext_lazy as _
 from django.views import generic
+from django.views.generic.list import MultipleObjectMixin
 from django.views.generic import View
 from oscar.core.loading import get_model
 from braces import views
@@ -115,7 +116,7 @@ class CatalogueView(BaseCatalogue, generic.ListView):
         return context
 
 
-class ProductCategoryView(BaseCatalogue, views.JSONResponseMixin, views.AjaxResponseMixin, SingleObjectMixin, generic.ListView):
+class ProductCategoryView(BaseCatalogue, SingleObjectMixin, generic.ListView):
     template_name = 'catalogue/category.html'
     enforce_paths = True
     model = Product
@@ -126,6 +127,7 @@ class ProductCategoryView(BaseCatalogue, views.JSONResponseMixin, views.AjaxResp
     feature_orders = ('parent__sort', 'parent__title',)
     filter_slug = 'filter_slug'
     url_view_name = 'catalogue:category'
+    queryset = Product.objects.list()
 
     def post(self, request, *args, **kwargs):
         if self.request.is_ajax():
@@ -159,11 +161,17 @@ class ProductCategoryView(BaseCatalogue, views.JSONResponseMixin, views.AjaxResp
         context['sorting_type'] = self.kwargs['sorting_type']
         return context
 
-    @property
-    def object(self):
-        return self.get_object(queryset=self.model_category.objects.filter(enable=True))
+    # @property
+    # def object(self):
+    #     return self.get_object(queryset=self.model_category.objects.browse_lo_level()
+    #         # .prefetch_related(
+    #         # Prefetch('children', queryset=Category.objects.browse(level_up=False, fields=['id', 'parent__id']).select_related('parent')),
+    #         # Prefetch('children__children', queryset=Category.objects.browse(level_up=False, fields=['id', 'parent__id']).select_related('parent')),
+    #     # )
+    #     )
 
     def get(self, request, *args, **kwargs):
+        self.object = self.get_object(queryset=self.model_category.objects.page())
         self.kwargs['filter_slug_objects'] = self.selected_filters
         potential_redirect = self.redirect_if_necessary(request.path, self.object)
 
@@ -203,26 +211,18 @@ class ProductCategoryView(BaseCatalogue, views.JSONResponseMixin, views.AjaxResp
         sort = filter(lambda order: order.argument == sort_argument, self.orders)[0]
 
         queryset = super(ProductCategoryView, self).get_queryset()
-        queryset = queryset.filter(enable=True, categories=self.object.get_descendants(include_self=True), categories__enable=True)
-
+        queryset = queryset.filter(
+            categories__in=self.object.get_descendants_through_children(),
+            categories__enable=True
+        )
         selected_filters = list(self.selected_filters)[:]
-
-        if kwargs.get('potential_filter', None):
-            selected_filters.append(kwargs.get('potential_filter'))
-
         key = lambda feature: feature.parent.pk
         iter = groupby(sorted(selected_filters, key=key), key=key)
 
         for parent, values in iter:
             queryset = queryset.filter(filters__in=map(lambda obj: obj, values))
 
-        queryset = queryset.distinct().select_related('product_class').prefetch_related(
-            Prefetch('images'),
-            Prefetch('characteristics'),
-            Prefetch('product_class__options'),
-            Prefetch('stockrecords'),
-            Prefetch('categories__parent__parent'),
-        )
+        queryset = queryset.distinct()
 
         order = sort.column
 
@@ -236,51 +236,16 @@ class ProductCategoryView(BaseCatalogue, views.JSONResponseMixin, views.AjaxResp
         queryset = queryset.order_by(order)
         return queryset
 
-    def get_products(self, **kwargs):
-        queryset = Product.objects.filter(
-            enable=True, categories=self.object.get_descendants(include_self=True), categories__enable=True
-        )
-
-        selected_filters = list(self.selected_filters)[:]
-
-        if kwargs.get('potential_filter', None):
-            selected_filters.append(kwargs.get('potential_filter'))
-
-        key = lambda feature: feature.parent.pk
-        iter = groupby(sorted(selected_filters, key=key), key=key)
-
-        for parent, values in iter:
-            queryset = queryset.filter(filters__in=map(lambda obj: obj, values))
-
-        return queryset
-
     def get_context_data(self, **kwargs):
         context = super(ProductCategoryView, self).get_context_data(**kwargs)
 
         # Todo replace on one query, without regroup
-        context['filters'] = Feature.objects.only(*self.feature_only).filter(
-            level=1, filter_products__categories=self.object.get_descendants(include_self=True),
+        filters = Feature.objects.browse().only('title', 'parent', 'slug').filter(
+            level=1, filter_products__categories__in=self.object.get_descendants_through_children(),
             filter_products__enable=True, filter_products__categories__enable=True
-        ).order_by(*self.feature_orders).select_related('parent').prefetch_related(
-            Prefetch('filter_products')
-        ).distinct()
+        ).order_by(*self.feature_orders).distinct()
 
-        products = lambda **kwargs: map(lambda obj: obj.id, self.get_products(**kwargs))
-        key = lambda feature: feature.parent.pk
-        # Todo really need sort by feature.parent.pk ?
-        iter = groupby(sorted(self.selected_filters, key=key), key=key)
-        filters_parent = map(lambda obj: obj[0], iter)
-
-        for feature in context['filters']:
-            feature.potential_products_count = feature.filter_products.filter(
-                id__in=products(potential_filter=feature)
-            )
-
-            if feature.parent.pk in filters_parent:
-                feature.potential_products_count = feature.potential_products_count.exclude(id__in=products)
-
-            feature.potential_products_count = feature.potential_products_count.count()
-
+        context['filters'] = filters
         context['url_extra_kwargs'].update({'category_slug': self.kwargs.get('category_slug')})
         context['selected_filters'] = self.selected_filters
         return context
@@ -372,40 +337,13 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
             return self.object
 
         self.kwargs['slug'] = self.kwargs['product_slug']
-        return super(ProductDetailView, self).get_object(queryset)
+        return super(ProductDetailView, self).get_object(self.model.objects.detail())
 
     def redirect_if_necessary(self, current_path, product):
         if self.enforce_paths:
             expected_path = product.get_absolute_url
             if expected_path != urlquote(current_path):
                 return HttpResponsePermanentRedirect(expected_path)
-
-    def get_queryset(self):
-        queryset = super(ProductDetailView, self).get_queryset()
-        return queryset.filter(enable=True).select_related('parent__product_class').prefetch_related(
-            Prefetch('reviews', queryset=ProductReview.objects.filter(status=ProductReview.APPROVED), to_attr='reviews_approved'),
-            Prefetch('options', queryset=Feature.objects.filter(level=0), to_attr='options_enabled'),
-            Prefetch('images', queryset=ProductImage.objects.only('original', 'product')),
-            Prefetch('categories__parent__parent'),
-            Prefetch('stockrecords', queryset=StockRecord.objects.order_by('price_excl_tax'),
-                     to_attr='stockrecords_list'),
-            Prefetch('children__stockrecords', queryset=StockRecord.objects.order_by('price_excl_tax'),
-                     to_attr='children_stock_list'),
-            'characteristics__parent',
-        )
-        # .select_related('product_class').prefetch_related(
-        # Prefetch('images', queryset=ProductImage.objects.only('original', 'product')),
-        # Prefetch('images__original'),
-        # Prefetch('attributes'),
-        # Prefetch('categories__parent__parent'),
-        # Prefetch('filters'),
-        # Prefetch('reviews'),
-        # Prefetch('children__categories__parent__parent'),
-        # Prefetch('children__characteristics'),
-        # Prefetch('children__images'),
-        # Prefetch('stockrecords__partner'),
-        # Prefetch('characteristics'),
-        # )
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -444,11 +382,13 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
                 if selected_val.features_by_product:
                     for product in selected_val.features_by_product[0].product_with_images.all()[:5]:
                         product_image = product.primary_image()
-                        images.append({
-                            'title': product_image.caption or product.get_title(),
-                            'pk': product_image.pk,
-                            'thumb_url': get_thumbnailer(product_image.original).get_thumbnail(options_small_thumb).url
-                        })
+
+                        if not product_image.is_missing:
+                            images.append({
+                                'title': product_image.caption or product.get_title(),
+                                'pk': product_image.pk,
+                                'thumb_url': get_thumbnailer(product_image.original).get_thumbnail(options_small_thumb).url
+                            })
 
                 selected_val = {
                     'pk': selected_val.pk,
@@ -629,9 +569,11 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
 
         if stockrecord:
             stockrecord = stockrecord.attributes.prefetch_related(
-                Prefetch('product_features', queryset=ProductFeature.objects.filter(
+                Prefetch(
+                    'product_features', queryset=ProductFeature.objects.filter(
                         **self.filter_feature_parent()
-                    ).select_related('product').prefetch_related('product__images__original'), to_attr='features_by_product'
+                    ).select_related('product').prefetch_related('product__images__original'),
+                    to_attr='features_by_product'
                 )
             )
 
@@ -645,9 +587,9 @@ class ProductDetailView(views.JSONResponseMixin, views.AjaxResponseMixin, CorePr
                 'children', queryset=stockrecord, to_attr='selected_val'
             ),
             Prefetch('product_features', queryset=ProductFeature.objects.filter(
-                    **self.filter_product_feature()
-                ).select_related('product').prefetch_related('product__images__original'), to_attr='features_by_product'
-            )
+                **self.filter_product_feature()
+            ).select_related('product').prefetch_related('product__images__original'), to_attr='features_by_product'
+                     )
         ).annotate(
             price=Min('children__stockrecords__price_excl_tax'), count_child=Count('children', distinct=True)
         ).order_by('product_features__sort', 'price', '-count_child', 'title', 'pk')

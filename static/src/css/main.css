@@ -973,8 +973,8 @@ input[type="number"][id*="quantity"] {
   position: relative;
 }
 /*!
- * Bootstrap v3.3.6 (http://getbootstrap.com)
- * Copyright 2011-2015 Twitter, Inc.
+ * Bootstrap v3.3.7 (http://getbootstrap.com)
+ * Copyright 2011-2016 Twitter, Inc.
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
  */
 /*! normalize.css v3.0.3 | MIT License | github.com/necolas/normalize.css */
@@ -2069,7 +2069,6 @@ a:focus {
   text-decoration: underline;
 }
 a:focus {
-  outline: thin dotted;
   outline: 5px auto -webkit-focus-ring-color;
   outline-offset: -2px;
 }
@@ -4074,7 +4073,6 @@ select[size] {
 input[type="file"]:focus,
 input[type="radio"]:focus,
 input[type="checkbox"]:focus {
-  outline: thin dotted;
   outline: 5px auto -webkit-focus-ring-color;
   outline-offset: -2px;
 }
@@ -4565,7 +4563,6 @@ select[multiple].input-lg {
 .btn.focus,
 .btn:active.focus,
 .btn.active.focus {
-  outline: thin dotted;
   outline: 5px auto -webkit-focus-ring-color;
   outline-offset: -2px;
 }
@@ -8338,6 +8335,11 @@ h4,
 .checkout-quantity .input-group {
   max-width: 100%;
 }
+.padding_bottom {
+  padding-top: 10px;
+  border-bottom: 1px solid rgba(194, 194, 194, 0.39);
+  padding-bottom: 10px;
+}
 .well-info {
   background-color: #d9edf7;
   border-color: #bce8f1;
@@ -8537,7 +8539,6 @@ div {
 .page-header {
   margin-top: 0;
   margin-bottom: 0;
-  padding: 0 15px;
 }
 .alert-error {
   background-color: #f2dede;
@@ -9122,9 +9123,9 @@ header .bottom .navbar .nav > li .yamm-content .image .btn-menu {
   content: ">>";
 }
 .main .categories {
-  margin-bottom: 20px;
-  border-top: 1px solid rgba(194, 194, 194, 0.39);
-  padding-top: 20px;
+  padding-top: 10px;
+  border-bottom: 1px solid rgba(194, 194, 194, 0.39);
+  padding-bottom: 10px;
 }
 .main .categories .prevSlide,
 .main .categories .nextSlide {
@@ -9151,18 +9152,16 @@ header .bottom .navbar .nav > li .yamm-content .image .btn-menu {
   font-size: 14px;
   font-weight: 400;
   line-height: 15px;
-  display: inline-block;
 }
 .main .categories .item {
   background: url('../../image/filter_line.png') right center no-repeat;
 }
 .main .categories .item img {
   margin: auto;
-  max-height: 62px;
 }
 .main .sort {
-  border-bottom: 1px solid rgba(194, 194, 194, 0.39);
   padding-top: 10px;
+  border-bottom: 1px solid rgba(194, 194, 194, 0.39);
   padding-bottom: 10px;
 }
 .main .sort a {
@@ -9276,40 +9275,38 @@ header .bottom .navbar .nav > li .yamm-content .image .btn-menu {
   padding-bottom: 10px;
   padding-top: 10px;
 }
-.main .category .more {
-  color: #6f6f6f;
-  font-size: 20px;
-  font-weight: 400;
-  text-decoration: underline;
+.main .category .read-more-state {
+  display: none;
 }
-.main .category .description {
-  position: relative;
-  height: 105px;
-  overflow: hidden;
-  color: #c2c2c2;
-  font-size: 15px;
-  font-weight: 400;
+.main .category .read-more-target {
+  opacity: 0;
+  max-height: 0;
+  font-size: 0;
+  transition: .25s ease;
 }
-.main .category .description .gradientback {
-  position: absolute;
-  bottom: 0px;
-  left: 0px;
-  width: 100%;
-  height: 50px;
-  background: -moz-linear-gradient(top, rgba(255, 255, 255, 0.4) 0%, #ffffff 100%);
-  /* FF3.6+ */
-  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, rgba(255, 255, 255, 0.4)), color-stop(100%, #ffffff));
-  /* Chrome,Safari4+ */
-  background: -webkit-linear-gradient(top, rgba(255, 255, 255, 0.4) 0%, #ffffff 100%);
-  /* Chrome10+,Safari5.1+ */
-  background: -o-linear-gradient(top, rgba(255, 255, 255, 0.4) 0%, #ffffff 100%);
-  /* Opera 11.10+ */
-  background: -ms-linear-gradient(top, rgba(255, 255, 255, 0.4) 0%, #ffffff 100%);
-  /* IE10+ */
-  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.4) 0%, #ffffff 100%);
-  /* W3C */
-  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#0089fff1', endColorstr='#000000', GradientType=0);
-  /* IE6-9 */
+.main .category .read-more-state:checked ~ .read-more-wrap .short {
+  display: none;
+}
+.main .category .read-more-state:checked ~ .read-more-wrap .read-more-target {
+  opacity: 1;
+  font-size: inherit;
+  max-height: 999em;
+}
+.main .category .read-more-state ~ .read-more-trigger:before {
+  content: 'Больше';
+}
+.main .category .read-more-state:checked ~ .read-more-trigger:before {
+  content: 'Меньше';
+}
+.main .category .read-more-trigger {
+  cursor: pointer;
+  display: inline-block;
+  padding: 0 .5em;
+  color: #666;
+  font-size: .9em;
+  line-height: 2;
+  border: 1px solid #ddd;
+  border-radius: .25em;
 }
 .main .wrapper-gallery {
   width: 64px;
@@ -10135,4 +10132,4 @@ footer .bottom {
     line-height: 24px;
   }
 }
-/*# sourceMappingURL=static/src/css/main.css.map */
+/*# sourceMappingURL=main.css.map */

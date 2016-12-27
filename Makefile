@@ -38,11 +38,21 @@ libs:
     # Install other libs
 	sudo apt-get install libpq-dev
 	sudo apt-get install libmagickwand-dev
+	sudo apt-get install libjpeg-dev
 
     # Install gettext for run makemessages
 	sudo apt-get install gettext
 
 	sudo apt-get install libffi-dev
+
+	# Install grunt
+	sudo npm install -g grunt-cli
+
+	# Install npm libs
+	npm install
+
+	# Todo Move this to doc
+	# If use pycharm: add /usr/local/lib/node_modules/grunt-cli/ to Grunt Task in input - grunt cli package
 
 install_pip:
 	sudo apt-get install python-pip

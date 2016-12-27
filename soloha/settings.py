@@ -77,7 +77,8 @@ INSTALLED_APPS = \
     ] + get_core_apps(
         [
             'apps.catalogue', 'apps.promotions', 'apps.partner', 'apps.search', 'apps.order',
-            'apps.basket', 'apps.checkout', 'apps.customer', 'apps.dashboard.promotions'
+            'apps.basket', 'apps.checkout', 'apps.customer', 'apps.dashboard.promotions', 'apps.offer',
+            'apps.voucher', 'apps.analytics',
         ]
     )
 
@@ -172,8 +173,8 @@ TEMPLATE_DIRS = (
     location('templates'),
 )
 
-STATIC_URL = '/static_root/'
-STATIC_ROOT = os.path.join(BASE_DIR,  'static_root')
+STATIC_URL = settings_local.STATIC_URL
+STATIC_ROOT = settings_local.FOLDER_STATIC_ROOT
 MEDIA_ROOT = os.path.join(BASE_DIR,  'media')
 MEDIA_URL = "/media/"
 
@@ -184,7 +185,8 @@ STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
     'compressor.finders.CompressorFinder',
 )
-CKEDITOR_JQUERY_URL = os.path.join(STATICFILES_DIRS, '/bower_components/jquery/dist/jquery.min.js')
+
+CKEDITOR_JQUERY_URL = os.path.join(STATIC_URL, 'bower_components/jquery/dist/jquery.min.js')
 CKEDITOR_UPLOAD_PATH = 'images/'
 
 CKEDITOR_CONFIGS = {
@@ -326,6 +328,8 @@ IMPORT_EXPORT_USE_TRANSACTIONS = True
 THUMBNAIL_ALIASES = {
     '': {
         'category_icon': {'size': (50, 30), 'crop': True},
+        'subcategory_image': {'size': (94, 62), 'crop': True},
+        'category_banner': {'size': (574, 230), 'crop': True},
         'basket_quick': {'size': (85, 50), 'crop': True},
         'basket_quick_product_image': {'size': (30, 30), 'crop': True},
         'basket_content': {'size': (150, 150), 'crop': True},
