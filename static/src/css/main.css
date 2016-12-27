@@ -9293,10 +9293,10 @@ header .bottom .navbar .nav > li .yamm-content .image .btn-menu {
   max-height: 999em;
 }
 .main .category .read-more-state ~ .read-more-trigger:before {
-  content: 'Show more';
+  content: 'Больше';
 }
 .main .category .read-more-state:checked ~ .read-more-trigger:before {
-  content: 'Show less';
+  content: 'Меньше';
 }
 .main .category .read-more-trigger {
   cursor: pointer;
