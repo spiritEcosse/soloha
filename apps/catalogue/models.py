@@ -44,11 +44,13 @@ class ProductiveCategoryQuerySet(models.QuerySet):
     def parent_double(self):
         return '{0}__{0}'.format(self.parent)
 
-    def prefetch(self, children, grandchildren):
-        return self.prefetch_related(
-            Prefetch('children', queryset=children),
-            Prefetch('children__children', queryset=grandchildren),
-        )
+    def prefetch(self, children, grandchildren=False):
+        prefetch = [Prefetch('children', queryset=children)]
+
+        if grandchildren:
+            prefetch += [Prefetch('children__children', queryset=grandchildren)]
+
+        return self.prefetch_related(*prefetch)
 
     def select_main_menu(self):
         return self.select_related('image_banner', 'icon')
@@ -76,7 +78,18 @@ class ProductiveCategoryQuerySet(models.QuerySet):
 
     def only_page(self):
         return self.only(
-            'slug', 'name', 'h1', 'slug', 'meta_title', 'meta_description', 'meta_keywords', 'description',
+            'slug', 'name', 'h1', 'meta_title', 'meta_description', 'meta_keywords', 'description',
+            'image__file_ptr__file',
+            "image__file_ptr__original_filename",
+            "image__file_ptr__name",
+            "image__is_public",
+            'image__id',
+            'parent_id',
+        )
+
+    def only_page_children(self):
+        return self.only(
+            'slug', 'name',
             'image__file_ptr__file',
             "image__file_ptr__original_filename",
             "image__file_ptr__name",
@@ -140,7 +153,7 @@ class ProductiveCategoryManager(models.Manager):
 
     def page(self):
         return self.common().select_page().prefetch(
-            children=self.common().only_parent(),
+            children=self.common().select_page().only_page_children(),
             grandchildren=self.common().only_parent()
         ).only_page()
 
