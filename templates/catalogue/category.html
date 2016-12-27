@@ -140,21 +140,20 @@
 {% block headertext %}{{ object.get_h1 }}{% endblock %}
 
 {% block post_content %}
-    {#    <div class="row">#}
-    {#        <div class="col-xs-24 category">#}
-    {#            <div class="description">#}
-    {#                {{ object.description|default:""|striptags }}#}
-    {#                <div class="gradientback"></div>#}
-    {#            </div>#}
-    {#            <div class="text-right">#}
-    {#                <a href="#" class="more">Читать полностью --></a>#}
-    {#            </div>#}
-    {#        </div>#}
-    {#    </div>#}
-
     <div class="row">
         <div class="col-xs-24 category">
-            {{ object.description|safe }}
+            <div>
+                <input type="checkbox" class="read-more-state" id="post-1"/>
+
+                <div class="read-more-wrap">
+                    <div class="short">{{ object.description|safe|truncatewords_html:"100" }}</div>
+
+                    <div class="read-more-target">
+                        {{ object.description|safe }}
+                    </div>
+                </div>
+                <label for="post-1" class="read-more-trigger pull-right"></label>
+            </div>
         </div>
     </div>
 {% endblock %}

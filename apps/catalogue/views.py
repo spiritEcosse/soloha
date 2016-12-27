@@ -1,6 +1,7 @@
 from oscar.apps.catalogue.views import ProductDetailView as CoreProductDetailView
 from django.utils.translation import ugettext_lazy as _
 from django.views import generic
+from django.views.generic.list import MultipleObjectMixin
 from django.views.generic import View
 from oscar.core.loading import get_model
 from braces import views

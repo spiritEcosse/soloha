@@ -38,15 +38,9 @@
 </head>
 
 <body id="{% block body_id %}default{% endblock %}" data-spy="scroll" data-target=".scrollspy" class="{% block body_class %}default{% endblock %}">
-{# Main content goes in this 'layout' block #}
 {% block layout %}{% endblock %}
 
 {% block before_end_body %}{% endblock %}
-
-{% comment %}
-    Scripts loaded from a CDN.  These can't be wrapped by the 'compress' tag and so we
-    use a separate block for them.
-{% endcomment %}
 
 {% block cdn_scripts %}{% endblock %}
 
@@ -59,8 +53,5 @@
         {% block onbodyload %}{% endblock %}
     });
 </script>
-
-{# Page meta-data - this is populated by the 'metadata' template context processor #}
-<!-- {% trans "Version:" %} {{ version }} -->
 </body>
 </html>
