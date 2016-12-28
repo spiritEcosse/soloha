@@ -30,17 +30,13 @@
   app.controller('Header', [
     '$http', '$scope', '$location', '$window', '$document', '$log', '$cacheFactory', function($http, $scope, $location, $window, $document, $log, $cacheFactory) {
       return $scope.update_products = function() {
+        $('#search-dropdown').addClass('open');
+        $scope.searched_products = [];
         return $http.post('/search/', {
           'search_string': $scope.search
         }).success(function(data) {
-          $scope.search_string = data.search_string;
           $scope.sorting_type = data.sorting_type;
-          $scope.searched_products = data.searched_products;
-          if ($scope.searched_products.length && $scope.search) {
-            return $scope.display = 'block';
-          } else {
-            return $scope.display = 'none';
-          }
+          return $scope.searched_products = data.searched_products;
         }).error(function() {
           return console.error('An error occurred during submission');
         });

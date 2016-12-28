@@ -8663,6 +8663,12 @@ header .center .pages .navbar .container-fluid a:focus {
   background-color: transparent;
   text-decoration: underline;
 }
+header .center .search .input-group-btn {
+  position: static;
+}
+header .center .search .progress {
+  margin-bottom: 0;
+}
 header .center .search .dropdown-menu {
   padding: 0;
   width: 100%;

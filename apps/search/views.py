@@ -118,9 +118,9 @@ class FacetedSearchView(views.JSONResponseMixin, views.AjaxResponseMixin, CoreFa
         searched_products = [{'id': obj.pk,
                               'title': obj.title,
                               'main_image': obj.object.get_values()['image'],
-                              'href': obj.object.get_absolute_url(),
-                              'price': obj.object.get_values()['price']} for obj in sqs]
-
+                              'href': obj.object.get_values()['absolute_url'],
+                              # 'price': obj.object.get_values()['price']
+                              } for obj in sqs]
         return searched_products
 
     def get_search_queryset(self):
