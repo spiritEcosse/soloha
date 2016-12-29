@@ -25,6 +25,7 @@ tar -xzvf data/fixtures/all.tar.gz -C data/fixtures/
 # Load initial data from fixtures.
 ./manage.py loaddata data/fixtures/*.json
 ./manage.py oscar_populate_countries
-./manage.py clear_index --noinput
-./manage.py update_index catalogue
-
+./manage.py rebuild_index --noinput
+#sudo touch /var/solr/data/$1/conf/schema.xml
+#./manage.py build_solr_schema >> /var/solr/data/$1/conf/schema.xml
+#sudo chown solr:solr /var/solr/data/$1/conf/schema.xml

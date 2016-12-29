@@ -68,7 +68,36 @@ create_settings_local:
 
 debian_ubuntu_install_modules: postgresql libs install_pip
 
-site: debian_ubuntu_install_modules create_settings_local virtual_environment
+site: debian_ubuntu_install_modules create_settings_local solr virtual_environment
+
+solr:
+#	sudo apt-get install python-software-properties
+#	sudo add-apt-repository ppa:webupd8team/java
+#	sudo apt-get update
+#	sudo apt-get install oracle-java8-installer
+#	wget https://archive.apache.org/dist/lucene/solr/4.10.2/solr-4.10.2.tgz
+	sudo rm -f /etc/default/solr.in.sh
+	sudo sorl/bin/./install_solr_service.sh solr-4.10.2.tgz
+	rm -f solr-4.10.2.tgz
+	sudo su - solr -c "/opt/solr/bin/solr create -c $(current_dir) -n data_driven_schema_configs"
+	sudo touch /var/solr/data/$1/conf/schema.xml
+	./manage.py build_solr_schema >> /var/solr/data/$1/conf/schema.xml
+	sudo chown solr:solr /var/solr/data/$1/conf/schema.xml
+	sudo service solr restart
+
+solr_remove: solr_remove_service solr_remove_folders deluser_solr
+
+solr_remove_service:
+	sudo service solr stop
+	sudo rm -fr /etc/init.d/solr
+
+solr_remove_folders:
+	sudo rm -fr /var/solr
+	sudo rm -fr /opt/solr*
+
+deluser_solr:
+	sudo deluser --remove-home solr
+	sudo deluser -f --group solr
 
 
 

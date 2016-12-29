@@ -14,8 +14,10 @@ THUMBNAIL_DEBUG = DEBUG
 
 HAYSTACK_CONNECTIONS = {
     'default': {
-        'ENGINE': 'haystack.backends.simple_backend.SimpleEngine'
-    }
+        'ENGINE': 'haystack.backends.solr_backend.SolrEngine',
+        'URL': 'http://127.0.0.1:8983/solr/{}'.format(PROJECT_DIR),
+        'EXCLUDED_INDEXES': ['apps.catalogue.models.Product'],
+    },
 }
 
 FOLDER_STATIC = os.path.join(BASE_DIR, 'static')
