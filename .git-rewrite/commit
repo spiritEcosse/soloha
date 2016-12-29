@@ -1,0 +1,6 @@
+tree 3ab24f11635c80f5c458a486a974656203ce423c
+parent 1feb4c0fa22400eae71a5e43cb511cedbfd02a72
+author igor <shevchenkcoigor@gmail.com> 1470926695 +0300
+committer igor <shevchenkcoigor@gmail.com> 1470926695 +0300
+
+fix - 'NoneType' object has no attribute 'file'

@@ -527,11 +527,12 @@ class AbstractProduct(models.Model, CommonFeatureProduct):
     def get_values(self):
         values = dict()
         values['title'] = strip_entities(self.title)
-        values['absolute_url'] = self.get_absolute_url()
+        values['absolute_url'] = self.get_absolute_url
 
         selector = Selector()
         strategy = selector.strategy()
         info = strategy.fetch_for_product(self)
+
         if info.availability.is_available_to_buy:
             values['price'] = str(info.stockrecord.price_excl_tax)
         else:

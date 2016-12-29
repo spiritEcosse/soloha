@@ -261,7 +261,7 @@ OSCAR_ORDER_STATUS_PIPELINE = {
     'Being processed': ('Processed', 'Cancelled',),
     'Cancelled': (),
 }
-OSCAR_DEFAULT_CURRENCY = 'UAH'
+OSCAR_DEFAULT_CURRENCY = u'UAH'
 OSCAR_CURRENCY_FORMAT = u'#,##0.## грн.'
 OSCAR_PRODUCTS_PER_PAGE = 24
 
