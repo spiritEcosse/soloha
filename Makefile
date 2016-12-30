@@ -1,5 +1,12 @@
 #!/usr/bin/env bash
 current_dir := $(notdir $(CURDIR))
+solr_version := 4.10.2
+#solr_version := 6.3.0
+solr := solr
+solr_file := $(solr)-$(solr_version)
+opt_solr := /opt/$(solr)
+schema_xml := "$(opt_solr)/solr/$(current_dir)/conf/schema.xml"
+jetty := jetty
 
 postgresql:
     # Install postgresql
@@ -70,33 +77,43 @@ debian_ubuntu_install_modules: postgresql libs install_pip
 
 site: debian_ubuntu_install_modules create_settings_local solr virtual_environment
 
-solr:
+solr: solr_remove install_solr
+
+install_solr:
 #	sudo apt-get install python-software-properties
 #	sudo add-apt-repository ppa:webupd8team/java
 #	sudo apt-get update
-#	sudo apt-get install oracle-java8-installer
-#	wget https://archive.apache.org/dist/lucene/solr/4.10.2/solr-4.10.2.tgz
-	sudo rm -f /etc/default/solr.in.sh
-	sudo sorl/bin/./install_solr_service.sh solr-4.10.2.tgz
-	rm -f solr-4.10.2.tgz
-	sudo su - solr -c "/opt/solr/bin/solr create -c $(current_dir) -n data_driven_schema_configs"
-	sudo touch /var/solr/data/$1/conf/schema.xml
-	./manage.py build_solr_schema >> /var/solr/data/$1/conf/schema.xml
-	sudo chown solr:solr /var/solr/data/$1/conf/schema.xml
-	sudo service solr restart
+#	sudo apt-get -y install oracle-java8-installer
+#	sudo mkdir /usr/java
+#	sudo mkdir $(opt_solr)
+	sudo ln -sf /usr/lib/jvm/java-8-openjdk-amd64 /usr/java/default
+	sudo wget -P /opt https://archive.apache.org/dist/lucene/$(solr)/$(solr_version)/$(solr_file).tgz
+	sudo tar -xvf /opt/$(solr_file).tgz
+	sudo cp -R /opt/$(solr_file)/example $(opt_solr)
+	sudo apt-get install jetty
+	sudo cp -f $(solr)/$(jetty) /etc/default/$(jetty)
+	sudo useradd -d $(opt_solr) -s /sbin/false $(solr)
+	sudo chown $(solr):$(solr) -R $(opt_solr)
+	sudo mv $(opt_solr)/solr/collection1 $(current_dir)
+	sudo rm -R $(opt_solr)/solr/$(current_dir) data
+	sudo echo "name=$(current_dir)" > $(opt_solr)/solr/$(current_dir)/core.properties
 
-solr_remove: solr_remove_service solr_remove_folders deluser_solr
+	./manage.py build_$(solr)_schema > $(schema_xml)
+	sudo chown $(solr):$(solr) -R /opt/$(solr)/*
+	sudo service $(jetty) start
+
+solr_remove: solr_remove_service solr_remove_folders
 
 solr_remove_service:
-	sudo service solr stop
-	sudo rm -fr /etc/init.d/solr
+#	sudo service $(jetty) stop
+	sudo rm -f /etc/default/$(jetty).in.sh
+	sudo rm -fr /etc/init.d/$(jetty)
 
 solr_remove_folders:
-	sudo rm -fr /var/solr
-	sudo rm -fr /opt/solr*
+	sudo rm -fr /opt/$(solr)*
 
 deluser_solr:
-	sudo deluser --remove-home solr
+	sudo deluser -f --remove-home solr
 	sudo deluser -f --group solr
 
 
