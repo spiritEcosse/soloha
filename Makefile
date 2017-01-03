@@ -3,10 +3,15 @@ current_dir := $(notdir $(CURDIR))
 solr_version := 4.10.2
 #solr_version := 6.3.0
 solr := solr
+opt := /opt/
 solr_file := $(solr)-$(solr_version)
 opt_solr := /opt/$(solr)
 schema_xml := "$(opt_solr)/solr/$(current_dir)/conf/schema.xml"
 jetty := jetty
+jetty-v := $(jetty)8
+jetty_logging := $(jetty)-logging.xml
+jetty_version := 9.4.0.v20161208
+multicore_solr := $(opt_solr)/multicore/$(solr).xml
 
 postgresql:
     # Install postgresql
@@ -85,29 +90,39 @@ install_solr:
 #	sudo apt-get update
 #	sudo apt-get -y install oracle-java8-installer
 #	sudo mkdir /usr/java
-#	sudo mkdir $(opt_solr)
-	sudo ln -sf /usr/lib/jvm/java-8-openjdk-amd64 /usr/java/default
-	sudo wget -P /opt https://archive.apache.org/dist/lucene/$(solr)/$(solr_version)/$(solr_file).tgz
-	sudo tar -xvf /opt/$(solr_file).tgz
-	sudo cp -R /opt/$(solr_file)/example $(opt_solr)
-	sudo apt-get install jetty
-	sudo cp -f $(solr)/$(jetty) /etc/default/$(jetty)
-	sudo useradd -d $(opt_solr) -s /sbin/false $(solr)
-	sudo chown $(solr):$(solr) -R $(opt_solr)
-	sudo mv $(opt_solr)/solr/collection1 $(current_dir)
-	sudo rm -R $(opt_solr)/solr/$(current_dir) data
-	sudo echo "name=$(current_dir)" > $(opt_solr)/solr/$(current_dir)/core.properties
 
-	./manage.py build_$(solr)_schema > $(schema_xml)
-	sudo chown $(solr):$(solr) -R /opt/$(solr)/*
-	sudo service $(jetty) start
+#	sudo mkdir $(opt_solr)
+#	sudo ln -sf /usr/lib/jvm/java-8-openjdk-amd64 /usr/java/default
+#	sudo wget -P $(opt) https://archive.apache.org/dist/lucene/$(solr)/$(solr_version)/$(solr_file).tgz
+#	sudo tar -xvf $(opt)$(solr_file).tgz -C $(opt)
+#	sudo cp -rp $(opt)$(solr_file)/example/* $(opt_solr)/
+#	sudo rm -Rf example-DIH exampledocs work
+#	sudo cp -f $(multicore_solr) $(opt_solr)/$(solr)/
+#	sudo rm -Rf $(opt_solr)/multicore/
+#	sudo sed "s/core0/$(current_dir)/g" $(multicore_solr)
+#	sudo cp -f $(solr)/$(jetty)/$(jetty) /etc/default/$(jetty)
+#	sudo cp -f $(solr)/$(jetty)/$(jetty_logging) $(opt_solr)/etc/
+#	sudo useradd -d $(opt_solr) -s /sbin/false $(solr) &>/dev/null
+#	sudo chown $(solr):$(solr) -R $(opt_solr)/*
+#	sudo cp -f $(solr)/$(jetty).sh /etc/init.d/$(jetty)
+#	sudo wget -O /etc/init.d/jetty https://raw.githubusercontent.com/eclipse/jetty.project/master/jetty-distribution/src/main/resources/bin/jetty.sh
+#	sudo chmod a+x /etc/init.d/jetty
+#	sudo update-rc.d jetty defaults
+#	sudo rm -fr $(opt_solr)/solr/$(current_dir)/data
+#	sudo bash -c "echo 'name=$(current_dir)' > $(opt_solr)/$(solr)/$(current_dir)/core.properties"
+#	sudo bash -c "source ~/.virtualenvwrapper.sh && workon $(current_dir) && ./manage.py build_$(solr)_schema > $(schema_xml)"
+#	sudo cp -f $(solr)/$(jetty)/start.ini $(opt_solr)
+#	sudo chown $(solr):$(solr) -R $(opt_solr)/*
+#	sudo service $(jetty) start
 
 solr_remove: solr_remove_service solr_remove_folders
 
 solr_remove_service:
-#	sudo service $(jetty) stop
-	sudo rm -f /etc/default/$(jetty).in.sh
-	sudo rm -fr /etc/init.d/$(jetty)
+	sudo sudo apt-get --purge remove jetty*
+	sudo service $(jetty) stop &>/dev/null
+	sudo rm -f /etc/default/$(jetty)*
+	sudo rm -f /etc/init.d/$(jetty)*
+	sudo rm -fr /var/lib/$(jetty)*
 
 solr_remove_folders:
 	sudo rm -fr /opt/$(solr)*
