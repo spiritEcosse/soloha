@@ -14,6 +14,7 @@ class ProductIndex(indexes.SearchIndex, indexes.Indexable):
         document=True, use_template=True, template_name='search/indexes/catalogue/product_text.txt'
     )
     title = indexes.EdgeNgramField(model_attr='title', null=True)
+    slug = indexes.EdgeNgramField(model_attr='slug')
     product_id = indexes.IntegerField(model_attr='id')
 
     # Fields for faceting
