@@ -244,10 +244,11 @@ class ProductCategoryView(BaseCatalogue, SingleObjectMixin, generic.ListView):
             level=1, filter_products__categories__in=self.object.get_descendants_through_children(),
             filter_products__enable=True, filter_products__categories__enable=True
         ).annotate(
-            potential_products_count=Case(
-                When(
-                    filter_products__in=self.get_queryset().values_list('id', flat=True), then=0
-                ), default=0, output_field=IntegerField()
+            potential_products_count=Count(
+                Case(
+                    When(filter_products__in=self.get_queryset().values_list('id', flat=True), then=1),
+                    default=0, output_field=IntegerField()
+                )
             )
         ).order_by(*self.feature_orders).distinct()
 
