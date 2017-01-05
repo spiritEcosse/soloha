@@ -6,12 +6,13 @@ solr := solr
 opt := /opt/
 solr_file := $(solr)-$(solr_version)
 opt_solr := /opt/$(solr)
-schema_xml := "$(opt_solr)/solr/$(current_dir)/conf/schema.xml"
+schema_xml := $(opt_solr)/solr/$(current_dir)/conf/schema.xml
 jetty := jetty
 jetty-v := $(jetty)8
 jetty_logging := $(jetty)-logging.xml
 jetty_version := 9.4.0.v20161208
 multicore_solr := $(opt_solr)/multicore/$(solr).xml
+data_solr := $(opt_solr)/$(solr)/$(current_dir)/data
 
 postgresql:
     # Install postgresql
@@ -104,7 +105,8 @@ install_solr:
 	sudo update-rc.d $(jetty) defaults
 	sudo mv $(opt_solr)/$(solr)/collection1 $(opt_solr)/$(solr)/$(current_dir)
 	sudo bash -c "echo 'name=$(current_dir)' > $(opt_solr)/$(solr)/$(current_dir)/core.properties"
-	sudo rm -fr $(opt_solr)/solr/$(current_dir)/data
+	sudo rm -fr $(data_solr)
+	sudo mkdir $(data_solr) &>/dev/null
 	sudo bash -c "source ~/.virtualenvwrapper.sh && workon $(current_dir) && ./manage.py build_$(solr)_schema > $(schema_xml)"
 	sudo wget -O $(opt_solr)/start.ini http://git.eclipse.org/c/jetty/org.eclipse.jetty.project.git/plain/jetty-distribution/src/main/resources/start.ini
 	sudo chown $(solr):$(solr) -R $(opt_solr)/*

@@ -127,10 +127,10 @@ class FacetedSearchView(views.JSONResponseMixin, views.AjaxResponseMixin, CoreFa
         sqs_search = []
         if self.kwargs['search_string']:
             sqs = SearchQuerySet()
-            # sqs_title = sqs.autocomplete(title=self.kwargs['search_string'])
-            # sqs_slug = sqs.autocomplete(slug=self.kwargs['search_string'])
+            sqs_title = sqs.autocomplete(title=self.kwargs['search_string'])
+            sqs_slug = sqs.autocomplete(slug=self.kwargs['search_string'])
             sqs_id = sqs.autocomplete(product_id=self.kwargs['search_string'])
-            sqs_search = sqs_id
+            sqs_search = sqs_title or sqs_slug or sqs_id
         return sqs_search
 
     def get_queryset(self):
