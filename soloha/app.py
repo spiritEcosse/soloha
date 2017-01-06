@@ -23,8 +23,6 @@ subscribe_view = get_class('subscribe.views', 'SubscribeView')
 class Soloha(app.Shop):
     def get_urls(self):
         urlpatterns = [
-            url(r'^search/filter/(?P<filter_slug>[\w-]+(/[\w-]+)*)/', search_view.as_view()),
-            url(r'^search/', search_view.as_view()),
             url(r'^contacts/', contacts_view.as_view(), name='contacts'),
             url(r'^ckeditor/', include('ckeditor_uploader.urls')),
             url(r'^filer/', include('filer.urls')),

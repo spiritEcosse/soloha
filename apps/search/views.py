@@ -15,6 +15,7 @@ from django.db.models import Count
 from django.db.models import Q
 from django.shortcuts import render
 from django.forms.models import model_to_dict
+from django.core.urlresolvers import reverse
 
 Product = get_model('catalogue', 'product')
 
@@ -26,6 +27,7 @@ class FacetedSearchView(views.JSONResponseMixin, views.AjaxResponseMixin, CoreFa
     template_name = 'search/results.html'
     model = Product
     paginate_by = OSCAR_PRODUCTS_PER_PAGE
+    url_view_name = 'search:search'
 
     def post(self, request, *args, **kwargs):
         if self.request.is_ajax() and self.request.GET.get('q'):
@@ -110,6 +112,8 @@ class FacetedSearchView(views.JSONResponseMixin, views.AjaxResponseMixin, CoreFa
             sort_link = 'q={}&sorting_type={}'.format(context['query'], link)
             context['sort_types'].append((sorting_url, text, is_active, sort_link))
 
+        context['url_extra_kwargs'] = {}
+        context['url_view_name'] = self.url_view_name
         return context
 
     def get_products(self, **kwargs):
