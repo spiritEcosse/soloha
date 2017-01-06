@@ -236,24 +236,51 @@ class ProductCategoryView(BaseCatalogue, SingleObjectMixin, generic.ListView):
         queryset = queryset.order_by(order)
         return queryset
 
+    def get_products(self, **kwargs):
+        queryset = Product.objects.filter(
+            enable=True, categories=self.object.get_descendants(include_self=True), categories__enable=True
+        )
+
+        selected_filters = list(self.selected_filters)[:]
+
+        if kwargs.get('potential_filter', None):
+            selected_filters.append(kwargs.get('potential_filter'))
+
+        key = lambda feature: feature.parent.pk
+        iter = groupby(sorted(selected_filters, key=key), key=key)
+
+        for parent, values in iter:
+            queryset = queryset.filter(filters__in=map(lambda obj: obj, values))
+
+        return queryset
+
     def get_context_data(self, **kwargs):
         context = super(ProductCategoryView, self).get_context_data(**kwargs)
 
-        filters = Feature.objects.browse().only('title', 'parent', 'slug').filter(
+        # Todo replace on one query, without regroup
+        context['filters'] = Feature.objects.browse().only('title', 'parent', 'slug').filter(
             level=1, filter_products__categories__in=self.object.get_descendants_through_children(),
             filter_products__enable=True, filter_products__categories__enable=True
-        ).annotate(
-            potential_products_count=Count(
-                Case(
-                    When(filter_products__in=self.get_queryset().values_list('id', flat=True)),
-                    default=0, output_field=IntegerField()
-                )
+        ).order_by(*self.feature_orders).prefetch_related(
+            Prefetch('filter_products', queryset=Product.objects.only('id').order_by())
+        ).distinct()
+
+        products = lambda **kwargs: map(lambda obj: obj.id, self.get_products(**kwargs))
+        key = lambda feature: feature.parent.pk
+        # Todo really need sort by feature.parent.pk ?
+        iter = groupby(sorted(self.selected_filters, key=key), key=key)
+        filters_parent = map(lambda obj: obj[0], iter)
+
+        for feature in context['filters']:
+            feature.potential_products_count = feature.filter_products.filter(
+                id__in=products(potential_filter=feature)
             )
-        ).order_by(*self.feature_orders).distinct()
 
-        print filters.query
+            if feature.parent.pk in filters_parent:
+                feature.potential_products_count = feature.potential_products_count.exclude(id__in=products)
 
-        context['filters'] = filters
+            feature.potential_products_count = feature.potential_products_count.count()
+
         context['url_extra_kwargs'].update({'category_slug': self.kwargs.get('category_slug')})
         context['selected_filters'] = self.selected_filters
         return context
