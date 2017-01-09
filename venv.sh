@@ -19,11 +19,8 @@ pip install -r requirements.txt
 # Create cache table
 ./manage.py createcachetable
 
-# Unzip
-tar -xzvf data/fixtures/all.tar.gz -C data/fixtures/
-
 # Load initial data from fixtures.
-./manage.py loaddata data/fixtures/*.json
+./manage.py loaddata all.json.bz2
 ./manage.py oscar_populate_countries
 ./manage.py rebuild_index --noinput
 #sudo touch /var/solr/data/$1/conf/schema.xml

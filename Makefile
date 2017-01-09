@@ -88,7 +88,7 @@ solr: solr_remove install_solr
 install_solr:
 #	sudo apt-get install python-software-properties
 	sudo add-apt-repository ppa:webupd8team/java -y
-#	sudo apt-get update
+	sudo apt-get update
 	sudo apt-get -y install oracle-java8-installer
 	sudo mkdir -p /usr/java
 	sudo ln -sf /usr/lib/jvm/java-8-openjdk-amd64 /usr/java/default
