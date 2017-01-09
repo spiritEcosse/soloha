@@ -94,7 +94,7 @@ install_solr:
 	sudo ln -sf /usr/lib/jvm/java-8-openjdk-amd64 /usr/java/default
 
 	sudo mkdir $(opt_solr)
-	sudo wget -P $(opt) https://archive.apache.org/dist/lucene/$(solr)/$(solr_version)/$(solr_file).tgz
+#	sudo wget -P $(opt) https://archive.apache.org/dist/lucene/$(solr)/$(solr_version)/$(solr_file).tgz
 	sudo tar -xvf $(opt)$(solr_file).tgz -C $(opt)
 	sudo cp -rp $(opt)$(solr_file)/example/* $(opt_solr)/
 	sudo cp -f $(solr)/$(jetty)/$(jetty) /etc/default/$(jetty)
@@ -111,6 +111,7 @@ install_solr:
 	sudo wget -O $(opt_solr)/start.ini http://git.eclipse.org/c/jetty/org.eclipse.jetty.project.git/plain/jetty-distribution/src/main/resources/start.ini
 	sudo chown $(solr):$(solr) -R $(opt_solr)/*
 	sudo service $(jetty) start
+	sudo service $(jetty) restart
 
 solr_remove: solr_remove_service solr_remove_folders
 
@@ -122,7 +123,8 @@ solr_remove_service:
 	sudo rm -fr /var/lib/$(jetty)*
 
 solr_remove_folders:
-	sudo rm -fr /opt/$(solr)*
+	sudo rm -fr /opt/$(solr)
+#	sudo rm -fr /opt/$(solr)*
 
 deluser_solr:
 	sudo deluser -f --remove-home solr

@@ -80,6 +80,7 @@ purl==1.1
 pyasn1==0.1.9
 pyasn1-modules==0.0.8
 pybrowscap==2.0
+pycountry==17.1.8
 pycparser==2.14
 pycrypto==2.6.1
 Pygments==2.1.3

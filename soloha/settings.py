@@ -212,7 +212,6 @@ EMAIL_PORT = settings_local.EMAIL_PORT
 EMAIL_USE_TLS = settings_local.EMAIL_USE_TLS
 OSCAR_FROM_EMAIL = DEFAULT_FROM_EMAIL
 
-
 AUTHENTICATION_BACKENDS = (
     'oscar.apps.customer.auth_backends.EmailBackend',
     'django.contrib.auth.backends.ModelBackend',
