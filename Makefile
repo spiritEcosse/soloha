@@ -106,25 +106,27 @@ install_java:
 	sudo ln -sf /usr/lib/jvm/java-8-openjdk-amd64 /usr/java/default
 
 install_solr:
-	sudo mkdir $(opt_solr)
-	sudo wget -P $(opt) https://archive.apache.org/dist/lucene/$(solr)/$(solr_version)/$(solr_file).tgz
-	sudo tar -xvf $(opt)$(solr_file).tgz -C $(opt)
-	sudo cp -rp $(opt)$(solr_file)/example/* $(opt_solr)/
-	sudo cp -f $(solr)/$(jetty)/$(jetty) /etc/default/$(jetty)
-	sudo cp -f $(solr)/$(jetty)/$(jetty_logging) $(opt_solr)/etc/
-	sudo useradd -d $(opt_solr) -s /sbin/false $(solr) &>/dev/null
-	sudo cp -f $(solr)/$(jetty)/$(jetty).sh /etc/init.d/$(jetty)
-	sudo chmod a+x /etc/init.d/$(jetty)
-	sudo update-rc.d $(jetty) defaults
-	sudo mv $(opt_solr)/$(solr)/collection1 $(opt_solr)/$(solr)/$(current_dir)
-	sudo bash -c "echo 'name=$(current_dir)' > $(opt_solr)/$(solr)/$(current_dir)/core.properties"
-	sudo rm -fr $(data_solr)
-	sudo mkdir $(data_solr) &>/dev/null
-	sudo bash -c "source ~/.virtualenvwrapper.sh && workon $(current_dir) && ./manage.py build_$(solr)_schema > $(schema_xml)"
-	sudo wget -O $(opt_solr)/start.ini http://git.eclipse.org/c/jetty/org.eclipse.jetty.project.git/plain/jetty-distribution/src/main/resources/start.ini
-	sudo chown $(solr):$(solr) -R $(opt_solr)/*
-	sudo service $(jetty) start
-	sudo service $(jetty) restart
+	sudo su
+	mkdir $(opt_solr)
+	wget -P $(opt) https://archive.apache.org/dist/lucene/$(solr)/$(solr_version)/$(solr_file).tgz
+	tar -xvf $(opt)$(solr_file).tgz -C $(opt)
+	cp -rp $(opt)$(solr_file)/example/* $(opt_solr)/
+	cp -f $(solr)/$(jetty)/$(jetty) /etc/default/$(jetty)
+	cp -f $(solr)/$(jetty)/$(jetty_logging) $(opt_solr)/etc/
+	useradd -d $(opt_solr) -s /sbin/false $(solr) &>/dev/null
+	cp -f $(solr)/$(jetty)/$(jetty).sh /etc/init.d/$(jetty)
+	chmod a+x /etc/init.d/$(jetty)
+	update-rc.d $(jetty) defaults
+	mv $(opt_solr)/$(solr)/collection1 $(opt_solr)/$(solr)/$(current_dir)
+	bash -c "echo 'name=$(current_dir)' > $(opt_solr)/$(solr)/$(current_dir)/core.properties"
+	rm -fr $(data_solr)
+	mkdir $(data_solr) &>/dev/null
+	bash -c "source virtualenvwrapper.sh && workon $(current_dir) && ./manage.py build_$(solr)_schema > $(schema_xml)"
+	wget -O $(opt_solr)/start.ini http://git.eclipse.org/c/jetty/org.eclipse.jetty.project.git/plain/jetty-distribution/src/main/resources/start.ini
+	chown $(solr):$(solr) -R $(opt_solr)/*
+	service $(jetty) start
+	service $(jetty) restart
+	exit
 
 solr_remove: solr_remove_service solr_remove_folders
 
