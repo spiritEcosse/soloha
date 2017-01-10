@@ -86,7 +86,8 @@ site: debian_ubuntu_install_modules create_settings_local solr virtual_environme
 solr: solr_remove install_solr
 
 install_solr:
-	sudo apt-get install software-properties-common
+	sudo apt-get install python-software-properties # Debian Wheezy and earlier
+	sudo apt-get install software-properties-common # Debian Jessie and later (2014-)
 	sudo add-apt-repository ppa:webupd8team/java -y
 	sudo apt-get update
 	sudo apt-get -y install oracle-java8-installer
