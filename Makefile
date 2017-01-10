@@ -83,9 +83,20 @@ debian_ubuntu_install_modules: postgresql libs install_pip
 
 site: debian_ubuntu_install_modules create_settings_local solr virtual_environment
 
-solr: solr_remove install_solr
+solr: install_java solr_remove install_solr
+solr_production: solr_remove install_solr
 
-install_solr:
+install_java:
+	# For Debian
+	su -
+	echo "deb http://ppa.launchpad.net/webupd8team/java/ubuntu xenial main" | tee /etc/apt/sources.list.d/webupd8team-java.list
+	echo "deb-src http://ppa.launchpad.net/webupd8team/java/ubuntu xenial main" | tee -a /etc/apt/sources.list.d/webupd8team-java.list
+	apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys EEA14886
+	apt-get update
+	apt-get install oracle-java8-installer
+	exit
+	# end for Debian
+
 	sudo apt-get install python-software-properties # Debian Wheezy and earlier
 	sudo apt-get install software-properties-common # Debian Jessie and later (2014-)
 	sudo add-apt-repository ppa:webupd8team/java -y
@@ -94,6 +105,7 @@ install_solr:
 	sudo mkdir -p /usr/java
 	sudo ln -sf /usr/lib/jvm/java-8-openjdk-amd64 /usr/java/default
 
+install_solr:
 	sudo mkdir $(opt_solr)
 	sudo wget -P $(opt) https://archive.apache.org/dist/lucene/$(solr)/$(solr_version)/$(solr_file).tgz
 	sudo tar -xvf $(opt)$(solr_file).tgz -C $(opt)
