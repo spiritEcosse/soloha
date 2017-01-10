@@ -113,7 +113,7 @@ install_solr:
 	sudo cp -f $(solr)/$(jetty)/$(jetty) /etc/default/$(jetty)
 	sudo cp -f $(solr)/$(jetty)/$(jetty_logging) $(opt_solr)/etc/
 	sudo useradd -d $(opt_solr) -s /sbin/false $(solr) &>/dev/null
-	sudo wget -O /etc/init.d/$(jetty) https://raw.githubusercontent.com/eclipse/$(jetty).project/master/$(jetty)-distribution/src/main/resources/bin/$(jetty).sh
+	sudo cp -f $(solr)/$(jetty)/$(jetty).sh /etc/init.d/$(jetty)
 	sudo chmod a+x /etc/init.d/$(jetty)
 	sudo update-rc.d $(jetty) defaults
 	sudo mv $(opt_solr)/$(solr)/collection1 $(opt_solr)/$(solr)/$(current_dir)
