@@ -6,6 +6,9 @@ from django import forms
 from apps.catalogue.abstract_models import REGEXP_PHONE
 from dal import autocomplete
 
+from apps.catalogue.models import SortFeatureInCategory
+
+
 QuickOrder = get_model('order', 'QuickOrder')
 ProductRecommendation = get_model('catalogue', 'ProductRecommendation')
 Feature = get_model('catalogue', 'Feature')
@@ -119,3 +122,13 @@ class ProductForm(forms.ModelForm):
         characteristics.extend(self.cleaned_data['filters'])
         self.cleaned_data['characteristics'] = characteristics
         return self.cleaned_data
+
+
+class SortFeatureInCategoryForm(forms.ModelForm):
+    class Meta:
+        fields = '__all__'
+        model = SortFeatureInCategory
+        widgets = {
+            'feature': autocomplete.ModelSelect2(url='feature-autocomplete'),
+            'category': autocomplete.ModelSelect2(url='categories-autocomplete'),
+        }

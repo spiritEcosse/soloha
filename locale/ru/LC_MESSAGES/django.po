@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-12-28 12:45+0000\n"
+"POT-Creation-Date: 2017-01-10 13:22+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -72,7 +72,8 @@ msgstr ""
 "валюты других товаров в вашей корзине"
 
 #: apps/basket/models.py:213 apps/catalogue/abstract_models.py:570
-#: apps/catalogue/abstract_models.py:1005 apps/order/models.py:30
+#: apps/catalogue/abstract_models.py:1005 apps/catalogue/models.py:337
+#: apps/order/models.py:30
 msgid "Feature"
 msgstr "Особенности"
 
@@ -382,13 +383,13 @@ msgstr "Иконка"
 msgid "Image"
 msgstr "Картинка"
 
-#: apps/catalogue/abstract_models.py:721
+#: apps/catalogue/abstract_models.py:721 apps/catalogue/models.py:338
 #: templates/dashboard/catalogue/product_update.html:124
 #: templates/dashboard/comms/list.html:33
 msgid "Category"
 msgstr "Категория"
 
-#: apps/catalogue/abstract_models.py:1001
+#: apps/catalogue/abstract_models.py:1001 apps/catalogue/models.py:339
 msgid "Sort"
 msgstr "Сортировка"
 
@@ -448,23 +449,23 @@ msgstr "Опция товара"
 msgid "Product options"
 msgstr "Опции товара"
 
-#: apps/catalogue/forms.py:34 apps/catalogue/forms.py:43
+#: apps/catalogue/forms.py:37 apps/catalogue/forms.py:46
 msgid "You comment"
 msgstr "Ваш комментарий"
 
-#: apps/catalogue/forms.py:35 apps/catalogue/forms.py:41
+#: apps/catalogue/forms.py:38 apps/catalogue/forms.py:44
 msgid "You name"
 msgstr "Ваше имя"
 
-#: apps/catalogue/forms.py:36 apps/catalogue/forms.py:42
+#: apps/catalogue/forms.py:39 apps/catalogue/forms.py:45
 msgid "You phone number"
 msgstr "Ваш номер телефона"
 
-#: apps/catalogue/forms.py:37 apps/catalogue/forms.py:44
+#: apps/catalogue/forms.py:40 apps/catalogue/forms.py:47
 msgid "You email"
 msgstr "Ваш email"
 
-#: apps/catalogue/forms.py:48 apps/catalogue/forms.py:51
+#: apps/catalogue/forms.py:51 apps/catalogue/forms.py:54
 #: apps/subscribe/forms.py:28 apps/subscribe/forms.py:31
 #: apps/subscribe/forms.py:34
 msgid "This field required."
@@ -474,22 +475,30 @@ msgstr "Это поле обязательно."
 msgid "Image of recommendation product."
 msgstr "Изображение рекомендуемого товара."
 
+#: apps/catalogue/models.py:342
+msgid "Sort feature in category page"
+msgstr ""
+
+#: apps/catalogue/models.py:343
+msgid "Sorts feature in category page"
+msgstr ""
+
 #: apps/catalogue/tests.py:123 apps/catalogue/tests.py:287
 msgid "Product is not available."
 msgstr "Товар не доступен."
 
 #: apps/catalogue/tests.py:766 apps/catalogue/tests.py:1123
-#: apps/search/views.py:97
+#: apps/search/views.py:99
 msgid "By popularity"
 msgstr "По популярности"
 
 #: apps/catalogue/tests.py:766 apps/catalogue/tests.py:1123
-#: apps/search/views.py:98
+#: apps/search/views.py:100
 msgid "By price descending"
 msgstr "По убыванию цены"
 
 #: apps/catalogue/tests.py:767 apps/catalogue/tests.py:1124
-#: apps/search/views.py:99
+#: apps/search/views.py:101
 msgid "By price ascending"
 msgstr "По возрастанию цены"
 
@@ -520,16 +529,16 @@ msgstr "Убыванию цены"
 msgid "All products"
 msgstr ""
 
-#: apps/catalogue/views.py:310 apps/subscribe/views.py:46
+#: apps/catalogue/views.py:345 apps/subscribe/views.py:46
 #, python-format
 msgid "Order online %s"
 msgstr ""
 
-#: apps/catalogue/views.py:644
+#: apps/catalogue/views.py:679
 msgid "Please, enter number."
 msgstr "Пожалуйста, введите номер."
 
-#: apps/catalogue/views.py:677
+#: apps/catalogue/views.py:712
 msgid "Available size limits: min - \"{}\", max - \"{}\""
 msgstr ""
 
@@ -965,7 +974,7 @@ msgstr ""
 #: templates/customer/wishlists/wishlists_detail.html:10
 #: templates/customer/wishlists/wishlists_form.html:7
 #: templates/dashboard/catalogue/category_list.html:31
-#: templates/flatpages/default.html:20 templates/partials/header.html:140
+#: templates/flatpages/default.html:20 templates/partials/header.html:142
 #: templates/search/results.html:15 templates/sitemap/sitemap.html:11
 msgid "Home"
 msgstr ""
@@ -1336,8 +1345,25 @@ msgstr ""
 #: templates/catalogue/browse.html:159
 #: templates/dashboard/catalogue/product_list.html:73
 #: templates/dashboard/ranges/range_product_list.html:125
-#: templates/search/results.html:108
+#: templates/search/results.html:109
 msgid "No products found."
+msgstr ""
+
+#: templates/catalogue/category.html:49
+msgid "Selected"
+msgstr "Выбранные"
+
+#: templates/catalogue/category.html:61 templates/catalogue/category.html:103
+msgid "Clear"
+msgstr ""
+
+#: templates/catalogue/category.html:78
+msgid "Selection of parameters"
+msgstr "Выбрать параметры"
+
+#: templates/catalogue/category.html:106
+#: templates/catalogue/product/attributes/attribute_products_modal.html:42
+msgid "Choose"
 msgstr ""
 
 #: templates/catalogue/detail.html:84
@@ -1558,12 +1584,8 @@ msgid "Click to expand"
 msgstr ""
 
 #: templates/catalogue/product/attributes/attribute_products_modal.html:28
-#: templates/partials/header.html:111
+#: templates/partials/header.html:113
 msgid "Loading..."
-msgstr ""
-
-#: templates/catalogue/product/attributes/attribute_products_modal.html:42
-msgid "Choose"
 msgstr ""
 
 #: templates/catalogue/product/attributes/attribute_products_modal.html:45
@@ -4871,7 +4893,7 @@ msgid "all rights reserved"
 msgstr "все права защищены"
 
 #: templates/partials/header.html:10 templates/partials/header.html.py:59
-#: templates/partials/header.html:134
+#: templates/partials/header.html:136
 msgid "Toggle navigation"
 msgstr ""
 
@@ -4883,7 +4905,7 @@ msgstr "Телефоны"
 msgid "You are looking for something"
 msgstr "Вы ищете что-то"
 
-#: templates/partials/header.html:83 templates/partials/header.html.py:118
+#: templates/partials/header.html:83 templates/partials/header.html.py:120
 msgid "Show all search results"
 msgstr "Показать все найденные результаты"
 
@@ -4895,7 +4917,7 @@ msgstr "Показать 5 результатов"
 msgid "Results search"
 msgstr ""
 
-#: templates/partials/header.html:203
+#: templates/partials/header.html:205
 msgid "Хочу"
 msgstr ""
 
@@ -4973,12 +4995,6 @@ msgstr ""
 #~| msgid "Not selected"
 #~ msgid "Not specified."
 #~ msgstr "Не выбрано"
-
-#~ msgid "Selected"
-#~ msgstr "Выбранные"
-
-#~ msgid "Selection of parameters"
-#~ msgstr "Выбрать параметры"
 
 #~ msgid "Sent!"
 #~ msgstr "Отправлено!"

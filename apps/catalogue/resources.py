@@ -25,6 +25,7 @@ except ImportError:
     class NullHandler(logging.Handler):
         def emit(self, record):
             pass
+from apps.catalogue.models import SortFeatureInCategory
 
 logging.getLogger(__name__).addHandler(NullHandler())
 
@@ -383,4 +384,20 @@ class ProductResource(ModelResource):
         fields = ('id', 'delete', 'title', 'slug', 'enable', 'structure', 'parent', 'h1', 'meta_title',
                   'meta_description', 'meta_keywords', 'categories_slug', 'filters_slug', 'characteristics_slug',
                   'product_class', )
+        export_order = fields
+
+
+class SortFeatureInCategoryResource(ModelResource):
+    feature = fields.Field(
+        attribute='feature', column_name='feature',
+        widget=import_export_widgets.ForeignKeyWidget(model=Feature, field='slug')
+    )
+    category = fields.Field(
+        attribute='category', column_name='category',
+        widget=import_export_widgets.ForeignKeyWidget(model=Category, field='slug')
+    )
+
+    class Meta:
+        model = SortFeatureInCategory
+        fields = ('id', 'delete', 'sort',  'feature', 'category', )
         export_order = fields

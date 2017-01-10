@@ -29,6 +29,10 @@ try:
 except ImportError:
     from django.utils.encoding import force_unicode as force_text
 
+from apps.catalogue.models import SortFeatureInCategory
+from apps.catalogue.forms import SortFeatureInCategoryForm
+from apps.catalogue.resources import SortFeatureInCategoryResource
+
 
 Feature = get_model('catalogue', 'Feature')
 AttributeOption = get_model('catalogue', 'AttributeOption')
@@ -264,6 +268,15 @@ class CategoryAdmin(ImportExportMixin, ImportExportActionModelAdmin, DraggableMP
               "https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js")
 
 
+class SortFeatureInCategoryAdmin(ImportExportMixin, ImportExportActionModelAdmin):
+    form = SortFeatureInCategoryForm
+    resource_class = SortFeatureInCategoryResource
+
+    class Media:
+        js = ("https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css",
+              "https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js")
+
+
 admin.site.register(ProductClass, ProductClassAdmin)
 admin.site.register(Product, ProductAdmin)
 admin.site.register(ProductAttribute, ProductAttributeAdmin)
@@ -275,3 +288,4 @@ admin.site.register(Category, CategoryAdmin)
 admin.site.register(Feature, FeatureAdmin)
 admin.site.register(ProductFeature, ProductFeatureAdmin)
 admin.site.register(ProductRecommendation, ProductRecommendationAdmin)
+admin.site.register(SortFeatureInCategory, SortFeatureInCategoryAdmin)

@@ -332,4 +332,19 @@ if not is_model_registered('catalogue', 'ProductImage'):
     __all__.append('ProductImage')
 
 
+@python_2_unicode_compatible
+class SortFeatureInCategory(models.Model):
+    feature = models.ForeignKey(Feature, verbose_name=_('Feature'), related_name='sort_from_category')
+    category = models.ForeignKey(Category, verbose_name=_('Category'), related_name='sort_from_category')
+    sort = models.IntegerField(_('Sort'), default=0, db_index=True)
+
+    class Meta:
+        verbose_name = _('Sort feature in category page')
+        verbose_name_plural = _('Sorts feature in category page')
+        unique_together = ('category', 'feature', 'sort', )
+
+    def __str__(self):
+        return u'{}, {} - {}'.format(self.sort, getattr(self, 'category', None), getattr(self, 'feature', None))
+
+
 from oscar.apps.catalogue.models import *  # noqa

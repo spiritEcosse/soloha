@@ -124,7 +124,7 @@ class ProductCategoryView(BaseCatalogue, SingleObjectMixin, generic.ListView):
     paginate_by = OSCAR_PRODUCTS_PER_PAGE
     use_keys = ('sort', 'filter_slug', )
     feature_only = ('title', 'slug', 'parent__id', 'parent__title', )
-    feature_orders = ('parent__sort', 'parent__title',)
+    feature_orders = ('parent__sort', 'parent__title')
     filter_slug = 'filter_slug'
     url_view_name = 'catalogue:category'
     queryset = Product.objects.list()
@@ -261,7 +261,13 @@ class ProductCategoryView(BaseCatalogue, SingleObjectMixin, generic.ListView):
         context['filters'] = Feature.objects.browse().only('title', 'parent', 'slug').filter(
             level=1, filter_products__categories__in=self.object.get_descendants_through_children(),
             filter_products__enable=True, filter_products__categories__enable=True
-        ).order_by(*self.feature_orders).prefetch_related(
+        ).annotate(
+            sort_parent=Case(
+                When(
+                    parent__sort_from_category__category=self.object, then='parent__sort_from_category__sort'
+                ), default=0, output_field=IntegerField()
+            )
+        ).order_by('sort_parent', *self.feature_orders).prefetch_related(
             Prefetch('filter_products', queryset=Product.objects.only('id').order_by())
         ).distinct()
 
