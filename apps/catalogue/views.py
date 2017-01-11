@@ -265,7 +265,7 @@ class ProductCategoryView(BaseCatalogue, SingleObjectMixin, generic.ListView):
             sort_parent=Case(
                 When(
                     parent__sort_from_category__category=self.object, then='parent__sort_from_category__sort'
-                ), default=0, output_field=IntegerField()
+                ), output_field=IntegerField()
             )
         ).order_by('sort_parent', *self.feature_orders).prefetch_related(
             Prefetch('filter_products', queryset=Product.objects.only('id').order_by())
