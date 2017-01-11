@@ -14,6 +14,7 @@ local.py
 **/bower_components/
 /media/*
 /static_root/*
+image_not_found.jpg
 
 # Vagrant
 .vagrant
