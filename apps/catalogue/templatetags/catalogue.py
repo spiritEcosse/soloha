@@ -2,6 +2,8 @@ from django.core.urlresolvers import reverse
 from django import template
 from django.template import Node, Library, TemplateSyntaxError, VariableDoesNotExist, NodeList
 import re
+from django.template.defaultfilters import stringfilter
+from django.utils.text import Truncator, re_words, re_chars, re_tag
 
 register = Library()
 
@@ -160,3 +162,4 @@ def string_strip(parser, token):
     nodelist = parser.parse(('end_string_strip',))
     parser.delete_first_token()
     return StringStripNode(nodelist)
+

@@ -10,36 +10,26 @@
         {% trans 'Characteristics' %}:
     </div>
     <div class="panel-body">
-        <div class="row option">
-            <div class="col-xs-12">
-                {% trans "ISBN" %}:
-            </div>
-            <div class="col-xs-12 values">
-                {{ product.id }}
-            </div>
-        </div>
         {% regroup product.characteristics.all by parent as characteristics %}
 
         {% for characteristic in characteristics %}
             <div class="row option">
-                <div class="col-xs-12">
-                    {{ characteristic.grouper }}:
-                </div>
-                <div class="col-xs-12 values">
+                <div class="col-xs-24">
+                    <strong>{{ characteristic.grouper }}:</strong>
                     {% join_by_attribute characteristic.list|dictsort:'title' ', ' 'title' %}
                 </div>
             </div>
         {% endfor %}
 
-        {% iffeature "reviews" %}
-            <div class="row option">
-                <div class="col-xs-12">
-                    {% trans "Number of reviews" %}
-                </div>
-                <div class="col-xs-12 values">
-                    {{ product.num_approved_reviews }}
-                </div>
-            </div>
-        {% endiffeature %}
+{#        {% iffeature "reviews" %}#}
+{#            <div class="row option">#}
+{#                <div class="col-xs-12">#}
+{#                    {% trans "Number of reviews" %}#}
+{#                </div>#}
+{#                <div class="col-xs-12 values">#}
+{#                    {{ product.num_approved_reviews }}#}
+{#                </div>#}
+{#            </div>#}
+{#        {% endiffeature %}#}
     </div>
 </div>

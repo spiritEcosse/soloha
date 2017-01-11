@@ -18,7 +18,7 @@
     {% if selected_filters %}
         {% include 'catalogue/partials/meta_tags.html' %}.
     {% endif %}
-    {{ category.get_meta_title }} | {{ block.super }}
+    {{ object.get_meta_title }} | {{ block.super }}
 {% endblock %}
 
 {# Todo refactoring remove {% regroup selected_filters by parent as group_filters %} and query from db #}
@@ -26,7 +26,7 @@
     {% if selected_filters.exists %}
         {% include 'catalogue/partials/meta_tags.html' %}.
     {% endif %}
-    {{ category.get_meta_description|default:""|striptags }}
+    {{ object.get_meta_description|default:""|striptags }}
 {% endblock %}
 
 {# Todo refactoring remove {% regroup selected_filters by parent as group_filters %} and query from db #}
@@ -34,7 +34,7 @@
     {% if selected_filters.exists %}
         {% include 'catalogue/partials/meta_tags.html' %}
     {% else %}
-        {{ category.meta_keywords|default:""|striptags }}
+        {{ object.meta_keywords|default:""|striptags }}
     {% endif %}
 {% endblock %}
 
@@ -128,38 +128,32 @@
     {% endif %}
 {% endblock %}
 
-{% block breadcrumbs %}
-    <ol class="breadcrumb">
+{% block breadcrumbs_child %}
+    {% for category in object.get_ancestors %}
         <li>
-            <a href="{{ homepage_url }}">{% trans "Home" %}</a>
+            <a href="{{ category.get_absolute_url }}">{{ category.name }}</a>
         </li>
-        {% for category in category.get_ancestors %}
-            <li>
-                <a href="{{ category.get_absolute_url }}">{{ category.name }}</a>
-            </li>
-        {% endfor %}
-        <li class="active">{{ category.name }}</li>
-    </ol>
+    {% endfor %}
+    <li class="active">{{ object.name }}</li>
 {% endblock %}
 
-{% block headertext %}{{ category.get_h1 }}{% endblock %}
+{% block headertext %}{{ object.get_h1 }}{% endblock %}
 
 {% block post_content %}
-    {#    <div class="row">#}
-    {#        <div class="col-xs-24 category">#}
-    {#            <div class="description">#}
-    {#                {{ category.description|default:""|striptags }}#}
-    {#                <div class="gradientback"></div>#}
-    {#            </div>#}
-    {#            <div class="text-right">#}
-    {#                <a href="#" class="more">Читать полностью --></a>#}
-    {#            </div>#}
-    {#        </div>#}
-    {#    </div>#}
-
     <div class="row">
         <div class="col-xs-24 category">
-            {{ category.description|safe }}
+            <div>
+                <input type="checkbox" class="read-more-state" id="post-1"/>
+
+                <div class="read-more-wrap">
+                    <div class="short">{{ object.description|safe|truncatewords_html:"100" }}</div>
+
+                    <div class="read-more-target">
+                        {{ object.description|safe }}
+                    </div>
+                </div>
+                <label for="post-1" class="read-more-trigger pull-right"></label>
+            </div>
         </div>
     </div>
 {% endblock %}

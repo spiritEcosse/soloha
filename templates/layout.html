@@ -44,10 +44,8 @@
                 </div>
                 {% block modal %}{% endblock %}
 
-                {#                 Div exists for AJAX updates to entire content section#}
                 <div id="content_inner">{% block content %}{% endblock %}</div>
 
-                {# Render promotions #}
                 {% block promotions %}
                     <div id="promotions" class="col-xs-24">
                         {% for promotion in promotions_page %}

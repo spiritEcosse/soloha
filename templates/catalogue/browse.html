@@ -7,6 +7,7 @@
 {% load mptt_tags %}
 {% load catalogue %}
 {% load i18n %}
+{% load thumbnail %}
 
 {% block meta_robots %}
     {{ block.super }}
@@ -26,17 +27,27 @@
         <li>
             <a href="{{ homepage_url }}">{% trans "Home" %}</a>
         </li>
-        <li class="active">{{ summary }}</li>
+        {% if summary %}
+            <li class="active">{{ summary }}</li>
+        {% else %}
+            <li>
+                <a href="{% url 'catalogue:index' %}">
+                    {% trans 'All products' %}
+                </a>
+            </li>
+        {% endif %}
+
+        {% block breadcrumbs_child %}{% endblock %}
     </ul>
 {% endblock breadcrumbs %}
 
 {% block column_left %}
-    {% full_tree_for_model catalogue.Category as categories %}
+    {% full_tree_for_model catalogue.Category as categories_menu %}
 
     {% if categories %}
         <div class="heading">{% trans "All categories" %}</div>
         <div class="list-group">
-            {% recursetree categories %}
+            {% recursetree categories_menu %}
                 {% if node.enable %}
                     {% with title=node.name|lower|capfirst|truncatechars:63 url=node.get_absolute_url %}
                         <a href="{{ node.get_absolute_url }}" class="list-group-item{% ifequal category.slug node.slug %} active{% endifequal %}">
@@ -67,17 +78,34 @@
 {% endblock %}
 
 {% block content %}
+    {% assign subcategies object.children.all|default:categories %}
+
+    {% if subcategies %}
+        <div class="row categories">
+            <div class="col-xs-18 col-sm-21">
+                <div class="lightSlider">
+                    {% for category in subcategies %}
+                        <div class="col-xs-12 col-sm-4 item text-center">
+                            {% with category_name=category.name %}
+                                <a href="{{ category.get_absolute_url }}">
+                                    <img src="{{ category.image|thumbnail_url:"subcategory_image" }}"
+                                         title="{{ category_name }}" alt="{{ category_name }}" class="img-responsive"/>
+                                    <div class="title">{{ category_name }}</div>
+                                </a>
+                            {% endwith %}
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+{#            <div class="col-xs-3 col-sm-3 text-center">#}
+{#                <a href="#"><div class="arrow"></div>Посмотреть все кровати</a>#}
+{#            </div>#}
+        </div>
+    {% endif %}
+
     <div class="row sort">
         <div class="col-xs-8">
-            <form method="get" class="form-inline">
-                {# Render other search params in a hidden block #}
-                <div style="display:none">
-                    {% for value in selected_facets %}
-                        <input name="selected_facets" value="{{ value }}" />
-                    {% endfor %}
-                    {{ form.q }}
-                </div>
-
+            <span class="text show">
                 {% if paginator.count %}
                     {% if paginator.num_pages > 1 %}
                         {% blocktrans with start=page_obj.start_index end=page_obj.end_index count num_results=paginator.count %}
@@ -92,17 +120,10 @@
                             <strong>{{ num_results }}</strong> results.
                         {% endblocktrans %}
                     {% endif %}
-                    {% if form %}
-                        <div class="pull-right">
-                            {% include "partials/form_field.html" with field=form.sort_by %}
-                        </div>
-                    {% endif %}
                 {% else %}
-                    <p>
-                        {% trans "<strong>0</strong> results." %}
-                    </p>
+                    {% trans "<strong>0</strong> results." %}
                 {% endif %}
-            </form>
+            </span>
         </div>
         <div class="col-xs-16 text-right">
             <span class="text">{% trans 'Sort by' %}:</span>
@@ -114,8 +135,8 @@
                         {% else %}
                             {% assign sort order.argument %}
                         {% endif %}
-                        <a href="{% reverse_url url_view_name url_extra_kwargs sort=sort %}"
-                           class="btn {% if select_order == order.argument %} btn-danger disabled{% else %} btn-default{% endif %}"
+                        <a href="{% reverse_url url_view_name url_extra_kwargs sort=sort %}" type="button"
+                           class="btn {% if select_order == order.argument %} btn-danger{% else %} btn-default{% endif %}"
                            title="{{ order.title }}">
                             {{ order.title }}
                         </a>
