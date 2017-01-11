@@ -23,6 +23,7 @@ from soloha.settings import OSCAR_PRODUCTS_PER_PAGE
 from soloha.core.templatetags.currency_filters import currency
 
 import json
+from django.db.models import Min, Q, Prefetch, BooleanField, Case, When, Count, Max, IntegerField
 import operator
 import functools
 import logging
@@ -289,9 +290,8 @@ class ProductCategoryView(SingleObjectMixin, generic.ListView):
                     default=0, output_field=IntegerField()
                 )
             )
-        ).order_by(*self.feature_orders).distinct()
+        )
 
-        context['filters'] = filters
         context['url_extra_kwargs'].update({'category_slug': self.kwargs.get('category_slug')})
         context['selected_filters'] = self.selected_filters
 
