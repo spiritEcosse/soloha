@@ -31,7 +31,6 @@ sitemaps = {
 
 urlpatterns = [
                   url(r'^spirit/', include(admin.site.urls)),
-                  url(r'^(?P<url>.*/)$', views.flatpage),
                   url(r'', include(application.urls)),
                   url(r'^sitemap\.xml$', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
               ] + \
