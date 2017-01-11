@@ -20,6 +20,7 @@ from django.conf.urls.static import static
 from soloha import settings
 from django.contrib.sitemaps.views import sitemap
 from sitemap import ProductSitemap, CategorySitemap, FlatPageSitemap
+from django.contrib.flatpages import views
 
 
 sitemaps = {
@@ -30,6 +31,7 @@ sitemaps = {
 
 urlpatterns = [
                   url(r'^spirit/', include(admin.site.urls)),
+                  url(r'^(?P<url>.*/)$', views.flatpage),
                   url(r'', include(application.urls)),
                   url(r'^sitemap\.xml$', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
               ] + \
