@@ -267,7 +267,7 @@ class ProductCategoryView(BaseCatalogue, SingleObjectMixin, generic.ListView):
                     parent__sort_from_category__category=self.object, then='parent__sort_from_category__sort'
                 ), output_field=IntegerField()
             )
-        ).order_by('sort_parent', *self.feature_orders).prefetch_related(
+        ).order_by('sort_parent').prefetch_related(
             Prefetch('filter_products', queryset=Product.objects.only('id').order_by())
         ).distinct()
 
@@ -278,6 +278,8 @@ class ProductCategoryView(BaseCatalogue, SingleObjectMixin, generic.ListView):
         filters_parent = map(lambda obj: obj[0], iter)
 
         for feature in context['filters']:
+            print feature.parent
+
             feature.potential_products_count = feature.filter_products.filter(
                 id__in=products(potential_filter=feature)
             )
