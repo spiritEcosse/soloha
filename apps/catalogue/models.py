@@ -76,6 +76,9 @@ class ProductiveCategoryQuerySet(models.QuerySet):
     def order_simple(self):
         return self.order_by()
 
+    def order_menu(self):
+        return self.order_by('sort')
+
     def only_page(self):
         return self.only(
             'slug', 'name', 'h1', 'meta_title', 'meta_description', 'meta_keywords', 'description',
@@ -140,7 +143,7 @@ class ProductiveCategoryManager(models.Manager):
         return self.common().hi().select_main_menu().prefetch(
             children=self.children(),
             grandchildren=self.grandchildren()
-        ).only_menu()
+        ).only_menu().order_menu()
 
     def children(self):
         return self.common().select_children().only_children()
