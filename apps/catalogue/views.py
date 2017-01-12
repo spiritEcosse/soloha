@@ -1,3 +1,5 @@
+#  -*- coding: utf-8 -*-
+
 from oscar.apps.catalogue.views import ProductDetailView as CoreProductDetailView
 from django.utils.translation import ugettext_lazy as _
 from django.views import generic
@@ -30,6 +32,7 @@ from oscar.apps.partner import prices
 from oscar.templatetags.currency_filters import currency
 from django.utils.functional import cached_property
 from django.template.defaultfilters import truncatechars
+from django.db.models.expressions import RawSQL
 
 logger = logging.getLogger(__name__)
 
@@ -257,29 +260,53 @@ class ProductCategoryView(BaseCatalogue, SingleObjectMixin, generic.ListView):
     def get_context_data(self, **kwargs):
         context = super(ProductCategoryView, self).get_context_data(**kwargs)
 
-        # Todo replace on one query, without regroup
-        context['filters'] = Feature.objects.browse().only('title', 'parent', 'slug').filter(
-            level=1, filter_products__categories__in=self.object.get_descendants_through_children(),
-            filter_products__enable=True, filter_products__categories__enable=True
-        ).annotate(
-            sort_parent=Case(
-                When(
-                    parent__sort_from_category__category=self.object, then='parent__sort_from_category__sort'
-                ), output_field=IntegerField()
-            )
-        ).order_by('sort_parent').prefetch_related(
-            Prefetch('filter_products', queryset=Product.objects.only('id').order_by())
-        ).distinct()
+        filters = Feature.objects.raw(u"""
+        SELECT DISTINCT
+          "catalogue_feature"."id",
+          "catalogue_feature"."title",
+          "catalogue_feature"."slug",
+          "catalogue_feature"."parent_id",
+          "catalogue_sortfeatureincategory"."sort",
+          T6."id",
+          T6."title",
+          T6."slug",
+          T6."parent_id"
+        FROM "catalogue_feature"
+          INNER JOIN "catalogue_product_filters" ON ("catalogue_feature"."id" = "catalogue_product_filters"."feature_id")
+          INNER JOIN "catalogue_product" ON ("catalogue_product_filters"."product_id" = "catalogue_product"."id")
+          INNER JOIN "catalogue_product_categories" ON ("catalogue_product"."id" = "catalogue_product_categories"."product_id")
+          INNER JOIN "catalogue_category" ON ("catalogue_product_categories"."category_id" = "catalogue_category"."id")
+          LEFT OUTER JOIN "catalogue_feature" T6 ON ("catalogue_feature"."parent_id" = T6."id")
+          LEFT OUTER JOIN "catalogue_sortfeatureincategory" ON (T6."id" = "catalogue_sortfeatureincategory"."feature_id" AND catalogue_sortfeatureincategory.category_id=%s)
+        WHERE ("catalogue_product_categories"."category_id" IN (%s) AND "catalogue_product"."enable" = TRUE AND "catalogue_feature"."level" = 1)
+        ORDER BY "catalogue_sortfeatureincategory"."sort";
+        """, params=(self.object.id, ', '.join(map(lambda obj: str(obj.id), self.object.get_descendants_through_children())), ))
+
+        # map(lambda obj: obj.id, self.object.get_descendants_through_children())
+
+        # # Todo replace on one query, without regroup
+        # context['filters'] = Feature.objects.browse().only('title', 'parent', 'slug').filter(
+        #     level=1, filter_products__categories__in=self.object.get_descendants_through_children(),
+        #     filter_products__enable=True, filter_products__categories__enable=True
+        # ).extra(
+        #     select={
+        #         'parent_sort': """
+        #             EXISTS (SELECT "catalogue_sortfeatureincategory"."sort" FROM "catalogue_sortfeatureincategory"
+        #             WHERE T6."id" = "catalogue_sortfeatureincategory"."feature_id" AND catalogue_sortfeatureincategory.category_id=%s)
+        #         """
+        #     }, select_params=(self.object.id, 99, )
+        # ).order_by('parent_sort').prefetch_related(
+        #     Prefetch('filter_products', queryset=Product.objects.only('id').order_by())
+        # ).distinct()
 
         products = lambda **kwargs: map(lambda obj: obj.id, self.get_products(**kwargs))
         key = lambda feature: feature.parent.pk
         # Todo really need sort by feature.parent.pk ?
         iter = groupby(sorted(self.selected_filters, key=key), key=key)
         filters_parent = map(lambda obj: obj[0], iter)
+        context['filters'] = list()
 
-        for feature in context['filters']:
-            print feature.parent
-
+        for feature in filters:
             feature.potential_products_count = feature.filter_products.filter(
                 id__in=products(potential_filter=feature)
             )
@@ -288,6 +315,7 @@ class ProductCategoryView(BaseCatalogue, SingleObjectMixin, generic.ListView):
                 feature.potential_products_count = feature.potential_products_count.exclude(id__in=products)
 
             feature.potential_products_count = feature.potential_products_count.count()
+            context['filters'].append(feature)
 
         context['url_extra_kwargs'].update({'category_slug': self.kwargs.get('category_slug')})
         context['selected_filters'] = self.selected_filters
