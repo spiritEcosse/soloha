@@ -2,9 +2,9 @@ from django.contrib.flatpages.models import FlatPage
 from django.template.defaultfilters import truncatechars
 from django.utils.html import strip_tags
 from django.utils.text import capfirst
-from django.core.urlresolvers import get_script_prefix
+from django.utils.functional import cached_property
 from django.db import models
-from django.utils.encoding import iri_to_uri, python_2_unicode_compatible
+from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 from django.core.urlresolvers import reverse
 
@@ -53,5 +53,6 @@ class InfoPage(models.Model):
     def title(self):
         return self.flatpage.title
 
+    @cached_property
     def get_absolute_url(self):
         return reverse('pages', self.flatpage.url)
