@@ -55,4 +55,4 @@ class InfoPage(models.Model):
 
     @cached_property
     def get_absolute_url(self):
-        return reverse('pages', kwargs={'slug': self.flatpage.url})
+        return reverse('pages', kwargs={'url': self.flatpage.url})
