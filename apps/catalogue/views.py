@@ -259,28 +259,53 @@ class ProductCategoryView(BaseCatalogue, SingleObjectMixin, generic.ListView):
 
     def get_context_data(self, **kwargs):
         context = super(ProductCategoryView, self).get_context_data(**kwargs)
+        categories = tuple(map(lambda obj: obj.id, self.object.get_descendants_through_children()))
 
-        filters = Feature.objects.raw(u"""
-        SELECT DISTINCT
-          "catalogue_feature"."id",
-          "catalogue_feature"."title",
-          "catalogue_feature"."slug",
-          "catalogue_feature"."parent_id",
-          "catalogue_sortfeatureincategory"."sort",
-          T6."id",
-          T6."title",
-          T6."slug",
-          T6."parent_id"
-        FROM "catalogue_feature"
-          INNER JOIN "catalogue_product_filters" ON ("catalogue_feature"."id" = "catalogue_product_filters"."feature_id")
-          INNER JOIN "catalogue_product" ON ("catalogue_product_filters"."product_id" = "catalogue_product"."id")
-          INNER JOIN "catalogue_product_categories" ON ("catalogue_product"."id" = "catalogue_product_categories"."product_id")
-          INNER JOIN "catalogue_category" ON ("catalogue_product_categories"."category_id" = "catalogue_category"."id")
-          LEFT OUTER JOIN "catalogue_feature" T6 ON ("catalogue_feature"."parent_id" = T6."id")
-          LEFT OUTER JOIN "catalogue_sortfeatureincategory" ON (T6."id" = "catalogue_sortfeatureincategory"."feature_id" AND catalogue_sortfeatureincategory.category_id=%s)
-        WHERE ("catalogue_product_categories"."category_id" IN (%s) AND "catalogue_product"."enable" = TRUE AND "catalogue_feature"."level" = 1)
-        ORDER BY "catalogue_sortfeatureincategory"."sort";
-        """, params=(self.object.id, ', '.join(map(lambda obj: str(obj.id), self.object.get_descendants_through_children())), ))
+        if len(categories) > 1:
+            filters = Feature.objects.raw(u"""
+            SELECT DISTINCT
+              "catalogue_feature"."id",
+              "catalogue_feature"."title",
+              "catalogue_feature"."slug",
+              "catalogue_feature"."parent_id",
+              "catalogue_sortfeatureincategory"."sort",
+              T6."id",
+              T6."title",
+              T6."slug",
+              T6."parent_id"
+            FROM "catalogue_feature"
+              INNER JOIN "catalogue_product_filters" ON ("catalogue_feature"."id" = "catalogue_product_filters"."feature_id")
+              INNER JOIN "catalogue_product" ON ("catalogue_product_filters"."product_id" = "catalogue_product"."id")
+              INNER JOIN "catalogue_product_categories" ON ("catalogue_product"."id" = "catalogue_product_categories"."product_id")
+              INNER JOIN "catalogue_category" ON ("catalogue_product_categories"."category_id" = "catalogue_category"."id")
+              LEFT OUTER JOIN "catalogue_feature" T6 ON ("catalogue_feature"."parent_id" = T6."id")
+              LEFT OUTER JOIN "catalogue_sortfeatureincategory" ON (T6."id" = "catalogue_sortfeatureincategory"."feature_id" AND catalogue_sortfeatureincategory.category_id=%s)
+            WHERE ("catalogue_product_categories"."category_id" IN %s AND "catalogue_product"."enable" = TRUE AND "catalogue_feature"."level" = 1)
+            ORDER BY "catalogue_sortfeatureincategory"."sort";
+            """, [self.object.id, categories])
+        else:
+            filters = Feature.objects.raw(u"""
+            SELECT DISTINCT
+              "catalogue_feature"."id",
+              "catalogue_feature"."title",
+              "catalogue_feature"."slug",
+              "catalogue_feature"."parent_id",
+              "catalogue_sortfeatureincategory"."sort",
+              T6."id",
+              T6."title",
+              T6."slug",
+              T6."parent_id"
+            FROM "catalogue_feature"
+              INNER JOIN "catalogue_product_filters" ON ("catalogue_feature"."id" = "catalogue_product_filters"."feature_id")
+              INNER JOIN "catalogue_product" ON ("catalogue_product_filters"."product_id" = "catalogue_product"."id")
+              INNER JOIN "catalogue_product_categories" ON ("catalogue_product"."id" = "catalogue_product_categories"."product_id")
+              INNER JOIN "catalogue_category" ON ("catalogue_product_categories"."category_id" = "catalogue_category"."id")
+              LEFT OUTER JOIN "catalogue_feature" T6 ON ("catalogue_feature"."parent_id" = T6."id")
+              LEFT OUTER JOIN "catalogue_sortfeatureincategory" ON (T6."id" = "catalogue_sortfeatureincategory"."feature_id" AND catalogue_sortfeatureincategory.category_id=%s)
+            WHERE ("catalogue_product_categories"."category_id" IN (%s) AND "catalogue_product"."enable" = TRUE AND "catalogue_feature"."level" = 1)
+            ORDER BY "catalogue_sortfeatureincategory"."sort";
+            """, [self.object.id, self.object.id])
+
 
         # map(lambda obj: obj.id, self.object.get_descendants_through_children())
 
