@@ -36,6 +36,9 @@ class FlatPageSitemap(Sitemap):
     changefreq = 'monthly'
     priority = 0.5
 
+    def location(self, obj):
+        return obj.get_absolute_url
+
     def items(self):
         return InfoPage.objects.filter(enable=True)
 
