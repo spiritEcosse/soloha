@@ -6,6 +6,7 @@ from django.core.urlresolvers import get_script_prefix
 from django.db import models
 from django.utils.encoding import iri_to_uri, python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
+from django.core.urlresolvers import reverse
 
 
 @python_2_unicode_compatible
@@ -35,7 +36,7 @@ class InfoPage(models.Model):
         app_label = 'flatpages'
 
     def __str__(self):
-        return "%s -- %s" % (self.url, self.title)
+        return "%s -- %s" % (self.flatpage.url, self.flatpage.title)
 
     def get_meta_description(self):
         return self.meta_description or truncatechars(strip_tags(self.flatpage.content), 100)
@@ -53,4 +54,4 @@ class InfoPage(models.Model):
         return self.flatpage.title
 
     def get_absolute_url(self):
-        return iri_to_uri(get_script_prefix() + self.flatpage.url.strip(get_script_prefix()) + get_script_prefix())
+        return reverse('pages', self.flatpage.url)
