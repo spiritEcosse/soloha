@@ -473,52 +473,7 @@
 
   app = angular.module(app_name);
 
-  app.controller('Search', [
-    '$http', '$scope', '$window', '$document', '$location', '$routeParams', '$compile', function($http, $scope, $window, $document, $location, $routeParams, $compile) {
-      $http.post($location.absUrl()).success(function(data) {
-        var clear, items;
-        items = angular.element(document).find('#product');
-        items.attr('ng-repeat', 'product in products');
-        $compile(items)($scope);
-        clear = angular.element('.clear');
-        clear.remove();
-        $scope.products = data.products;
-        $scope.initial_page_number = data.page_number;
-        $scope.page_number = data.page_number;
-        $scope.num_pages = data.num_pages;
-        $scope.search_string = data.search_string;
-        $scope.pages = [data.pages[parseInt($scope.initial_page_number) - 1]];
-        $scope.pages[0].active = "True";
-        $scope.pages[0].link = "";
-        return $scope.sorting_type = data.sorting_type;
-      }).error(function() {
-        return console.error('An error occurred during submission');
-      });
-      return $scope.submit = function() {
-        return $http.post($location.absUrl(), {
-          'search_string': $scope.search_string,
-          'page': $scope.page_number,
-          'sorting_type': $scope.sorting_type
-        }).success(function(data) {
-          var clear, i, page_active, ref, ref1;
-          clear = angular.element('.clear_pagination');
-          clear.remove();
-          $scope.pages = data.pages;
-          for (page_active = i = ref = parseInt($scope.initial_page_number) - 1, ref1 = parseInt($scope.page_number); ref <= ref1 ? i <= ref1 : i >= ref1; page_active = ref <= ref1 ? ++i : --i) {
-            $scope.pages[page_active].active = "True";
-            $scope.pages[page_active].link = "";
-          }
-          $scope.products = $scope.products.concat(data.products_next_page);
-          $scope.page_number = parseInt($scope.page_number) + 1;
-          if ($scope.page_number === parseInt($scope.num_pages)) {
-            return $scope.hide = true;
-          }
-        }).error(function() {
-          return console.error('An error occurred during submission');
-        });
-      };
-    }
-  ]);
+  app.controller('Search', ['$http', '$scope', '$window', '$document', '$location', '$routeParams', '$compile', function($http, $scope, $window, $document, $location, $routeParams, $compile) {}]);
 
 }).call(this);
 

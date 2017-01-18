@@ -60,6 +60,7 @@ libs:
 
 	# Install grunt
 	sudo npm install -g grunt-cli
+	npm install grunt-cli
 
 	# Install npm libs
 	npm install
