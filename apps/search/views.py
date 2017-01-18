@@ -108,9 +108,9 @@ class FacetedSearchView(views.JSONResponseMixin, views.AjaxResponseMixin, CoreFa
             is_active = False
             if self.kwargs.get('sorting_type', '') == type:
                 is_active = True
-            sorting_url = '{}?q={}&sorting_type={}'.format(self.request.path, context['query'], link)
-            sort_link = 'q={}&sorting_type={}'.format(context['query'], link)
-            context['sort_types'].append((sorting_url, text, is_active, sort_link))
+            # sorting_url = '{}?q={}&sorting_type={}'.format(self.request.path, context['query'], link)
+            # sort_link = 'q={}&sorting_type={}'.format(context['query'], link)
+            # context['sort_types'].append((sorting_url, text, is_active, sort_link))
 
         context['url_extra_kwargs'] = {}
         context['url_view_name'] = self.url_view_name
@@ -178,11 +178,11 @@ class FacetedSearchView(views.JSONResponseMixin, views.AjaxResponseMixin, CoreFa
         for page in page_numbers:
             pages_dict = dict()
             pages_dict['page_number'] = page
-            pages_dict['link'] = "{}?page={}&q={}&sorting_type={}".format(
-                                                                    self.kwargs['url'],
-                                                                    page,
-                                                                    self.kwargs['search_string'],
-                                                                    dict_old_sorting_types.get(self.kwargs.get('sorting_type'), 'popularity'))
+            # pages_dict['link'] = "{}?page={}&q={}&sorting_type={}".format(
+            #                                                         self.kwargs['url'],
+            #                                                         page,
+            #                                                         self.kwargs['search_string'],
+            #                                                         dict_old_sorting_types.get(self.kwargs.get('sorting_type'), 'popularity'))
             pages_dict['active'] = 'False'
             pages.append(pages_dict)
 
