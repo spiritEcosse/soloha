@@ -9161,6 +9161,7 @@ header .bottom .navbar .nav > li .yamm-content .image .btn-menu {
 }
 .main .categories .item {
   background: url('../../image/filter_line.png') right center no-repeat;
+  height: 100px;
 }
 .main .categories .item img {
   margin: auto;
