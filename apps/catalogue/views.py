@@ -344,6 +344,7 @@ class ProductCategoryView(BaseCatalogue, SingleObjectMixin, generic.ListView):
 
         context['url_extra_kwargs'].update({'category_slug': self.kwargs.get('category_slug')})
         context['selected_filters'] = self.selected_filters
+        context['subcategories'] = self.object.children.order_by('sort')
         return context
 
     def get_page_link(self, page_numbers, **kwargs):
