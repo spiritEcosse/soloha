@@ -16,7 +16,7 @@ data_solr := $(opt_solr)/$(solr)/$(current_dir)/data
 
 postgresql:
     # Install postgresql
-	sudo apt-get install postgresql postgresql-contrib
+	sudo apt-get -y install postgresql postgresql-contrib
 
     # Restart postgresql
 	sudo service postgresql restart
@@ -38,7 +38,7 @@ postgresql:
 
 libs:
     # Install compiler from less to css
-	sudo apt install npm
+	sudo apt -y install npm
 	sudo npm install -g less
 	sudo ln -sf /usr/bin/nodejs /usr/bin/node
 
@@ -49,14 +49,14 @@ libs:
 	cd static && bower install
 
     # Install other libs
-	sudo apt-get install libpq-dev
-	sudo apt-get install libmagickwand-dev
-	sudo apt-get install libjpeg-dev
+	sudo apt-get -y install libpq-dev
+	sudo apt-get -y install libmagickwand-dev
+	sudo apt-get -y install libjpeg-dev
 
     # Install gettext for run makemessages
-	sudo apt-get install gettext
+	sudo apt-get -y install gettext
 
-	sudo apt-get install libffi-dev
+	sudo apt-get -y install libffi-dev
 
 	# Install grunt
 	sudo npm install -g grunt-cli
@@ -69,7 +69,7 @@ libs:
 	# If use pycharm: add /usr/local/lib/node_modules/grunt-cli/ to Grunt Task in input - grunt cli package
 
 install_pip:
-	sudo apt-get install python-pip
+	sudo apt-get -y install python-pip
 	sudo pip install virtualenvwrapper
 
 virtual_environment:
@@ -82,24 +82,25 @@ create_settings_local:
 
 debian_ubuntu_install_modules: postgresql libs install_pip
 
-site: debian_ubuntu_install_modules create_settings_local solr virtual_environment
+#site: debian_ubuntu_install_modules create_settings_local solr virtual_environment
+site: virtual_environment
 
 solr: install_java solr_remove install_solr
 solr_production: solr_remove install_solr
 
 install_java:
 	# For Debian
-	su -
-	echo "deb http://ppa.launchpad.net/webupd8team/java/ubuntu xenial main" | tee /etc/apt/sources.list.d/webupd8team-java.list
-	echo "deb-src http://ppa.launchpad.net/webupd8team/java/ubuntu xenial main" | tee -a /etc/apt/sources.list.d/webupd8team-java.list
-	apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys EEA14886
-	apt-get update
-	apt-get install oracle-java8-installer
-	exit
+#	su -
+#	echo "deb http://ppa.launchpad.net/webupd8team/java/ubuntu xenial main" | tee /etc/apt/sources.list.d/webupd8team-java.list
+#	echo "deb-src http://ppa.launchpad.net/webupd8team/java/ubuntu xenial main" | tee -a /etc/apt/sources.list.d/webupd8team-java.list
+#	apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys EEA14886
+#	apt-get update
+#	apt-get -y install oracle-java8-installer
+#	exit
 	# end for Debian
 
-	sudo apt-get install python-software-properties # Debian Wheezy and earlier
-	sudo apt-get install software-properties-common # Debian Jessie and later (2014-)
+#	sudo apt-get -y install python-software-properties # Debian Wheezy and earlier
+	sudo apt-get -y install software-properties-common # Debian Jessie and later (2014-)
 	sudo add-apt-repository ppa:webupd8team/java -y
 	sudo apt-get update
 	sudo apt-get -y install oracle-java8-installer
@@ -123,7 +124,6 @@ install_solr:
 	sudo mkdir $(data_solr) &>/dev/null
 	sudo bash -c "source virtualenvwrapper.sh && workon $(current_dir) && ./manage.py build_$(solr)_schema > $(schema_xml)"
 	sudo cp -f $(solr)/$(jetty)/start.ini $(opt_solr)
-#	sudo wget -O $(opt_solr)/start.ini http://git.eclipse.org/c/jetty/org.eclipse.jetty.project.git/plain/jetty-distribution/src/main/resources/start.ini
 	sudo chown $(solr):$(solr) -R $(opt_solr)/*
 	sudo service $(jetty) start
 	sudo service $(jetty) restart
@@ -182,6 +182,7 @@ css:
 	npm run build
 
 clean:
+
 	# Remove files not in source control
 	find . -type f -name "*.pyc" -delete
 	rm -rf nosetests.xml coverage.xml htmlcov *.egg-info *.pdf dist violations.txt

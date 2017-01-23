@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
 source `which virtualenvwrapper.sh`
-deactivate &>/dev/null # temporary solution, remove in future - &>/dev/null
 rmvirtualenv $1
 mkvirtualenv $1
 
