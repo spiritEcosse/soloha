@@ -4,6 +4,7 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from phonenumber_field.modelfields import PhoneNumberField
 from ckeditor_uploader.fields import RichTextUploadingField
+from filer.fields.image import FilerImageField
 
 
 @python_2_unicode_compatible
@@ -11,7 +12,9 @@ class Info(models.Model):
     site = models.OneToOneField(Site, on_delete=models.CASCADE, related_name='info')
     work_time = models.CharField(verbose_name=_('Work time'), max_length=1000)
     address = models.CharField(verbose_name=_('Actual address'), max_length=1000)
-    phone_numbers = models.ManyToManyField('sites.PhoneNumber', verbose_name=_('Phone numbers'), blank=True)
+    phone_numbers = models.ManyToManyField('sites.PhoneNumber', verbose_name=_('Phone numbers'), blank=True, related_name='info_site'
+                                                                                                                          ''
+                                                                                                                          '')
     email = models.EmailField(verbose_name=_('Email'), max_length=200)
     shop_short_desc = models.CharField(verbose_name=_('Short description of shop'), max_length=200, blank=True)
     way = RichTextUploadingField(verbose_name=_('Way to us'), blank=True)
@@ -43,6 +46,7 @@ class PhoneNumberManager(models.Manager):
 
 class PhoneNumber(models.Model):
     phone_number = PhoneNumberField(verbose_name=_('Phone number'), blank=True)
+    icon = FilerImageField(verbose_name=_('Icon'), blank=True, null=True, related_name='phone_number_icon')
     objects = PhoneNumberManager()
 
     class Meta:

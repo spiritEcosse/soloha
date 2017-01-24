@@ -20,7 +20,14 @@
                         {% with count_phone_numbers=current_site.info.phone_numbers.count phone_numbers_slice=current_site.info.phone_numbers.all|slice:"4:" %}
                             <ul class="nav navbar-nav">
                                 {% for phone in current_site.info.phone_numbers_slice %}
-                                    <li><a href="tel:{{ phone.phone_number }}">{{ phone.phone_number.as_international }}</a></li>
+                                    <li>
+                                        {% if phone.icon %}
+                                            <span class="pull-left" aria-hidden="true">
+                                                {% thumbnail phone.icon 10x10 crop as icon %}
+                                                <img src="{{ icon.url }}">
+                                            </span>
+                                        {% endif %}
+                                        <a href="tel:{{ phone.phone_number }}">{{ phone.phone_number.as_international }}</a></li>
                                 {% endfor %}
 
                                 {% if phone_numbers_slice %}
