@@ -21,7 +21,7 @@
                             <ul class="nav navbar-nav">
                                 {% for phone in current_site.info.phone_numbers_slice %}
                                     <li>
-                                        <a href="tel:{{ phone.phone_number }}" class="btn btn-default btn-transparent" aria-label="">
+                                        <a href="tel:{{ phone.phone_number }}" title="{% trans 'Call on' %} {{ phone.phone_number }} {{ phone.title_operator }}" class="btn btn-default btn-transparent" aria-label="{% trans 'Call on' %} {{ phone.phone_number }} {{ phone.title_operator }}">
                                             {% if phone.icon %}
                                                 {% thumbnail phone.icon 30x20 crop as icon %}
                                                 <img src="{{ icon.url }}">

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-10 13:22+0000\n"
+"POT-Creation-Date: 2017-01-24 15:51+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -72,7 +72,7 @@ msgstr ""
 "валюты других товаров в вашей корзине"
 
 #: apps/basket/models.py:213 apps/catalogue/abstract_models.py:570
-#: apps/catalogue/abstract_models.py:1005 apps/catalogue/models.py:337
+#: apps/catalogue/abstract_models.py:1009 apps/catalogue/models.py:340
 #: apps/order/models.py:30
 msgid "Feature"
 msgstr "Особенности"
@@ -90,36 +90,36 @@ msgid "Title"
 msgstr "Наименование"
 
 #: apps/catalogue/abstract_models.py:86 apps/catalogue/abstract_models.py:555
-#: apps/catalogue/abstract_models.py:693
+#: apps/catalogue/abstract_models.py:697
 msgid "Slug"
 msgstr "Имя в url"
 
-#: apps/catalogue/abstract_models.py:87 apps/catalogue/abstract_models.py:694
-#: apps/ex_flatpages/models.py:22
+#: apps/catalogue/abstract_models.py:87 apps/catalogue/abstract_models.py:698
+#: apps/ex_flatpages/models.py:26
 msgid "Enable"
 msgstr "Включенный"
 
-#: apps/catalogue/abstract_models.py:88 apps/catalogue/abstract_models.py:696
-#: apps/ex_flatpages/models.py:23
+#: apps/catalogue/abstract_models.py:88 apps/catalogue/abstract_models.py:700
+#: apps/ex_flatpages/models.py:27
 msgid "h1"
 msgstr ""
 
-#: apps/catalogue/abstract_models.py:89 apps/catalogue/abstract_models.py:697
-#: apps/ex_flatpages/models.py:24
+#: apps/catalogue/abstract_models.py:89 apps/catalogue/abstract_models.py:701
+#: apps/ex_flatpages/models.py:28
 msgid "Meta tag: title"
 msgstr "Мета тег: title"
 
-#: apps/catalogue/abstract_models.py:90 apps/catalogue/abstract_models.py:698
-#: apps/ex_flatpages/models.py:25
+#: apps/catalogue/abstract_models.py:90 apps/catalogue/abstract_models.py:702
+#: apps/ex_flatpages/models.py:29
 msgid "Meta tag: description"
 msgstr "Мета тег: description"
 
-#: apps/catalogue/abstract_models.py:91 apps/catalogue/abstract_models.py:699
-#: apps/ex_flatpages/models.py:26
+#: apps/catalogue/abstract_models.py:91 apps/catalogue/abstract_models.py:703
+#: apps/ex_flatpages/models.py:30
 msgid "Meta tag: keywords"
 msgstr "Мета тег: keywords"
 
-#: apps/catalogue/abstract_models.py:92 apps/catalogue/abstract_models.py:703
+#: apps/catalogue/abstract_models.py:92 apps/catalogue/abstract_models.py:707
 #: templates/catalogue/detail.html:129
 #: templates/dashboard/offers/offer_detail.html:67
 #: templates/dashboard/offers/summary.html:12
@@ -190,7 +190,7 @@ msgid "Date updated"
 msgstr ""
 
 #: apps/catalogue/abstract_models.py:127 apps/catalogue/abstract_models.py:194
-#: apps/catalogue/abstract_models.py:436 apps/catalogue/abstract_models.py:722
+#: apps/catalogue/abstract_models.py:436 apps/catalogue/abstract_models.py:726
 #: soloha/core/utils.py:16
 #: templates/dashboard/catalogue/category_delete.html:12
 #: templates/dashboard/catalogue/category_form.html:8
@@ -249,7 +249,7 @@ msgid "This flag indicates if this product can be used in an offer or not"
 msgstr ""
 
 #: apps/catalogue/abstract_models.py:168 apps/catalogue/abstract_models.py:621
-#: apps/catalogue/abstract_models.py:1003 apps/partner/abstract_models.py:24
+#: apps/catalogue/abstract_models.py:1007 apps/partner/abstract_models.py:24
 #: templates/customer/wishlists/wishlists_detail.html:32
 #: templates/dashboard/catalogue/stockalert_list.html:48
 #: templates/dashboard/orders/order_detail.html:109
@@ -305,7 +305,7 @@ msgstr ""
 msgid "Product class"
 msgstr "Класс товара"
 
-#: apps/catalogue/abstract_models.py:556 apps/catalogue/abstract_models.py:695
+#: apps/catalogue/abstract_models.py:556 apps/catalogue/abstract_models.py:699
 msgid "Parent"
 msgstr "Родитель"
 
@@ -342,7 +342,7 @@ msgstr ""
 msgid "Product image"
 msgstr "Картинка товара"
 
-#: apps/catalogue/abstract_models.py:692 apps/contacts/forms.py:12
+#: apps/catalogue/abstract_models.py:696 apps/contacts/forms.py:12
 #: templates/customer/wishlists/wishlists_list.html:9
 #: templates/dashboard/catalogue/product_class_form.html:97
 #: templates/dashboard/catalogue/product_class_list.html:27
@@ -367,85 +367,85 @@ msgstr "Картинка товара"
 msgid "Name"
 msgstr "Имя"
 
-#: apps/catalogue/abstract_models.py:702
+#: apps/catalogue/abstract_models.py:706
 msgid "Link banner"
 msgstr "Ссылка на баннер"
 
-#: apps/catalogue/abstract_models.py:704
+#: apps/catalogue/abstract_models.py:708
 msgid "Image banner"
 msgstr "Картирка баннера"
 
-#: apps/catalogue/abstract_models.py:706
+#: apps/catalogue/abstract_models.py:710 apps/ex_sites/models.py:49
 msgid "Icon"
 msgstr "Иконка"
 
-#: apps/catalogue/abstract_models.py:707 apps/catalogue/abstract_models.py:1008
+#: apps/catalogue/abstract_models.py:711 apps/catalogue/abstract_models.py:1012
 msgid "Image"
 msgstr "Картинка"
 
-#: apps/catalogue/abstract_models.py:721 apps/catalogue/models.py:338
+#: apps/catalogue/abstract_models.py:725 apps/catalogue/models.py:341
 #: templates/dashboard/catalogue/product_update.html:124
 #: templates/dashboard/comms/list.html:33
 msgid "Category"
 msgstr "Категория"
 
-#: apps/catalogue/abstract_models.py:1001 apps/catalogue/models.py:339
+#: apps/catalogue/abstract_models.py:1005 apps/catalogue/models.py:342
 msgid "Sort"
 msgstr "Сортировка"
 
-#: apps/catalogue/abstract_models.py:1002
+#: apps/catalogue/abstract_models.py:1006
 msgid "Block info"
 msgstr "Блок информация"
 
-#: apps/catalogue/abstract_models.py:1007
+#: apps/catalogue/abstract_models.py:1011
 msgid "Available non standard size for this feature"
 msgstr "Доступен не стандартный размер для этой функции"
 
-#: apps/catalogue/abstract_models.py:1009
+#: apps/catalogue/abstract_models.py:1013
 msgid "Product with images."
 msgstr "Продукт с изображениями."
 
-#: apps/catalogue/abstract_models.py:1017
+#: apps/catalogue/abstract_models.py:1021
 msgid "Product feature"
 msgstr "Особенность товара"
 
-#: apps/catalogue/abstract_models.py:1018
+#: apps/catalogue/abstract_models.py:1022
 msgid "Product features"
 msgstr "Особенности товара"
 
-#: apps/catalogue/abstract_models.py:1026
+#: apps/catalogue/abstract_models.py:1030
 msgid "For this feature not specified bottom_line."
 msgstr "Для этой функции не указана верхняя граница."
 
-#: apps/catalogue/abstract_models.py:1029
+#: apps/catalogue/abstract_models.py:1033
 msgid "For this feature not specified top_line."
 msgstr "Для этой функции не указан нижняя граница."
 
-#: apps/catalogue/abstract_models.py:1032
+#: apps/catalogue/abstract_models.py:1036
 msgid "For this product set non_standard_price_retail to 0."
 msgstr "Для этого продукта установить non_standard_price_retail к 0."
 
-#: apps/catalogue/abstract_models.py:1052
+#: apps/catalogue/abstract_models.py:1056
 msgid "Plus on price"
 msgstr "Плюс к цене"
 
-#: apps/catalogue/abstract_models.py:1053
+#: apps/catalogue/abstract_models.py:1057
 msgid "Percent"
 msgstr "Процент"
 
-#: apps/catalogue/abstract_models.py:1054 apps/partner/abstract_models.py:57
+#: apps/catalogue/abstract_models.py:1058 apps/partner/abstract_models.py:57
 msgid "Price (retail)"
 msgstr "Рекомендованная цена от производителя"
 
-#: apps/catalogue/abstract_models.py:1055 apps/partner/abstract_models.py:64
+#: apps/catalogue/abstract_models.py:1059 apps/partner/abstract_models.py:64
 msgid "Cost Price"
 msgstr "Себестоимость"
 
-#: apps/catalogue/abstract_models.py:1061
+#: apps/catalogue/abstract_models.py:1065
 msgid "Product option"
 msgstr "Опция товара"
 
-#: apps/catalogue/abstract_models.py:1062
+#: apps/catalogue/abstract_models.py:1066
 msgid "Product options"
 msgstr "Опции товара"
 
@@ -471,15 +471,15 @@ msgstr "Ваш email"
 msgid "This field required."
 msgstr "Это поле обязательно."
 
-#: apps/catalogue/models.py:276
+#: apps/catalogue/models.py:279
 msgid "Image of recommendation product."
 msgstr "Изображение рекомендуемого товара."
 
-#: apps/catalogue/models.py:342
+#: apps/catalogue/models.py:345
 msgid "Sort feature in category page"
 msgstr ""
 
-#: apps/catalogue/models.py:343
+#: apps/catalogue/models.py:346
 msgid "Sorts feature in category page"
 msgstr ""
 
@@ -502,43 +502,43 @@ msgstr "По убыванию цены"
 msgid "By price ascending"
 msgstr "По возрастанию цены"
 
-#: apps/catalogue/views.py:49
+#: apps/catalogue/views.py:52
 msgid "Not selected"
 msgstr "Не выбрано"
 
-#: apps/catalogue/views.py:50
+#: apps/catalogue/views.py:53
 msgid ""
 "Your message has been sent. We will contact you on the specified details."
 msgstr ""
 "Ваше сообщение было отправлено. Мы свяжемся с Вами по указанным реквизитам."
 
-#: apps/catalogue/views.py:77
+#: apps/catalogue/views.py:80
 msgid "Popularity"
 msgstr "Популярности"
 
-#: apps/catalogue/views.py:78
+#: apps/catalogue/views.py:81
 msgid "Price ascending"
 msgstr "Возрастанию цены"
 
-#: apps/catalogue/views.py:79
+#: apps/catalogue/views.py:82
 msgid "Price descending"
 msgstr "Убыванию цены"
 
-#: apps/catalogue/views.py:115 templates/catalogue/browse.html:35
+#: apps/catalogue/views.py:118 templates/catalogue/browse.html:35
 #: templates/catalogue/detail.html:53 templates/partials/nav_primary.html:45
 msgid "All products"
 msgstr ""
 
-#: apps/catalogue/views.py:345 apps/subscribe/views.py:46
+#: apps/catalogue/views.py:407 apps/subscribe/views.py:46
 #, python-format
 msgid "Order online %s"
 msgstr ""
 
-#: apps/catalogue/views.py:679
+#: apps/catalogue/views.py:741
 msgid "Please, enter number."
 msgstr "Пожалуйста, введите номер."
 
-#: apps/catalogue/views.py:712
+#: apps/catalogue/views.py:774
 msgid "Available size limits: min - \"{}\", max - \"{}\""
 msgstr ""
 
@@ -546,7 +546,7 @@ msgstr ""
 msgid "Enter a valid phone number"
 msgstr "Введите действительный номер телефона."
 
-#: apps/contacts/forms.py:18 apps/ex_sites/models.py:15
+#: apps/contacts/forms.py:18 apps/ex_sites/models.py:18
 #: templates/checkout/checkout.html:49 templates/checkout/thank_you.html:53
 #: templates/dashboard/partners/partner_manage.html:41
 #: templates/dashboard/partners/partner_user_list.html:43
@@ -716,40 +716,64 @@ msgstr ""
 msgid "Content blocks can only be linked to internal URLs"
 msgstr ""
 
-#: apps/ex_sites/models.py:12
+#: apps/ex_sites/models.py:13
 msgid "Work time"
 msgstr "Рабочее время"
 
-#: apps/ex_sites/models.py:13
+#: apps/ex_sites/models.py:14
 msgid "Actual address"
 msgstr "Фактический адрес"
 
-#: apps/ex_sites/models.py:14 apps/ex_sites/models.py:46
+#: apps/ex_sites/models.py:15 apps/ex_sites/models.py:56
 #, fuzzy
 #| msgid "Phone number"
 msgid "Phone numbers"
 msgstr "Номер телефона"
 
-#: apps/ex_sites/models.py:16
+#: apps/ex_sites/models.py:19
 msgid "Short description of shop"
 msgstr "Краткое описание магазина"
 
-#: apps/ex_sites/models.py:17
+#: apps/ex_sites/models.py:20
 msgid "Way to us"
 msgstr ""
 
-#: apps/ex_sites/models.py:18
+#: apps/ex_sites/models.py:21
 msgid "Map google"
 msgstr ""
 
-#: apps/ex_sites/models.py:25 apps/ex_sites/models.py:26
+#: apps/ex_sites/models.py:22
+msgid "Google Analytics"
+msgstr ""
+
+#: apps/ex_sites/models.py:23
+msgid "Yandex verification"
+msgstr ""
+
+#: apps/ex_sites/models.py:24
+msgid "Google verification"
+msgstr ""
+
+#: apps/ex_sites/models.py:25
+msgid "Fast call"
+msgstr ""
+
+#: apps/ex_sites/models.py:26
+msgid "Chat"
+msgstr ""
+
+#: apps/ex_sites/models.py:33 apps/ex_sites/models.py:34
 #: templates/partials/footer.html:73
 msgid "Information"
 msgstr "Информация"
 
-#: apps/ex_sites/models.py:40 apps/ex_sites/models.py:45
+#: apps/ex_sites/models.py:48 apps/ex_sites/models.py:55
 msgid "Phone number"
 msgstr "Номер телефона"
+
+#: apps/ex_sites/models.py:50
+msgid "Title operator"
+msgstr ""
 
 #: apps/order/models.py:11
 msgid "Name client"
@@ -974,7 +998,7 @@ msgstr ""
 #: templates/customer/wishlists/wishlists_detail.html:10
 #: templates/customer/wishlists/wishlists_form.html:7
 #: templates/dashboard/catalogue/category_list.html:31
-#: templates/flatpages/default.html:20 templates/partials/header.html:142
+#: templates/flatpages/default.html:20 templates/partials/header.html:150
 #: templates/search/results.html:15 templates/sitemap/sitemap.html:11
 msgid "Home"
 msgstr ""
@@ -1292,7 +1316,7 @@ msgstr "Все категории"
 msgid "Refine by"
 msgstr ""
 
-#: templates/catalogue/browse.html:111
+#: templates/catalogue/browse.html:109
 #, python-format
 msgid ""
 "\n"
@@ -1320,7 +1344,7 @@ msgstr[2] ""
 "показано с <strong>%(start)s</strong> по <strong>%(end)s</strong>.\n"
 "                    "
 
-#: templates/catalogue/browse.html:117
+#: templates/catalogue/browse.html:115
 #, python-format
 msgid ""
 "\n"
@@ -1334,15 +1358,15 @@ msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 
-#: templates/catalogue/browse.html:124
+#: templates/catalogue/browse.html:122
 msgid "<strong>0</strong> results."
 msgstr ""
 
-#: templates/catalogue/browse.html:129 templates/catalogue/browse.html:130
+#: templates/catalogue/browse.html:127 templates/catalogue/browse.html:128
 msgid "Sort by"
 msgstr ""
 
-#: templates/catalogue/browse.html:159
+#: templates/catalogue/browse.html:157
 #: templates/dashboard/catalogue/product_list.html:73
 #: templates/dashboard/ranges/range_product_list.html:125
 #: templates/search/results.html:109
@@ -1584,7 +1608,7 @@ msgid "Click to expand"
 msgstr ""
 
 #: templates/catalogue/product/attributes/attribute_products_modal.html:28
-#: templates/partials/header.html:113
+#: templates/partials/header.html:121
 msgid "Loading..."
 msgstr ""
 
@@ -2611,7 +2635,7 @@ msgstr ""
 #: templates/dashboard/users/index.html:34
 #: templates/dashboard/vouchers/voucher_list.html:34
 #: templates/dashboard/vouchers/voucher_list.html:39
-#: templates/partials/header.html:84 templates/partials/search.html:7
+#: templates/partials/header.html:92 templates/partials/search.html:7
 #: templates/search/results.html:18
 msgid "Search"
 msgstr ""
@@ -4892,32 +4916,36 @@ msgstr "Карта сайта"
 msgid "all rights reserved"
 msgstr "все права защищены"
 
-#: templates/partials/header.html:10 templates/partials/header.html.py:59
-#: templates/partials/header.html:136
+#: templates/partials/header.html:10 templates/partials/header.html.py:67
+#: templates/partials/header.html:144
 msgid "Toggle navigation"
 msgstr ""
 
-#: templates/partials/header.html:30 templates/partials/header.html.py:31
+#: templates/partials/header.html:24
+msgid "Call on"
+msgstr "Позвонить на"
+
+#: templates/partials/header.html:38 templates/partials/header.html.py:39
 msgid "Phones"
 msgstr "Телефоны"
 
-#: templates/partials/header.html:80
+#: templates/partials/header.html:88
 msgid "You are looking for something"
 msgstr "Вы ищете что-то"
 
-#: templates/partials/header.html:83 templates/partials/header.html.py:120
+#: templates/partials/header.html:91 templates/partials/header.html.py:128
 msgid "Show all search results"
 msgstr "Показать все найденные результаты"
 
-#: templates/partials/header.html:86
+#: templates/partials/header.html:94
 msgid "Show 5 results"
 msgstr "Показать 5 результатов"
 
-#: templates/partials/header.html:88
+#: templates/partials/header.html:96
 msgid "Results search"
 msgstr ""
 
-#: templates/partials/header.html:205
+#: templates/partials/header.html:213
 msgid "Хочу"
 msgstr ""
 

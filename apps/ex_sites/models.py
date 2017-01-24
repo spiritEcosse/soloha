@@ -47,6 +47,7 @@ class PhoneNumberManager(models.Manager):
 class PhoneNumber(models.Model):
     phone_number = PhoneNumberField(verbose_name=_('Phone number'), blank=True)
     icon = FilerImageField(verbose_name=_('Icon'), blank=True, null=True, related_name='phone_number_icon')
+    title_operator = models.CharField(verbose_name=_('Title operator'), blank=True, max_length=50)
     objects = PhoneNumberManager()
 
     class Meta:
