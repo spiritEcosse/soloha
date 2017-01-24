@@ -150,6 +150,19 @@ a, span, div {
         background:transparent;
     }
 }
+.well-transparent {
+    background:transparent;
+    border: none;
+
+    &:active:hover, .active:hover, &:active:focus, .active:focus {
+        border: none;
+        background:transparent;
+    }
+}
+.well-transparent-left {
+    .well-transparent();
+    padding-left: 0;
+}
 .btn-faster {
     background-image: linear-gradient(to top, white 0%, #e6e6e6 50%, #e6e6e6 50%, white 100%);
     border: 1px solid #e6e6e6;

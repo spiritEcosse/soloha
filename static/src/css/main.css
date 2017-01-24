@@ -8444,6 +8444,29 @@ div {
   border: none;
   background: transparent;
 }
+.well-transparent {
+  background: transparent;
+  border: none;
+}
+.well-transparent:active:hover,
+.well-transparent .active:hover,
+.well-transparent:active:focus,
+.well-transparent .active:focus {
+  border: none;
+  background: transparent;
+}
+.well-transparent-left {
+  background: transparent;
+  border: none;
+  padding-left: 0;
+}
+.well-transparent-left:active:hover,
+.well-transparent-left .active:hover,
+.well-transparent-left:active:focus,
+.well-transparent-left .active:focus {
+  border: none;
+  background: transparent;
+}
 .btn-faster {
   background-image: linear-gradient(to top, white 0%, #e6e6e6 50%, #e6e6e6 50%, white 100%);
   border: 1px solid #e6e6e6;
