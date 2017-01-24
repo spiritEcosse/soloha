@@ -21,13 +21,14 @@
                             <ul class="nav navbar-nav">
                                 {% for phone in current_site.info.phone_numbers_slice %}
                                     <li>
-                                        {% if phone.icon %}
-                                            <span class="pull-left" aria-hidden="true">
-                                                {% thumbnail phone.icon 10x10 crop as icon %}
+                                        <a href="tel:{{ phone.phone_number }}" class="btn btn-default btn-transparent" aria-label="">
+                                            {% if phone.icon %}
+                                                {% thumbnail phone.icon 30x20 crop as icon %}
                                                 <img src="{{ icon.url }}">
-                                            </span>
-                                        {% endif %}
-                                        <a href="tel:{{ phone.phone_number }}">{{ phone.phone_number.as_international }}</a></li>
+                                            {% endif %}
+                                            {{ phone.phone_number.as_international }}
+                                        </a>
+                                    </li>
                                 {% endfor %}
 
                                 {% if phone_numbers_slice %}
