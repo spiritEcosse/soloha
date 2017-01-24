@@ -82,8 +82,7 @@ create_settings_local:
 
 debian_ubuntu_install_modules: postgresql libs install_pip
 
-#site: debian_ubuntu_install_modules create_settings_local solr virtual_environment
-site: virtual_environment
+site: debian_ubuntu_install_modules create_settings_local virtual_environment solr
 
 solr: install_java solr_remove install_solr
 solr_production: solr_remove install_solr

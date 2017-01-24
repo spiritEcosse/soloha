@@ -16,6 +16,11 @@ class Info(models.Model):
     shop_short_desc = models.CharField(verbose_name=_('Short description of shop'), max_length=200, blank=True)
     way = RichTextUploadingField(verbose_name=_('Way to us'), blank=True)
     map = RichTextUploadingField(verbose_name=_('Map google'))
+    google_analytics = models.TextField(verbose_name=_('Google Analytics'), blank=True)
+    yandex_verification = models.CharField(verbose_name=_('Yandex verification'), blank=True, max_length=500)
+    google_verification = models.CharField(verbose_name=_('Google verification'), blank=True, max_length=500)
+    fast_call = models.TextField(verbose_name=_('Fast call'), blank=True)
+    chat = models.TextField(verbose_name=_('Chat'), blank=True)
 
     def __str__(self):
         return self.site.domain
