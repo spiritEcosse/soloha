@@ -30,11 +30,6 @@
     {% endblock %}
 
     {% block extrahead %}{% endblock %}
-
-    {% block tracking %}
-        {# Default to using Google analytics #}
-        {% include "partials/google_analytics.html" %}
-    {% endblock %}
 </head>
 
 <body id="{% block body_id %}default{% endblock %}" data-spy="scroll" data-target=".scrollspy" class="{% block body_class %}default{% endblock %}">
@@ -53,25 +48,13 @@
         {% block onbodyload %}{% endblock %}
     });
 </script>
-<script crossorigin="anonymous" async type="text/javascript" src="//api.pozvonim.com/widget/callback/v3/bcedbfbf5cbb7b31b6f3008abdf7f05b/connect" id="check-code-pozvonim" charset="UTF-8"></script>
-<!-- Start SiteHeart code -->
-<script>
-(function(){
-var widget_id = 698375;
-_shcp =[{widget_id : widget_id}];
-var lang =(navigator.language || navigator.systemLanguage
-|| navigator.userLanguage ||"en")
-.substr(0,2).toLowerCase();
-var url ="widget.siteheart.com/widget/sh/"+ widget_id +"/"+ lang +"/widget.js";
-var hcc = document.createElement("script");
-hcc.type ="text/javascript";
-hcc.async =true;
-hcc.src =("https:"== document.location.protocol ?"https":"http")
-+"://"+ url;
-var s = document.getElementsByTagName("script")[0];
-s.parentNode.insertBefore(hcc, s.nextSibling);
-})();
-</script>
-<!-- End SiteHeart code -->
+
+{% block tracking %}
+    {{ current_site.info.google_analytics|safe }}
+{% endblock %}
+{{ current_site.info.fast_call|safe }}
+{{ current_site.info.chat|safe }}
+{{ current_site.info.yandex_verification|safe }}
+{{ current_site.info.google_analytics|safe }}
 </body>
 </html>
