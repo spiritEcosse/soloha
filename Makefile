@@ -82,7 +82,9 @@ create_settings_local:
 
 debian_ubuntu_install_modules: postgresql libs install_pip
 
-site: debian_ubuntu_install_modules create_settings_local virtual_environment solr
+site: debian_ubuntu_install_modules create_settings_local solr virtual_environment
+	sudo bash -c "source virtualenvwrapper.sh && workon $(current_dir) && ./manage.py build_$(solr)_schema > $(schema_xml)"
+
 
 solr: install_java solr_remove install_solr
 solr_production: solr_remove install_solr
@@ -121,7 +123,6 @@ install_solr:
 	sudo bash -c "echo 'name=$(current_dir)' > $(opt_solr)/$(solr)/$(current_dir)/core.properties"
 	sudo rm -fr $(data_solr)
 	sudo mkdir $(data_solr) &>/dev/null
-	sudo bash -c "source virtualenvwrapper.sh && workon $(current_dir) && ./manage.py build_$(solr)_schema > $(schema_xml)"
 	sudo cp -f $(solr)/$(jetty)/start.ini $(opt_solr)
 	sudo chown $(solr):$(solr) -R $(opt_solr)/*
 	sudo service $(jetty) start
