@@ -241,7 +241,7 @@ class ProductCategoryView(BaseCatalogue, SingleObjectMixin, generic.ListView):
 
     def get_products(self, **kwargs):
         queryset = Product.objects.filter(
-            enable=True, categories=self.object.get_descendants(include_self=True), categories__enable=True
+            enable=True, categories__in=self.object.get_descendants_through_children(), categories__enable=True
         )
 
         selected_filters = list(self.selected_filters)[:]
