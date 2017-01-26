@@ -48,6 +48,9 @@ libs:
 	# Install npm libs
 	npm install
 
+	# Docker
+	sudo apt install -y docker-compose
+
 	# Todo Move this to doc
 	# If use pycharm: add /usr/local/lib/node_modules/grunt-cli/ to Grunt Task in input - grunt cli package
 
