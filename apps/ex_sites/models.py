@@ -5,6 +5,8 @@ from django.utils.translation import ugettext_lazy as _
 from phonenumber_field.modelfields import PhoneNumberField
 from ckeditor_uploader.fields import RichTextUploadingField
 from filer.fields.image import FilerImageField
+import os
+from soloha.settings import MEDIA_ROOT
 
 
 @python_2_unicode_compatible
@@ -57,3 +59,23 @@ class PhoneNumber(models.Model):
 
     def __str__(self):
         return self.phone_number.as_international
+
+    @property
+    def image(self):
+        return self.check_exist_image()
+
+    @property
+    def name(self):
+        return self.icon.file.name if self.icon else ''
+
+    def check_exist_image(self):
+        current_path = os.getcwd()
+        os.chdir(MEDIA_ROOT)
+        abs_path = os.path.abspath(self.name)
+        image = self.icon
+
+        if not self.name or not os.path.exists(abs_path) or not os.path.isfile(abs_path):
+            image = False
+
+        os.chdir(current_path)
+        return image
