@@ -266,7 +266,7 @@ OSCAR_SHOP_NAME = 'soloha'
 # DEBUG_TOOLBAR_CONFIG = settings_local.DEBUG_TOOLBAR_CONFIG
 SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
 USE_ETAGS = not DEBUG
-INTERNAL_IPS = settings_local.INTERNAL_IPS
+# INTERNAL_IPS = settings_local.INTERNAL_IPS
 
 HTML_MINIFY = not DEBUG
 KEEP_COMMENTS_ON_MINIFYING = False
