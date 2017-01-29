@@ -38,38 +38,38 @@
                         {% include "catalogue/partials/add_to_basket_form.html" %}
                     {% endblock %}
 
-                    <div class="wrapper-btn-faster col-xs-12">
-                        <button type="button" data-toggle="modal" {% if not session.price.exists %}disabled{% endif %} data-target="#quick_order" class="btn btn-block btn-md btn-default">
-                            {% trans 'Quick order' %}
-                        </button>
-                        <div class="modal fade" id="quick_order" tabindex="-1" role="dialog" aria-labelledby="quick order">
-                            <div class="modal-dialog" role="document">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <button type="button" class="close" data-dismiss="modal" aria-label="{% trans 'Close' %}">
-                                            <span aria-hidden="true">&times;</span>
-                                        </button>
-                                        <h4 class="modal-title">{% trans 'Quick order' %}</h4>
-                                    </div>
-                                    <div class="modal-body text-left">
-                                        <form name="{{ form.form_name }}" method="post" novalidate ng-init="button.send='{% trans "Send" %}'; button.actual=button.send; button.sending='{% trans "Sending..." %}'">
-                                            {% csrf_token %}
-                                            {{ form.as_div }}
-                                            <div class="row">
-                                                <div class="col-xs-8">
-                                                    <button type="button" ng-disabled="disabled_button" ng-click="quick_order()" class="btn btn-success">{% trans 'Submit' %}</button>
-                                                </div>
-                                                <div class="col-xs-16">
-                                                    <div class="alert alert-dismissible" role="alert" ng-class="alert.type" ng-cloak="" ng-if="alert !== null">
-                                                        <button type="button" class="close" data-dismiss="alert" aria-label="{% trans 'Close' %}" ng-click="remove_alert()">
-                                                            <span aria-hidden="true">&times;</span>
-                                                        </button>
-                                                        <span ng-bind="alert.msg"></span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </form>
-
+{#                    <div class="wrapper-btn-faster col-xs-12">#}
+{#                        <button type="button" data-toggle="modal" {% if not session.price.exists %}disabled{% endif %} data-target="#quick_order" class="btn btn-block btn-md btn-default">#}
+{#                            {% trans 'Quick order' %}#}
+{#                        </button>#}
+{#                        <div class="modal fade" id="quick_order" tabindex="-1" role="dialog" aria-labelledby="quick order">#}
+{#                            <div class="modal-dialog" role="document">#}
+{#                                <div class="modal-content">#}
+{#                                    <div class="modal-header">#}
+{#                                        <button type="button" class="close" data-dismiss="modal" aria-label="{% trans 'Close' %}">#}
+{#                                            <span aria-hidden="true">&times;</span>#}
+{#                                        </button>#}
+{#                                        <h4 class="modal-title">{% trans 'Quick order' %}</h4>#}
+{#                                    </div>#}
+{#                                    <div class="modal-body text-left">#}
+{#                                        <form name="{{ form.form_name }}" method="post" novalidate ng-init="button.send='{% trans "Send" %}'; button.actual=button.send; button.sending='{% trans "Sending..." %}'">#}
+{#                                            {% csrf_token %}#}
+{#                                            {{ form.as_div }}#}
+{#                                            <div class="row">#}
+{#                                                <div class="col-xs-8">#}
+{#                                                    <button type="button" ng-disabled="disabled_button" ng-click="quick_order()" class="btn btn-success">{% trans 'Submit' %}</button>#}
+{#                                                </div>#}
+{#                                                <div class="col-xs-16">#}
+{#                                                    <div class="alert alert-dismissible" role="alert" ng-class="alert.type" ng-cloak="" ng-if="alert !== null">#}
+{#                                                        <button type="button" class="close" data-dismiss="alert" aria-label="{% trans 'Close' %}" ng-click="remove_alert()">#}
+{#                                                            <span aria-hidden="true">&times;</span>#}
+{#                                                        </button>#}
+{#                                                        <span ng-bind="alert.msg"></span>#}
+{#                                                    </div>#}
+{#                                                </div>#}
+{#                                            </div>#}
+{#                                        </form>#}
+{##}
 {#                                        {% verbatim %}#}
 {#                                        <div class="alert alert-{{ alert_mode }}" role="alert" ng-show="send_form">#}
 {#                                            {% endverbatim %}#}
@@ -77,14 +77,14 @@
 {#                                            <span class="sr-only">{% trans 'The form is submitted successfully' %}:</span>#}
 {#                                            {{ answer }}#}
 {#                                        </div>#}
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-default" data-dismiss="modal">{% trans 'Close' %}</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+{#                                    </div>#}
+{#                                    <div class="modal-footer">#}
+{#                                        <button type="button" class="btn btn-default" data-dismiss="modal">{% trans 'Close' %}</button>#}
+{#                                    </div>#}
+{#                                </div>#}
+{#                            </div>#}
+{#                        </div>#}
+{#                    </div>#}
                 </div>
             </div>
             {% if flatpages %}
