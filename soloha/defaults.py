@@ -249,3 +249,6 @@ PRODUCT_SEARCH_HANDLER = None
 
 SETTINGS = dict(
     [(k, v) for k, v in locals().items() if k.startswith('')])
+
+OSCAR_REQUIRED_ADDRESS_FIELDS = ('first_name', 'last_name', 'line1', 'line4', 'postcode', 'country')
+OSCAR_IMAGE_FOLDER = 'images/products/%Y/%m/'

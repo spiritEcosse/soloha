@@ -95,9 +95,9 @@ DATABASES = {
         'ENGINE': settings_local.DB_BACKEND,
         'NAME': settings_local.DB_NAME,
         'USER': settings_local.DB_USER,
-        'PASSWORD': settings_local.DB_PASSWORD,
+        # 'PASSWORD': settings_local.DB_PASSWORD,
         'HOST': settings_local.DB_HOST,
-        'POST': settings_local.DB_PORT,
+        'PORT': settings_local.DB_PORT,
         'ATOMIC_REQUESTS': settings_local.DB_ATOMIC_REQUESTS,
     },
 }
