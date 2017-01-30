@@ -26,6 +26,7 @@ class Info(models.Model):
     google_verification = models.CharField(verbose_name=_('Google verification'), blank=True, max_length=500)
     fast_call = models.TextField(verbose_name=_('Fast call'), blank=True)
     chat = models.TextField(verbose_name=_('Chat'), blank=True)
+    cities = models.CharField(verbose_name=_('Cities'), blank=True, max_length=500)
 
     def __str__(self):
         return self.site.domain

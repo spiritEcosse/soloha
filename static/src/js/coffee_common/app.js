@@ -133,6 +133,11 @@
       $rootScope.keys = Object.keys;
       $scope.sent_signal = [];
       clone_attributes = [];
+      $scope.alert = null;
+      $scope.disabled_button = false;
+      $scope.remove_alert = function() {
+        return $scope.alert = null;
+      };
       $scope.change_price = function(option_id) {
         if (Object.keys($scope.options_children).length !== 0) {
           $scope.option_id = Object.keys($scope.options_children[$scope.option_id]).filter(function(key) {
@@ -321,10 +326,18 @@
       };
       $scope.quick_order = function() {
         if ($scope.quick_order_data) {
+          $scope.disabled_button = true;
+          $scope.alert = null;
+          $scope.button.actual = $scope.button.sending;
           return $http.post('/catalogue/quick/order/' + clone_data.product.pk, $scope.quick_order_data).success(function(out_data) {
             if (!djangoForm.setErrors($scope.quick_order_form, out_data.errors)) {
-              return $scope.send_form = true;
+              $scope.alert = {
+                msg: out_data.msg,
+                type: 'alert-success'
+              };
             }
+            $scope.button.actual = $scope.button.send;
+            return $scope.disabled_button = false;
           }).error(function() {
             return console.error('An error occured during submission');
           });

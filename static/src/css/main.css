@@ -9016,6 +9016,9 @@ header .bottom .navbar .nav > li .yamm-content .image .btn-menu {
   font-weight: 400;
   text-transform: uppercase;
 }
+header .navbar {
+  margin-bottom: 5px;
+}
 .main .items {
   padding-top: 10px;
 }

@@ -43,6 +43,11 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
     $rootScope.keys = Object.keys
     $scope.sent_signal = []
     clone_attributes = []
+    $scope.alert = null
+    $scope.disabled_button = false
+
+    $scope.remove_alert = ->
+        $scope.alert = null
 
     $scope.change_price = (option_id) ->
 #    if $scope.option_model
@@ -159,7 +164,7 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
             angular.forEach attributes, (attribute) ->
                 if attribute.selected_val.pk != 0
                     selected_attributes.push(attribute.selected_val.pk)
-            #    Todo igor: if selected_attributes is empty - message select - attribute for display price
+#                Todo igor: if selected_attributes is empty - message select - attribute for display price
 
             exist_selected_attr = clone_data.stockrecords[selected_attributes.toString()]
 
@@ -203,10 +208,17 @@ app.controller 'Product', ['$http', '$scope', '$window', '$document', '$location
 
     $scope.quick_order = () ->
         if $scope.quick_order_data
-            $http.post('/catalogue/quick/order/' + clone_data.product.pk, $scope.quick_order_data).success((out_data) ->
+            $scope.disabled_button = true
+            $scope.alert = null
+            $scope.button.actual = $scope.button.sending
+
+            $http.post('/catalogue/quick/order/' + clone_data.product.pk, $scope.quick_order_data).success (out_data) ->
                 if !djangoForm.setErrors($scope.quick_order_form, out_data.errors)
-                    $scope.send_form = true
-            ).error ->
+                    $scope.alert = ({msg: out_data.msg, type: 'alert-success'})
+
+                $scope.button.actual = $scope.button.send
+                $scope.disabled_button = false
+            .error ->
                 console.error 'An error occured during submission'
 
     $scope.change_wishlist = () ->
