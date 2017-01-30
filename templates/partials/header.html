@@ -69,13 +69,11 @@
                                 <span class="icon-bar"></span>
                                 <span class="icon-bar"></span>
                             </button>
-                            {% with flatpages_header.0 as first_page %}
-                                <a class="navbar-brand" href="{% url 'pages' first_page.get_absolute_url %}">{{ first_page.title }}</a>
-                            {% endwith %}
+                            <a class="navbar-brand" href="{% url 'contacts' %}">{% trans "Contact us" %}</a>
                         </div>
                         <div id="navbar" class="collapse navbar-collapse">
                             <ul class="nav navbar-nav">
-                                {% for page in flatpages_header|slice:'1:' %}
+                                {% for page in flatpages_header %}
                                     <li><a href="{% url 'pages' page.get_absolute_url %}">{{ page.title }}</a></li>
                                 {% endfor %}
                             </ul>

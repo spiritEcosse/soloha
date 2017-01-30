@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-24 15:51+0000\n"
+"POT-Creation-Date: 2017-01-30 10:48+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -375,7 +375,7 @@ msgstr "Ссылка на баннер"
 msgid "Image banner"
 msgstr "Картирка баннера"
 
-#: apps/catalogue/abstract_models.py:710 apps/ex_sites/models.py:49
+#: apps/catalogue/abstract_models.py:710 apps/ex_sites/models.py:51
 msgid "Icon"
 msgstr "Иконка"
 
@@ -546,7 +546,7 @@ msgstr ""
 msgid "Enter a valid phone number"
 msgstr "Введите действительный номер телефона."
 
-#: apps/contacts/forms.py:18 apps/ex_sites/models.py:18
+#: apps/contacts/forms.py:18 apps/ex_sites/models.py:20
 #: templates/checkout/checkout.html:49 templates/checkout/thank_you.html:53
 #: templates/dashboard/partners/partner_manage.html:41
 #: templates/dashboard/partners/partner_user_list.html:43
@@ -716,62 +716,62 @@ msgstr ""
 msgid "Content blocks can only be linked to internal URLs"
 msgstr ""
 
-#: apps/ex_sites/models.py:13
+#: apps/ex_sites/models.py:15
 msgid "Work time"
 msgstr "Рабочее время"
 
-#: apps/ex_sites/models.py:14
+#: apps/ex_sites/models.py:16
 msgid "Actual address"
 msgstr "Фактический адрес"
 
-#: apps/ex_sites/models.py:15 apps/ex_sites/models.py:56
+#: apps/ex_sites/models.py:17 apps/ex_sites/models.py:58
 #, fuzzy
 #| msgid "Phone number"
 msgid "Phone numbers"
 msgstr "Номер телефона"
 
-#: apps/ex_sites/models.py:19
+#: apps/ex_sites/models.py:21
 msgid "Short description of shop"
 msgstr "Краткое описание магазина"
 
-#: apps/ex_sites/models.py:20
+#: apps/ex_sites/models.py:22
 msgid "Way to us"
 msgstr ""
 
-#: apps/ex_sites/models.py:21
+#: apps/ex_sites/models.py:23
 msgid "Map google"
 msgstr ""
 
-#: apps/ex_sites/models.py:22
+#: apps/ex_sites/models.py:24
 msgid "Google Analytics"
 msgstr ""
 
-#: apps/ex_sites/models.py:23
+#: apps/ex_sites/models.py:25
 msgid "Yandex verification"
 msgstr ""
 
-#: apps/ex_sites/models.py:24
+#: apps/ex_sites/models.py:26
 msgid "Google verification"
 msgstr ""
 
-#: apps/ex_sites/models.py:25
+#: apps/ex_sites/models.py:27
 msgid "Fast call"
 msgstr ""
 
-#: apps/ex_sites/models.py:26
+#: apps/ex_sites/models.py:28
 msgid "Chat"
 msgstr ""
 
-#: apps/ex_sites/models.py:33 apps/ex_sites/models.py:34
+#: apps/ex_sites/models.py:35 apps/ex_sites/models.py:36
 #: templates/partials/footer.html:73
 msgid "Information"
 msgstr "Информация"
 
-#: apps/ex_sites/models.py:48 apps/ex_sites/models.py:55
+#: apps/ex_sites/models.py:50 apps/ex_sites/models.py:57
 msgid "Phone number"
 msgstr "Номер телефона"
 
-#: apps/ex_sites/models.py:50
+#: apps/ex_sites/models.py:52
 msgid "Title operator"
 msgstr ""
 
@@ -998,7 +998,7 @@ msgstr ""
 #: templates/customer/wishlists/wishlists_detail.html:10
 #: templates/customer/wishlists/wishlists_form.html:7
 #: templates/dashboard/catalogue/category_list.html:31
-#: templates/flatpages/default.html:20 templates/partials/header.html:150
+#: templates/flatpages/default.html:20 templates/partials/header.html:156
 #: templates/search/results.html:15 templates/sitemap/sitemap.html:11
 msgid "Home"
 msgstr ""
@@ -2059,28 +2059,28 @@ msgstr ""
 
 #: templates/contacts/contacts.html:6
 msgid "Contacts us"
-msgstr ""
+msgstr "Наши контакты"
 
 #: templates/contacts/contacts.html:11 templates/contacts/contacts.html:108
 msgid "Contacts"
-msgstr ""
+msgstr "Контакты"
 
 #: templates/contacts/contacts.html:78
 msgid "Feedback"
-msgstr ""
+msgstr "Задайте вопрос"
 
 #: templates/contacts/contacts.html:82 templates/contacts/contacts.html:88
 msgid "Send"
-msgstr ""
+msgstr "Отправить"
 
 #: templates/contacts/contacts.html:82 templates/dashboard/comms/detail.html:83
 #: templates/dashboard/users/detail.html:92
 msgid "Sending..."
-msgstr ""
+msgstr "Отправка..."
 
 #: templates/contacts/contacts.html:189
 msgid "How to reach us"
-msgstr ""
+msgstr "Как нас найти"
 
 #: templates/customer/baseaccountpage.html:6
 #: templates/customer/baseaccountpage.html:17
@@ -4917,7 +4917,7 @@ msgid "all rights reserved"
 msgstr "все права защищены"
 
 #: templates/partials/header.html:10 templates/partials/header.html.py:67
-#: templates/partials/header.html:144
+#: templates/partials/header.html:150
 msgid "Toggle navigation"
 msgstr ""
 
@@ -4945,7 +4945,7 @@ msgstr "Показать 5 результатов"
 msgid "Results search"
 msgstr ""
 
-#: templates/partials/header.html:213
+#: templates/partials/header.html:219
 msgid "Хочу"
 msgstr ""
 
