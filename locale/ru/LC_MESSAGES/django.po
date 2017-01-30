@@ -1601,7 +1601,7 @@ msgstr ""
 
 #: templates/catalogue/product/attributes/attribute_modal.html:15
 msgid "All fabrics"
-msgstr ""
+msgstr "Все ткани"
 
 #: templates/catalogue/product/attributes/attribute_products_modal.html:15
 msgid "Click to expand"
@@ -1624,7 +1624,7 @@ msgstr ""
 
 #: templates/catalogue/product/attributes/attributes_all_images.html:20
 msgid "View all fabrics"
-msgstr ""
+msgstr "Все ткани"
 
 #: templates/catalogue/reviews/partials/review_stars.html:14
 #, python-format
