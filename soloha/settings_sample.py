@@ -1,4 +1,4 @@
-import os
+import os, sys
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_DIR = os.path.basename(BASE_DIR)
@@ -14,18 +14,11 @@ THUMBNAIL_DEBUG = DEBUG
 
 HAYSTACK_CONNECTIONS = {
     'default': {
-        'ENGINE': 'haystack.backends.simple_backend.SimpleEngine'
-    }
+        'ENGINE': 'haystack.backends.solr_backend.SolrEngine',
+        'URL': 'http://127.0.0.1:8983/solr/{}'.format(PROJECT_DIR),
+        'EXCLUDED_INDEXES': ['apps.catalogue.search_indexes.ProductIndex'],
+    },
 }
-
-# HAYSTACK_CONNECTIONS = {
-#     'default': {
-#         'ENGINE': 'haystack.backends.solr_backend.SolrEngine',
-#         'URL': 'http://127.0.0.1:8983/solr/',
-#     },
-# }
-
-# HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
 
 FOLDER_STATIC = os.path.join(BASE_DIR, 'static')
 STATIC_URL = '/static_root/'
@@ -52,6 +45,7 @@ CACHE_MIDDLEWARE_KEY_PREFIX = PROJECT_DIR
 KEY_PREFIX = CACHE_MIDDLEWARE_KEY_PREFIX
 
 MIDDLEWARE_CLASSES = (
+    # 'django.middleware.cache.UpdateCacheMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.gzip.GZipMiddleware',
@@ -62,15 +56,23 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
+    'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware',
     'django.middleware.locale.LocaleMiddleware',
     'apps.basket.middleware.BasketMiddleware',
     'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware',
+    # 'django.middleware.cache.FetchFromCacheMiddleware',
 )
 
 ALLOWED_HOSTS = ['*']
 
 DB_BACKEND = 'django.db.backends.postgresql_psycopg2'
-DB_NAME, DB_USER, DB_PASSWORD = (PROJECT_DIR, ) * 3
-DB_HOST = 'localhost'
-DB_PORT = ''
 DB_ATOMIC_REQUESTS = True
+
+if sys.version_info[0] == 3:
+    DB_NAME, DB_USER = ('postgres', ) * 2
+    DB_HOST = 'db'
+    DB_PORT = 5432
+else:
+    DB_NAME, DB_USER, DB_PASSWORD = (PROJECT_DIR, ) * 3
+    DB_HOST = 'localhost'
+    DB_PORT = ''
