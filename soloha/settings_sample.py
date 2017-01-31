@@ -1,4 +1,4 @@
-import os
+import os, sys
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_DIR = os.path.basename(BASE_DIR)
@@ -66,7 +66,13 @@ MIDDLEWARE_CLASSES = (
 ALLOWED_HOSTS = ['*']
 
 DB_BACKEND = 'django.db.backends.postgresql_psycopg2'
-DB_NAME, DB_USER, DB_PASSWORD = (PROJECT_DIR, ) * 3
-DB_HOST = 'localhost'
-DB_PORT = ''
 DB_ATOMIC_REQUESTS = True
+
+if sys.version_info[0] == 3:
+    DB_NAME, DB_USER = ('postgres', ) * 2
+    DB_HOST = 'db'
+    DB_PORT = 5432
+else:
+    DB_NAME, DB_USER, DB_PASSWORD = (PROJECT_DIR, ) * 3
+    DB_HOST = 'localhost'
+    DB_PORT = ''

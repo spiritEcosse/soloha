@@ -249,7 +249,7 @@ class ProductCategoryView(BaseCatalogue, SingleObjectMixin, generic.ListView):
         if kwargs.get('potential_filter', None):
             selected_filters.append(kwargs.get('potential_filter'))
 
-        key = lambda feature: feature.parent.pk
+        key = lambda feature: feature.parent_id
         iter = groupby(sorted(selected_filters, key=key), key=key)
 
         for parent, values in iter:
@@ -264,12 +264,12 @@ class ProductCategoryView(BaseCatalogue, SingleObjectMixin, generic.ListView):
         if len(categories) > 1:
             filters = Feature.objects.raw(u"""
             SELECT DISTINCT
+              T6."id" as id_parent,
               "catalogue_feature"."id",
               "catalogue_feature"."title",
               "catalogue_feature"."slug",
               "catalogue_feature"."parent_id",
               "catalogue_sortfeatureincategory"."sort",
-              T6."id",
               T6."title",
               T6."slug",
               T6."parent_id"
@@ -286,12 +286,12 @@ class ProductCategoryView(BaseCatalogue, SingleObjectMixin, generic.ListView):
         else:
             filters = Feature.objects.raw(u"""
             SELECT DISTINCT
+              T6."id" as id_parent,
               "catalogue_feature"."id",
               "catalogue_feature"."title",
               "catalogue_feature"."slug",
               "catalogue_feature"."parent_id",
               "catalogue_sortfeatureincategory"."sort",
-              T6."id",
               T6."title",
               T6."slug",
               T6."parent_id"
@@ -305,7 +305,6 @@ class ProductCategoryView(BaseCatalogue, SingleObjectMixin, generic.ListView):
             WHERE ("catalogue_product_categories"."category_id" IN (%s) AND "catalogue_product"."enable" = TRUE AND "catalogue_feature"."level" = 1)
             ORDER BY "catalogue_sortfeatureincategory"."sort";
             """, [self.object.id, self.object.id])
-
 
         # map(lambda obj: obj.id, self.object.get_descendants_through_children())
 
@@ -324,7 +323,7 @@ class ProductCategoryView(BaseCatalogue, SingleObjectMixin, generic.ListView):
         #     Prefetch('filter_products', queryset=Product.objects.only('id').order_by())
         # ).distinct()
 
-        products = lambda **kwargs: map(lambda obj: obj.id, self.get_products(**kwargs))
+        # products = lambda **kwargs: map(lambda obj: obj.id, self.get_products(**kwargs))
         key = lambda feature: feature.parent.pk
         # Todo really need sort by feature.parent.pk ?
         iter = groupby(sorted(self.selected_filters, key=key), key=key)
@@ -332,14 +331,14 @@ class ProductCategoryView(BaseCatalogue, SingleObjectMixin, generic.ListView):
         context['filters'] = list()
 
         for feature in filters:
-            feature.potential_products_count = feature.filter_products.filter(
-                id__in=products(potential_filter=feature)
-            )
+            # feature.potential_products_count = feature.filter_products.filter(
+            #     id__in=products(potential_filter=feature)
+            # )
 
-            if feature.parent.pk in filters_parent:
-                feature.potential_products_count = feature.potential_products_count.exclude(id__in=products)
+            # if feature.parent_id in filters_parent:
+            #     feature.potential_products_count = feature.potential_products_count.exclude(id__in=products)
 
-            feature.potential_products_count = feature.potential_products_count.count()
+            # feature.potential_products_count = feature.potential_products_count.count()
             context['filters'].append(feature)
 
         context['url_extra_kwargs'].update({'category_slug': self.kwargs.get('category_slug')})
