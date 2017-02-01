@@ -83,6 +83,19 @@ site: debian_ubuntu_install_modules create_settings_local virtual_environment
 site3: debian_ubuntu_install_modules create_settings_local python3 virtual_environment
 test: run_test
 
+up:
+	docker-compose build
+	docker-compose up
+
+build_in_docker: run_dev
+	docker-compose build
+
+run_in_docker:
+	docker-machine restart dev
+	# really need ?
+	#eval $(docker-machine env dev)
+	docker-compose up
+
 
 
 sandbox_image:

@@ -16,18 +16,18 @@ services:
   web:
     restart: always
     build: .
-    expose:
-      - "8000"
+#    expose:
+#      - "8000"
 #    links:
 #      - postgres:postgres
 #      - redis:redis
-    volumes:
-      - /usr/src/app
-      - /usr/src/app/static
+#    volumes:
+#      - /usr/src/app
+#      - /usr/src/app/static
     depends_on:
       - db
 #    env_file: .env
-    command: /usr/local/bin/gunicorn soloha.wsgi:application -w 2 -b :8000
+    command: /usr/local/bin/gunicorn soloha.wsgi:application -w 3 -b :8000
 
   nginx:
     restart: always
