@@ -62,6 +62,10 @@ virtual_environment:
 	# Create virtualenv and install libs from requirements
 	./venv.sh $(current_dir)
 
+virtual_environment_docker3:
+	# Create virtualenv and install libs from requirements
+	./venv.sh $(current_dir)
+
 create_settings_local:
     # Create settings_local
 	cp $(current_dir)/settings_sample.py $(current_dir)/settings_local.py
@@ -76,25 +80,36 @@ reset_db: postgresql initial_db
 python3:
 	sudo apt-get install python3-dev libevent-dev python-psycopg2
 
+docker_python3:
+	sudo apt-get install libevent-dev python-psycopg2
+
+site: debian_ubuntu_install_modules create_settings_local virtual_environment
+site3: create_settings_local python3 virtual_environment
+site_docker3: create_settings_local virtual_environment_docker3
+test: run_test
+
+
 run_test:
 	detox
 
-site: debian_ubuntu_install_modules create_settings_local virtual_environment
-site3: debian_ubuntu_install_modules create_settings_local python3 virtual_environment
-test: run_test
 
-up:
-	docker-compose build
-	docker-compose up
 
-build_in_docker: run_dev
-	docker-compose build
-
-run_in_docker:
+docker_restart_machine:
 	docker-machine restart dev
-	# really need ?
-	#eval $(docker-machine env dev)
+	docker-machine env dev
+	eval $(docker-machine env dev)
+
+docker_compose_up: docker_compose_build
 	docker-compose up
+
+docker_compose_build:
+	docker-compose build
+
+docker_run: docker_restart_machine docker_compose_build docker_compose_up
+
+docker_shell:
+	docker run -a stdin -a stdout -i -t soloha_web /bin/bash
+
 
 
 
