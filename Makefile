@@ -108,7 +108,7 @@ docker_compose_build:
 docker_run: docker_restart_machine docker_compose_build docker_compose_up
 
 docker_shell:
-	docker run -a stdin -a stdout -i -t soloha_web /bin/bash
+	docker exec -it soloha_web_1 bash
 
 
 

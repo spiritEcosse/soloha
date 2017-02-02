@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 
-#python manage.py collectstatic --noinput
-#
-#python manage.py makemigrations
-#python manage.py migrate
+python manage.py collectstatic --noinput
+
+python manage.py makemigrations
+python manage.py migrate catalogue
+python manage.py migrate
 
 # Prepare log files and start outputting logs to stdout
 #touch /srv/logs/gunicorn.log
