@@ -15,8 +15,8 @@ services:
       - db
       - redis
     volumes:
-      - /usr/src/app
-      - /usr/src/app/static
+      - .:/code
+      - .:/code/static
     depends_on:
       - db
     command: /usr/local/bin/gunicorn soloha.wsgi:application -w 3 -b :8000
