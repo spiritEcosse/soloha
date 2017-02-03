@@ -108,8 +108,20 @@ docker_compose_build:
 docker_run: docker_restart_machine docker_compose_build docker_compose_up
 
 docker_shell:
-	docker run -a stdin -a stdout -i -t soloha_web /bin/bash
+	docker exec -i -t soloha_web_1 /bin/bash
 
+
+
+post_compose_up:
+	eval $(docker-machine env dev)
+	docker exec soloha_web_1 ./manage.py collectstatic --noinput
+	docker exec soloha_web_1 ./manage.py makemigrations
+	docker exec soloha_web_1 ./manage.py migrate
+
+	# not test
+	docker exec soloha_web_1 ./manage.py loaddata data/fixtures/*.json
+	docker exec soloha_web_1 ./manage.py oscar_populate_countries
+	docker exec soloha_web_1 ./manage.py rebuild_index
 
 
 

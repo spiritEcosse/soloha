@@ -13,6 +13,7 @@ coverage==4.0.3
 cryptography==1.4
 DAWG-Python==0.7.2
 decorator==4.0.10
+Django==1.10.5
 diff-match-patch==20121119
 django-admin-bootstrapped==2.5.7
 django-angular==0.8.4
