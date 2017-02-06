@@ -19,7 +19,8 @@ services:
       - .:/code/static
     depends_on:
       - db
-    command: /usr/local/bin/gunicorn soloha.wsgi:application -w 3 -b :8000
+#    command: /usr/local/bin/gunicorn soloha.wsgi:application -w 3 -b :8000
+    command: bash -c "python manage.py makemigrations && python manage.py migrate && gunicorn mydjango.wsgi -b 0.0.0.0:8000"
 
   nginx:
     restart: always
