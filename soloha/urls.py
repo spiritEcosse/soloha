@@ -22,6 +22,7 @@ from django.contrib.auth import views as auth_views
 from django.core.urlresolvers import reverse_lazy
 
 from sitemap import ProductSitemap, CategorySitemap, FlatPageSitemap
+from django.contrib.flatpages import views
 
 from apps.catalogue.admin import ProductAutocomplete, FeatureAutocomplete, CategoriesAutocomplete
 from apps.partner.admin import PartnerAutocomplete

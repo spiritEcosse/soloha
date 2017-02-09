@@ -686,6 +686,10 @@ class AbstractProductImage(models.Model, CommonFeatureProduct):
             image.display_order = idx
             image.save()
 
+    @property
+    def is_missing(self):
+        return False
+
 
 @python_2_unicode_compatible
 class CustomAbstractCategory(MPTTModel):

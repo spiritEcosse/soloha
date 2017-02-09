@@ -14,6 +14,7 @@ class InfoPageInline(admin.StackedInline):
 class InfoPageAdmin(FlatPageAdmin):
     inlines = (InfoPageInline, )
     form = forms.FlatPageForm
+    prepopulated_fields = {"url": ("title", )}
 
 
 admin.site.unregister(FlatPage)

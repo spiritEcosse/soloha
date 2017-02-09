@@ -168,7 +168,6 @@ EMAIL_PORT = settings_local.EMAIL_PORT
 EMAIL_USE_TLS = settings_local.EMAIL_USE_TLS
 OSCAR_FROM_EMAIL = DEFAULT_FROM_EMAIL
 
-
 AUTHENTICATION_BACKENDS = (
     'apps.customer.auth_backends.EmailBackend',
     'django.contrib.auth.backends.ModelBackend',
@@ -193,7 +192,7 @@ THUMBNAIL_HIGH_RESOLUTION = True
 FILER_CANONICAL_URL = 'sharing/'
 FILER_DEBUG = DEBUG
 FILER_ENABLE_LOGGING = DEBUG
-FILER_DUMP_PAYLOAD = True
+FILER_DUMP_PAYLOAD = False
 
 THUMBNAIL_PROCESSORS = (
     'easy_thumbnails.processors.colorspace',
@@ -252,6 +251,7 @@ IMPORT_EXPORT_USE_TRANSACTIONS = True
 THUMBNAIL_ALIASES = {
     '': {
         'category_icon': {'size': (50, 30), 'crop': True},
+        'phone_icon': {'size': (50, 30), 'crop': True},
         'subcategory_image': {'size': (94, 62), 'crop': True},
         'category_banner': {'size': (574, 230), 'crop': True},
         'basket_quick': {'size': (85, 50), 'crop': True},

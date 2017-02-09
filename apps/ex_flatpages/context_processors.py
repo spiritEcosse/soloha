@@ -10,6 +10,7 @@ def context_data(request):
         Prefetch('info__phone_numbers', queryset=PhoneNumber.objects.browse()),
     ).get()
     context['current_site'] = site
+
     flatpages = site.flatpage_set.select_related('info').filter(info__position__in=('header', 'footer')).only(
         'url',
         'title',

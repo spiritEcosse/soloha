@@ -1,4 +1,4 @@
-{% extends "layout_2_col.html" %}
+{% extends "layout.html" %}
 
 {% load currency_filters %}
 {% load thumbnail %}
@@ -26,88 +26,89 @@
         Products matching "{{ q }}"
     {% endblocktrans %}
 {% endblock %}
+
 {% block column_left %}
-    {% if filters %}
-        <div class="heading">Подбор по параметрам</div>
-        <div class="filter">
-            {% for filter in filters %}
-                <div class="items">
-                    <div class="name" >{{ filter }}</div>
-                    <div class="values">
-                        <ul class="list-group">
-                            {% for filter_value in filter.children_in_products %}
-                                <li class="list-group-item checkbox">
-                                    <label>
-                                        {% for sorting_url, text, is_active, link in sort_types %}
-                                            {% if is_active %}
-                                                <a href="{% concatenate category filter_slug filter_value %}?{{ link }}">
-                                                {% if filter_value.get_absolute_url in filter_slug %}
-                                                    <input type="checkbox" checked onclick="location.href='{% concatenate category filter_slug filter_value %}?{{ link }}'"/>
-                                                {% else %}
-                                                    <input type="checkbox" name="checkbox" value="value" onclick="location.href='{% concatenate category filter_slug filter_value %}?{{ link }}'"/>
-                                                {% endif %}
-                                            {% endif %}
-                                        {% endfor %}
-                                        {{ filter_value.title }}
-                                        <span class="count">({{ filter_value.num_prod }})</span>
-                                        </a>
-                                    </label>
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    </div>
-                </div>
-            {% endfor %}
-        </div>
-    {% endif %}
+    {#    {% if filters %}#}
+    {#        <div class="heading">Подбор по параметрам</div>#}
+    {#        <div class="filter">#}
+    {#            {% for filter in filters %}#}
+    {#                <div class="items">#}
+    {#                    <div class="name" >{{ filter }}</div>#}
+    {#                    <div class="values">#}
+    {#                        <ul class="list-group">#}
+    {#                            {% for filter_value in filter.children_in_products %}#}
+    {#                                <li class="list-group-item checkbox">#}
+    {#                                    <label>#}
+    {#                                        {% for sorting_url, text, is_active, link in sort_types %}#}
+    {#                                            {% if is_active %}#}
+    {#                                                <a href="{% concatenate category filter_slug filter_value %}?{{ link }}">#}
+    {#                                                {% if filter_value.get_absolute_url in filter_slug %}#}
+    {#                                                    <input type="checkbox" checked onclick="location.href='{% concatenate category filter_slug filter_value %}?{{ link }}'"/>#}
+    {#                                                {% else %}#}
+    {#                                                    <input type="checkbox" name="checkbox" value="value" onclick="location.href='{% concatenate category filter_slug filter_value %}?{{ link }}'"/>#}
+    {#                                                {% endif %}#}
+    {#                                            {% endif %}#}
+    {#                                        {% endfor %}#}
+    {#                                        {{ filter_value.title }}#}
+    {#                                        <span class="count">({{ filter_value.num_prod }})</span>#}
+    {#                                        </a>#}
+    {#                                    </label>#}
+    {#                                </li>#}
+    {#                            {% endfor %}#}
+    {#                        </ul>#}
+    {#                    </div>#}
+    {#                </div>#}
+    {#            {% endfor %}#}
+    {#        </div>#}
+    {#    {% endif %}#}
 {% endblock column_left %}
 
 {% block content %}
-        <div class="row sort">
-            <div class="col-xs-16">
-                <span class="text">Сортировать:</span>
-                <div class="btn-group btn-group-md" role="group" aria-label="Sort">
-                    {% for sorting_url, name, is_active in sort_types %}
-                        {% if is_active %}
-                            <a href="{{ sorting_url }}" type="button" class="btn btn-default btn-danger">{{ name }}</a>
-                        {% else %}
-                            <a href="{{ sorting_url }}" type="button" class="btn btn-default"> {{ name }}</a>
-                        {% endif %}
-                    {% endfor %}
-                </div>
-            </div>
-        </div>
-        <div class="row items">
-            {% if page_obj %}
-                {% for product in page_obj %}
-                    {% if forloop.first %}
-                        <div class="col-sm-6 col-md-6" id="product">
-                            {% include "catalogue/partials/product.html" %}
-                        </div>
-                    {% else %}
-                        <span class="clear">
+    {#        <div class="row sort">#}
+    {#            <div class="col-xs-16">#}
+    {#                <span class="text">Сортировать:</span>#}
+    {#                <div class="btn-group btn-group-md" role="group" aria-label="Sort">#}
+    {#                    {% for sorting_url, name, is_active in sort_types %}#}
+    {#                        {% if is_active %}#}
+    {#                            <a href="{{ sorting_url }}" type="button" class="btn btn-default btn-danger">{{ name }}</a>#}
+    {#                        {% else %}#}
+    {#                            <a href="{{ sorting_url }}" type="button" class="btn btn-default"> {{ name }}</a>#}
+    {#                        {% endif %}#}
+    {#                    {% endfor %}#}
+    {#                </div>#}
+    {#            </div>#}
+    {#        </div>#}
+    <div class="items">
+        {% if page_obj %}
+            {% for product in page_obj %}
+                {% if forloop.first %}
+                    <div class="col-sm-6 col-md-6" id="product">
+                        {% include "catalogue/partials/product.html" %}
+                    </div>
+                {% else %}
+                    <span class="clear">
                     <div class="col-sm-6 col-md-6" id="product">
                         {% include "catalogue/partials/product.html" %}
                     </div>
                     </span>
-                    {% endif %}
-                {% endfor %}
-                <div class="clearfix"></div>
-                <div name="more_products" class="col-xs-6 col-xs-offset-8 wrapper" action=".">
-                    {% csrf_token %}
-                    {% if page_obj.number != paginator.num_pages %}
-                    <a href="#" class="more_products" ng-click="submit()" ng-hide="hide == true"> {#  onclick="location.href='/test/'" #}
-                        ПОКАЗАТЬ ЕЩЕ
-                    </a>
-                        {% endif %}
-                </div>
-                <div>
-                    {% include "catalogue/partials/pagination.html" %}
-                </div>
-            {% else %}
-                <div class="nonefound col-xs-24">{% trans "No products found." %}</div>
-            {% endif %}
-        </div>
+                {% endif %}
+            {% endfor %}
+            <div class="clearfix"></div>
+            {#                <div name="more_products" class="col-xs-6 col-xs-offset-8 wrapper" action=".">#}
+            {#                    {% csrf_token %}#}
+            {#                    {% if page_obj.number != paginator.num_pages %}#}
+            {#                    <a href="#" class="more_products" ng-click="submit()" ng-hide="hide == true"> {#  onclick="location.href='/test/'" #}
+            {#                        ПОКАЗАТЬ ЕЩЕ#}
+            {#                    </a>#}
+            {#                        {% endif %}#}
+            {#                </div>#}
+            <div class="col-xs-24 text-right">
+                {% include "catalogue/partials/pagination.html" %}
+            </div>
+        {% else %}
+            <div class="nonefound col-xs-24">{% trans "No products found." %}</div>
+        {% endif %}
+    </div>
 {% endblock %}
 
 

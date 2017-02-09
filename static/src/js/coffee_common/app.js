@@ -133,6 +133,11 @@
       $rootScope.keys = Object.keys;
       $scope.sent_signal = [];
       clone_attributes = [];
+      $scope.alert = null;
+      $scope.disabled_button = false;
+      $scope.remove_alert = function() {
+        return $scope.alert = null;
+      };
       $scope.change_price = function(option_id) {
         if (Object.keys($scope.options_children).length !== 0) {
           $scope.option_id = Object.keys($scope.options_children[$scope.option_id]).filter(function(key) {
@@ -321,10 +326,18 @@
       };
       $scope.quick_order = function() {
         if ($scope.quick_order_data) {
+          $scope.disabled_button = true;
+          $scope.alert = null;
+          $scope.button.actual = $scope.button.sending;
           return $http.post('/catalogue/quick/order/' + clone_data.product.pk, $scope.quick_order_data).success(function(out_data) {
             if (!djangoForm.setErrors($scope.quick_order_form, out_data.errors)) {
-              return $scope.send_form = true;
+              $scope.alert = {
+                msg: out_data.msg,
+                type: 'alert-success'
+              };
             }
+            $scope.button.actual = $scope.button.send;
+            return $scope.disabled_button = false;
           }).error(function() {
             return console.error('An error occured during submission');
           });
@@ -473,52 +486,7 @@
 
   app = angular.module(app_name);
 
-  app.controller('Search', [
-    '$http', '$scope', '$window', '$document', '$location', '$routeParams', '$compile', function($http, $scope, $window, $document, $location, $routeParams, $compile) {
-      $http.post($location.absUrl()).success(function(data) {
-        var clear, items;
-        items = angular.element(document).find('#product');
-        items.attr('ng-repeat', 'product in products');
-        $compile(items)($scope);
-        clear = angular.element('.clear');
-        clear.remove();
-        $scope.products = data.products;
-        $scope.initial_page_number = data.page_number;
-        $scope.page_number = data.page_number;
-        $scope.num_pages = data.num_pages;
-        $scope.search_string = data.search_string;
-        $scope.pages = [data.pages[parseInt($scope.initial_page_number) - 1]];
-        $scope.pages[0].active = "True";
-        $scope.pages[0].link = "";
-        return $scope.sorting_type = data.sorting_type;
-      }).error(function() {
-        return console.error('An error occurred during submission');
-      });
-      return $scope.submit = function() {
-        return $http.post($location.absUrl(), {
-          'search_string': $scope.search_string,
-          'page': $scope.page_number,
-          'sorting_type': $scope.sorting_type
-        }).success(function(data) {
-          var clear, i, page_active, ref, ref1;
-          clear = angular.element('.clear_pagination');
-          clear.remove();
-          $scope.pages = data.pages;
-          for (page_active = i = ref = parseInt($scope.initial_page_number) - 1, ref1 = parseInt($scope.page_number); ref <= ref1 ? i <= ref1 : i >= ref1; page_active = ref <= ref1 ? ++i : --i) {
-            $scope.pages[page_active].active = "True";
-            $scope.pages[page_active].link = "";
-          }
-          $scope.products = $scope.products.concat(data.products_next_page);
-          $scope.page_number = parseInt($scope.page_number) + 1;
-          if ($scope.page_number === parseInt($scope.num_pages)) {
-            return $scope.hide = true;
-          }
-        }).error(function() {
-          return console.error('An error occurred during submission');
-        });
-      };
-    }
-  ]);
+  app.controller('Search', ['$http', '$scope', '$window', '$document', '$location', '$routeParams', '$compile', function($http, $scope, $window, $document, $location, $routeParams, $compile) {}]);
 
 }).call(this);
 

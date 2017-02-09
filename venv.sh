@@ -1,19 +1,20 @@
 #!/usr/bin/env bash
 
-#source `which virtualenvwrapper.sh`
-#rmvirtualenv $1
-#mkvirtualenv $1 --python=`which python3`
-
-# Python 3 (replace ~/.virtualenvs on variable - where locate ~/.virtualenvs or something like)
-# mkvirtualenv $1 -p /usr/bin/python3.4 ~/.virtualenvs/$1
+source `which virtualenvwrapper.sh`
+rmvirtualenv $1
+mkvirtualenv $1
 
 # Install libs in virtual environment
 pip install -r requirements.txt
 
 # Update migrations
+git clean -xf **/migrations/** # temporary solution, use because rmvirtualenv is use
 ./manage.py makemigrations
 
 # Apply migrate
+# I know that a bad approach, it is temporary, if I have time to change no more than the right one.
+./manage.py migrate
+./manage.py migrate catalogue
 ./manage.py migrate
 
 # Collectstatic
@@ -22,12 +23,10 @@ pip install -r requirements.txt
 # Create cache table
 ./manage.py createcachetable
 
-# Unzip
-#tar -xzvf data/fixtures/all.tar.gz -C data/fixtures/
-
 # Load initial data from fixtures.
-#./manage.py loaddata data/fixtures/*.json
-#./manage.py oscar_populate_countries
-#./manage.py clear_index --noinput
-#./manage.py update_index catalogue
-
+./manage.py loaddata data/fixtures/all.json.bz2
+./manage.py oscar_populate_countries
+./manage.py rebuild_index --noinput
+#sudo touch /var/solr/data/$1/conf/schema.xml
+#./manage.py build_solr_schema >> /var/solr/data/$1/conf/schema.xml
+#sudo chown solr:solr /var/solr/data/$1/conf/schema.xml

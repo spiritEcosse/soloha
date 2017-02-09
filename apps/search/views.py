@@ -5,10 +5,10 @@ from braces import views
 from haystack.views import FacetedSearchView
 
 from django.views import generic
+
 from django.db.models.query import Prefetch
 from django.conf import settings
 from django.db.models import Count
-from django.utils.translation import ugettext_lazy as _
 
 from apps.search import signals
 from apps.catalogue.models import Product, Feature
@@ -81,6 +81,7 @@ class FacetedSearchView(views.JSONResponseMixin, views.AjaxResponseMixin, CoreFa
     template_name = 'search/results.html'
     model = Product
     paginate_by = OSCAR_PRODUCTS_PER_PAGE
+    url_view_name = 'search:search'
 
     def post(self, request, *args, **kwargs):
         if self.request.is_ajax() and self.request.GET.get('q'):
@@ -161,10 +162,12 @@ class FacetedSearchView(views.JSONResponseMixin, views.AjaxResponseMixin, CoreFa
             is_active = False
             if self.kwargs.get('sorting_type', '') == type:
                 is_active = True
-            sorting_url = '{}?q={}&sorting_type={}'.format(self.request.path, context['query'], link)
-            sort_link = 'q={}&sorting_type={}'.format(context['query'], link)
-            context['sort_types'].append((sorting_url, text, is_active, sort_link))
+            # sorting_url = '{}?q={}&sorting_type={}'.format(self.request.path, context['query'], link)
+            # sort_link = 'q={}&sorting_type={}'.format(context['query'], link)
+            # context['sort_types'].append((sorting_url, text, is_active, sort_link))
 
+        context['url_extra_kwargs'] = {}
+        context['url_view_name'] = self.url_view_name
         return context
 
     def get_products(self, **kwargs):
@@ -182,8 +185,8 @@ class FacetedSearchView(views.JSONResponseMixin, views.AjaxResponseMixin, CoreFa
         sqs_search = []
         if self.kwargs['search_string']:
             sqs = SearchQuerySet()
-            sqs_title = sqs.autocomplete(title_ngrams=self.kwargs['search_string'])
-            sqs_slug = sqs.autocomplete(slug_ngrams=self.kwargs['search_string'])
+            sqs_title = sqs.autocomplete(title=self.kwargs['search_string'])
+            sqs_slug = sqs.autocomplete(slug=self.kwargs['search_string'])
             sqs_id = sqs.autocomplete(product_id=self.kwargs['search_string'])
             sqs_search = sqs_title or sqs_slug or sqs_id
         return sqs_search
@@ -229,11 +232,11 @@ class FacetedSearchView(views.JSONResponseMixin, views.AjaxResponseMixin, CoreFa
         for page in page_numbers:
             pages_dict = dict()
             pages_dict['page_number'] = page
-            pages_dict['link'] = "{}?page={}&q={}&sorting_type={}".format(
-                                                                    self.kwargs['url'],
-                                                                    page,
-                                                                    self.kwargs['search_string'],
-                                                                    dict_old_sorting_types.get(self.kwargs.get('sorting_type'), 'popularity'))
+            # pages_dict['link'] = "{}?page={}&q={}&sorting_type={}".format(
+            #                                                         self.kwargs['url'],
+            #                                                         page,
+            #                                                         self.kwargs['search_string'],
+            #                                                         dict_old_sorting_types.get(self.kwargs.get('sorting_type'), 'popularity'))
             pages_dict['active'] = 'False'
             pages.append(pages_dict)
 

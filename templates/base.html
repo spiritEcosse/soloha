@@ -19,6 +19,8 @@
     <meta name="keywords" content="{% string_strip %}{% block keywords %}{% endblock %}{% end_string_strip %}" />
     <meta name="viewport" content="{% block viewport %}width=device-width{% endblock %}" />
     <meta name="robots" content="{% string_strip %}{% block meta_robots %}noarchive, nocache{% endblock %}{% end_string_strip %}" />
+    {{ current_site.info.yandex_verification|safe }}
+    {{ current_site.info.google_analytics|safe }}
 
     <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
     <!--[if lt IE 9]>
@@ -30,11 +32,6 @@
     {% endblock %}
 
     {% block extrahead %}{% endblock %}
-
-    {% block tracking %}
-        {# Default to using Google analytics #}
-        {% include "partials/google_analytics.html" %}
-    {% endblock %}
 </head>
 
 <body id="{% block body_id %}default{% endblock %}" data-spy="scroll" data-target=".scrollspy" class="{% block body_class %}default{% endblock %}">
@@ -53,5 +50,16 @@
         {% block onbodyload %}{% endblock %}
     });
 </script>
+
+{% block tracking %}
+    {{ current_site.info.google_analytics|safe }}
+{% endblock %}
+{{ current_site.info.fast_call|safe }}
+{{ current_site.info.chat|safe }}
+<script src="https://apis.google.com/js/platform.js" async defer>
+    {lang: 'ru'}
+</script>
+<script id="facebook-jssdk" src="//connect.facebook.net/ru_RU/sdk.js#xfbml=1&amp;version=v2.4"></script>
+
 </body>
 </html>

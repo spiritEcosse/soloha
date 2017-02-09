@@ -69,11 +69,13 @@
                     {% endif %}
                 </div>
                 <div class="col-xs-24 col-sm-6 column">
-                    {% if flatpages_footer %}
+                    {% if current_site.flatpage_set.all %}
                         <div class="title line-bottom">{% trans "Information" %}</div>
                         <ul class="list-group">
-                            {% for page in flatpages_footer %}
-                                <li class="list-group-item"><a href="{{ page.get_absolute_url }}">{{ page.title }}</a></li>
+                            {% for page in current_site.flatpage_set.all %}
+                                <li class="list-group-item">
+                                    <a href="{% url 'pages' page.get_absolute_url %}">{{ page.title }}</a></li>
+                                </li>
                             {% endfor %}
                         </ul>
                     {% endif %}
@@ -90,8 +92,8 @@
                     <div class="title line-bottom">{% trans "Support service" %}</div>
                     <ul class="list-group">
                         <li class="list-group-item"><a href="{% url 'contacts' %}">{% trans "Contact us" %}</a></li>
-                        <li class="list-group-item"><a href="#">{% trans "Return purchase " %}</a></li>
-                        <li class="list-group-item"><a href="#">{% trans "Site Map" %}</a></li>
+{#                        <li class="list-group-item"><a href="#">{% trans "Return purchase " %}</a></li>#}
+{#                        <li class="list-group-item"><a href="#">{% trans "Site Map" %}</a></li>#}
                     </ul>
                 </div>
                 {#                    <div class="col-xs-24 col-sm-6 column account">#}

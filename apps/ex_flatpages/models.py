@@ -1,11 +1,15 @@
-from django.db import models
 from django.contrib.flatpages.models import FlatPage
-from django.utils.translation import ugettext_lazy as _
 from django.template.defaultfilters import truncatechars
 from django.utils.html import strip_tags
 from django.utils.text import capfirst
+from django.utils.functional import cached_property
+from django.db import models
+from django.utils.encoding import python_2_unicode_compatible
+from django.utils.translation import ugettext_lazy as _
+from django.core.urlresolvers import reverse
 
 
+@python_2_unicode_compatible
 class InfoPage(models.Model):
     GLYPHICON_CHOICES = (
         ('car', 'icon-car'),
@@ -31,6 +35,9 @@ class InfoPage(models.Model):
     class Meta:
         app_label = 'flatpages'
 
+    def __str__(self):
+        return "%s -- %s" % (self.flatpage.url, self.flatpage.title)
+
     def get_meta_description(self):
         return self.meta_description or truncatechars(strip_tags(self.flatpage.content), 100)
 
@@ -45,3 +52,7 @@ class InfoPage(models.Model):
 
     def title(self):
         return self.flatpage.title
+
+    @cached_property
+    def get_absolute_url(self):
+        return reverse('pages', kwargs={'url': self.flatpage.url})

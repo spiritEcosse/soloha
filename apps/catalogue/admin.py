@@ -14,6 +14,8 @@ from apps.catalogue.models import Product, Category, Feature, ProductClass, Prod
     ProductAttributeValue, ProductAttribute, ProductFeature, ProductImage, AttributeOptionGroup, Option, AttributeOption
 from apps.catalogue import resources, forms as catalogue_forms
 from apps.partner import models as partner_models, forms as partner_forms
+from apps.catalogue.forms import SortFeatureInCategoryForm
+from apps.catalogue.resources import SortFeatureInCategoryResource
 
 logging.getLogger(__name__).addHandler(logging.NullHandler())
 
@@ -235,6 +237,15 @@ class CategoryAdmin(ImportExportMixin, ImportExportActionModelAdmin, DraggableMP
             "https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css",
             "https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js"
         )
+
+
+class SortFeatureInCategoryAdmin(ImportExportMixin, ImportExportActionModelAdmin):
+    form = SortFeatureInCategoryForm
+    resource_class = SortFeatureInCategoryResource
+
+    class Media:
+        js = ("https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css",
+              "https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js")
 
 
 admin.site.register(ProductClass, ProductClassAdmin)

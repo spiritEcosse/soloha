@@ -1,9 +1,22 @@
 #!/usr/bin/env bash
 current_dir := $(notdir $(CURDIR))
+solr_version := 4.10.2
+#solr_version := 6.3.0
+solr := solr
+opt := /opt/
+solr_file := $(solr)-$(solr_version)
+opt_solr := /opt/$(solr)
+schema_xml := $(opt_solr)/solr/$(current_dir)/conf/schema.xml
+jetty := jetty
+jetty-v := $(jetty)8
+jetty_logging := $(jetty)-logging.xml
+jetty_version := 9.4.0.v20161208
+multicore_solr := $(opt_solr)/multicore/$(solr).xml
+data_solr := $(opt_solr)/$(solr)/$(current_dir)/data
 
 postgresql:
     # Install postgresql
-	sudo apt-get install postgresql postgresql-contrib
+	sudo apt-get -y install postgresql postgresql-contrib
 
     # Restart postgresql
 	sudo service postgresql restart
@@ -22,7 +35,7 @@ postgresql:
 
 libs:
     # Install compiler from less to css
-	sudo apt install npm
+	sudo apt -y install npm
 	sudo npm install -g less
 	sudo ln -sf /usr/bin/nodejs /usr/bin/node
 
@@ -33,17 +46,18 @@ libs:
 	cd static && bower install
 
     # Install other libs
-	sudo apt-get install libpq-dev
-	sudo apt-get install libmagickwand-dev
-	sudo apt-get install libjpeg-dev
+	sudo apt-get -y install libpq-dev
+	sudo apt-get -y install libmagickwand-dev
+	sudo apt-get -y install libjpeg-dev
 
     # Install gettext for run makemessages
-	sudo apt-get install gettext
+	sudo apt-get -y install gettext
 
-	sudo apt-get install libffi-dev
+	sudo apt-get -y install libffi-dev
 
 	# Install grunt
 	sudo npm install -g grunt-cli
+	npm install grunt-cli
 
 	# Install npm libs
 	npm install
@@ -55,14 +69,10 @@ libs:
 	# If use pycharm: add /usr/local/lib/node_modules/grunt-cli/ to Grunt Task in input - grunt cli package
 
 install_pip:
-	sudo apt-get install python-pip
+	sudo apt-get -y install python-pip
 	sudo pip install virtualenvwrapper
 
 virtual_environment:
-	# Create virtualenv and install libs from requirements
-	./venv.sh $(current_dir)
-
-virtual_environment_docker3:
 	# Create virtualenv and install libs from requirements
 	./venv.sh $(current_dir)
 
@@ -122,6 +132,70 @@ post_compose_up:
 	docker exec soloha_web_1 ./manage.py loaddata data/fixtures/*.json
 	docker exec soloha_web_1 ./manage.py oscar_populate_countries
 	docker exec soloha_web_1 ./manage.py rebuild_index
+
+
+site: debian_ubuntu_install_modules create_settings_local solr virtual_environment
+	sudo bash -c "source virtualenvwrapper.sh && workon $(current_dir) && ./manage.py build_$(solr)_schema > $(schema_xml)"
+
+
+solr: install_java solr_remove install_solr
+solr_production: solr_remove install_solr
+
+install_java:
+	# For Debian
+#	su -
+#	echo "deb http://ppa.launchpad.net/webupd8team/java/ubuntu xenial main" | tee /etc/apt/sources.list.d/webupd8team-java.list
+#	echo "deb-src http://ppa.launchpad.net/webupd8team/java/ubuntu xenial main" | tee -a /etc/apt/sources.list.d/webupd8team-java.list
+#	apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys EEA14886
+#	apt-get update
+#	apt-get -y install oracle-java8-installer
+#	exit
+	# end for Debian
+
+#	sudo apt-get -y install python-software-properties # Debian Wheezy and earlier
+	sudo apt-get -y install software-properties-common # Debian Jessie and later (2014-)
+	sudo add-apt-repository ppa:webupd8team/java -y
+	sudo apt-get update
+	sudo apt-get -y install oracle-java8-installer
+	sudo mkdir -p /usr/java
+	sudo ln -sf /usr/lib/jvm/java-8-openjdk-amd64 /usr/java/default
+
+install_solr:
+	sudo mkdir $(opt_solr)
+	sudo wget -P $(opt) https://archive.apache.org/dist/lucene/$(solr)/$(solr_version)/$(solr_file).tgz
+	sudo tar -xvf $(opt)$(solr_file).tgz -C $(opt)
+	sudo cp -rp $(opt)$(solr_file)/example/* $(opt_solr)/
+	sudo cp -f $(solr)/$(jetty)/$(jetty) /etc/default/$(jetty)
+	sudo cp -f $(solr)/$(jetty)/$(jetty_logging) $(opt_solr)/etc/
+	sudo useradd -d $(opt_solr) -s /sbin/false $(solr) &>/dev/null
+	sudo cp -f $(solr)/$(jetty)/$(jetty).sh /etc/init.d/$(jetty)
+	sudo chmod a+x /etc/init.d/$(jetty)
+	sudo update-rc.d $(jetty) defaults
+	sudo mv $(opt_solr)/$(solr)/collection1 $(opt_solr)/$(solr)/$(current_dir)
+	sudo bash -c "echo 'name=$(current_dir)' > $(opt_solr)/$(solr)/$(current_dir)/core.properties"
+	sudo rm -fr $(data_solr)
+	sudo mkdir $(data_solr) &>/dev/null
+	sudo cp -f $(solr)/$(jetty)/start.ini $(opt_solr)
+	sudo chown $(solr):$(solr) -R $(opt_solr)/*
+	sudo service $(jetty) start
+	sudo service $(jetty) restart
+
+solr_remove: solr_remove_service solr_remove_folders
+
+solr_remove_service:
+	sudo sudo apt-get --purge remove jetty*
+	sudo service $(jetty) stop &>/dev/null
+	sudo rm -f /etc/default/$(jetty)*
+	sudo rm -f /etc/init.d/$(jetty)*
+	sudo rm -fr /var/lib/$(jetty)*
+
+solr_remove_folders:
+	sudo rm -fr /opt/$(solr)
+	sudo rm -fr /opt/$(solr)*
+
+deluser_solr:
+	sudo deluser -f --remove-home solr
+	sudo deluser -f --group solr
 
 
 

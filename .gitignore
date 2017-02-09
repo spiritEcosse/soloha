@@ -6,14 +6,13 @@ local.py
 /dist/
 /build/
 **/whoosh_index/
-/data/fixtures/*
-!/data/fixtures/all.tar.gz
 .idea/
 **/node_modules/
 **/bower_components/
 /media/*
 !/media/image_not_found.jpg
 /static_root/*
+image_not_found.jpg
 
 # Vagrant
 .vagrant
@@ -116,4 +115,4 @@ fabric.properties
 Будет удалено apps/flatpages/
 Будет удалено data/
 Будет удалено static_root/
-*.log
+*.log*

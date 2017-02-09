@@ -78,28 +78,26 @@
 {% endblock %}
 
 {% block content %}
-    {% assign subcategies object.children.all|default:categories %}
+    {#    {% assign subcategories object.children.all|default:categories %}#}
 
-    {% if subcategies %}
+    {% if subcategories %}
         <div class="row categories">
-            <div class="col-xs-18 col-sm-21">
-                <div class="lightSlider">
-                    {% for category in subcategies %}
-                        <div class="col-xs-12 col-sm-4 item text-center">
-                            {% with category_name=category.name %}
-                                <a href="{{ category.get_absolute_url }}">
-                                    <img src="{{ category.image|thumbnail_url:"subcategory_image" }}"
-                                         title="{{ category_name }}" alt="{{ category_name }}" class="img-responsive"/>
-                                    <div class="title">{{ category_name }}</div>
-                                </a>
-                            {% endwith %}
-                        </div>
-                    {% endfor %}
+            {#                <div class="lightSlider">#}
+            {% for category in subcategories %}
+                <div class="col-xs-12 col-sm-6 item text-center">
+                    {% with category_name=category.name %}
+                        <a href="{{ category.get_absolute_url }}">
+                            <img src="{{ category.image|thumbnail_url:"subcategory_image" }}"
+                                 title="{{ category_name }}" alt="{{ category_name }}" class="img-responsive"/>
+                            <div class="title">{{ category_name }}</div>
+                        </a>
+                    {% endwith %}
                 </div>
-            </div>
-{#            <div class="col-xs-3 col-sm-3 text-center">#}
-{#                <a href="#"><div class="arrow"></div>Посмотреть все кровати</a>#}
-{#            </div>#}
+            {% endfor %}
+            {#                </div>#}
+            {#            <div class="col-xs-3 col-sm-3 text-center">#}
+            {#                <a href="#"><div class="arrow"></div>Посмотреть все кровати</a>#}
+            {#            </div>#}
         </div>
     {% endif %}
 

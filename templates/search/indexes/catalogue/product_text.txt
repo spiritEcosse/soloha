@@ -1,3 +1,4 @@
-{{ object.id }}
+{{ object.product_id }}
 {{ object.title }}
+{{ object.slug }}
 {{ object.price }}

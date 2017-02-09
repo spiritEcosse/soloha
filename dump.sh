@@ -1,15 +1,16 @@
 #!/usr/bin/env bash
 
+FILE=$(date +"%Y-%m-%d-%H.%M.%S").all.json
+FILE_ARCHIVE=$FILE.bz2
+PROJECT_LOCATION=/home/h5782c/zapchastie
+FIXTURES=$PROJECT_LOCATION/data/fixtures
+
 function dumpdata() {
-    echo "Here, the recent actions of the this script."
     source /home/h5782c/virtualenv/zapchastie/2.7/bin/activate
-    ./manage.py dumpdata --indent 4 --natural-primary --natural-foreign -e contenttypes -e auth.Permission -e sessions -e admin > data/fixtures/all.json
-    cd data/fixtures/
-    bzip2 -f all.json
-    cd ../../
-    git add .
-    git commit -m "autocommit datetime on `date +'%Y-%m-%d %H:%M:%S'` (dump database and images)"
-    git push
+    $PROJECT_LOCATION/manage.py dumpdata --indent 4 --natural-primary --natural-foreign -e contenttypes -e auth.Permission -e sessions -e admin > $FIXTURES/$FILE
+    bzip2 -f $FIXTURES/$FILE
+    $PROJECT_LOCATION/dropbox_uploader.sh upload $FIXTURES/$FILE_ARCHIVE /
+    rm -f $FIXTURES/*.all.json*
 }
 
-dumpdata 2>&1 | tee error.log
+dumpdata 2>&1 | tee $PROJECT_LOCATION/error.log
