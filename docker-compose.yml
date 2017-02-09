@@ -1,0 +1,35 @@
+version: '2'
+services:
+  db:
+    image: postgres
+
+  redis:
+    image: redis
+
+  web:
+    restart: always
+    build: .
+    expose:
+      - "8000"
+    links:
+      - db
+      - redis
+    volumes:
+      - .:/code
+      - .:/code/static
+    depends_on:
+      - db
+#    command: /usr/local/bin/gunicorn soloha.wsgi:application -w 3 -b :8000
+    command: bash -c "python manage.py makemigrations && python manage.py migrate && gunicorn mydjango.wsgi -b 0.0.0.0:8000"
+
+  nginx:
+    restart: always
+    build: ./nginx/
+    ports:
+      - "80:80"
+    volumes:
+      - /www/static
+    volumes_from:
+      - web
+    links:
+      - web:web
