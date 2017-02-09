@@ -90,17 +90,7 @@ RECOMMENDED_PRODUCTS = 20
 # Database
 # https://docs.djangoproject.com/en/1.8/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': settings_local.DB_BACKEND,
-        'NAME': settings_local.DB_NAME,
-        'USER': settings_local.DB_USER,
-        # 'PASSWORD': settings_local.DB_PASSWORD,
-        'HOST': settings_local.DB_HOST,
-        'PORT': settings_local.DB_PORT,
-        'ATOMIC_REQUESTS': settings_local.DB_ATOMIC_REQUESTS,
-    },
-}
+DATABASES = settings_local.DATABASES
 
 
 # Internationalization
@@ -197,26 +187,12 @@ FILER_DUMP_PAYLOAD = False
 THUMBNAIL_PROCESSORS = (
     'easy_thumbnails.processors.colorspace',
     'easy_thumbnails.processors.autocrop',
-    #'easy_thumbnails.processors.scale_and_crop',
     'filer.thumbnail_processors.scale_and_crop_with_subject_location',
     'easy_thumbnails.processors.filters',
 )
 
 THUMBNAIL_DUMMY = True
 THUMBNAIL_FORCE_OVERWRITE = True
-# OSCAR_PRODUCT_SEARCH_HANDLER = ""
-#
-# USE_LESS = True
-#
-# COMPRESS_PRECOMPILERS = (
-#     ('text/less', 'lessc {infile} {outfile}'),
-# )
-#
-# COMPRESS_OFFLINE_CONTEXT = {
-#     # this is the only default value from compressor itself
-#     'STATIC_URL': STATIC_URL,
-#     'use_less': USE_LESS,
-# }
 
 MAX_COUNT_PRODUCT = 20
 MAX_COUNT_CATEGORIES = 7

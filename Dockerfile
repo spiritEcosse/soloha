@@ -1,27 +1,13 @@
-############################################################
-# Dockerfile to run a Django-based web application
-# Based on an Ubuntu Image
-############################################################
-
-# Set the base image to use to Ubuntu
-FROM ubuntu:14.04
-
-FROM python:3.5
-
-# Set the file maintainer (your name - the file's author)
-MAINTAINER Igor Shevchenko
-
-RUN apt-get update && apt-get -y upgrade
-RUN apt-get install -y python python-pip
+FROM debian:8.5
 
 RUN mkdir /code
+
+RUN apt-get update
+RUN apt-get install -y libpq-dev python3 python3-dev python3-setuptools python3-pip libevent-dev python-psycopg2
+
+RUN easy_install3 pip
+
 WORKDIR /code
-
-COPY requirements.txt /code
+COPY requirements.txt .
 RUN pip install -r requirements.txt
-COPY . /code
-
-#COPY ./docker-entrypoint.sh /
-#ENTRYPOINT ["/docker-entrypoint.sh"]
-
-
+COPY . .

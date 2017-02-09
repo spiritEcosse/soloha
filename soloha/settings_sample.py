@@ -12,10 +12,22 @@ EMAIL_USE_TLS = True
 DEBUG = True
 THUMBNAIL_DEBUG = DEBUG
 
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://redis:6379/1",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    }
+}
+
+SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
+
 HAYSTACK_CONNECTIONS = {
     'default': {
         'ENGINE': 'haystack.backends.solr_backend.SolrEngine',
-        'URL': 'http://127.0.0.1:8983/solr/{}'.format(PROJECT_DIR),
+        'URL': 'http://solr:8983/solr',
         'EXCLUDED_INDEXES': ['apps.catalogue.search_indexes.ProductIndex'],
     },
 }
@@ -28,13 +40,6 @@ STATICFILES_DIRS = (
     FOLDER_STATIC,
 )
 
-CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
-        'LOCATION': PROJECT_DIR,
-    }
-}
-
 DEBUG_TOOLBAR_CONFIG = {
     'RENDER_PANELS': DEBUG,
     'JQUERY_URL': os.path.join(STATIC_URL, 'bower_components/jquery/dist/jquery.min.js'),
@@ -45,7 +50,7 @@ CACHE_MIDDLEWARE_KEY_PREFIX = PROJECT_DIR
 KEY_PREFIX = CACHE_MIDDLEWARE_KEY_PREFIX
 
 MIDDLEWARE_CLASSES = (
-    # 'django.middleware.cache.UpdateCacheMiddleware',
+    'django.middleware.cache.UpdateCacheMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.gzip.GZipMiddleware',
@@ -60,19 +65,18 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.locale.LocaleMiddleware',
     'apps.basket.middleware.BasketMiddleware',
     'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware',
-    # 'django.middleware.cache.FetchFromCacheMiddleware',
+    'django.middleware.cache.FetchFromCacheMiddleware',
 )
 
 ALLOWED_HOSTS = ['*']
 
-DB_BACKEND = 'django.db.backends.postgresql_psycopg2'
-DB_ATOMIC_REQUESTS = True
-
-if sys.version_info[0] == 3:
-    DB_NAME, DB_USER = ('postgres', ) * 2
-    DB_HOST = 'db'
-    DB_PORT = 5432
-else:
-    DB_NAME, DB_USER, DB_PASSWORD = (PROJECT_DIR, ) * 3
-    DB_HOST = 'localhost'
-    DB_PORT = ''
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'postgres',
+        'USER': 'postgres',
+        'HOST': 'db',
+        'PORT': 5432,
+        'ATOMIC_REQUESTS': True,
+    }
+}

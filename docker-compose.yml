@@ -3,33 +3,41 @@ services:
   db:
     image: postgres
 
-  redis:
-    image: redis
-
   web:
     restart: always
     build: .
+    command: ${HOME_DIR}/prepare.sh
+    volumes:
+      - .:${HOME_DIR}
     expose:
-      - "8000"
+      - "8050"
     links:
       - db
       - redis
-    volumes:
-      - .:/code
-      - .:/code/static
-    depends_on:
-      - db
-#    command: /usr/local/bin/gunicorn soloha.wsgi:application -w 3 -b :8000
-    command: bash -c "python manage.py makemigrations && python manage.py migrate && gunicorn mydjango.wsgi -b 0.0.0.0:8000"
+      - solr
+#      - node
 
   nginx:
     restart: always
-    build: ./nginx/
+    build: ./config/nginx
     ports:
-      - "80:80"
-    volumes:
-      - /www/static
+      - "8050:8050"
     volumes_from:
       - web
-    links:
-      - web:web
+    depends_on:
+      - web
+
+  redis:
+    image: redis
+    ports:
+      - "6379:6379"
+
+  solr:
+    image: cpilsworth/solr
+    ports:
+      - "8983"
+
+#  node:
+#    build: ./config/node
+#    volumes:
+#      - .:${HOME_DIR}
