@@ -112,7 +112,7 @@ class ProductForm(forms.ModelForm):
 class SortFeatureInCategoryForm(forms.ModelForm):
     class Meta:
         fields = '__all__'
-        model = SortFeatureInCategory
+        model = catalogue_models.SortFeatureInCategory
         widgets = {
             'feature': autocomplete.ModelSelect2(url='feature-autocomplete'),
             'category': autocomplete.ModelSelect2(url='categories-autocomplete'),

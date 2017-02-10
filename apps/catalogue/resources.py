@@ -372,3 +372,19 @@ class ProductResource(ModelResource):
                   'meta_description', 'meta_keywords', 'categories_slug', 'filters_slug', 'characteristics_slug',
                   'product_class', )
         export_order = fields
+
+
+class SortFeatureInCategoryResource(ModelResource):
+    feature = fields.Field(
+        attribute='feature', column_name='feature',
+        widget=widgets_catalogue.ForeignKeyWidget(model=catalogue_models.Feature, field='slug')
+    )
+    category = fields.Field(
+        attribute='category', column_name='category',
+        widget=widgets_catalogue.ForeignKeyWidget(model=catalogue_models.Category, field='slug')
+    )
+
+    class Meta:
+        model = catalogue_models.SortFeatureInCategory
+        fields = ('id', 'delete', 'sort',  'feature', 'category', )
+        export_order = fields
