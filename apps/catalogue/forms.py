@@ -108,3 +108,12 @@ class ProductForm(forms.ModelForm):
         characteristics.extend(self.cleaned_data['filters'])
         self.cleaned_data['characteristics'] = characteristics
         return self.cleaned_data
+
+class SortFeatureInCategoryForm(forms.ModelForm):
+    class Meta:
+        fields = '__all__'
+        model = SortFeatureInCategory
+        widgets = {
+            'feature': autocomplete.ModelSelect2(url='feature-autocomplete'),
+            'category': autocomplete.ModelSelect2(url='categories-autocomplete'),
+        }
