@@ -116,3 +116,4 @@ fabric.properties
 Будет удалено data/
 Будет удалено static_root/
 *.log*
+solr.xml
