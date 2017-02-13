@@ -1,14 +1,18 @@
-version: '2'
+version: '3.0'
+
 services:
   db:
     image: postgres
 
   web:
+    build:
+      context: .
+      args:
+        WORK_DIR: $WORK_DIR
     restart: always
-    build: .
-    command: ${HOME_DIR}/prepare.sh
+    command: $WORK_DIR/prepare.sh
     volumes:
-      - .:${HOME_DIR}
+      - .:$WORK_DIR
     expose:
       - "8050"
     links:
@@ -21,16 +25,16 @@ services:
     restart: always
     build: ./config/nginx
     ports:
-      - "8050:8050"
-    volumes_from:
-      - web
+      - "805:8050"
+    volumes:
+      - .:$WORK_DIR
     depends_on:
       - web
 
   redis:
     image: redis
     ports:
-      - "6379:6379"
+      - "6379"
 
   solr:
     image: cpilsworth/solr
@@ -40,4 +44,4 @@ services:
 #  node:
 #    build: ./config/node
 #    volumes:
-#      - .:${HOME_DIR}
+#      - .:$WORK_DIR
