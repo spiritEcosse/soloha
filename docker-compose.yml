@@ -1,4 +1,4 @@
-version: '3.0'
+version: '2'
 
 services:
   db:
@@ -15,8 +15,9 @@ services:
       - .:$WORK_DIR
     expose:
       - "8050"
-    links:
+    depends_on:
       - db
+    links:
       - redis
       - solr
 #      - node
@@ -25,7 +26,7 @@ services:
     restart: always
     build: ./config/nginx
     ports:
-      - "805:8050"
+      - "8050:8050"
     volumes:
       - .:$WORK_DIR
     depends_on:
@@ -38,8 +39,11 @@ services:
 
   solr:
     image: cpilsworth/solr
+    restart: always
     ports:
       - "8983"
+    volumes:
+      - ./$LOCAL_SOLR_SCHEMA:$SOLR_SCHEMA
 
 #  node:
 #    build: ./config/node

@@ -27,7 +27,7 @@ SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
 HAYSTACK_CONNECTIONS = {
     'default': {
         'ENGINE': 'haystack.backends.solr_backend.SolrEngine',
-        'URL': 'http://solr:8983/solr',
+        'URL': 'http://solr:8983/solr/collection1',
         'EXCLUDED_INDEXES': ['apps.catalogue.search_indexes.ProductIndex'],
     },
 }

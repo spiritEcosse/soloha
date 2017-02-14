@@ -120,6 +120,11 @@ docker_run: docker_restart_machine docker_compose_build docker_compose_up
 docker_shell:
 	docker exec -it soloha_web_1 bash
 
+docker_compose_kill_rm:
+	docker-compose kill web db
+	docker-compose rm web db
+	docker rmi soloha_web postgres
+
 
 
 post_compose_up:
