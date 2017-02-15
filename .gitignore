@@ -26,6 +26,7 @@ npm-debug.log
 *.DS_Store
 .python-version
 **/migrations/**
+!**/__init__.py
 
 # IDE files
 .project

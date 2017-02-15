@@ -102,12 +102,23 @@ test: run_test
 run_test:
 	detox
 
+dump: get_dump arhive
+get_dump:
+	ssh igor@91.240.87.113 ~/.virtualenvs/soloha/bin/python ~/web/www/soloha/./manage.py dumpdata --indent 4 --natural-primary --natural-foreign -e contenttypes -e auth.permission -e sessions -e admin > data/fixtures/all.json
+	scp igor@91.240.87.113:~/web/www/soloha/data/fixtures/all.json data/fixtures/
+arhive:
+	bzip2 -f data/fixtures/all.json
+download_dump:
+	scp igor@91.240.87.113:~/web/www/soloha/data/fixtures/all.json data/fixtures/
+
 
 
 docker_restart_machine:
 	docker-machine restart dev
 	docker-machine env dev
 	eval $(docker-machine env dev)
+
+docker_compose_up_hard: docker_compose_kill_rm docker_compose_up
 
 docker_compose_up: docker_compose_build
 	docker-compose up
@@ -120,10 +131,21 @@ docker_run: docker_restart_machine docker_compose_build docker_compose_up
 docker_shell:
 	docker exec -it soloha_web_1 bash
 
-docker_compose_kill_rm:
+docker_compose_kill_rm: clean
 	docker-compose kill web db
 	docker-compose rm web db
-	docker rmi soloha_web postgres
+	docker rmi -f soloha_web postgres
+
+clean:
+	# Remove files not in source control
+#	git clean -xf **/migrations/**
+	sudo find -path */migrations/* ! -name __init__.py -name '*.py' -exec rm -r "{}" \;
+	sudo find . -type f -name "*.pyc" -delete
+#	find . -path '*/__pycache__/*' -delete
+#	find . -type d -name '__pycache__' -empty -delete
+	rm -rf nosetests.xml coverage.xml htmlcov *.egg-info *.pdf dist violations.txt
+
+
 
 
 
@@ -238,11 +260,6 @@ css:
 	npm install
 	npm run build
 
-clean:
-	# Remove files not in source control
-	find . -type f -name "*.pyc" -delete
-	rm -rf nosetests.xml coverage.xml htmlcov *.egg-info *.pdf dist violations.txt
-
 preflight: lint
     # Bare minimum of tests to run before pushing to master
 	./runtests.py
@@ -261,7 +278,7 @@ release: clean
 	python setup.py sdist bdist_wheel
 	twine upload -s dist/*
 
-#./manage.py dumpdata --indent 4 --natural-primary --natural-foreign -e contenttypes -e auth.Permission -e sessions -e admin > data/fixtures/all.json
+#./manage.py dumpdata --indent 4 --natural-primary --natural-foreign -e contenttypes -e auth.permission -e sessions -e admin > data/fixtures/all.json
 #for tests :run in shell for webdriver.Firefox():export PATH=$PATH:/home/igor/web/
 # run all tests under all envs
 #$ tox
