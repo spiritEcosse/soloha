@@ -104,7 +104,7 @@ run_test:
 
 dump: get_dump arhive
 get_dump:
-	ssh igor@91.240.87.113 ~/.virtualenvs/soloha/bin/python ~/web/www/soloha/./manage.py dumpdata --indent 4 --natural-primary --natural-foreign -e contenttypes -e auth.permission -e sessions -e admin > data/fixtures/all.json
+	ssh igor@91.240.87.113 ~/.virtualenvs/soloha/bin/python ~/web/www/soloha/./manage.py dumpdata --indent 4 --natural-primary --natural-foreign -e contenttypes -e auth.permission -e sessions -e admin -e catalogue.productcategory > data/fixtures/all.json
 arhive:
 	bzip2 -f data/fixtures/all.json
 #download_dump:
@@ -117,7 +117,7 @@ docker_restart_machine:
 	docker-machine env dev
 	eval $(docker-machine env dev)
 
-docker_compose_up_hard: docker_compose_kill_rm docker_compose_up
+docker_compose_up_hard: docker_compose_kill_rm dump docker_compose_up
 
 docker_compose_up: docker_compose_build
 	docker-compose up
