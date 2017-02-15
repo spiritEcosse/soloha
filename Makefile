@@ -105,11 +105,10 @@ run_test:
 dump: get_dump arhive
 get_dump:
 	ssh igor@91.240.87.113 ~/.virtualenvs/soloha/bin/python ~/web/www/soloha/./manage.py dumpdata --indent 4 --natural-primary --natural-foreign -e contenttypes -e auth.permission -e sessions -e admin > data/fixtures/all.json
-	scp igor@91.240.87.113:~/web/www/soloha/data/fixtures/all.json data/fixtures/
 arhive:
 	bzip2 -f data/fixtures/all.json
-download_dump:
-	scp igor@91.240.87.113:~/web/www/soloha/data/fixtures/all.json data/fixtures/
+#download_dump:
+#	scp igor@91.240.87.113:~/web/www/soloha/data/fixtures/all.json data/fixtures/
 
 
 
