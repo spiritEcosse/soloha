@@ -18,11 +18,11 @@ module.exports = (grunt) ->
         cssmin:
             dist:
                 files:
-                    'static/build/css/style.min.css': ['static/bower_components/lightslider/dist/css/lightslider.css',
-                        'static/bower_components/yamm/assets/css/yamm.css',
+                    'static/build/css/style.min.css': ['bower_components/lightslider/dist/css/lightslider.css',
+                        'bower_components/yamm/assets/css/yamm.css',
                         "static/djangular/css/bootstrap3.css",
                         "static/djangular/css/styles.css",
-                        "static/bower_components/bootstrap-select/dist/css/bootstrap-select.min.css",
+                        "bower_components/bootstrap-select/dist/css/bootstrap-select.min.css",
                         'static/oscar/css/styles.css',
                         'static/src/css/**/*.css',
                     ],
@@ -33,19 +33,19 @@ module.exports = (grunt) ->
                     sourceMapName : 'static/build/js/sourceMap.map'
                     report: 'gzip'
                 files:
-                    'static/build/js/script.min.js': ["static/bower_components/jquery/dist/jquery.min.js",
-                    'static/bower_components/bootstrap/dist/js/bootstrap.min.js',
-                    'static/bower_components/angular/angular.js',
+                    'static/build/js/script.min.js': ["bower_components/jquery/dist/jquery.min.js",
+                    'bower_components/bootstrap/dist/js/bootstrap.min.js',
+                    'bower_components/angular/angular.js',
                     'static/djangular/js/django-angular.js',
-                    'static/bower_components/angular-resource/angular-resource.js',
-                    'static/bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js',
-                    'static/bower_components/angular-route/angular-route.min.js',
+                    'bower_components/angular-resource/angular-resource.js',
+                    'bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js',
+                    'bower_components/angular-route/angular-route.min.js',
                     'static/oscar/js/oscar/ui.js',
-                    'static/bower_components/lightslider/dist/js/lightslider.min.js',
-                    "static/bower_components/angular-animate/angular-animate.min.js",
-                    "static/bower_components/angular-scroll/angular-scroll.min.js",
+                    'bower_components/lightslider/dist/js/lightslider.min.js',
+                    "bower_components/angular-animate/angular-animate.min.js",
+                    "bower_components/angular-scroll/angular-scroll.min.js",
                     "static/src/js/**/*.js",
-                    "static/bower_components/blueimp-bootstrap-image-gallery/js/bootstrap-image-gallery.min.js",
+                    "bower_components/blueimp-bootstrap-image-gallery/js/bootstrap-image-gallery.min.js",
                     ]
         imagemin:
             dist:

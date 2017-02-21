@@ -17,10 +17,10 @@ services:
       - "8050"
     depends_on:
       - db
+      - node
     links:
       - redis
       - solr
-#      - node
 
   nginx:
     restart: always
@@ -45,7 +45,13 @@ services:
     volumes:
       - ./$LOCAL_SOLR_SCHEMA:$SOLR_SCHEMA
 
-#  node:
-#    build: ./config/node
-#    volumes:
-#      - .:$WORK_DIR
+  node:
+    build:
+      context: .
+      dockerfile: ./config/node/Dockerfile
+      args:
+        WORK_DIR: $WORK_DIR
+        STATIC_FOLDER: $STATIC_FOLDER
+    volumes:
+      - .:$WORK_DIR
+    command: $WORK_DIR/tasks_grunt.sh

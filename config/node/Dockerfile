@@ -1,8 +1,14 @@
 FROM node
-WORKDIR /code
+
+ARG WORK_DIR
+ARG STATIC_FOLDER
+WORKDIR $WORK_DIR
+
 COPY package.json .
-RUN npm install
 RUN npm install -g bower
-WORKDIR /code/static
-COPY static/bower.json .
-RUN bower install --allow-root
+RUN npm install -g grunt-cli
+
+COPY bower.json .
+
+COPY Gruntfile.coffee .
+COPY $STATIC_FOLDER .
