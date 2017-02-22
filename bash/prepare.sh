@@ -3,7 +3,7 @@
 #sleep 10s
 sleep 10s
 #. .env
-. .env
+. ../.env
 #./manage.py collectstatic --noinput
 ./manage.py collectstatic --noinput
 #./manage.py makemigrations

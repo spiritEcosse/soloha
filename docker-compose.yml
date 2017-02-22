@@ -10,7 +10,7 @@ services:
       args:
         WORK_DIR: $WORK_DIR
     restart: always
-    command: $WORK_DIR/prepare.sh
+    command: $WORK_DIR/bash/prepare.sh
     volumes:
       - .:$WORK_DIR
     expose:
@@ -24,7 +24,7 @@ services:
 
   nginx:
     restart: always
-    build: ./config/nginx
+    build: config/nginx
     ports:
       - "8050:8050"
     volumes:
@@ -48,10 +48,20 @@ services:
   node:
     build:
       context: .
-      dockerfile: ./config/node/Dockerfile
+      dockerfile: config/node/Dockerfile
       args:
         WORK_DIR: $WORK_DIR
         STATIC_FOLDER: $STATIC_FOLDER
     volumes:
       - .:$WORK_DIR
-    command: $WORK_DIR/tasks_grunt.sh
+    command: $WORK_DIR/bash/tasks_grunt.sh
+
+  tox:
+    build:
+      context: .
+      dockerfile: config/tox/Dockerfile
+      args:
+        WORK_DIR: $WORK_DIR
+    volumes:
+      - .:$WORK_DIR
+    command: $WORK_DIR/bash/prebuild_tox.sh
