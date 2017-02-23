@@ -117,7 +117,10 @@ docker_restart_machine:
 	docker-machine env dev
 	eval $(docker-machine env dev)
 
-docker_compose_up_hard: docker_compose_kill_rm dump docker_compose_up
+docker_compose_up_hard: docker_compose_stop_rm docker_compose_up
+
+docker_compose_up_flag_build:
+	docker-compose up --build
 
 docker_compose_up: docker_compose_build
 	docker-compose up
@@ -130,16 +133,16 @@ docker_run: docker_restart_machine docker_compose_build docker_compose_up
 docker_shell:
 	docker exec -it soloha_web_1 bash
 
-docker_compose_kill_rm: clean
-	docker-compose kill web db
-	docker-compose rm web db
-	docker rmi -f soloha_web postgres
+docker_compose_stop_rm: clean
+	docker-compose stop
+	docker-compose rm
 
 clean:
 	# Remove files not in source control
 #	git clean -xf **/migrations/**
-	sudo find -path */migrations/* ! -name __init__.py -name '*.py' -exec rm -r "{}" \;
+#	sudo find -path */migrations/* ! -name __init__.py -name '*.py' -exec rm -r "{}" \;
 	sudo find . -type f -name "*.pyc" -delete
+	sudo rm -fr node_modules/ bower_components/ && sudo rm -fr static/build/ && sudo rm -fr static_root/build/
 #	find . -path '*/__pycache__/*' -delete
 #	find . -type d -name '__pycache__' -empty -delete
 	rm -rf nosetests.xml coverage.xml htmlcov *.egg-info *.pdf dist violations.txt

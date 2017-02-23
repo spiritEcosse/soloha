@@ -57,11 +57,4 @@ services:
     command: $WORK_DIR/bash/tasks_grunt.sh
 
   tox:
-    build:
-      context: .
-      dockerfile: config/tox/Dockerfile
-      args:
-        WORK_DIR: $WORK_DIR
-    volumes:
-      - .:$WORK_DIR
-    command: $WORK_DIR/bash/prebuild_tox.sh
+    image: themattrix/tox
