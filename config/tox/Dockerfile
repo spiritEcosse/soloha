@@ -39,10 +39,9 @@ ONBUILD RUN pyenv local 3.6.0 && \
     pyenv local --unset && \
     pyenv rehash
 
-RUN 
-ARG WORK_DIR
-RUN mkdir $WORK_DIR
-WORKDIR $WORK_DIR
+ONBUILD ARG WORK_DIR
+ONBUILD RUN mkdir $WORK_DIR
+ONBUILD WORKDIR $WORK_DIR
 
 ONBUILD COPY bash_scripts $WORK_DIR
 ONBUILD COPY requirements.txt tox.ini $WORK_DIR/
