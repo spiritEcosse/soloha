@@ -64,7 +64,7 @@ services:
   tox:
     build:
       context: .
+      dockerfile: config/tox/Dockerfile
       args:
         WORK_DIR: $WORK_DIR
-      dockerfile: config/tox/Dockerfile
     command: $WORK_DIR/$PREBUILD_TOX
