@@ -39,11 +39,15 @@ ONBUILD RUN pyenv local 3.6.0 && \
     pyenv local --unset && \
     pyenv rehash
 
-ONBUILD ARG WORK_DIR
-ONBUILD RUN mkdir $WORK_DIR
-ONBUILD WORKDIR $WORK_DIR
+ARG WORK_DIR
+USER spirit
+CMD mkdir $WORK_DIR
+WORKDIR $WORK_DIR
 
-ONBUILD COPY bash_scripts $WORK_DIR
-ONBUILD COPY requirements.txt tox.ini $WORK_DIR/
-ONBUILD ARG SKIP_TOX=false
-ONBUILD ARG BUILD=true
+#COPY bash_scripts $WORK_DIR
+#COPY requirements.txt tox.ini $WORK_DIR/
+#CMD chown spirit:spirit -R $WORK_DIR
+
+ARG SKIP_TOX=false
+ARG BUILD=true
+

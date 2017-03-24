@@ -67,4 +67,4 @@ services:
       dockerfile: config/tox/Dockerfile
       args:
         WORK_DIR: $WORK_DIR
-    command: $WORK_DIR/$PREBUILD_TOX
+#    command: $WORK_DIR/$PREBUILD_TOX
